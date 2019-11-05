@@ -39,7 +39,7 @@ jobs:
 
       - save_cache:
           paths:
-             -/sample_management_system
+             - ./venv
      
           key: v1-dependencies-{{ checksum "requirements.txt" }}
 
