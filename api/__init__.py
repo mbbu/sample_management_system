@@ -28,9 +28,10 @@ def file_logging(app_instance):
 # noinspection PyTypeChecker
 def register_resources(app):
     # TODO: import resources here
+    from api.resources.hello_world_resource import HelloWorldResource
 
     api = Api(app)
-
+    api.add_resource(HelloWorldResource, '/welcome')
     # TODO: register resources here
 
 
@@ -73,6 +74,6 @@ def create_app(test_config=None):
 
     @app.route('/')
     def index():
-        return 'Hello World!'
+        return 'Hello, Welcome to MBBU Sample Management System!'
 
     return app
