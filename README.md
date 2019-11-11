@@ -13,9 +13,11 @@ This is a web based application that interfaces samples available at ICIPE and a
  ~> Using python3; 
     >> python3 -m venv <<name_of_virtual_environment>>
 
- ~> Using python2 install [virtualenv tool](https://pypi.org/project/virtualenv/1.7.1.2/)
+ ~> Using python2 install virtualenv tool (https://pypi.org/project/virtualenv/1.7.1.2/)
     >> virtualenv <<name_of_virtual_environment>>
 ```
+
+> [virtualenv tool](https://pypi.org/project/virtualenv/1.7.1.2/)
 
 ***3.Install the requirements***
 ```
