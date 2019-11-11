@@ -7,6 +7,7 @@ from flask import Flask
 from flask_restful import Api
 
 from api.constants import APP_CONFIG_ENV_VAR, DEV_CONFIG_VAR, PROD_CONFIG_VAR, APP_NAME
+from api.models.database import BaseModel
 
 
 def get_config_type():
@@ -71,6 +72,9 @@ def create_app(test_config=None):
         pass
 
     register_resources(app)
+
+    # Database and Migrations setup
+    db = BaseModel.init_app(app)
 
     @app.route('/')
     def index():
