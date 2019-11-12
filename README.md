@@ -19,7 +19,7 @@ This is a web based application that interfaces samples available at ICIPE and a
 
 > [virtualenv tool](https://pypi.org/project/virtualenv/1.7.1.2/)
 
-***3.Install the requirements***
+***3.Install the requirements*** (Ensure you are on the develop branch)
 ```
     >> pip install -r requirements.txt
 ```
