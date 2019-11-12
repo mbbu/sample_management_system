@@ -45,4 +45,9 @@ This is a web based application that interfaces samples available at ICIPE and a
  >> curl --url http://127.0.0.1:5000/welcome
 ```
 
+---
+***Adding new requirements to requirements.txt file***
+```
+ >> pip freeze | grep -v "pkg-resources" > requirements.txt
+```
 :+1:
