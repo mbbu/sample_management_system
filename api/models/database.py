@@ -14,6 +14,7 @@ class BaseModel(object):
     def migrate_db(app, db):
         # ToDo imports of models to be placed here
         from api.models.role import Role
+        from api.models.user import User
         Migrate(app, db)
 
     @staticmethod
