@@ -9,4 +9,4 @@ class Role(BaseModel.db.Model):
     description = AppDb.Column(AppDb.String(255), nullable=True)
 
     # todo: relationships defined here
-    user = AppDb.relationship('User', backref='role', lazy='dymanic')
+    user = AppDb.relationship('User', backref='role', lazy='dynamic')
