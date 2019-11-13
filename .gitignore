@@ -102,3 +102,10 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# IDEA generated files
+.idea/
+.vscode/
+
+# bash scripts
+*.sh
