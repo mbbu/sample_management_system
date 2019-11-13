@@ -15,6 +15,7 @@ class BaseModel(object):
         # ToDo imports of models to be placed here
         from api.models.role import Role
         from api.models.user import User
+        from api.models.sample import Sample
         Migrate(app, db)
 
     @staticmethod

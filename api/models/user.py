@@ -13,11 +13,11 @@ class User (UserMixin, BaseModel.db.Model):
     password_hash = AppDb.Column(AppDb.String(128))
     firstname = AppDb.Column(AppDb.String(65), nullable = False)
     lastname = AppDb.Column(AppDb.String(65), nullable = False)
-    #samples = AppDb.relationship('Sample', backref='', lazy='dynamic')
+    sample = AppDb.relationship('Sample', backref='sampleOwner', lazy='dynamic')
 
 
     def __repr__():
-        return '<User {}>'.format(self.firstname, self.lastname)
+        return '<User {}>'.format(self.firstname, self.lastname, self.role_id)
 
     def set_password (self, password) :
         self.password_hash = generate_password_hash(password) 

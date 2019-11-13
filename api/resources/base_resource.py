@@ -5,5 +5,5 @@ from flask_restful.representations.json import output_json
 class BaseResource(Resource):
 
     @staticmethod
-    def send_json_message(message, code: int):
+    def send_json_message(message, code):
         return output_json({"message": message}, code)
