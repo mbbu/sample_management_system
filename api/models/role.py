@@ -7,3 +7,4 @@ class Role(BaseModel.db.Model):
     code = AppDb.Column(AppDb.String(20), nullable=False, unique=True, index=True)
     name = AppDb.Column(AppDb.String(50), nullable=False)
     description = AppDb.Column(AppDb.String(255), nullable=True)
+    user = AppDb.relationship('User', backref='role', lazy='dymanic')
