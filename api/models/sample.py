@@ -19,7 +19,8 @@ class Sample(BaseModel.db.Model):
     amount = AppDb.Column(AppDb.Integer, nullable=False)  # todo set a default value
 
     # relationships
-    boxhasSample = AppDb.relationship('Box', backref='box_sample', lazy=True)
+    boxHasSample = AppDb.relationship('Box', backref='box_sample', lazy=True)
+    sampleHasPublication = AppDb.relationship('Publication', backref='publication_sample', lazy='dynamic')
 
     def __repr__(self):
         return '<Sample {}>'.format(self.box_id, self.animal_species, self.sample_type,

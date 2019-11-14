@@ -22,6 +22,7 @@ class BaseModel(object):
         from api.models.chamber import Chamber
         from api.models.freezer import Freezer
         from api.models.laboratory import Laboratory
+        from api.models.publication import  Publication
         Migrate(app, db)
         return [
             Role, User, Sample,
