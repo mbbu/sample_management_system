@@ -62,18 +62,18 @@ def upgrade():
     op.add_column(u'sample', sa.Column('retention_period', sa.Integer(), nullable=True))
     op.create_foreign_key(None, 'sample', 'box', ['box_id'], ['id'])
     op.drop_column(u'sample', 'retension_period')
-    op.add_column(u'users', sa.Column('first_name', sa.String(length=65), nullable=False))
-    op.add_column(u'users', sa.Column('last_name', sa.String(length=65), nullable=False))
-    op.add_column(u'users', sa.Column('password', sa.String(length=128), nullable=False))
-    op.alter_column(u'users', 'email',
-               existing_type=sa.VARCHAR(length=65),
-               nullable=False)
-    op.alter_column(u'users', 'role_id',
-               existing_type=sa.INTEGER(),
-               nullable=False)
-    op.drop_column(u'users', 'lastname')
-    op.drop_column(u'users', 'firstname')
-    op.drop_column(u'users', 'password_hash')
+    # op.add_column(u'users', sa.Column('first_name', sa.String(length=65), nullable=False))
+    # op.add_column(u'users', sa.Column('last_name', sa.String(length=65), nullable=False))
+    # op.alter_column(u'users', sa.Column('password', sa.String(length=128), nullable=False))
+    # op.alter_column(u'users', 'email',
+    #            existing_type=sa.VARCHAR(length=65),
+    #            nullable=False)
+    # op.alter_column(u'users', 'role_id',
+    #            existing_type=sa.INTEGER(),
+    #            nullable=False)
+    # op.drop_column(u'users', 'lastname')
+    # op.drop_column(u'users', 'firstname')
+    # op.drop_column(u'users', 'password_hash')
     # ### end Alembic commands ###
 
 
