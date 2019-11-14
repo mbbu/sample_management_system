@@ -20,6 +20,7 @@ class Sample(BaseModel.db.Model):
 
     # relationships
     boxhasSample = AppDb.relationship('Box', backref='box_sample', lazy='dynamic')
+    samplehaspublication = AppDb.relationship('Publication', backref='publication_sample', lazy='dynamic')
 
     def __repr__(self):
         return '<Sample {}>'.format(self.box_id, self.animal_species, self.sample_type,
