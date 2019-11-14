@@ -7,12 +7,12 @@ class Publication(BaseModel.db.Model):
     sample_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('sample.id'))
     user_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('users.id'))
     sample_results = AppDb.Column(AppDb.String(150), nullable=False)
-    title = AppDb.Column(AppDb.String(150), nullable=True)
+    publication_title = AppDb.Column(AppDb.String(150), nullable=True)
     co_authors = AppDb.Column(AppDb.String(150), nullable=True)
 
-    # todo: relationships defined here
-    userhaspublication = AppDb.relationship('User', backref='publication', lazy='dynamic')
+    # # todo: relationships defined here
+    # userhaspublication = AppDb.relationship('User', backref='publication', lazy='dynamic')
 
     def __repr__(self):
-        return '<Publication {}>'.format(self.sample_id, self.user_id, self.sample_results, self.title,
+        return '<Publication {}>'.format(self.sample_id, self.user_id, self.sample_results, self.publication_title,
                                          self.co_authors)

@@ -18,13 +18,16 @@ class Sample(BaseModel.db.Model):
     temperature = AppDb.Column(AppDb.DECIMAL(5, 2), nullable=False)  # Default = Celsius
     amount = AppDb.Column(AppDb.Integer, nullable=False)  # todo set a default value
 
-    # relationships
-    boxHasSample = AppDb.relationship('Box', backref='box_sample', lazy=True)
-    sampleHasPublication = AppDb.relationship('Publication', backref='publication_sample', lazy='dynamic')
+    # relationship(s)
+    box = AppDb.relationship('Box', backref='sample', lazy=True)
+    publication = AppDb.relationship('Publication', backref='sample', lazy=True)
 
     def __repr__(self):
-        return '<Sample {}>'.format(self.box_id, self.animal_species, self.sample_type,
-                                    self.sample_description, self.location_collected,
-                                    self.project, self.project_owner, self.retention_period,
-                                    self.barcode, self.analysis,
-                                    self.temperature, self.amount)
+        return '<< Sample: (type={0} || desc={1} || project={2} || barcode={3} || species={4} ||' \
+               'box={5} || retention={6} || amount={7}) >>' \
+            .format(self.sample_type, self.sample_description,
+                    self.project, self.barcode, self.animal_species,
+                    self.box_id, self.retention_period, self.amount,
+                    # not represented
+                    self.location_collected, self.project_owner,
+                    self.analysis, self.temperature)

@@ -7,8 +7,8 @@ class Chamber(BaseModel.db.Model):
     freezer_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('freezer.id'))
     type = AppDb.Column(AppDb.String(50), nullable=False)
 
-    # relationships
-    chamberinrack = AppDb.relationship('Rack', backref='chamber', lazy='dynamic')
+    # relationship(s)
+    freezer = AppDb.relationship('Freezer', backref='chamber', lazy=True)
 
     def __repr__(self):
-        return '<Chamber {}>'.format(self.freezer_id, self.type)
+        return '<< Chamber:  (type={0} || freezer={1}) >>'.format(self.type, self.freezer_id)

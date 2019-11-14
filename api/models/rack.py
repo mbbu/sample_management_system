@@ -8,7 +8,7 @@ class Rack(BaseModel.db.Model):
     number = AppDb.Column(AppDb.Integer, nullable=False)
 
     # relationships
-    rackintray = AppDb.relationship('Tray', backref='rack', lazy='dynamic')
+    chamber = AppDb.relationship('Chamber', backref='rack', lazy=True)
 
     def __repr__(self):
-        return '<Rack {}>'.format(self.chamber_id, self.number)
+        return '<< Rack: (number={0} || chamber={1} ) >>'.format(self.number, self.chamber_id)

@@ -7,8 +7,8 @@ class Box(BaseModel.db.Model):
     tray_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('tray.id'))
     label = AppDb.Column(AppDb.String(65), nullable=False)
 
-    # relationships
-    sampleinbox = AppDb.relationship('Sample', backref='box', lazy='dynamic')
+    # relationship(s)
+    tray = AppDb.relationship('Tray', backref='box', lazy=True)
 
     def __repr__(self):
-        return '<Box {}>'.format(self.label, self.tray_id)
+        return '<< Box: (label={0} || tray={1}) >>'.format(self.label, self.tray_id)

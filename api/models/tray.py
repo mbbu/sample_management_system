@@ -7,8 +7,8 @@ class Tray(BaseModel.db.Model):
     rack_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('rack.id'))
     number = AppDb.Column(AppDb.Integer, nullable=False)  # todo: should be unique?
 
-    # relationships
-    boxintray = AppDb.relationship('Box', backref='tray', lazy='dynamic')
+    # relationship(s)
+    rack = AppDb.relationship('Rack', backref='tray', lazy=True)
 
     def __repr__(self):
-        return '<Tray {}>'.format(self.rack_id, self.number)
+        return '<< Tray: (number={0} || rack={1}) >>'.format(self.number, self.rack_id)

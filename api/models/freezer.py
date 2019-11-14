@@ -8,8 +8,9 @@ class Freezer(BaseModel.db.Model):
     freezer = AppDb.Column(AppDb.Integer, nullable=False)  # todo change freezer to number
     room = AppDb.Column(AppDb.String(65), nullable=False)
 
-    # todo: relationships defined here
-    chamberinfreezer = AppDb.relationship('Chamber', backref='freezer', lazy='dynamic')
+    # relationship(s)
+    lab = AppDb.relationship('Laboratory', backref='freezer', lazy=True)
 
     def __repr__(self):
-        return '<Freezer {}>'.format(self.laboratory_id, self.freezer, self.room)
+        return '<< Freezer: (number={0} || room={1} || lab={2}) >>'\
+            .format(self.freezer, self.room, self.laboratory_id)
