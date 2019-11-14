@@ -23,6 +23,11 @@ class BaseModel(object):
         from api.models.freezer import Freezer
         from api.models.laboratory import Laboratory
         Migrate(app, db)
+        return [
+            Role, User, Sample,
+            Box, Tray, Rack,
+            Chamber, Freezer, Laboratory
+        ]
 
     @staticmethod
     def init_app(app):

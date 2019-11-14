@@ -16,10 +16,10 @@ class Sample(BaseModel.db.Model):
     barcode = AppDb.Column(AppDb.String(100), nullable=True)  # todo: changed to not nullable when module is done
     analysis = AppDb.Column(AppDb.String(100), nullable=True)
     temperature = AppDb.Column(AppDb.DECIMAL(5, 2), nullable=False)  # Default = Celsius
-    amount = AppDb.Column(AppDb.Integer, nullable=False)
+    amount = AppDb.Column(AppDb.Integer, nullable=False)  # todo set a default value
 
     # relationships
-    boxhasSample = AppDb.relationship('Box', backref='box_sample', lazy='dynamic')
+    boxhasSample = AppDb.relationship('Box', backref='box_sample', lazy=True)
 
     def __repr__(self):
         return '<Sample {}>'.format(self.box_id, self.animal_species, self.sample_type,
