@@ -1,14 +1,16 @@
 import logging
-from logging.handlers import RotatingFileHandler
-
 import os
+from logging.handlers import RotatingFileHandler
+from logging.handlers import SMTPHandler
 
 from flask import Flask
-from flask_restful import Api
 from flask_login import LoginManager
+from flask_restful import Api
 
 from api.constants import APP_CONFIG_ENV_VAR, DEV_CONFIG_VAR, PROD_CONFIG_VAR, APP_NAME
 from api.models.database import BaseModel
+
+from api.config import BaseConfig
 
 
 def get_config_type():
@@ -30,6 +32,31 @@ def file_logging(app_instance):
     app_instance.logger.info(APP_NAME)
 
 
+def mail_admin(app):
+    print(BaseConfig.MAIL_SERVER)
+    if BaseConfig.MAIL_SERVER:
+        auth = None
+        if BaseConfig.MAIL_USERNAME or BaseConfig.MAIL_PASSWORD:
+            auth = (BaseConfig.MAIL_USERNAME, BaseConfig.MAIL_PASSWORD)
+
+        secure = None
+        if BaseConfig.MAIL_USE_TLS:
+            secure = ()
+
+        mail_handler = SMTPHandler(
+            mailhost=(BaseConfig.MAIL_SERVER, BaseConfig.MAIL_PORT),
+            fromaddr='no-reply@' + BaseConfig.MAIL_SERVER,
+            toaddrs=BaseConfig.ADMINS,
+            subject='Sample Management System Failure',
+            credentials=auth,
+            secure=secure
+        )
+
+        mail_handler.setLevel(logging.ERROR)
+        app.logger.addHandler(mail_handler)
+    pass
+
+
 # noinspection PyTypeChecker
 def register_resources(app):
     # TODO: import resources here
@@ -43,6 +70,7 @@ def register_resources(app):
 def config_app(app_instance):
     config_type = get_config_type()
     file_logging(app_instance)
+    # mail_admin(app_instance) todo: uncomment when app is in production
 
     # possible configurations as a dictionary
     configs = {
