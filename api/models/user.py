@@ -13,11 +13,12 @@ class User(UserMixin, BaseModel.db.Model):
     password = AppDb.Column(AppDb.String(128), nullable=False)
     role_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('role.id'), nullable=False)
 
-    # todo: relationships defined here
-    sample = AppDb.relationship('Sample', backref='sampleOwner', lazy='dynamic')
+    # relationship(s)
+    sample_owner = AppDb.relationship('Sample', backref='owner', lazy='dynamic')
+    publication_owner = AppDb.relationship('Publication', backref='author', lazy='dynamic')
     
     def __repr__(self):
-        return '<User name={0}, email={1}>'.format(self.first_name, self.email)
+        return '<< User: (name={0} || email={1}) >>'.format(self.first_name, self.email)
 
     @staticmethod
     def hash_password(password):

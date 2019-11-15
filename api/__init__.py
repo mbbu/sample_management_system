@@ -76,6 +76,13 @@ def create_app(test_config=None):
     # Database and Migrations setup
     db = BaseModel.init_app(app)
 
+    @app.shell_context_processor
+    def make_shell_processor():
+        return {
+            'db': BaseModel.init_db(app),
+            'models': BaseModel.migrate_db(app, db)
+        }
+
     @app.route('/')
     def index():
         return 'Hello, Welcome to MBBU Sample Management System!'

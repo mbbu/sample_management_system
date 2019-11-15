@@ -8,5 +8,5 @@ class Role(BaseModel.db.Model):
     name = AppDb.Column(AppDb.String(50), nullable=False)
     description = AppDb.Column(AppDb.String(255), nullable=True)
 
-    # todo: relationships defined here
+    # relationship(s) defined here
     user = AppDb.relationship('User', backref='role', lazy='dynamic')
