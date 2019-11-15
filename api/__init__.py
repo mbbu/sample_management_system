@@ -3,14 +3,14 @@ import os
 from logging.handlers import RotatingFileHandler
 from logging.handlers import SMTPHandler
 
-from flask import Flask
+from flask import Flask, render_template
 from flask_login import LoginManager
 from flask_restful import Api
 
 from api.constants import APP_CONFIG_ENV_VAR, DEV_CONFIG_VAR, PROD_CONFIG_VAR, APP_NAME
 from api.models.database import BaseModel
-
 from api.config import BaseConfig
+from api.resources.base_resource import BaseResource
 
 
 def get_config_type():
@@ -33,7 +33,6 @@ def file_logging(app_instance):
 
 
 def mail_admin(app):
-    print(BaseConfig.MAIL_SERVER)
     if BaseConfig.MAIL_SERVER:
         auth = None
         if BaseConfig.MAIL_USERNAME or BaseConfig.MAIL_PASSWORD:
@@ -125,8 +124,22 @@ def create_app(test_config=None):
 
     @app.route('/')
     def index():
-        app.logger.info('Welcome Page Accessed!By {0}')
+        from flask_login import current_user
+        app.logger.info('Welcome Page Accessed!By {0}'.format(current_user))
         return 'Hello, Welcome to MBBU Sample Management System!'
+
+    @app.errorhandler(404)
+    def not_found_error(error):
+        app.logger.info(error)
+        return BaseResource.send_json_message('Sorry we couldn\'t find what you were looking for.', 404)
+
+    @app.errorhandler(500)
+    def internal_error(error):
+        BaseModel.init_db(app).session.rollback()
+        app.logger.error(error)
+        return BaseResource.send_json_message('An unexpected error occurred!'
+                                              ' But stay put the administrator has been notified. '
+                                              'Sorry for the inconvenience!', 500)
 
     return app
 
