@@ -3,7 +3,8 @@ import os
 from logging.handlers import RotatingFileHandler
 from logging.handlers import SMTPHandler
 
-from flask import Flask, render_template
+from flask import Flask, render_template, has_request_context, request
+from flask.logging import default_handler
 from flask_login import LoginManager
 from flask_restful import Api
 
@@ -17,13 +18,25 @@ def get_config_type():
     return os.environ.get(APP_CONFIG_ENV_VAR, PROD_CONFIG_VAR).lower().strip()
 
 
+class RequestFormatter(logging.Formatter):
+    def format(self, record):
+        if has_request_context():
+            record.url = request.url
+            record.remote_addr = request.remote_addr
+        else:
+            record.url = None
+            record.remote_addr = None
+        return super().format(record)
+
+
 def file_logging(app_instance):
     if not os.path.exists('logs'):
         os.mkdir('logs')
 
     handler = RotatingFileHandler('logs/' + APP_NAME + ".log")
-    handler.setFormatter(logging.Formatter(
-        '%(asctime)s [%(levelname)s]: %(message)s [in %(pathname)s:%(lineno)d]'
+    handler.setFormatter(RequestFormatter(
+        '[%(asctime)s] Remote Address:%(remote_addr)s requested %(url)s\n'
+        ' [%(levelname)s]: %(message)s [in %(pathname)s::%(lineno)d]\n'
     ))
     handler.setLevel(logging.DEBUG)
 
@@ -50,7 +63,10 @@ def mail_admin(app):
             credentials=auth,
             secure=secure
         )
-
+        mail_handler.setFormatter(RequestFormatter(
+            '%(asctime)s %(remote_addr)s requested %(url)s\n'
+            ' [%(levelname)s]: %(message)s [in %(pathname)s:%(lineno)d]'
+        ))
         mail_handler.setLevel(logging.ERROR)
         app.logger.addHandler(mail_handler)
     pass
@@ -125,7 +141,7 @@ def create_app(test_config=None):
     @app.route('/')
     def index():
         from flask_login import current_user
-        app.logger.info('Welcome Page Accessed!By {0}'.format(current_user))
+        app.logger.info('Welcome Page Accessed!By {0}')
         return 'Hello, Welcome to MBBU Sample Management System!'
 
     @app.errorhandler(404)
