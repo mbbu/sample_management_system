@@ -76,9 +76,11 @@ def mail_admin(app):
 def register_resources(app):
     # TODO: import resources here
     from api.resources.hello_world_resource import HelloWorldResource
+    from api.resources.theme_resource import ThemeResource
 
     api = Api(app)
     api.add_resource(HelloWorldResource, '/welcome')
+    api.add_resource(ThemeResource, '/theme')
     # TODO: register resources here
 
 
