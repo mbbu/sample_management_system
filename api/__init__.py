@@ -2,13 +2,12 @@ import logging
 import os
 from logging.handlers import RotatingFileHandler
 from logging.handlers import SMTPHandler
-
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 from flask_login import LoginManager
 from flask_restful import Api
-
 from api.constants import APP_CONFIG_ENV_VAR, DEV_CONFIG_VAR, PROD_CONFIG_VAR, APP_NAME
 from api.models.database import BaseModel
+from api.models.sample import Sample
 from api.config import BaseConfig
 from api.resources.base_resource import BaseResource
 
@@ -127,6 +126,12 @@ def create_app(test_config=None):
         from flask_login import current_user
         app.logger.info('Welcome Page Accessed!By {0}'.format(current_user))
         return 'Hello, Welcome to MBBU Sample Management System!'
+
+    @app.route('/api/sample', methods=['GET'])
+    def sample():
+        sample = Sample.query.all()
+        return jsonify({'sample' : sample})
+        
 
     @app.errorhandler(404)
     def not_found_error(error):

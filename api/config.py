@@ -1,5 +1,4 @@
 import os
-
 from api.constants import APP_NAME, DATABASE_URI_ENV_NAME
 
 
