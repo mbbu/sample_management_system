@@ -9,6 +9,7 @@ class Chamber(BaseModel.db.Model):
 
     # relationship(s)
     freezer = AppDb.relationship('Freezer', backref='chamber', lazy=True)
+    #rack = AppDb.relationship('Rack', backref='chamber', lazy=True)
 
     def __repr__(self):
         return '<< Chamber:  (type={0} || freezer={1}) >>'.format(self.type, self.freezer_id)

@@ -10,6 +10,7 @@ class Freezer(BaseModel.db.Model):
 
     # relationship(s)
     lab = AppDb.relationship('Laboratory', backref='freezer', lazy=True)
+    #chamber = AppDb.relationship('Chamber', backref='freezer', lazy=True)
 
     def __repr__(self):
         return '<< Freezer: (number={0} || room={1} || lab={2}) >>'\

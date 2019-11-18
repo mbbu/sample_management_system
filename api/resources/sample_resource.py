@@ -6,4 +6,4 @@ from api.models.sample import Sample
 class Sample_Resource (Resource):
     def get(self):
         samples = Sample.query.all()
-        return jsonify({'sample' : sample})
+        return jsonify({'samples' : samples})

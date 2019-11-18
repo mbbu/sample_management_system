@@ -15,7 +15,7 @@ class User(UserMixin, BaseModel.db.Model):
 
     # relationship(s)
     sample_owner = AppDb.relationship('Sample', backref='owner', lazy='dynamic')
-    publication_owner = AppDb.relationship('Publication', backref='author', lazy='dynamic')
+    publication = AppDb.relationship('Publication', back_populates='user')
     
     def __repr__(self):
         return '<< User: (name={0} || email={1}) >>'.format(self.first_name, self.email)
