@@ -2,11 +2,9 @@ import logging
 import os
 from logging.handlers import RotatingFileHandler
 from logging.handlers import SMTPHandler
-
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify , request
 from flask_login import LoginManager
 from flask_restful import Api
-
 from api.constants import APP_CONFIG_ENV_VAR, DEV_CONFIG_VAR, PROD_CONFIG_VAR, APP_NAME
 from api.models.database import BaseModel
 from api.config import BaseConfig
@@ -60,9 +58,15 @@ def mail_admin(app):
 def register_resources(app):
     # TODO: import resources here
     from api.resources.hello_world_resource import HelloWorldResource
+    from api.resources.theme_resource import ThemeResource
+    from api.resources.sample_resource import SampleResource
+
 
     api = Api(app)
     api.add_resource(HelloWorldResource, '/welcome')
+    api.add_resource(ThemeResource, '/theme')
+    api.add_resource(SampleResource, '/sample')
+
     # TODO: register resources here
 
 
@@ -127,6 +131,7 @@ def create_app(test_config=None):
         from flask_login import current_user
         app.logger.info('Welcome Page Accessed!By {0}'.format(current_user))
         return 'Hello, Welcome to MBBU Sample Management System!'
+
 
     @app.errorhandler(404)
     def not_found_error(error):

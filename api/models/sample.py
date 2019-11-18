@@ -4,8 +4,10 @@ from api.models.database import BaseModel
 class Sample(BaseModel.db.Model):
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
+    theme_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('theme.id'))
     user_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('users.id'))
     box_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('box.id'))
+    theme_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('theme.id'))
     animal_species = AppDb.Column(AppDb.String(100), nullable=False, index=True)
     sample_type = AppDb.Column(AppDb.String(100), nullable=False, index=True)
     sample_description = AppDb.Column(AppDb.String(150), nullable=False)
@@ -19,8 +21,9 @@ class Sample(BaseModel.db.Model):
     amount = AppDb.Column(AppDb.Integer, nullable=False)  # todo set a default value
 
     # relationship(s)
-    box = AppDb.relationship('Box', backref='sample', lazy=True)
+    user = AppDb.relationship('User', backref='sample', lazy=True)
     publication = AppDb.relationship('Publication', backref='sample', lazy=True)
+    # theme = AppDb.relationship('Theme', backref='sample', lazy=True)
 
     def __repr__(self):
         return '<< Sample: (type={0} || desc={1} || project={2} || barcode={3} || species={4} ||' \

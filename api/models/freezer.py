@@ -5,7 +5,7 @@ class Freezer(BaseModel.db.Model):
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
     laboratory_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('laboratory.id'))
-    freezer = AppDb.Column(AppDb.Integer, nullable=False)  # todo change freezer to number
+    number = AppDb.Column(AppDb.Integer, nullable=False)  
     room = AppDb.Column(AppDb.String(65), nullable=False)
 
     # relationship(s)

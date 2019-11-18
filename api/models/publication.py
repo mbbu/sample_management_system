@@ -11,7 +11,7 @@ class Publication(BaseModel.db.Model):
     co_authors = AppDb.Column(AppDb.String(150), nullable=True)
 
     # # todo: relationships defined here
-    # userhaspublication = AppDb.relationship('User', backref='publication', lazy='dynamic')
+    user= AppDb.relationship('User', back_populates='publication', uselist=False)
 
     def __repr__(self):
         return '<Publication {}>'.format(self.sample_id, self.user_id, self.sample_results, self.publication_title,

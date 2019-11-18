@@ -7,4 +7,4 @@ class Theme(BaseModel.db.Model):
     name = AppDb.Column(AppDb.String(65), nullable=False, index=True)
 
     # relationship
-    sample = AppDb.relationship('Sample', backref='theme', lazy='dynamic')
+    sample = AppDb.relationship('Sample', backref='theme', lazy=True)
