@@ -4,6 +4,7 @@ from api.models.database import BaseModel
 class Sample(BaseModel.db.Model):
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
+    theme_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('theme.id'))
     user_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('users.id'))
     box_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('box.id'))
     theme_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('theme.id'))
@@ -22,9 +23,7 @@ class Sample(BaseModel.db.Model):
     # relationship(s)
     user = AppDb.relationship('User', backref='sample', lazy=True)
     publication = AppDb.relationship('Publication', backref='sample', lazy=True)
-    theme = AppDb.relationship('Theme', back_populates='sample', uselist=False)
-    box = AppDb.relationship('Box', backref='sample', lazy=True)
-
+    # theme = AppDb.relationship('Theme', backref='sample', lazy=True)
 
     def __repr__(self):
         return '<< Sample: (type={0} || desc={1} || project={2} || barcode={3} || species={4} ||' \

@@ -3,7 +3,7 @@ from flask_restful import Resource
 from api.models.sample import Sample
 
 
-class Sample_Resource (Resource):
+class SampleResource (BaseResource):
     def get(self):
         samples = Sample.query.all()
         return jsonify({'samples' : samples})

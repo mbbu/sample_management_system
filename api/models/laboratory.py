@@ -7,7 +7,7 @@ class Laboratory(BaseModel.db.Model):
     name = AppDb.Column(AppDb.String(65), nullable=False)
     room = AppDb.Column(AppDb.Integer, nullable=False)
 
-      # relationship(s)
+    # relationship(s)
     freezer = AppDb.relationship('Freezer', backref='lab', lazy=True)
 
     def __repr__(self):
