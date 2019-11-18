@@ -3,7 +3,8 @@ from flask_migrate import Migrate
 
 
 class BaseModel(object):
-    db = None
+    # db = None
+    db = SQLAlchemy()
 
     @staticmethod
     def init_db(app):
@@ -27,7 +28,7 @@ class BaseModel(object):
         Migrate(app, db)
         return [
             Role, User, Sample,
-            Box, Tray, Rack,
+            Box, Tray, Rack, Theme,
             Chamber, Freezer, Laboratory, Publication
         ]
 
