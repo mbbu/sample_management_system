@@ -7,7 +7,6 @@ class Sample(BaseModel.db.Model):
     theme_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('theme.id'))
     user_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('users.id'))
     box_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('box.id'))
-    theme_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('theme.id'))
     animal_species = AppDb.Column(AppDb.String(100), nullable=False, index=True)
     sample_type = AppDb.Column(AppDb.String(100), nullable=False, index=True)
     sample_description = AppDb.Column(AppDb.String(150), nullable=False)
