@@ -67,3 +67,17 @@ class ThemeResource(BaseResource):
                 BaseModel.db.session.rollback()
                 return BaseResource.send_json_message("Error while adding theme", 500)
         return BaseResource.send_json_message("No changes made", 200)
+
+    def delete(self, id):
+
+        theme = BaseModel.db.session.query(Theme).get(id)
+        print(theme.name)
+
+        if not theme:
+            return BaseResource.send_json_message("No theme with that name")
+
+        BaseModel.db.session.delete(theme)
+        BaseModel.db.session.commit()
+        return BaseResource.send_json_message("Theme deleted", 200)
+
+
