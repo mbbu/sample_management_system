@@ -1,6 +1,5 @@
 from flask import current_app
 from flask_restful import reqparse, fields
-
 from api.models.database import BaseModel
 from api.models.theme import Theme
 from api.resources.base_resource import BaseResource
