@@ -62,7 +62,7 @@ def register_resources(app):
 
     api = Api(app)
     api.add_resource(HelloWorldResource, '/', '/index', '/welcome')
-    api.add_resource(ThemeResource, '/theme')
+    api.add_resource(ThemeResource, '/theme', '/theme/<id>')
     api.add_resource(SampleResource, '/sample')
 
     # TODO: register resources here

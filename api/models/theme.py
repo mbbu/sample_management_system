@@ -4,7 +4,19 @@ from api.models.database import BaseModel
 class Theme(BaseModel.db.Model):
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
-    name = AppDb.Column(AppDb.String(65), nullable=False, index=True)
+    code = AppDb.Column(AppDb.String(10), nullable=True, unique=True)
+    name = AppDb.Column(AppDb.String(65), nullable=False, unique=True, index=True)
 
     # relationship
     sample = AppDb.relationship('Sample', backref='theme', lazy=True)
+
+    @staticmethod
+    def theme_exists(name):
+        if Theme.query.filter(
+                Theme.name == name
+        ).first():
+            return True
+        return False
+
+    def __repr__(self):
+        return '<< Theme: (code={0} || name={1}) >>'.format(self.code, self.name)
