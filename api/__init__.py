@@ -5,7 +5,7 @@ from logging.handlers import SMTPHandler
 from flask import Flask, render_template
 from flask_login import LoginManager
 from flask_restful import Api
-from api.constants import APP_CONFIG_ENV_VAR, DEV_CONFIG_VAR, PROD_CONFIG_VAR, APP_NAME
+from api.constants import APP_CONFIG_ENV_VAR, DEV_CONFIG_VAR, PROD_CONFIG_VAR, APP_NAME, AppLoggingFormat
 from api.models.database import BaseModel
 from api.config import BaseConfig
 from api.resources.base_resource import BaseResource
@@ -20,9 +20,7 @@ def file_logging(app_instance):
         os.mkdir('logs')
 
     handler = RotatingFileHandler('logs/' + APP_NAME + ".log")
-    handler.setFormatter(logging.Formatter(
-        '%(asctime)s [%(levelname)s]: %(message)s [in %(pathname)s:%(lineno)d]'
-    ))
+    handler.setFormatter(AppLoggingFormat)
     handler.setLevel(logging.DEBUG)
 
     app_instance.logger.addHandler(handler)
@@ -49,6 +47,7 @@ def mail_admin(app):
             secure=secure
         )
 
+        mail_handler.setFormatter(AppLoggingFormat)
         mail_handler.setLevel(logging.ERROR)
         app.logger.addHandler(mail_handler)
     pass
@@ -61,9 +60,8 @@ def register_resources(app):
     from api.resources.theme_resource import ThemeResource
     from api.resources.sample_resource import SampleResource
 
-
     api = Api(app)
-    api.add_resource(HelloWorldResource, '/welcome')
+    api.add_resource(HelloWorldResource, '/', '/index', '/welcome')
     api.add_resource(ThemeResource, '/theme')
     api.add_resource(SampleResource, '/sample')
 
@@ -131,7 +129,6 @@ def create_app(test_config=None):
         from flask_login import current_user
         app.logger.info('Welcome Page Accessed!By {0}'.format(current_user))
         return 'Hello, Welcome to MBBU Sample Management System!'
-
 
     @app.errorhandler(404)
     def not_found_error(error):

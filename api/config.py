@@ -1,4 +1,8 @@
 import os
+import logging
+
+from flask import has_request_context, request
+
 from api.constants import APP_NAME, DATABASE_URI_ENV_NAME
 
 
@@ -26,3 +30,15 @@ class ProductionConfig(BaseConfig):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     ENV = "production"
     DEBUG = False
+
+
+# override default log formats
+class RequestFormatter(logging.Formatter):
+    def format(self, record):
+        if has_request_context():
+            record.url = request.url
+            record.remote_addr = request.remote_addr
+        else:
+            record.url = None
+            record.remote_addr = None
+        return super().format(record)
