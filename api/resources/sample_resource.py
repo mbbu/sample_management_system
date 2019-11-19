@@ -1,8 +1,9 @@
-from flask_restful import fields, marshal, marshal_with, output_json, reqparse
+from flask_restful import fields, marshal, output_json, reqparse
 from api.models.sample import Sample
 from api.resources.base_resource import BaseResource
+from api.models.database import BaseModel
 
-post_parser = reqparse.RequestParser()
+parser = reqparse.RequestParser()
 
 """
     Checkout how the resource is built;
@@ -21,6 +22,7 @@ post_parser = reqparse.RequestParser()
 
 class SampleResource(BaseResource):
     fields = {
+    'id' : fields.Integer,
     'theme_id' : fields.Integer,
     'user_id': fields.Integer,
     'box_id' : fields.Integer,
@@ -45,25 +47,55 @@ class SampleResource(BaseResource):
 
     
     def post(self):
-        args = post_parser.parse_args()
-        post_parser.add_argument('theme_id', type=str, location='json', required=False,  )
-        post_parser.add_argument('user_id', type=str, location='json', required=False,  )
-        post_parser.add_argument('box_id', type=str, location='json', required=False,  )
-        post_parser.add_argument('animal_species', type=str, location='json', required=True,  )
-        post_parser.add_argument('sample_type', type=str, location='json', required=True,  )
-        post_parser.add_argument('sample_description', type=str, location='json', required=True,  )
-        post_parser.add_argument('location_collected', type=str, location='json', required=True,  )
-        post_parser.add_argument('project', type=str, location='json', required=True,  )
-        post_parser.add_argument('project_owner', type=str, location='json', required=True,  )
-        post_parser.add_argument('retention_period', type = int, location='json', required=True,  )
-        post_parser.add_argument('barcode', type = int, location='json', required=True,  )
-        post_parser.add_argument('temperature', type = int, location='json', required=True,  )
-        post_parser.add_argument('amount', type = int, location='json', required=True,  )
+        args = parser.parse_args()
+        parser.add_argument('theme_id', type=str, location='json', required=False,  )
+        parser.add_argument('user_id', type=str, location='json', required=False,  )
+        parser.add_argument('box_id', type=str, location='json', required=False,  )
+        parser.add_argument('animal_species', type=str, location='json', required=True,  )
+        parser.add_argument('sample_type', type=str, location='json', required=True,  )
+        parser.add_argument('sample_description', type=str, location='json', required=True,  )
+        parser.add_argument('location_collected', type=str, location='json', required=True,  )
+        parser.add_argument('project', type=str, location='json', required=True,  )
+        parser.add_argument('project_owner', type=str, location='json', required=True,  )
+        parser.add_argument('retention_period', type = int, location='json', required=True,  )
+        parser.add_argument('barcode', type = int, location='json', required=True,  )
+        parser.add_argument('temperature', type = int, location='json', required=True,  )
+        parser.add_argument('amount', type = int, location='json', required=True,  )
 
         data = marshal(args, self.fields)
         return BaseResource.send_json_message(data, 200)
 
-    def put(self):
-        
+    def put(self, id):
+        args = parser.parse_args()
+        parser.add_argument('theme_id', type=str, location='json',  )
+        parser.add_argument('user_id', type=str, location='json',  )
+        parser.add_argument('box_id', type=str, location='json',  )
+        parser.add_argument('animal_species', type=str, location='json',  )
+        parser.add_argument('sample_type', type=str, location='json', )
+        parser.add_argument('sample_description', type=str, location='json',  )
+        parser.add_argument('location_collected', type=str, location='json',  )
+        parser.add_argument('project', type=str, location='json',  )
+        parser.add_argument('project_owner', type=str, location='json',  )
+        parser.add_argument('retention_period', type = int, location='json',  )
+        parser.add_argument('barcode', type = int, location='json',  )
+        parser.add_argument('temperature', type = int, location='json',  )
+        parser.add_argument('amount', type = int, location='json',  )
+
+        data = marshal(args, self.fields)
+        return BaseResource.send_json_message(data, 200)
+
+    def delete(self, id):
+        samples = BaseModel.db.session.query(Sample).get_or_404(id)
+        print ( {samples})
+        BaseModel.db.session.delete(samples)
+        BaseModel.db.session.commit()
+
+        return output_json("message: Sucessful", 200)
+
+
+
+
+
+
 
     
