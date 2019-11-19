@@ -1,4 +1,6 @@
 from flask_restful import fields, marshal, output_json, reqparse
+
+
 from api.models.sample import Sample
 from api.resources.base_resource import BaseResource
 from api.models.database import BaseModel
@@ -18,7 +20,7 @@ parser = reqparse.RequestParser()
         after computation, we use the BaseResource.send_json_message() method to update the client on the status
             of the operation.
 """
-    
+
 
 class SampleResource(BaseResource):
     fields = {
@@ -37,15 +39,15 @@ class SampleResource(BaseResource):
     'analysis': fields.String,
     'temperature': fields.String,
     'amount': fields.Integer
+      
     }
-  
+
     def get(self):
         samples = Sample.query.all()
         data = marshal(samples, self.fields)
         # return output_json(data, 200)
         return BaseResource.send_json_message(data, 200)
 
-    
     def post(self):
         args = parser.parse_args()
         parser.add_argument('theme_id', type=str, location='json', required=False,  )
@@ -95,7 +97,3 @@ class SampleResource(BaseResource):
 
 
 
-
-
-
-    
