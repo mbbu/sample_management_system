@@ -2,12 +2,14 @@ import logging
 import os
 from logging.handlers import RotatingFileHandler
 from logging.handlers import SMTPHandler
-from flask import Flask, render_template
+
+from flask import Flask
 from flask_login import LoginManager
 from flask_restful import Api
-from api.constants import APP_CONFIG_ENV_VAR, DEV_CONFIG_VAR, PROD_CONFIG_VAR, APP_NAME, AppLoggingFormat
-from api.models.database import BaseModel
+
 from api.config import BaseConfig
+from api.constants import APP_CONFIG_ENV_VAR, DEV_CONFIG_VAR, PROD_CONFIG_VAR, APP_NAME
+from api.models.database import BaseModel
 from api.resources.base_resource import BaseResource
 
 
@@ -20,7 +22,7 @@ def file_logging(app_instance):
         os.mkdir('logs')
 
     handler = RotatingFileHandler('logs/' + APP_NAME + ".log")
-    handler.setFormatter(AppLoggingFormat)
+    handler.setFormatter(BaseConfig.LOGGING_FORMAT)
     handler.setLevel(logging.DEBUG)
 
     app_instance.logger.addHandler(handler)
@@ -47,7 +49,7 @@ def mail_admin(app):
             secure=secure
         )
 
-        mail_handler.setFormatter(AppLoggingFormat)
+        mail_handler.setFormatter(BaseConfig.LOGGING_FORMAT)
         mail_handler.setLevel(logging.ERROR)
         app.logger.addHandler(mail_handler)
     pass
@@ -59,17 +61,13 @@ def register_resources(app):
     from api.resources.hello_world_resource import HelloWorldResource
     from api.resources.theme_resource import ThemeResource
     from api.resources.sample_resource import SampleResource
+    from api.resources.user_resource import UserResource
 
     api = Api(app)
     api.add_resource(HelloWorldResource, '/', '/index', '/welcome')
-<<<<<<< HEAD
-    api.add_resource(ThemeResource, '/theme')
     api.add_resource(SampleResource, '/sample', '/sample/<id>')
-
-=======
-    api.add_resource(ThemeResource, '/theme', '/theme/<id>')
-    api.add_resource(SampleResource, '/sample')
->>>>>>> 4161d6ae4040489d17aa34bfce59c37c8926f88f
+    api.add_resource(ThemeResource, '/themes', '/theme/<id>')
+    api.add_resource(UserResource, '/users', '/user/<email>')
 
     # TODO: register resources here
 
