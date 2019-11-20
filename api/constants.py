@@ -9,4 +9,11 @@ PROD_CONFIG_VAR = "production"
 # Database
 DATABASE_URI_ENV_NAME = APP_NAME + "_DATABASE_URI"
 
-# External URLs
+# Logging Format
+from api.config import RequestFormatter
+AppLoggingFormat = RequestFormatter(
+        '[%(asctime)s] Remote Address:%(remote_addr)s requested %(url)s\n'
+        ' [%(levelname)s]: %(message)s [in %(pathname)s::%(lineno)d]\n'
+    )
+
+# External URLs and APIs
