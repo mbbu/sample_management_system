@@ -62,12 +62,14 @@ def register_resources(app):
     from api.resources.theme_resource import ThemeResource
     from api.resources.sample_resource import SampleResource
     from api.resources.user_resource import UserResource
+    from api.resources.box_resource import BoxResource
 
     api = Api(app)
     api.add_resource(HelloWorldResource, '/', '/index', '/welcome')
     api.add_resource(SampleResource, '/samples', '/sample/<id>')
     api.add_resource(ThemeResource, '/themes', '/theme/<id>')
     api.add_resource(UserResource, '/users', '/user/<email>')
+    api.add_resource(BoxResource, '/boxes', '/box/<label>')
 
     # TODO: register resources here
 
