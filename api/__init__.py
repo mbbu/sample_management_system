@@ -62,12 +62,14 @@ def register_resources(app):
     from api.resources.theme_resource import ThemeResource
     from api.resources.sample_resource import SampleResource
     from api.resources.user_resource import UserResource
+    from api.resources.publication_resource import PublicationResource
 
     api = Api(app)
     api.add_resource(HelloWorldResource, '/', '/index', '/welcome')
     api.add_resource(SampleResource, '/sample', '/sample/<id>')
     api.add_resource(ThemeResource, '/themes', '/theme/<id>')
     api.add_resource(UserResource, '/users', '/user/<email>')
+    api.add_resource(PublicationResource, '/publication', '/publication/<id>')
 
     # TODO: register resources here
 

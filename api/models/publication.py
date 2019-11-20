@@ -13,6 +13,14 @@ class Publication(BaseModel.db.Model):
     # # todo: relationships defined here
     user= AppDb.relationship('User', back_populates='publication', uselist=False)
 
+    @staticmethod
+    def publication_exists(publication_title):
+        if Publication.query.filter(
+                Publication.publication_title == publication_title
+        ).first():
+            return True
+        return False
+
     def __repr__(self):
         return '<Publication {}>'.format(self.sample_id, self.user_id, self.sample_results, self.publication_title,
                                          self.co_authors)
