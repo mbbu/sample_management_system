@@ -65,7 +65,7 @@ def register_resources(app):
 
     api = Api(app)
     api.add_resource(HelloWorldResource, '/', '/index', '/welcome')
-    api.add_resource(SampleResource, '/sample', '/sample/<id>')
+    api.add_resource(SampleResource, '/samples', '/sample/<id>')
     api.add_resource(ThemeResource, '/themes', '/theme/<id>')
     api.add_resource(UserResource, '/users', '/user/<email>')
 
@@ -125,7 +125,7 @@ def create_app(test_config=None):
     def make_shell_processor():
         return {
             'db': BaseModel.init_db(app),
-            'models': BaseModel.migrate_db(app, db)
+            'models': BaseModel.migrate_db()
         }
 
     @app.route('/')
