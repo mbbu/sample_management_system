@@ -1,9 +1,21 @@
-import os
 import logging
+import os
 
 from flask import has_request_context, request
 
 from api.constants import APP_NAME, DATABASE_URI_ENV_NAME
+
+
+# override default log formats
+class RequestFormatter(logging.Formatter):
+    def format(self, record):
+        if has_request_context():
+            record.url = request.url
+            record.remote_addr = request.remote_addr
+        else:
+            record.url = None
+            record.remote_addr = None
+        return super().format(record)
 
 
 class BaseConfig(object):
@@ -19,6 +31,12 @@ class BaseConfig(object):
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     ADMINS = ['jeffkim207@gmail.com']
 
+    # Add Custom log format to config
+    LOGGING_FORMAT = RequestFormatter(
+        '[%(asctime)s] Remote Address:%(remote_addr)s requested %(url)s\n'
+        ' [%(levelname)s]: %(message)s [in %(pathname)s::%(lineno)d]\n'
+    )
+
 
 class DevelopmentConfig(BaseConfig):
     SQLALCHEMY_TRACK_MODIFICATIONS = True
@@ -31,14 +49,3 @@ class ProductionConfig(BaseConfig):
     ENV = "production"
     DEBUG = False
 
-
-# override default log formats
-class RequestFormatter(logging.Formatter):
-    def format(self, record):
-        if has_request_context():
-            record.url = request.url
-            record.remote_addr = request.remote_addr
-        else:
-            record.url = None
-            record.remote_addr = None
-        return super().format(record)
