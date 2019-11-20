@@ -2,12 +2,14 @@ import logging
 import os
 from logging.handlers import RotatingFileHandler
 from logging.handlers import SMTPHandler
-from flask import Flask, render_template
+
+from flask import Flask
 from flask_login import LoginManager
 from flask_restful import Api
+
+from api.config import BaseConfig
 from api.constants import APP_CONFIG_ENV_VAR, DEV_CONFIG_VAR, PROD_CONFIG_VAR, APP_NAME, AppLoggingFormat
 from api.models.database import BaseModel
-from api.config import BaseConfig
 from api.resources.base_resource import BaseResource
 
 
@@ -62,14 +64,8 @@ def register_resources(app):
 
     api = Api(app)
     api.add_resource(HelloWorldResource, '/', '/index', '/welcome')
-<<<<<<< HEAD
-    api.add_resource(ThemeResource, '/theme')
     api.add_resource(SampleResource, '/sample', '/sample/<id>')
-
-=======
     api.add_resource(ThemeResource, '/theme', '/theme/<id>')
-    api.add_resource(SampleResource, '/sample')
->>>>>>> 4161d6ae4040489d17aa34bfce59c37c8926f88f
 
     # TODO: register resources here
 
