@@ -88,22 +88,25 @@ class SampleResource(BaseResource):
         sample = SampleResource.get_sample(id)
 
         if Sample is not None:
-            if theme_id != theme_id or user_id != sample.user_id or box_id != sample.box_id or animal_species != sample.animal_species or sample_type != sample.sample_type or sample_description != sample.sample_description or location_collected != sample.location_collected or  project != sample.project or project_owner != sample.project_owner or retention_period != sample.retention_period or barcode != sample.barcode or analysis != sample.analysis or temperature != sample.temperature or amount != sample.amount :
+            if theme_id != sample.theme_id or user_id != sample.user_id or \
+                    box_id != sample.box_id or animal_species != sample.animal_species or \
+                    sample_type != sample.sample_type or sample_description != sample.sample_description \
+                    or location_collected != sample.location_collected or  project != sample.project or project_owner != sample.project_owner or retention_period != sample.retention_period or barcode != sample.barcode or analysis != sample.analysis or temperature != sample.temperature or amount != sample.amount :
                 try:
-                    theme_id= theme_id
-                    user_id =user_id
-                    box_id = box_id 
-                    animal_species =animal_species 
-                    sample_type= sample_type
-                    sample_description = sample_description 
-                    location_collected= location_collected 
-                    project =project
-                    project_owner = project_owner
-                    retention_period = retention_period
-                    barcode=barcode
-                    analysis=analysis
-                    temperature = temperature
-                    amount=amount
+                    sample.theme_id= theme_id
+                    sample.user_id =user_id
+                    sample.box_id = box_id 
+                    sample.animal_species =animal_species 
+                    sample.sample_type= sample_type
+                    sample.sample_description = sample_description 
+                    sample.location_collected= location_collected 
+                    sample.project =project
+                    sample.project_owner = project_owner
+                    sample.retention_period = retention_period
+                    sample.barcode=barcode
+                    sample.analysis=analysis
+                    sample.temperature = temperature
+                    sampleamount=amount
             
                     BaseModel.db.session.commit()
                     return BaseResource.send_json_message("Updated the Sample", 200)
