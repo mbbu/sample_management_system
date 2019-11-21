@@ -67,6 +67,7 @@ def register_resources(app):
     from api.resources.role_resource import RoleResource
     from api.resources.tray_resource import TrayResource
     from api.resources.rack_resource import RackResource
+    from api.resources.chamber_resource import ChamberResource
 
     api = Api(app)
     api.add_resource(HelloWorldResource, '/', '/index', '/welcome')
@@ -78,6 +79,7 @@ def register_resources(app):
     api.add_resource(RoleResource, '/roles', '/role/<code>')
     api.add_resource(TrayResource, '/tray', '/trays', '/tray/<num>')
     api.add_resource(RackResource, '/rack', '/racks', '/rack/<num>')
+    api.add_resource(ChamberResource, '/chamber', '/chambers', '/chamber/<c_type>')
 
     # TODO: register resources here
 
