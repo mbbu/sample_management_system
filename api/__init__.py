@@ -62,12 +62,18 @@ def register_resources(app):
     from api.resources.theme_resource import ThemeResource
     from api.resources.sample_resource import SampleResource
     from api.resources.user_resource import UserResource
+    from api.resources.publication_resource import PublicationResource
+    from api.resources.box_resource import BoxResource
+    from api.resources.role_resource import RoleResource
 
     api = Api(app)
     api.add_resource(HelloWorldResource, '/', '/index', '/welcome')
-    api.add_resource(SampleResource, '/sample', '/sample/<id>')
+    api.add_resource(SampleResource, '/samples', '/sample/<id>')
     api.add_resource(ThemeResource, '/themes', '/theme/<id>')
     api.add_resource(UserResource, '/users', '/user/<email>')
+    api.add_resource(PublicationResource, '/publication', '/publication/<id>')
+    api.add_resource(BoxResource, '/boxes', '/box/<label>')
+    api.add_resource(RoleResource, '/role', '/role/<id>')
 
     # TODO: register resources here
 
@@ -125,7 +131,7 @@ def create_app(test_config=None):
     def make_shell_processor():
         return {
             'db': BaseModel.init_db(app),
-            'models': BaseModel.migrate_db(app, db)
+            'models': BaseModel.migrate_db()
         }
 
     @app.route('/')

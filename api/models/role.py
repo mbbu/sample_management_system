@@ -10,3 +10,14 @@ class Role(BaseModel.db.Model):
 
     # relationship(s) defined here
     user = AppDb.relationship('User', backref='role', lazy='dynamic')
+
+    @staticmethod
+    def role_exists(name):
+        if Role.query.filter(
+            Role.name == name
+        ).first():
+            return True
+        return False
+
+    def __repr(self):
+        return '<< Role: (code={0} || name={1} || description={2}) >>'.format(self.code, self.name, self.description)
