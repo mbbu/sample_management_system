@@ -71,7 +71,7 @@ def register_resources(app):
     api.add_resource(SampleResource, '/samples', '/sample/<id>')
     api.add_resource(ThemeResource, '/themes', '/theme/<id>')
     api.add_resource(UserResource, '/users', '/user/<email>')
-    api.add_resource(PublicationResource, '/publication', '/publication/<id>')
+    api.add_resource(PublicationResource, '/publications', '/publication/<id>')
     api.add_resource(BoxResource, '/boxes', '/box/<label>')
     api.add_resource(RoleResource, '/roles', '/role/<code>')
 
