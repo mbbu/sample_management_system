@@ -18,5 +18,5 @@ class Theme(BaseModel.db.Model):
             return True
         return False
 
-    def __repr__(self):
+    def __repr(self):
         return '<< Theme: (code={0} || name={1}) >>'.format(self.code, self.name)
