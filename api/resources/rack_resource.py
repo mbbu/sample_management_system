@@ -8,8 +8,8 @@ from api.resources.base_resource import BaseResource
 
 class RackResource(BaseResource):
     fields = {
-        'chamber.type': fields.String,
-        'number': fields.Integer
+        'number': fields.Integer,
+        'chamber.type': fields.String
     }
 
     def get(self):

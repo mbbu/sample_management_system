@@ -8,9 +8,9 @@ from api.resources.base_resource import BaseResource
 
 class ChamberResource(BaseResource):
     fields = {
+        'type': fields.String,
         'freezer.room': fields.String,
-        'freezer.number': fields.String,
-        'type': fields.String
+        'freezer.number': fields.String
     }
 
     def get(self):

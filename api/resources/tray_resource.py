@@ -8,8 +8,8 @@ from api.resources.base_resource import BaseResource
 
 class TrayResource(BaseResource):
     fields = {
-        'rack.number': fields.String,
         'number': fields.Integer,
+        'rack.number': fields.Integer,
     }
 
     def get(self):

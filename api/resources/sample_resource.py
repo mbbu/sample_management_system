@@ -10,7 +10,7 @@ class SampleResource(BaseResource):
     fields = {
         'theme_id': fields.Integer,
         'user_id': fields.Integer,
-        'box_id': fields.Integer,
+        'box.label': fields.String,
         'animal_species': fields.String,
         'sample_type': fields.String,
         'sample_description': fields.String,

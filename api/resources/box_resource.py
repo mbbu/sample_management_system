@@ -9,8 +9,13 @@ from flask_restful import fields, marshal, reqparse
 
 class BoxResource(BaseResource):
     fields = {
-        'tray_id': fields.Integer,
-        'label': fields.String
+        'label': fields.String,
+        'tray.number': fields.Integer,
+        'tray.rack.number': fields.Integer,
+        'tray.rack.chamber.type': fields.String,
+        'tray.rack.chamber.freezer.number': fields.Integer,
+        'tray.rack.chamber.freezer.lab.name': fields.String,
+        'tray.rack.chamber.freezer.lab.room': fields.Integer
     }
 
     def get(self):
