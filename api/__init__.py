@@ -69,6 +69,7 @@ def register_resources(app):
     from api.resources.rack_resource import RackResource
     from api.resources.chamber_resource import ChamberResource
     from api.resources.freezer_resource import FreezerResource
+    from api.resources.lab_resource import LaboratoryResource
 
     api = Api(app)
     api.add_resource(HelloWorldResource, '/', '/index', '/welcome')
@@ -82,6 +83,7 @@ def register_resources(app):
     api.add_resource(RackResource, '/rack', '/racks', '/rack/<num>')
     api.add_resource(ChamberResource, '/chamber', '/chambers', '/chamber/<c_type>')
     api.add_resource(FreezerResource, '/freezer', '/freezers', '/freezer/<number>')
+    api.add_resource(LaboratoryResource, '/laboratory', '/laboratory/<name>')
 
     # TODO: register resources here
 

@@ -37,7 +37,6 @@ class FreezerResource(BaseResource):
 
         if not freezer:
             return BaseResource.send_json_message("Freezer does not exist", 404)
-
         args = FreezerResource.freezer_args()
 
         if args[0] != freezer.laboratory_id or args[1] != freezer.number or args[2] != freezer.room:
