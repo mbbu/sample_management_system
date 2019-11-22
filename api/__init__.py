@@ -65,15 +65,25 @@ def register_resources(app):
     from api.resources.publication_resource import PublicationResource
     from api.resources.box_resource import BoxResource
     from api.resources.role_resource import RoleResource
+    from api.resources.tray_resource import TrayResource
+    from api.resources.rack_resource import RackResource
+    from api.resources.chamber_resource import ChamberResource
+    from api.resources.freezer_resource import FreezerResource
+    from api.resources.lab_resource import LaboratoryResource
 
     api = Api(app)
     api.add_resource(HelloWorldResource, '/', '/index', '/welcome')
-    api.add_resource(SampleResource, '/samples', '/sample/<id>')
-    api.add_resource(ThemeResource, '/themes', '/theme/<id>')
-    api.add_resource(UserResource, '/users', '/user/<email>')
-    api.add_resource(PublicationResource, '/publication', '/publication/<id>')
-    api.add_resource(BoxResource, '/boxes', '/box/<label>')
-    api.add_resource(RoleResource, '/role', '/role/<id>')
+    api.add_resource(SampleResource, '/sample', '/samples', '/sample/<id>')
+    api.add_resource(ThemeResource, '/theme', '/themes', '/theme/<id>')
+    api.add_resource(UserResource, '/user', '/users', '/user/<email>')
+    api.add_resource(PublicationResource, '/publication', '/publications', '/publication/<id>')
+    api.add_resource(BoxResource, '/box','/boxes', '/box/<label>')
+    api.add_resource(RoleResource, '/role', '/roles', '/role/<code>')
+    api.add_resource(TrayResource, '/tray', '/trays', '/tray/<num>')
+    api.add_resource(RackResource, '/rack', '/racks', '/rack/<num>')
+    api.add_resource(ChamberResource, '/chamber', '/chambers', '/chamber/<c_type>')
+    api.add_resource(FreezerResource, '/freezer', '/freezers', '/freezer/<number>')
+    api.add_resource(LaboratoryResource, '/laboratory', '/laboratory/<name>')
 
     # TODO: register resources here
 

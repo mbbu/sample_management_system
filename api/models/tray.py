@@ -9,7 +9,14 @@ class Tray(BaseModel.db.Model):
 
     # relationship(s)
     rack = AppDb.relationship('Rack', backref='tray', lazy=True)
-    #tray = AppDb.relationship('Tray', backref='box', lazy=True)
+
+    @staticmethod
+    def tray_exists(num):
+        if Tray.query.filter(
+            Tray.number == num
+        ).first():
+            return True
+        return False
 
     def __repr__(self):
         return '<< Tray: (number={0} || rack={1}) >>'.format(self.number, self.rack_id)

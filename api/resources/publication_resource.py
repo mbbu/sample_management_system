@@ -4,13 +4,14 @@ from api.models.database import BaseModel
 from api.resources.base_resource import BaseResource
 from api.models.publication import Publication
 
-class PublicationResource (BaseResource) :
+
+class PublicationResource(BaseResource):
     fields = {
-        'sample_id' : fields.Integer,
-        'user_id' : fields.Integer,
-        'sample_results' : fields.String,
-        'publication_title' : fields.String,
-        'co_authors' : fields.String
+        'sample_id': fields.Integer,
+        'user_id': fields.Integer,
+        'sample_results': fields.String,
+        'publication_title': fields.String,
+        'co_authors': fields.String
 
     }
 
@@ -30,23 +31,23 @@ class PublicationResource (BaseResource) :
         if not Publication.publication_exists(publication_title):
             try:
                 publication = Publication(
-                    sample_id = sample_id,
-                    user_id = user_id,
-                    sample_results = sample_results,
-                    publication_title = publication_title,
-                    co_authors = co_authors
+                    sample_id=sample_id,
+                    user_id=user_id,
+                    sample_results=sample_results,
+                    publication_title=publication_title,
+                    co_authors=co_authors
                 )
-            
+
                 BaseModel.db.session.add(publication)
                 BaseModel.db.session.commit()
-                return BaseResource.send_json_message("Sucessfully Added a Publication", 200)
+                return BaseResource.send_json_message("Successfully Added a Publication", 200)
 
             except Exception as e:
                 current_app.logger.error(e)
                 BaseModel.db.session.rollback()
                 return BaseResource.send_json_message("Error while adding publication", 500)
         current_app.logger.error("Error while adding Publication :> Duplicate records")
-        return BaseResource.send_json_message('Publication already exsists', 500)
+        return BaseResource.send_json_message('Publication already exists', 500)
 
     def put(self, id):
         args = PublicationResource.publication_parser()
@@ -62,7 +63,7 @@ class PublicationResource (BaseResource) :
         if publication is not None:
             if sample_id != publication.sample_id or user_id != publication.user_id or \
                     sample_results != publication.sample_results or publication_title != publication.publication_title or \
-                    co_authors != publication.co_authors :
+                    co_authors != publication.co_authors:
 
                 try:
                     publication.sample_id = sample_id,
@@ -70,14 +71,14 @@ class PublicationResource (BaseResource) :
                     publication.sample_results = sample_results,
                     publication.publication_title = publication_title,
                     publication.co_authors = co_authors
-                
+
                     BaseModel.db.session.commit()
-                    return BaseResource.send_json_message("Sucessfully Updated a Publication", 202)
+                    return BaseResource.send_json_message("Successfully Updated a Publication", 202)
 
                 except Exception as e:
                     current_app.logger.error(e)
                     BaseModel.db.session.rollback()
-                    return BaseModel.send_json_message("Error while updating publication", 500)
+                    return BaseResource.send_json_message("Error while updating publication", 500)
             current_app.logger.error("No changes were made", 304)
             return BaseResource.send_json_message("No changes found", 404)
 
@@ -85,7 +86,7 @@ class PublicationResource (BaseResource) :
         publication = PublicationResource.get_publication(id)
 
         if not publication:
-            return BaseResource.send_json_message("Publication does not exsist", 404)
+            return BaseResource.send_json_message("Publication does not exist", 404)
 
         BaseModel.db.session.delete(publication)
         BaseModel.db.session.commit()
@@ -106,6 +107,3 @@ class PublicationResource (BaseResource) :
     @staticmethod
     def get_publication(publication_id):
         return BaseModel.db.session.query(Publication).get(publication_id)
-
-
-            

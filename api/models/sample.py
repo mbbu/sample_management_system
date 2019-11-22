@@ -22,7 +22,8 @@ class Sample(BaseModel.db.Model):
     # relationship(s)
     user = AppDb.relationship('User', backref='sample', lazy=True)
     publication = AppDb.relationship('Publication', backref='sample', lazy=True)
-    # theme = AppDb.relationship('Theme', backref='sample', lazy=True)
+    box = AppDb.relationship('Box', backref='sample', lazy=True)
+    # todo: Add relationship between box and sample
 
     def __repr__(self):
         return '<< Sample: (type={0} || desc={1} || project={2} || barcode={3} || species={4} ||' \
