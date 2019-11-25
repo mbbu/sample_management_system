@@ -3,7 +3,7 @@ import os
 
 from flask import has_request_context, request
 
-from api.constants import APP_NAME, DATABASE_URI_ENV_NAME, SECRET_KEY
+from api.constants import APP_NAME, DATABASE_URI_ENV_NAME, SECRET_KEY, ACCESS_EXPIRES, REFRESH_EXPIRES
 
 
 # override default log formats
@@ -36,6 +36,13 @@ class BaseConfig(object):
         '[%(asctime)s] Remote Address:%(remote_addr)s requested %(url)s\n'
         ' [%(levelname)s]: %(message)s [in %(pathname)s::%(lineno)d]\n'
     )
+
+    # Redis
+    JWT_ACCESS_TOKEN_EXPIRES = ACCESS_EXPIRES
+    JWT_REFRESH_TOKEN_EXPIRES = REFRESH_EXPIRES
+    JWT_BLACKLIST_ENABLED = True
+    JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
+    PROPAGATE_EXCEPTIONS = True
 
 
 class DevelopmentConfig(BaseConfig):
