@@ -12,6 +12,7 @@ class FreezerResource(BaseResource):
         'room': fields.String,
         'lab.name': fields.String,
         'lab.room': fields.Integer,
+        'code': fields.String
     }
 
     def get(self):
@@ -25,7 +26,8 @@ class FreezerResource(BaseResource):
         freezer = Freezer(
             laboratory_id=args[0],
             number=args[1],
-            room=args[2]
+            room=args[2],
+            code=args[3]
         )
 
         BaseModel.db.session.add(freezer)
@@ -44,6 +46,7 @@ class FreezerResource(BaseResource):
                 freezer.laboratory_id = args[0]
                 freezer.number = args[1]
                 freezer.room = args[2]
+                freezer.code = args[3]
                 BaseModel.db.session.commit()
                 return BaseResource.send_json_message("Successfully updated Freezer", 202)
 
@@ -69,15 +72,17 @@ class FreezerResource(BaseResource):
         parser.add_argument('laboratory', required=True)
         parser.add_argument('number', required=True)
         parser.add_argument('room', required=True)
+        parser.add_argument('code', required=True)
 
         args = parser.parse_args()
 
         laboratory = args['laboratory']
         number = args['number']
         room = args['room']
+        code =args['code']
 
         return [
-            laboratory, number, room
+            laboratory, number, room, code
         ]
 
     @staticmethod

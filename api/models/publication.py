@@ -7,7 +7,7 @@ class Publication(BaseModel.db.Model):
     sample_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('sample.id'))
     user_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('users.id'))
     sample_results = AppDb.Column(AppDb.String(150), nullable=False)
-    publication_title = AppDb.Column(AppDb.String(150), nullable=True)
+    publication_title = AppDb.Column(AppDb.String(150), unique = True, nullable=True)
     co_authors = AppDb.Column(AppDb.String(150), nullable=True)
 
     # # todo: relationships defined here
