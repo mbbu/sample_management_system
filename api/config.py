@@ -3,7 +3,7 @@ import os
 
 from flask import has_request_context, request
 
-from api.constants import APP_NAME, DATABASE_URI_ENV_NAME
+from api.constants import APP_NAME, DATABASE_URI_ENV_NAME, SECRET_KEY
 
 
 # override default log formats
@@ -21,7 +21,7 @@ class RequestFormatter(logging.Formatter):
 class BaseConfig(object):
     database_uri = os.getenv(DATABASE_URI_ENV_NAME)
     SQLALCHEMY_DATABASE_URI = database_uri
-    SECRET_KEY = os.environ.get(APP_NAME + "_SECRET_KEY")
+    SECRET_KEY = os.environ.get(SECRET_KEY) or os.urandom(32)
 
     # ADMIN MAILING CONFIG
     MAIL_SERVER = os.environ.get('MAIL_SERVER')

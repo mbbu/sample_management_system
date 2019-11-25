@@ -29,6 +29,7 @@ This is a web based application that interfaces samples available at ICIPE and a
 ***4.Export required variables***
 ```
  >> export SAMPLE_MANAGEMENT_SYSTEM_DATABASE_URI='<<SQLAlchmeny Database URI set on your computer>>'
+ >> export SAMPLE_MANAGEMENT_SYSTEM_SECRET_KEY='<<random key generated locally (os.urandom(32) )>>'
  >> export FLASK_APP=api/
 ```
 

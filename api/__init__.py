@@ -4,11 +4,12 @@ from logging.handlers import RotatingFileHandler
 from logging.handlers import SMTPHandler
 
 from flask import Flask
+from flask_jwt_extended import JWTManager
 from flask_login import LoginManager
 from flask_restful import Api
 
 from api.config import BaseConfig
-from api.constants import APP_CONFIG_ENV_VAR, DEV_CONFIG_VAR, PROD_CONFIG_VAR, APP_NAME
+from api.constants import APP_CONFIG_ENV_VAR, DEV_CONFIG_VAR, PROD_CONFIG_VAR, APP_NAME, SECRET_KEY
 from api.models.database import BaseModel
 from api.resources.base_resource import BaseResource
 
@@ -59,6 +60,7 @@ def mail_admin(app):
 def register_resources(app):
     # TODO: import resources here
     from api.resources.hello_world_resource import HelloWorldResource
+    from api.resources.auth_resource import AuthResource
     from api.resources.theme_resource import ThemeResource
     from api.resources.sample_resource import SampleResource
     from api.resources.user_resource import UserResource
@@ -73,11 +75,12 @@ def register_resources(app):
 
     api = Api(app)
     api.add_resource(HelloWorldResource, '/', '/index', '/welcome')
+    api.add_resource(AuthResource, '/auth', '/login')
     api.add_resource(SampleResource, '/sample', '/samples', '/sample/<id>')
     api.add_resource(ThemeResource, '/theme', '/themes', '/theme/<id>')
     api.add_resource(UserResource, '/user', '/users', '/user/<email>')
     api.add_resource(PublicationResource, '/publication', '/publications', '/publication/<id>')
-    api.add_resource(BoxResource, '/box','/boxes', '/box/<label>')
+    api.add_resource(BoxResource, '/box', '/boxes', '/box/<label>')
     api.add_resource(RoleResource, '/role', '/roles', '/role/<code>')
     api.add_resource(TrayResource, '/tray', '/trays', '/tray/<num>')
     api.add_resource(RackResource, '/rack', '/racks', '/rack/<num>')
@@ -130,6 +133,10 @@ def create_app(test_config=None):
     # Register Resources
     register_resources(app)
 
+    # JWT setup
+    app.config['SECRET_KEY'] = os.getenv(SECRET_KEY)
+    jwt = JWTManager(app)
+
     #  LoginManager
     login.init_app(app)
     login.login_view = 'login_bp.login'
@@ -144,10 +151,10 @@ def create_app(test_config=None):
             'models': BaseModel.migrate_db()
         }
 
-    @app.route('/')
+    @app.route('/home')
     def index():
-        from flask_login import current_user
-        app.logger.info('Welcome Page Accessed!By {0}'.format(current_user))
+        from flask_jwt_extended import get_jwt_identity
+        app.logger.info('Welcome Page Accessed!By {0}'.format(get_jwt_identity()))
         return 'Hello, Welcome to MBBU Sample Management System!'
 
     @app.errorhandler(404)
