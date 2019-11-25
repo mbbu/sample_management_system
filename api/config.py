@@ -21,7 +21,7 @@ class RequestFormatter(logging.Formatter):
 class BaseConfig(object):
     database_uri = os.getenv(DATABASE_URI_ENV_NAME)
     SQLALCHEMY_DATABASE_URI = database_uri
-    SECRET_KEY = os.environ.get(APP_NAME + "_SECRET_KEY")
+    SECRET_KEY = os.environ.get(APP_NAME + "_SECRET_KEY") or os.urandom(32)
 
     # ADMIN MAILING CONFIG
     MAIL_SERVER = os.environ.get('MAIL_SERVER')

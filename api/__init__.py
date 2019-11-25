@@ -4,6 +4,7 @@ from logging.handlers import RotatingFileHandler
 from logging.handlers import SMTPHandler
 
 from flask import Flask
+from flask_jwt_extended import JWTManager
 from flask_login import LoginManager
 from flask_restful import Api
 
@@ -130,6 +131,10 @@ def create_app(test_config=None):
     # Register Resources
     register_resources(app)
 
+    # JWT setup
+    app.config['SECRET_KEY'] = os.getenv(BaseConfig.SECRET_KEY)
+    jwt = JWTManager(app)
+
     #  LoginManager
     login.init_app(app)
     login.login_view = 'login_bp.login'
@@ -144,10 +149,10 @@ def create_app(test_config=None):
             'models': BaseModel.migrate_db()
         }
 
-    @app.route('/')
+    @app.route('/home')
     def index():
-        from flask_login import current_user
-        app.logger.info('Welcome Page Accessed!By {0}'.format(current_user))
+        from flask_jwt_extended import get_jwt_identity
+        app.logger.info('Welcome Page Accessed!By {0}'.format(get_jwt_identity()))
         return 'Hello, Welcome to MBBU Sample Management System!'
 
     @app.errorhandler(404)
