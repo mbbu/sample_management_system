@@ -1,6 +1,9 @@
 from flask import current_app
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jti
 from flask_restful import fields, marshal, reqparse
 
+from api import revoked_store
+from api.constants import ACCESS_EXPIRES, REFRESH_EXPIRES
 from api.models.database import BaseModel
 from api.models.user import User
 from api.resources.base_resource import BaseResource
@@ -41,7 +44,23 @@ class UserResource(BaseResource):
 
                 BaseModel.db.session.add(user)
                 BaseModel.db.session.commit()
-                return BaseResource.send_json_message('Registered user', 201)
+
+                # LogIn User
+                access_token = create_access_token(identity=user.email)
+                refresh_token = create_refresh_token(identity=user.email)
+
+                data = marshal(user, self.fields)
+                data.update({"token": access_token})
+                data.update({"refresh_token": refresh_token})
+                data.update({"response": "Registered user"})
+
+                # store the JWTs to redis with a status of not currently revoked.
+                access_jti = get_jti(encoded_token=access_token)
+                refresh_jti = get_jti(encoded_token=refresh_token)
+                revoked_store.set(access_jti, 'false', ACCESS_EXPIRES * 1.2)
+                revoked_store.set(refresh_jti, 'false', REFRESH_EXPIRES * 1.2)
+
+                return BaseResource.send_json_message(data, 201)
             except Exception as e:
                 current_app.logger.error(e)
                 BaseModel.db.session.rollback()

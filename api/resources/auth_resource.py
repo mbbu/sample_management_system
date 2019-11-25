@@ -1,6 +1,8 @@
-from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jti, \
+    get_raw_jwt, jwt_refresh_token_required
 from flask_restful import fields, reqparse, marshal
 
+from api.constants import ACCESS_EXPIRES, REFRESH_EXPIRES, revoked_store
 from api.models.user import User
 from api.resources.base_resource import BaseResource
 from api.utils import non_empty_string
@@ -30,19 +32,32 @@ class AuthResource(BaseResource):
 
         elif user.verify_password(password):
             access_token = create_access_token(identity=user.email)
+            refresh_token = create_refresh_token(identity=user.email)
+
             data = marshal(user, self.fields)
             data.update({"token": access_token})
+            data.update({"refresh_token": refresh_token})
+
+            # store the JWTs to redis with a status of not currently revoked.
+            access_jti = get_jti(encoded_token=access_token)
+            refresh_jti = get_jti(encoded_token=refresh_token)
+            revoked_store.set(access_jti, 'false', ACCESS_EXPIRES * 1.2)
+            revoked_store.set(refresh_jti, 'false', REFRESH_EXPIRES * 1.2)
+
             return BaseResource.send_json_message(data, 200)
         else:
             return BaseResource.send_json_message("Wrong password try again", 403)
 
 
-class UserLogOutResource(BaseResource):
+class LogOutResource(BaseResource):
     @jwt_required
     def get(self):
-        current_user = get_jwt_identity()
-        if current_user:
-            # session.clear()
-            # todo: revoke token by using a blacklist
-            return BaseResource.send_json_message("Successfully Logged Out", 200)
-        return BaseResource.send_json_message("Error while logging out", 200)
+        jti = get_raw_jwt()['jti']
+        revoked_store.set(jti, 'true', ACCESS_EXPIRES * 1.2)
+        return BaseResource.send_json_message("Successfully Logged Out", 200)
+
+    @jwt_refresh_token_required
+    def post(self):
+        jti = get_raw_jwt()['jti']
+        revoked_store.set(jti, 'true', REFRESH_EXPIRES * 1.2)
+        return BaseResource.send_json_message("Refresh token revoked", 200)
