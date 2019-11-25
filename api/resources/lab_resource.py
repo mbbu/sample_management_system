@@ -9,7 +9,8 @@ from api.models.laboratory import Laboratory
 class LaboratoryResource(BaseResource):
     fields = {
         'name' : fields.String,
-        'room' : fields.String
+        'room' : fields.String,
+        'code' : fields.String
     }
 
     def get(self):
@@ -22,11 +23,12 @@ class LaboratoryResource(BaseResource):
 
         laboratory= Laboratory(
             name = args[0],
-            room = args[1]
+            room = args[1],
+            code = args[2]
         ) 
         BaseModel.db.session.add(laboratory)
         BaseModel.db.session.commit()
-        return BaseResource.send_json_message("Succgitessfully Added Laboratory", 200)
+        return BaseResource.send_json_message("Successfully Added Laboratory", 200)
 
     def put(self, name):
         laboratory = LaboratoryResource.get_laboratory(name)
@@ -36,10 +38,12 @@ class LaboratoryResource(BaseResource):
 
         args = LaboratoryResource.laboratory_args()
 
-        if args[0] != laboratory.name or args[2] != laboratory.room:
+        if args[0] != laboratory.name or args[1] != laboratory.room or args[2] != laboratory.code:
             try:
                 laboratory.name = args[0]
                 laboratory.room = args[1]
+                laboratory.code = args[2]
+
                 BaseModel.db.session.commit()
                 return BaseResource.send_json_message("Update was successful", 201)
 
@@ -63,14 +67,15 @@ class LaboratoryResource(BaseResource):
         parser = reqparse.RequestParser()
         parser.add_argument('name', required=True)
         parser.add_argument('room', required=True)
-
+        parser.add_argument('code', required=True)
         args = parser.parse_args()
 
         name = args['name']
         room = args['room']
+        code = args['code']
 
         return [
-            name, room
+            name, room, code
         ]
 
     @staticmethod

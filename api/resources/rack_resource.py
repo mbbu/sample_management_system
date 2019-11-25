@@ -9,7 +9,8 @@ from api.resources.base_resource import BaseResource
 class RackResource(BaseResource):
     fields = {
         'number': fields.Integer,
-        'chamber.type': fields.String
+        'chamber.type': fields.String,
+        'code': fields.String
     }
 
     def get(self):
@@ -21,10 +22,11 @@ class RackResource(BaseResource):
         args = RackResource.rack_parser()
         chamber = int(args['chamber'])
         number = int(args['number'])
+        code = (args['code'])
 
         if not Rack.rack_exists(number):
             try:
-                rack = Rack(chamber_id=chamber, number=number)
+                rack = Rack(chamber_id=chamber, number=number, code=code)
                 BaseModel.db.session.add(rack)
                 BaseModel.db.session.commit()
                 return BaseResource.send_json_message("Created new rack", 201)
@@ -40,14 +42,16 @@ class RackResource(BaseResource):
         args = RackResource.rack_parser()
         chamber = int(args['chamber'])
         number = int(args['number'])
+        code = (args['code'])
 
         rack = RackResource.get_rack(num)
 
         if rack is not None:
-            if rack.chamber_id != chamber or rack.number != number:
+            if rack.chamber_id != chamber or rack.number != number or code.rack != code:
                 try:
                     rack.chamber_id = chamber
                     rack.number = number
+                    rack.code = code
                     BaseModel.db.session.commit()
                     return BaseResource.send_json_message("Updated rack", 202)
                 except Exception as e:
@@ -71,6 +75,7 @@ class RackResource(BaseResource):
         parser = reqparse.RequestParser()
         parser.add_argument('chamber', required=True)
         parser.add_argument('number', required=True)
+        parser.add_argument('code', required=True)
 
         args = parser.parse_args()
         return args

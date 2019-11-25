@@ -6,6 +6,7 @@ class Laboratory(BaseModel.db.Model):
     id = AppDb.Column(AppDb.Integer, primary_key=True)
     name = AppDb.Column(AppDb.String(65), nullable=False)
     room = AppDb.Column(AppDb.Integer, nullable=False)
+    code = AppDb.Column(AppDb.String(65), nullable=False)
 
     def __repr__(self):
-        return '<< Laboratory: (name={0} || room={1}) >>'.format(self.name, self.room)
+        return '<< Laboratory: (name={0} || room={1} || code={2})  >>'.format(self.name, self.room, self.code)

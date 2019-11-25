@@ -10,7 +10,8 @@ class ChamberResource(BaseResource):
     fields = {
         'type': fields.String,
         'freezer.room': fields.String,
-        'freezer.number': fields.String
+        'freezer.number': fields.String,
+        'code' : fields.String
     }
 
     def get(self):
@@ -22,6 +23,7 @@ class ChamberResource(BaseResource):
         args = ChamberResource.chamber_parser()
         freezer = int(args['freezer'])
         _type = args['type']
+        code = args['code']
 
         if not Chamber.chamber_exists(_type):
             try:
@@ -41,14 +43,16 @@ class ChamberResource(BaseResource):
         args = ChamberResource.chamber_parser()
         freezer = int(args['freezer'])
         _type = args['type']
+        code = args['code']
 
         chamber = ChamberResource.get_chamber(c_type)
 
         if chamber is not None:
-            if chamber.freezer_id != freezer or chamber.type != _type:
+            if chamber.freezer_id != freezer or chamber.type != _type or code.chamber != code:
                 try:
                     chamber.freezer_id = freezer
                     chamber.type = _type
+                    chamber.commit = code
                     BaseModel.db.session.commit()
                     return BaseResource.send_json_message("Updated chamber", 202)
                 except Exception as e:
@@ -73,6 +77,7 @@ class ChamberResource(BaseResource):
         parser = reqparse.RequestParser()
         parser.add_argument('freezer', required=True)
         parser.add_argument('type', required=True)
+        parser.add_argument('code', required=True)
 
         args = parser.parse_args()
         return args
