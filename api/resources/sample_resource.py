@@ -43,8 +43,8 @@ class SampleResource(BaseResource):
         BaseModel.db.session.commit()
         return BaseResource.send_json_message("Sample created", 201)
 
-    def put(self, id):
-        sample = SampleResource.get_sample(id)
+    def put(self, code):
+        sample = SampleResource.get_sample(code)
         args = SampleResource.sample_args()
 
         if sample is not None:
@@ -84,8 +84,8 @@ class SampleResource(BaseResource):
             return BaseResource.send_json_message("No changes made", 304)
         return BaseResource.send_json_message("Sample not found", 404)
 
-    def delete(self, id):
-        sample = SampleResource.get_sample(id)
+    def delete(self, code):
+        sample = SampleResource.get_sample(code)
 
         if not sample:
             return BaseResource.send_json_message("Sample not found", 404)
@@ -139,5 +139,5 @@ class SampleResource(BaseResource):
         ]
 
     @staticmethod
-    def get_sample(sample_id):
-        return BaseModel.db.session.query(Sample).get(sample_id)
+    def get_sample(sample_code):
+        return BaseModel.db.session.query(Sample).get(sample_code)

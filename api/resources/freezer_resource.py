@@ -34,14 +34,14 @@ class FreezerResource(BaseResource):
         BaseModel.db.session.commit()
         return BaseResource.send_json_message("Freezer Successfully Created", 201)
 
-    def put(self, number):
-        freezer = FreezerResource.get_freezer(number)
+    def put(self, code):
+        freezer = FreezerResource.get_freezer(code)
 
         if not freezer:
             return BaseResource.send_json_message("Freezer does not exist", 404)
         args = FreezerResource.freezer_args()
 
-        if args[0] != freezer.laboratory_id or args[1] != freezer.number or args[2] != freezer.room:
+        if args[0] != freezer.laboratory_id or args[1] != freezer.number or args[2] != freezer.room or args[3] != freezer.code:
             try:
                 freezer.laboratory_id = args[0]
                 freezer.number = args[1]
@@ -56,8 +56,8 @@ class FreezerResource(BaseResource):
                 return BaseResource.send_json_message("Error while updating freezer", 500)
         return BaseResource.send_json_message("No changes made", 304)
 
-    def delete(self, number):
-        freezer = FreezerResource.get_freezer(number)
+    def delete(self, code):
+        freezer = FreezerResource.get_freezer(code)
 
         if not freezer:
             return BaseResource.send_json_message("Freezer does not exist", 404)
@@ -86,5 +86,5 @@ class FreezerResource(BaseResource):
         ]
 
     @staticmethod
-    def get_freezer(number):
-        return BaseModel.db.session.query(Freezer).filter_by(number=number).first()
+    def get_freezer(code):
+        return BaseModel.db.session.query(Freezer).filter_by(code=code).first()

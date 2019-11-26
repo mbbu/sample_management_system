@@ -36,12 +36,12 @@ class ThemeResource(BaseResource):
         current_app.logger.error("Error while adding theme :> Duplicate records")
         return BaseResource.send_json_message("Theme already exists", 500)
 
-    def put(self, id):
+    def put(self, code):
         args = ThemeResource.theme_parser()
         name = args['name']
         code = args['code']
 
-        theme = ThemeResource.get_theme(id)
+        theme = ThemeResource.get_theme(code)
 
         if theme is not None:
             if name != theme.name or code != theme.code:
@@ -60,8 +60,8 @@ class ThemeResource(BaseResource):
             return BaseResource.send_json_message("No changes made", 304)
         return BaseResource.send_json_message("Theme not found", 404)
 
-    def delete(self, id):
-        theme = ThemeResource.get_theme(id)
+    def delete(self, code):
+        theme = ThemeResource.get_theme(code)
 
         if not theme:
             return BaseResource.send_json_message("Theme not found", 404)
@@ -80,5 +80,5 @@ class ThemeResource(BaseResource):
         return args
 
     @staticmethod
-    def get_theme(theme_id):
-        return BaseModel.db.session.query(Theme).get(theme_id)
+    def get_theme(theme_code):
+        return BaseModel.db.session.query(Theme).get(theme_code)

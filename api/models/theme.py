@@ -11,9 +11,9 @@ class Theme(BaseModel.db.Model):
     sample = AppDb.relationship('Sample', backref='theme', lazy=True)
 
     @staticmethod
-    def theme_exists(name):
+    def theme_exists(code):
         if Theme.query.filter(
-                Theme.name == name
+                Theme.code == code
         ).first():
             return True
         return False
