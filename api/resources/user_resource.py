@@ -22,10 +22,20 @@ class UserResource(BaseResource):
         'updated_at': fields.DateTime
     }
 
-    def get(self):
-        users = User.query.all()
-        data = marshal(users, self.fields)
-        return BaseResource.send_json_message(data, 200)
+    def get(self, **kwargs):
+        if kwargs:
+            print(kwargs.get('email'))
+            email = kwargs.get('email')
+            user = get_user(email)
+            if user is None:
+                return BaseResource.send_json_message("User not found", 404)
+            else:
+                data = marshal(user, self.fields)
+                return BaseResource.send_json_message(data, 200)
+        else:
+            users = User.query.all()
+            data = marshal(users, self.fields)
+            return BaseResource.send_json_message(data, 200)
 
     def post(self):
         args = UserResource.user_parser()
@@ -108,13 +118,16 @@ class UserResource(BaseResource):
             return BaseResource.send_json_message("No changes made", 304)
         return BaseResource.send_json_message("User not found", 404)
 
+    @jwt_required
     def delete(self, email):
         user = get_user(email)
 
         if not user:
             return BaseResource.send_json_message("User not found", 404)
 
-        BaseModel.db.session.delete(user)
+        user.is_deleted = True
+        user.deleted_at = datetime.now()
+        user.deleted_by = get_jwt_identity()
         BaseModel.db.session.commit()
         return BaseResource.send_json_message("User deleted", 200)
 

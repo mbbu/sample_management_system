@@ -3,7 +3,7 @@ from api.models.user import User
 
 
 def get_user(email):
-    return BaseModel.db.session.query(User).filter_by(email=email).first()
+    return BaseModel.db.session.query(User).filter(User.email == email, User.is_deleted == False).first()
 
 
 def non_empty_string(s: str):
