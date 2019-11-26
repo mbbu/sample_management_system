@@ -1,5 +1,7 @@
+from datetime import datetime
+
 from flask import current_app
-from flask_jwt_extended import create_access_token, create_refresh_token, get_jti
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jti, jwt_required, get_jwt_identity
 from flask_restful import fields, marshal, reqparse
 
 from api import revoked_store
@@ -16,6 +18,8 @@ class UserResource(BaseResource):
         'email': fields.String,
         'first_name': fields.String,
         'last_name': fields.String,
+        'created_at': fields.DateTime,
+        'updated_at': fields.DateTime
     }
 
     def get(self):
@@ -39,7 +43,8 @@ class UserResource(BaseResource):
                     last_name=last_name,
                     email=email,
                     role_id=role,
-                    password=User.hash_password(password)
+                    password=User.hash_password(password),
+                    created_by=email
                 )
 
                 BaseModel.db.session.add(user)
@@ -68,6 +73,7 @@ class UserResource(BaseResource):
         current_app.logger.error("Error while adding theme :> Duplicate records")
         return BaseResource.send_json_message('User already exists', 500)
 
+    @jwt_required
     def put(self, email):
         args = UserResource.user_parser()
 
@@ -89,6 +95,8 @@ class UserResource(BaseResource):
                     user.email = user_email
                     user.role_id = role
                     user.password = User.hash_password(password)
+                    user.updated_at = datetime.now()
+                    user.updated_by = get_jwt_identity()
 
                     BaseModel.db.session.commit()
                     return BaseResource.send_json_message("Updated user", 202)
