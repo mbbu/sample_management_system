@@ -4,7 +4,7 @@ from api.models.database import BaseModel
 class Rack(BaseModel.db.Model):
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
-    chamber_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('chamber.id'))
+    chamber_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('chamber.id'), nullable=True)
     number = AppDb.Column(AppDb.Integer, nullable=False)  # todo: is this unique?
     code = AppDb.Column(AppDb.String(65), nullable=False)
 

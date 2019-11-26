@@ -10,7 +10,7 @@ class User(BaseModel.db.Model):
     last_name = AppDb.Column(AppDb.String(65), nullable=False)
     email = AppDb.Column(AppDb.String(65), index=True, unique=True, nullable=False)
     password = AppDb.Column(AppDb.String(128), nullable=False)
-    role_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('role.id'), nullable=False)
+    role_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('role.id'), nullable=True)
 
     # relationship(s)
     sample_owner = AppDb.relationship('Sample', backref='owner', lazy='dynamic')

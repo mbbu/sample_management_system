@@ -4,7 +4,7 @@ from api.models.database import BaseModel
 class Tray(BaseModel.db.Model):
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
-    rack_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('rack.id'))
+    rack_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('rack.id'), nullable=True)
     number = AppDb.Column(AppDb.Integer, nullable=False)  # todo: should be unique?
     code = AppDb.Column(AppDb.String, nullable=False)
 
