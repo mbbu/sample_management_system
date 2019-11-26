@@ -4,7 +4,7 @@ from api.models.database import BaseModel
 class Chamber(BaseModel.db.Model):  # todo: what is the unique identifier.
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
-    freezer_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('freezer.id'))
+    freezer_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('freezer.id'), nullable=True)
     type = AppDb.Column(AppDb.String(50), nullable=False)
     code = AppDb.Column(AppDb.String(65), nullable=False)
 

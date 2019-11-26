@@ -4,7 +4,7 @@ from api.models.database import BaseModel
 class Freezer(BaseModel.db.Model):
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
-    laboratory_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('laboratory.id'))
+    laboratory_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('laboratory.id'), nullable=True)
     number = AppDb.Column(AppDb.Integer, nullable=False)  
     room = AppDb.Column(AppDb.String(65), nullable=False)
     code = AppDb.Column(AppDb.String(65), nullable=False)
