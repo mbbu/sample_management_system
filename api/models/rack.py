@@ -12,9 +12,9 @@ class Rack(BaseModel.db.Model):
     chamber = AppDb.relationship('Chamber', backref='rack', lazy=True)
 
     @staticmethod
-    def rack_exists(num):
+    def rack_exists(code):
         if Rack.query.filter(
-                Rack.number == num
+                Rack.code == code
         ).first():
             return True
         return False

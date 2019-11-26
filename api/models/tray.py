@@ -12,9 +12,9 @@ class Tray(BaseModel.db.Model):
     rack = AppDb.relationship('Rack', backref='tray', lazy=True)
 
     @staticmethod
-    def tray_exists(num):
+    def tray_exists(code):
         if Tray.query.filter(
-            Tray.number == num
+            Tray.code == code
         ).first():
             return True
         return False

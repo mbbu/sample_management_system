@@ -38,13 +38,13 @@ class RackResource(BaseResource):
         current_app.logger.error("Error while adding tray :> Duplicate records")
         return BaseResource.send_json_message("Tray already exists", 500)
 
-    def put(self, num):
+    def put(self, code):
         args = RackResource.rack_parser()
         chamber = int(args['chamber'])
         number = int(args['number'])
         code = (args['code'])
 
-        rack = RackResource.get_rack(num)
+        rack = RackResource.get_rack(code)
 
         if rack is not None:
             if rack.chamber_id != chamber or rack.number != number or code.rack != code:
@@ -61,8 +61,8 @@ class RackResource(BaseResource):
             return BaseResource.send_json_message("No changes made", 304)
         return BaseResource.send_json_message("Rack not found", 404)
 
-    def delete(self, num):
-        rack = RackResource.get_rack(num)
+    def delete(self, code):
+        rack = RackResource.get_rack(code)
 
         if rack is None:
             return BaseResource.send_json_message("Rack not found", 404)
@@ -81,5 +81,5 @@ class RackResource(BaseResource):
         return args
 
     @staticmethod
-    def get_rack(num):
-        return BaseModel.db.session.query(Rack).filter_by(number=num).first()
+    def get_rack(code):
+        return BaseModel.db.session.query(Rack).filter_by(code=code).first()

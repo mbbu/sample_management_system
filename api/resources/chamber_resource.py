@@ -25,9 +25,9 @@ class ChamberResource(BaseResource):
         _type = args['type']
         code = args['code']
 
-        if not Chamber.chamber_exists(_type):
+        if not Chamber.chamber_exists(code):
             try:
-                chamber = Chamber(freezer_id=freezer, type=_type)
+                chamber = Chamber(freezer_id=freezer, type=_type, code=code)
                 BaseModel.db.session.add(chamber)
                 BaseModel.db.session.commit()
                 return BaseResource.send_json_message("Created new chamber", 201)
@@ -39,13 +39,13 @@ class ChamberResource(BaseResource):
         current_app.logger.error("Error while adding tray :> Duplicate records")
         return BaseResource.send_json_message("Chamber already exists", 500)
 
-    def put(self, c_type):
+    def put(self, code):
         args = ChamberResource.chamber_parser()
         freezer = int(args['freezer'])
         _type = args['type']
         code = args['code']
 
-        chamber = ChamberResource.get_chamber(c_type)
+        chamber = ChamberResource.get_chamber(code)
 
         if chamber is not None:
             if chamber.freezer_id != freezer or chamber.type != _type or code.chamber != code:
@@ -63,8 +63,8 @@ class ChamberResource(BaseResource):
             return BaseResource.send_json_message("No changes made", 304)
         return BaseResource.send_json_message("Chamber not found", 404)
 
-    def delete(self, c_type):
-        chamber = ChamberResource.get_chamber(c_type)
+    def delete(self, code):
+        chamber = ChamberResource.get_chamber(code)
 
         if chamber is None:
             return BaseResource.send_json_message("Chamber not found", 404)
@@ -83,5 +83,5 @@ class ChamberResource(BaseResource):
         return args
 
     @staticmethod
-    def get_chamber(c_type):
-        return BaseModel.db.session.query(Chamber).filter_by(type=c_type).first()
+    def get_chamber(code):
+        return BaseModel.db.session.query(Chamber).filter_by(code =code).first()

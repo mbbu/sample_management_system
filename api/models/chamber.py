@@ -12,9 +12,9 @@ class Chamber(BaseModel.db.Model):  # todo: what is the unique identifier.
     freezer = AppDb.relationship('Freezer', backref='chamber', lazy=True)
 
     @staticmethod
-    def chamber_exists(type):
+    def chamber_exists(code):
         if Chamber.query.filter(
-            Chamber.type == type
+            Chamber.code == code
         ).first():
             return True
         return False

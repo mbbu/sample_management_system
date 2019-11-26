@@ -38,13 +38,13 @@ class TrayResource(BaseResource):
         current_app.logger.error("Error while adding tray :> Duplicate records")
         return BaseResource.send_json_message("Tray already exists", 500)
 
-    def put(self, num):
+    def put(self, code):
         args = TrayResource.tray_parser()
         rack = int(args['rack'])
         number = int(args['number'])
         code = (args['code'])
 
-        tray = TrayResource.get_tray(num)
+        tray = TrayResource.get_tray(code)
         if tray is not None:
             if rack != tray.rack_id or number != tray.number:
                 try:
@@ -61,8 +61,8 @@ class TrayResource(BaseResource):
             return BaseResource.send_json_message("No changes made", 304)
         return BaseResource.send_json_message("Tray not found", 404)
 
-    def delete(self, num):
-        tray = TrayResource.get_tray(num)
+    def delete(self, code):
+        tray = TrayResource.get_tray(code)
 
         if not tray:
             return BaseResource.send_json_message("Tray not found", 404)
@@ -83,5 +83,5 @@ class TrayResource(BaseResource):
         return args
 
     @staticmethod
-    def get_tray(num):
-        return BaseModel.db.session.query(Tray).filter_by(number=num).first()
+    def get_tray(code):
+        return BaseModel.db.session.query(Tray).filter_by(code=code).first()
