@@ -140,4 +140,5 @@ class SampleResource(BaseResource):
 
     @staticmethod
     def get_sample(sample_code):
-        return BaseModel.db.session.query(Sample).get(sample_code)
+        return BaseModel.db.session.query(Sample).filter_by(code=sample_code).first()
+

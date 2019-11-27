@@ -4,9 +4,9 @@ from api.models.database import BaseModel
 class Sample(BaseModel.db.Model):
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
-    theme_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('theme.id'), nullable=True)
-    user_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('users.id'), nullable=True)
-    box_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('box.id'), nullable=True)
+    theme_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('theme.id', ondelete='SET NULL'), nullable=True)
+    user_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
+    box_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('box.id', ondelete='SET NULL'), nullable=True)
     animal_species = AppDb.Column(AppDb.String(100), nullable=False, index=True)
     sample_type = AppDb.Column(AppDb.String(100), nullable=False, index=True)
     sample_description = AppDb.Column(AppDb.String(150), nullable=False)
