@@ -9,40 +9,38 @@ from api.constants import ACCESS_EXPIRES, REFRESH_EXPIRES
 from api.models.database import BaseModel
 from api.models.user import User
 from api.resources.base_resource import BaseResource
-from api.utils import get_user
+from api.utils import get_user, get_users_by_role, log_in_user_jwt
 
 
 class UserResource(BaseResource):
     fields = {
-        'role_id': fields.Integer,
+        'role.name': fields.String,
         'email': fields.String,
         'first_name': fields.String,
-        'last_name': fields.String,
-        'created_at': fields.DateTime,
-        'updated_at': fields.DateTime
+        'last_name': fields.String
     }
 
     def get(self, **kwargs):
         if kwargs:
-            print(kwargs.get('email'))
             email = kwargs.get('email')
-            user = get_user(email)
-            if user is None:
-                return BaseResource.send_json_message("User not found", 404)
-            else:
-                data = marshal(user, self.fields)
-                return BaseResource.send_json_message(data, 200)
+            role = kwargs.get('role')
+
+            if email:
+                user = get_user(email)
+                return UserResource.get_response(user)
+            elif role:
+                users = get_users_by_role(role)
+                return UserResource.get_response(users)
         else:
             users = User.query.all()
-            data = marshal(users, self.fields)
-            return BaseResource.send_json_message(data, 200)
+            return UserResource.get_response(users)
 
     def post(self):
         args = UserResource.user_parser()
 
         first_name = args['first_name']
         last_name = args['last_name']
-        email = args['email']
+        email = str(args['email']).lower()
         role = args['role']
         password = args['password']
 
@@ -56,30 +54,27 @@ class UserResource(BaseResource):
                     password=User.hash_password(password),
                     created_by=email
                 )
-
                 BaseModel.db.session.add(user)
                 BaseModel.db.session.commit()
 
                 # LogIn User
-                access_token = create_access_token(identity=user.email)
-                refresh_token = create_refresh_token(identity=user.email)
+                login = log_in_user_jwt(user)
+                access_token = login.get('access_token')
+                refresh_token = login.get('refresh_token')
 
                 data = marshal(user, self.fields)
                 data.update({"token": access_token})
                 data.update({"refresh_token": refresh_token})
                 data.update({"response": "Registered user"})
-
-                # store the JWTs to redis with a status of not currently revoked.
-                access_jti = get_jti(encoded_token=access_token)
-                refresh_jti = get_jti(encoded_token=refresh_token)
-                revoked_store.set(access_jti, 'false', ACCESS_EXPIRES * 1.2)
-                revoked_store.set(refresh_jti, 'false', REFRESH_EXPIRES * 1.2)
-
+                current_app.logger.info("New user created;"
+                                        "name={0}, email={1} at time={2}".format(first_name, email, datetime.now()))
                 return BaseResource.send_json_message(data, 201)
+
             except Exception as e:
                 current_app.logger.error(e)
                 BaseModel.db.session.rollback()
                 return BaseResource.send_json_message("Error while adding User", 500)
+
         current_app.logger.error("Error while adding theme :> Duplicate records")
         return BaseResource.send_json_message('User already exists', 500)
 
@@ -89,7 +84,7 @@ class UserResource(BaseResource):
 
         first_name = args['first_name']
         last_name = args['last_name']
-        user_email = args['email']
+        user_email = str(args['email']).lower()
         role = int(args['role'])
         password = args['password']
 
@@ -109,13 +104,18 @@ class UserResource(BaseResource):
                     user.updated_by = get_jwt_identity()
 
                     BaseModel.db.session.commit()
+                    current_app.logger.info("{0} updated some info;"
+                                            "email={1}, role={2} at time={3}"
+                                            .format(first_name, email, role, datetime.now()))
                     return BaseResource.send_json_message("Updated user", 202)
 
                 except Exception as e:
                     current_app.logger.error(e)
                     BaseModel.db.session.rollback()
                     return BaseResource.send_json_message("Error while updating user. Another user has that email", 500)
+
             return BaseResource.send_json_message("No changes made", 304)
+        current_app.logger.info("{0} trying to update {1} but does not exist".format(get_jwt_identity(), user.email))
         return BaseResource.send_json_message("User not found", 404)
 
     @jwt_required
@@ -129,6 +129,7 @@ class UserResource(BaseResource):
         user.deleted_at = datetime.now()
         user.deleted_by = get_jwt_identity()
         BaseModel.db.session.commit()
+        current_app.logger.info("{0} deleted {1}".format(get_jwt_identity(), user.email))
         return BaseResource.send_json_message("User deleted", 200)
 
     @staticmethod
@@ -142,3 +143,11 @@ class UserResource(BaseResource):
 
         args = parser.parse_args()
         return args
+
+    @staticmethod
+    def get_response(user):
+        if user is None:
+            return BaseResource.send_json_message("User not found", 404)
+        else:
+            data = marshal(user, UserResource.fields)
+            return BaseResource.send_json_message(data, 200)

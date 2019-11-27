@@ -79,7 +79,7 @@ def register_resources(app):
     api.add_resource(LogOutResource, '/logout', '/log-out')
     api.add_resource(SampleResource, '/sample', '/samples', '/sample/<code>')
     api.add_resource(ThemeResource, '/theme', '/themes', '/theme/<code>')
-    api.add_resource(UserResource, '/user', '/users', '/user/<email>')
+    api.add_resource(UserResource, '/users', '/user/<string:email>', '/user/<int:role>')
     api.add_resource(PublicationResource, '/publication', '/publications', '/publication/<publication_title>')
     api.add_resource(BoxResource, '/box', '/boxes', '/box/<label>')
     api.add_resource(RoleResource, '/role', '/roles', '/role/<code>')
