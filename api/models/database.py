@@ -25,14 +25,15 @@ class BaseModel(object):
         from api.models.freezer import Freezer
         from api.models.laboratory import Laboratory
         from api.models.publication import Publication
-        return  [
-            Role, User, Theme, Sample,
-            Box, Tray, Rack,
-            Chamber, Freezer, Laboratory, Publication
-        ]
 
-        #for model in models:
-            #return model
+        models = [
+                    Role, User, Theme, Sample,
+                    Box, Tray, Rack,
+                    Chamber, Freezer, Laboratory, Publication
+                ]
+
+        for model in models:
+            return model
 
     @staticmethod
     def init_app(app):
