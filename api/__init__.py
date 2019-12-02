@@ -6,7 +6,7 @@ from logging.handlers import SMTPHandler
 from flask import Flask
 from flask_jwt_extended import JWTManager, jwt_required
 from flask_restful import Api
-from werkzeug.exceptions import NotFound, BadRequest, InternalServerError
+from werkzeug.exceptions import NotFound, InternalServerError
 
 from api.config import BaseConfig
 from api.constants import APP_CONFIG_ENV_VAR, DEV_CONFIG_VAR, PROD_CONFIG_VAR, APP_NAME, SECRET_KEY, revoked_store
@@ -79,7 +79,8 @@ def register_resources(app):
     api.add_resource(LogOutResource, '/logout', '/log-out')
     api.add_resource(SampleResource, '/sample', '/samples', '/sample/<code>')
     api.add_resource(ThemeResource, '/theme', '/themes', '/theme/<code>')
-    api.add_resource(UserResource, '/users', '/user/<string:email>', '/user/<int:role>')
+    api.add_resource(UserResource, '/users', '/user/<string:email>', '/user/deleted=<string:deleted>',
+                     '/user/<int:role>')
     api.add_resource(PublicationResource, '/publication', '/publications', '/publication/<publication_title>')
     api.add_resource(BoxResource, '/box', '/boxes', '/box/<label>')
     api.add_resource(RoleResource, '/role', '/roles', '/role/<code>')
@@ -174,4 +175,3 @@ def create_app(test_config=None):
                                               'Sorry for the inconvenience!', 500)
 
     return app
-

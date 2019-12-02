@@ -3,7 +3,6 @@ from flask_jwt_extended import create_access_token, create_refresh_token, jwt_re
 from flask_restful import fields, reqparse, marshal
 
 from api.constants import ACCESS_EXPIRES, REFRESH_EXPIRES, revoked_store
-from api.models.user import User
 from api.resources.base_resource import BaseResource
 from api.utils import non_empty_string, get_user_by_email
 
@@ -22,7 +21,7 @@ class AuthResource(BaseResource):
 
         args = parser.parse_args()
 
-        email = str(args['email'])
+        email = str(args['email']).lower()
         password = args['password']
 
         user = get_user_by_email(email)

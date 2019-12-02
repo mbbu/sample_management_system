@@ -1,15 +1,14 @@
 from datetime import datetime
 
 from flask import current_app
-from flask_jwt_extended import current_user, create_refresh_token, get_jti, jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restful import fields, marshal, reqparse
 
-from api import revoked_store
-from api.constants import ACCESS_EXPIRES, REFRESH_EXPIRES
 from api.models.database import BaseModel
 from api.models.user import User
 from api.resources.base_resource import BaseResource
-from api.utils import get_active_users, get_user_by_email, get_users_by_role, log_in_user_jwt
+from api.utils import get_active_users, get_user_by_email, get_users_by_role, get_users_by_status, get_deactivated_user, \
+    log_in_user_jwt
 
 
 class UserResource(BaseResource):
@@ -22,14 +21,18 @@ class UserResource(BaseResource):
 
     def get(self, **kwargs):
         if kwargs:
-            email = kwargs.get('email')
+            email = str(kwargs.get('email')).lower()
             role = kwargs.get('role')
+            deleted = kwargs.get('deleted')
 
             if email:
                 user = get_user_by_email(email)
                 return UserResource.get_response(user)
             elif role:
                 users = get_users_by_role(role)
+                return UserResource.get_response(users)
+            elif deleted:
+                users = get_users_by_status(deleted)
                 return UserResource.get_response(users)
         else:
             users = get_active_users()
@@ -43,6 +46,8 @@ class UserResource(BaseResource):
         email = str(args['email']).lower()
         role = args['role']
         password = args['password']
+
+        deactivated_user = get_deactivated_user(email)
 
         if not User.user_exists(email):
             try:
@@ -75,8 +80,27 @@ class UserResource(BaseResource):
                 BaseModel.db.session.rollback()
                 return BaseResource.send_json_message("Error while adding User", 500)
 
-        current_app.logger.error("Error while adding theme :> Duplicate records")
-        return BaseResource.send_json_message('User already exists', 500)
+        elif deactivated_user is not None:
+            deactivated_user.is_deleted = False
+            deactivated_user.updated_at = datetime.now()
+            deactivated_user.updated_by = get_jwt_identity()
+            BaseModel.db.session.commit()
+
+            # LogIn User
+            login = log_in_user_jwt(deactivated_user)
+            access_token = login.get('access_token')
+            refresh_token = login.get('refresh_token')
+
+            data = marshal(deactivated_user, self.fields)
+            data.update({"token": access_token})
+            data.update({"refresh_token": refresh_token})
+            data.update({"response": "Registered user"})
+            current_app.logger.info("User's account has been activated;"
+                                    "name={0}, email={1} at time={2}".format(first_name, email, datetime.now()))
+            return BaseResource.send_json_message(data, 201)
+        else:
+            current_app.logger.error("Error while adding theme :> Duplicate records")
+            return BaseResource.send_json_message('User already exists', 500)
 
     @jwt_required
     def put(self, email):
@@ -118,7 +142,8 @@ class UserResource(BaseResource):
                     except Exception as e:
                         current_app.logger.error(e)
                         BaseModel.db.session.rollback()
-                        return BaseResource.send_json_message("Error while updating user. Another user has that email", 500)
+                        return BaseResource.send_json_message("Error while updating user. Another user has that email",
+                                                              500)
 
                 return BaseResource.send_json_message("No changes made", 304)
         current_app.logger.info("{0} trying to update {1} but does not exist".format(get_jwt_identity(), email))
@@ -126,7 +151,8 @@ class UserResource(BaseResource):
 
     @jwt_required
     def delete(self, email):
-        user = get_user_by_email(email)
+        em = str(email).lower()
+        user = get_user_by_email(em)
 
         if user is not None:
             if get_jwt_identity() != user.email:
@@ -162,3 +188,11 @@ class UserResource(BaseResource):
         else:
             data = marshal(user, UserResource.fields)
             return BaseResource.send_json_message(data, 200)
+
+
+class DeactivatedUsersResource(BaseResource):
+    def get(self):
+        return
+
+    def post(self):
+        return

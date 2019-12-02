@@ -41,6 +41,14 @@ def get_users_by_role(role):
     return BaseModel.db.session.query(User).filter(User.role_id == role, User.is_deleted == False).all()
 
 
+def get_users_by_status(status):
+    return BaseModel.db.session.query(User).filter(User.is_deleted == status).all()
+
+
+def get_deactivated_user(email):
+    return BaseModel.db.session.query(User).filter(User.email == email, User.is_deleted == True).first()
+
+
 def log_in_user_jwt(user):
     access_token = create_access_token(identity=user.email)
     refresh_token = create_refresh_token(identity=user.email)
