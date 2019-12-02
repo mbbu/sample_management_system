@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 
 
 class BaseModel(object):
-    # db = None
     db = SQLAlchemy()
 
     @staticmethod
@@ -25,16 +24,19 @@ class BaseModel(object):
         from api.models.freezer import Freezer
         from api.models.laboratory import Laboratory
         from api.models.publication import Publication
-        return  [
+        return [
             Role, User, Theme, Sample,
             Box, Tray, Rack,
             Chamber, Freezer, Laboratory, Publication
         ]
 
-        #for model in models:
-            #return model
+    @staticmethod
+    def db_meta_data():
+        models = BaseModel.migrate_db()
+        for model in models:
+            return model
 
     @staticmethod
     def init_app(app):
-        BaseModel.init_db(app)
-        Migrate(app, BaseModel.init_db(app))
+        db = BaseModel.init_db(app)
+        Migrate(app=app, db=db)
