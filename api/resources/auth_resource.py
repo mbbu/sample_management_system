@@ -5,7 +5,7 @@ from flask_restful import fields, reqparse, marshal
 from api.constants import ACCESS_EXPIRES, REFRESH_EXPIRES, revoked_store
 from api.models.user import User
 from api.resources.base_resource import BaseResource
-from api.utils import non_empty_string
+from api.utils import non_empty_string, get_user_by_email
 
 
 class AuthResource(BaseResource):
@@ -25,7 +25,7 @@ class AuthResource(BaseResource):
         email = str(args['email'])
         password = args['password']
 
-        user = User.query.filter(User.email == email).first()
+        user = get_user_by_email(email)
 
         if user is None:
             return BaseResource.send_json_message("User not found", 404)

@@ -6,7 +6,34 @@ from api.models.database import BaseModel
 from api.models.user import User
 
 
-def get_user(email):
+"""
+    Parser formatting methods for json fields sent in request. Plays the same role as 
+    the form validation methods.    
+"""
+
+
+def non_empty_string(s: str):
+    if not s:
+        raise ValueError("Expected a non empty string")
+    return s
+
+
+def non_empty_int(i: int):
+    if not i:
+        raise ValueError("Expected an integer")
+    return i
+
+
+"""
+    Functions for requesting user resources. 
+"""
+
+
+def get_active_users():
+    return BaseModel.db.session.query(User).filter(User.is_deleted == False).all()
+
+
+def get_user_by_email(email):
     return BaseModel.db.session.query(User).filter(User.email == email, User.is_deleted == False).first()
 
 
@@ -26,14 +53,3 @@ def log_in_user_jwt(user):
 
     return {'access_token': access_token, 'refresh_token': refresh_token}
 
-
-def non_empty_string(s: str):
-    if not s:
-        raise ValueError("Expected a non empty string")
-    return s
-
-
-def non_empty_int(i: int):
-    if not i:
-        raise ValueError("Expected an integer")
-    return i
