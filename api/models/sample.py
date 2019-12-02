@@ -28,10 +28,11 @@ class Sample(BaseModel.db.Model):
 
     def __repr__(self):
         return '<< Sample: (type={0} || desc={1} || project={2} || barcode={3} || species={4} ||' \
-               'box={5} || retention={6} || amount={7} || code={8} ) >>' \
-            .format(self.sample_type, self.sample_description,
-                    self.project, self.barcode, self.animal_species,
-                    self.box_id, self.retention_period, self.amount, self.code,
-                    # not represented
-                    self.location_collected, self.project_owner,
-                    self.analysis, self.temperature)
+            'box={5} || retention={6} || amount={7} || code={8} || location={9} || owner={10}'  \
+            'analysis={11} || temperature={12} ) >>' \
+        .format(self.sample_type, self.sample_description,
+            self.project, self.barcode, self.animal_species,
+            self.box_id, self.retention_period, self.amount, self.code,
+            # not represented
+            self.location_collected, self.project_owner,
+            self.analysis, self.temperature)
