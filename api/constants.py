@@ -12,7 +12,7 @@ PROD_CONFIG_VAR = "production"
 SECRET_KEY = APP_NAME + '_SECRET_KEY'
 
 # Redis
-ACCESS_EXPIRES = timedelta(minutes=15)
+ACCESS_EXPIRES = timedelta(days=7)
 REFRESH_EXPIRES = timedelta(days=30)
 
 revoked_store = redis.StrictRedis(host='localhost', port=6379, db=0,
