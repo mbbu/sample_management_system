@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import current_app
+from flask import current_app, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restful import fields, marshal, reqparse
 
@@ -8,7 +8,7 @@ from api.models.database import BaseModel
 from api.models.user import User
 from api.resources.base_resource import BaseResource
 from api.utils import get_active_users, get_user_by_email, get_users_by_role, get_users_by_status, get_deactivated_user, \
-    log_in_user_jwt
+    log_in_user_jwt, format_and_lower_str
 
 
 class UserResource(BaseResource):
@@ -19,21 +19,22 @@ class UserResource(BaseResource):
         'last_name': fields.String
     }
 
-    def get(self, **kwargs):
-        if kwargs:
-            email = str(kwargs.get('email')).lower()
-            role = kwargs.get('role')
-            deleted = kwargs.get('deleted')
+    def get(self):
+        email = request.args.get('email')
+        role = request.args.get('role')
+        deleted = request.args.get('deleted')
 
-            if email:
-                user = get_user_by_email(email)
-                return UserResource.get_response(user)
-            elif role:
-                users = get_users_by_role(role)
-                return UserResource.get_response(users)
-            elif deleted:
-                users = get_users_by_status(deleted)
-                return UserResource.get_response(users)
+        if email is not None:
+            email = format_and_lower_str(email)()
+            user = get_user_by_email(email)
+            return UserResource.get_response(user)
+        elif role is not None:
+            users = get_users_by_role(role)
+            return UserResource.get_response(users)
+        elif deleted is not None:
+            deleted = str.capitalize(deleted)
+            users = get_users_by_status(deleted)
+            return UserResource.get_response(users)
         else:
             users = get_active_users()
             return UserResource.get_response(users)
@@ -83,7 +84,8 @@ class UserResource(BaseResource):
         elif deactivated_user is not None:
             deactivated_user.is_deleted = False
             deactivated_user.updated_at = datetime.now()
-            deactivated_user.updated_by = get_jwt_identity()
+            deactivated_user.password = User.hash_password(password)
+            deactivated_user.updated_by = get_jwt_identity() or deactivated_user.email
             BaseModel.db.session.commit()
 
             # LogIn User
@@ -103,7 +105,8 @@ class UserResource(BaseResource):
             return BaseResource.send_json_message('User already exists', 500)
 
     @jwt_required
-    def put(self, email):
+    def put(self):
+        email = format_and_lower_str(get_jwt_identity())()
         user = get_user_by_email(email)
 
         if user is not None:
@@ -131,7 +134,7 @@ class UserResource(BaseResource):
                         user.role_id = role
                         user.password = User.hash_password(password)
                         user.updated_at = datetime.now()
-                        user.updated_by = get_jwt_identity()
+                        user.updated_by = user.email
 
                         BaseModel.db.session.commit()
                         current_app.logger.info("{0} updated some info;"
@@ -150,9 +153,9 @@ class UserResource(BaseResource):
         return BaseResource.send_json_message("User not found", 404)
 
     @jwt_required
-    def delete(self, email):
-        em = str(email).lower()
-        user = get_user_by_email(em)
+    def delete(self):
+        email = format_and_lower_str(get_jwt_identity())()
+        user = get_user_by_email(email)
 
         if user is not None:
             if get_jwt_identity() != user.email:
@@ -188,11 +191,3 @@ class UserResource(BaseResource):
         else:
             data = marshal(user, UserResource.fields)
             return BaseResource.send_json_message(data, 200)
-
-
-class DeactivatedUsersResource(BaseResource):
-    def get(self):
-        return
-
-    def post(self):
-        return

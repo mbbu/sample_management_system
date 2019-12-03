@@ -5,7 +5,6 @@ from api.constants import ACCESS_EXPIRES, REFRESH_EXPIRES
 from api.models.database import BaseModel
 from api.models.user import User
 
-
 """
     Parser formatting methods for json fields sent in request. Plays the same role as 
     the form validation methods.    
@@ -61,3 +60,11 @@ def log_in_user_jwt(user):
 
     return {'access_token': access_token, 'refresh_token': refresh_token}
 
+
+"""
+    String formatters
+"""
+
+
+def format_and_lower_str(string):
+    return lambda: str(string).lower()

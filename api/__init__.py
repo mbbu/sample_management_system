@@ -79,8 +79,7 @@ def register_resources(app):
     api.add_resource(LogOutResource, '/logout', '/log-out')
     api.add_resource(SampleResource, '/sample', '/samples', '/sample/<code>')
     api.add_resource(ThemeResource, '/theme', '/themes', '/theme/<code>')
-    api.add_resource(UserResource, '/users', '/user/<string:email>', '/user/deleted=<string:deleted>',
-                     '/user/<int:role>')
+    api.add_resource(UserResource, '/user', '/users')
     api.add_resource(PublicationResource, '/publication', '/publications', '/publication/<publication_title>')
     api.add_resource(BoxResource, '/box', '/boxes', '/box/<label>')
     api.add_resource(RoleResource, '/role', '/roles', '/role/<code>')
@@ -89,6 +88,10 @@ def register_resources(app):
     api.add_resource(ChamberResource, '/chamber', '/chambers', '/chamber/<code>')
     api.add_resource(FreezerResource, '/freezer', '/freezers', '/freezer/<code>')
     api.add_resource(LaboratoryResource, '/laboratory', '/laboratory/<code>')
+
+    # Error handlers
+    # api.handle_error(500)
+    # api.error_router()
 
     # TODO: register resources here
 
