@@ -4,11 +4,12 @@ from logging.handlers import RotatingFileHandler
 from logging.handlers import SMTPHandler
 
 from flask import Flask
-from flask_login import LoginManager
+from flask_jwt_extended import JWTManager, jwt_required
 from flask_restful import Api
+from werkzeug.exceptions import NotFound, InternalServerError
 
 from api.config import BaseConfig
-from api.constants import APP_CONFIG_ENV_VAR, DEV_CONFIG_VAR, PROD_CONFIG_VAR, APP_NAME
+from api.constants import APP_CONFIG_ENV_VAR, DEV_CONFIG_VAR, PROD_CONFIG_VAR, APP_NAME, SECRET_KEY, revoked_store
 from api.models.database import BaseModel
 from api.resources.base_resource import BaseResource
 
@@ -59,6 +60,7 @@ def mail_admin(app):
 def register_resources(app):
     # TODO: import resources here
     from api.resources.hello_world_resource import HelloWorldResource
+    from api.resources.auth_resource import AuthResource, LogOutResource
     from api.resources.theme_resource import ThemeResource
     from api.resources.sample_resource import SampleResource
     from api.resources.user_resource import UserResource
@@ -73,17 +75,23 @@ def register_resources(app):
 
     api = Api(app)
     api.add_resource(HelloWorldResource, '/', '/index', '/welcome')
-    api.add_resource(SampleResource, '/sample', '/samples', '/sample/<id>')
-    api.add_resource(ThemeResource, '/theme', '/themes', '/theme/<id>')
-    api.add_resource(UserResource, '/user', '/users', '/user/<email>')
-    api.add_resource(PublicationResource, '/publication', '/publications', '/publication/<id>')
-    api.add_resource(BoxResource, '/box','/boxes', '/box/<label>')
+    api.add_resource(AuthResource, '/auth', '/login', '/auth/login')
+    api.add_resource(LogOutResource, '/logout', '/log-out')
+    api.add_resource(SampleResource, '/sample', '/samples', '/sample/<code>')
+    api.add_resource(ThemeResource, '/theme', '/themes', '/theme/<code>')
+    api.add_resource(UserResource, '/user', '/users')
+    api.add_resource(PublicationResource, '/publication', '/publications', '/publication/<publication_title>')
+    api.add_resource(BoxResource, '/box', '/boxes', '/box/<label>')
     api.add_resource(RoleResource, '/role', '/roles', '/role/<code>')
-    api.add_resource(TrayResource, '/tray', '/trays', '/tray/<num>')
-    api.add_resource(RackResource, '/rack', '/racks', '/rack/<num>')
-    api.add_resource(ChamberResource, '/chamber', '/chambers', '/chamber/<c_type>')
-    api.add_resource(FreezerResource, '/freezer', '/freezers', '/freezer/<number>')
-    api.add_resource(LaboratoryResource, '/laboratory', '/laboratory/<name>')
+    api.add_resource(TrayResource, '/tray', '/trays', '/tray/<code>')
+    api.add_resource(RackResource, '/rack', '/racks', '/rack/<code>')
+    api.add_resource(ChamberResource, '/chamber', '/chambers', '/chamber/<code>')
+    api.add_resource(FreezerResource, '/freezer', '/freezers', '/freezer/<code>')
+    api.add_resource(LaboratoryResource, '/laboratory', '/laboratory/<code>')
+
+    # Error handlers
+    # api.handle_error(500)
+    # api.error_router()
 
     # TODO: register resources here
 
@@ -109,9 +117,6 @@ def config_app(app_instance):
     app_instance.url_map.strict_slashes = False
 
 
-login = LoginManager()
-
-
 # Application Factory
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
@@ -130,9 +135,17 @@ def create_app(test_config=None):
     # Register Resources
     register_resources(app)
 
-    #  LoginManager
-    login.init_app(app)
-    login.login_view = 'login_bp.login'
+    # JWT setup
+    app.config['SECRET_KEY'] = os.getenv(SECRET_KEY)
+    jwt = JWTManager(app)
+
+    @jwt.token_in_blacklist_loader
+    def check_if_token_is_revoked(decrypted_token):
+        jti = decrypted_token['jti']
+        entry = revoked_store.get(jti)
+        if entry is None:
+            return True
+        return entry == 'true'
 
     # Database and Migrations setup
     db = BaseModel.init_app(app)
@@ -144,29 +157,24 @@ def create_app(test_config=None):
             'models': BaseModel.migrate_db()
         }
 
-    @app.route('/')
+    @app.route('/home')
+    @jwt_required
     def index():
-        from flask_login import current_user
-        app.logger.info('Welcome Page Accessed!By {0}'.format(current_user))
+        from flask_jwt_extended import get_jwt_identity
+        app.logger.info('Welcome Page Accessed!By {0}'.format(get_jwt_identity()))
         return 'Hello, Welcome to MBBU Sample Management System!'
 
-    @app.errorhandler(404)
+    @app.errorhandler(NotFound)
     def not_found_error(error):
         app.logger.info(error)
         return BaseResource.send_json_message('Sorry we couldn\'t find what you were looking for.', 404)
 
-    @app.errorhandler(500)
+    @app.errorhandler(InternalServerError)
     def internal_error(error):
         BaseModel.init_db(app).session.rollback()
         app.logger.error(error)
         return BaseResource.send_json_message('An unexpected error occurred!'
-                                              ' But stay put the administrator has been notified. '
+                                              'But stay put the administrator has been notified. '
                                               'Sorry for the inconvenience!', 500)
 
     return app
-
-
-@login.user_loader
-def load_user(user_id):
-    from api.models.user import User
-    BaseModel.db.session.query(User).get(int(user_id))

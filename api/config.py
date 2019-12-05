@@ -3,7 +3,7 @@ import os
 
 from flask import has_request_context, request
 
-from api.constants import APP_NAME, DATABASE_URI_ENV_NAME
+from api.constants import APP_NAME, DATABASE_URI_ENV_NAME, SECRET_KEY, ACCESS_EXPIRES, REFRESH_EXPIRES
 
 
 # override default log formats
@@ -21,7 +21,7 @@ class RequestFormatter(logging.Formatter):
 class BaseConfig(object):
     database_uri = os.getenv(DATABASE_URI_ENV_NAME)
     SQLALCHEMY_DATABASE_URI = database_uri
-    SECRET_KEY = os.environ.get(APP_NAME + "_SECRET_KEY")
+    SECRET_KEY = os.environ.get(SECRET_KEY) or os.urandom(32)
 
     # ADMIN MAILING CONFIG
     MAIL_SERVER = os.environ.get('MAIL_SERVER')
@@ -36,6 +36,13 @@ class BaseConfig(object):
         '[%(asctime)s] Remote Address:%(remote_addr)s requested %(url)s\n'
         ' [%(levelname)s]: %(message)s [in %(pathname)s::%(lineno)d]\n'
     )
+
+    # Redis
+    JWT_ACCESS_TOKEN_EXPIRES = ACCESS_EXPIRES
+    JWT_REFRESH_TOKEN_EXPIRES = REFRESH_EXPIRES
+    JWT_BLACKLIST_ENABLED = True
+    JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
+    PROPAGATE_EXCEPTIONS = True
 
 
 class DevelopmentConfig(BaseConfig):

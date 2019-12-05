@@ -10,6 +10,7 @@ class TrayResource(BaseResource):
     fields = {
         'number': fields.Integer,
         'rack.number': fields.Integer,
+        'code': fields.String
     }
 
     def get(self):
@@ -21,6 +22,7 @@ class TrayResource(BaseResource):
         args = TrayResource.tray_parser()
         rack = int(args['rack'])
         number = int(args['number'])
+        code = (args['code'])
 
         if not Tray.tray_exists(number):
             try:
@@ -36,17 +38,19 @@ class TrayResource(BaseResource):
         current_app.logger.error("Error while adding tray :> Duplicate records")
         return BaseResource.send_json_message("Tray already exists", 500)
 
-    def put(self, num):
+    def put(self, code):
         args = TrayResource.tray_parser()
         rack = int(args['rack'])
         number = int(args['number'])
+        code = (args['code'])
 
-        tray = TrayResource.get_tray(num)
+        tray = TrayResource.get_tray(code)
         if tray is not None:
             if rack != tray.rack_id or number != tray.number:
                 try:
                     tray.rack_id = rack
                     tray.number = number
+                    tray.code = code
                     BaseModel.db.session.commit()
                     return BaseResource.send_json_message("Updated tray", 202)
 
@@ -57,8 +61,8 @@ class TrayResource(BaseResource):
             return BaseResource.send_json_message("No changes made", 304)
         return BaseResource.send_json_message("Tray not found", 404)
 
-    def delete(self, num):
-        tray = TrayResource.get_tray(num)
+    def delete(self, code):
+        tray = TrayResource.get_tray(code)
 
         if not tray:
             return BaseResource.send_json_message("Tray not found", 404)
@@ -72,10 +76,12 @@ class TrayResource(BaseResource):
         parser = reqparse.RequestParser()
         parser.add_argument('rack', required=True)
         parser.add_argument('number', required=True)
+        parser.add_argument('code', required=True)
+
 
         args = parser.parse_args()
         return args
 
     @staticmethod
-    def get_tray(num):
-        return BaseModel.db.session.query(Tray).filter_by(number=num).first()
+    def get_tray(code):
+        return BaseModel.db.session.query(Tray).filter_by(code=code).first()

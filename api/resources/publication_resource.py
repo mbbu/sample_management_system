@@ -49,7 +49,7 @@ class PublicationResource(BaseResource):
         current_app.logger.error("Error while adding Publication :> Duplicate records")
         return BaseResource.send_json_message('Publication already exists', 500)
 
-    def put(self, id):
+    def put(self, publication_title):
         args = PublicationResource.publication_parser()
 
         sample_id = args['sample_id']
@@ -58,7 +58,7 @@ class PublicationResource(BaseResource):
         publication_title = args['publication_title']
         co_authors = args['co_authors']
 
-        publication = PublicationResource.get_publication(id)
+        publication = PublicationResource.get_publication(publication_title)
 
         if publication is not None:
             if sample_id != publication.sample_id or user_id != publication.user_id or \
@@ -82,8 +82,8 @@ class PublicationResource(BaseResource):
             current_app.logger.error("No changes were made", 304)
             return BaseResource.send_json_message("No changes found", 404)
 
-    def delete(self, id):
-        publication = PublicationResource.get_publication(id)
+    def delete(self, publication_title):
+        publication = PublicationResource.get_publication(publication_title)
 
         if not publication:
             return BaseResource.send_json_message("Publication does not exist", 404)
@@ -105,5 +105,5 @@ class PublicationResource(BaseResource):
         return args
 
     @staticmethod
-    def get_publication(publication_id):
-        return BaseModel.db.session.query(Publication).get(publication_id)
+    def get_publication(publication_publication_title):
+        return BaseModel.db.session.query(Publication).get(publication_)

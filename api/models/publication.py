@@ -4,10 +4,10 @@ from api.models.database import BaseModel
 class Publication(BaseModel.db.Model):
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
-    sample_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('sample.id'))
-    user_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('users.id'))
+    sample_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('sample.id', ondelete='SET NULL'), nullable=True)
+    user_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('users.id'), nullable=True)
     sample_results = AppDb.Column(AppDb.String(150), nullable=False)
-    publication_title = AppDb.Column(AppDb.String(150), nullable=True)
+    publication_title = AppDb.Column(AppDb.String(150), unique = True, nullable=True)
     co_authors = AppDb.Column(AppDb.String(150), nullable=True)
 
     # # todo: relationships defined here

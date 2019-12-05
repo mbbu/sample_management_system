@@ -4,19 +4,20 @@ from api.models.database import BaseModel
 class Tray(BaseModel.db.Model):
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
-    rack_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('rack.id'))
+    rack_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('rack.id', ondelete='SET NULL'), nullable=True)
     number = AppDb.Column(AppDb.Integer, nullable=False)  # todo: should be unique?
+    code = AppDb.Column(AppDb.String, nullable=False)
 
     # relationship(s)
     rack = AppDb.relationship('Rack', backref='tray', lazy=True)
 
     @staticmethod
-    def tray_exists(num):
+    def tray_exists(code):
         if Tray.query.filter(
-            Tray.number == num
+            Tray.code == code
         ).first():
             return True
         return False
 
     def __repr__(self):
-        return '<< Tray: (number={0} || rack={1}) >>'.format(self.number, self.rack_id)
+        return '<< Tray: (number={0} || rack={1} || code={2}) >>'.format(self.number, self.rack_id, self.code)

@@ -21,7 +21,8 @@ class SampleResource(BaseResource):
         'barcode': fields.String,
         'analysis': fields.String,
         'temperature': fields.String,
-        'amount': fields.Integer
+        'amount': fields.Integer,
+        'code' : fields.String
     }
 
     def get(self):
@@ -36,14 +37,14 @@ class SampleResource(BaseResource):
                         sample_type=args[4], sample_description=args[5], location_collected=args[6],
                         project=args[7], project_owner=args[8], retention_period=args[9], barcode=args[10],
                         analysis=args[11], temperature=args[12],
-                        amount=args[13])
+                        amount=args[13], code=args[14])
 
         BaseModel.db.session.add(sample)
         BaseModel.db.session.commit()
         return BaseResource.send_json_message("Sample created", 201)
 
-    def put(self, id):
-        sample = SampleResource.get_sample(id)
+    def put(self, code):
+        sample = SampleResource.get_sample(code)
         args = SampleResource.sample_args()
 
         if sample is not None:
@@ -53,7 +54,7 @@ class SampleResource(BaseResource):
                     or args[6] != sample.location_collected or args[7] != sample.project \
                     or args[8] != sample.project_owner or args[9] != sample.retention_period \
                     or args[10] != sample.barcode or args[11] != sample.analysis or args[12] != sample.temperature \
-                    or args[13] != sample.amount:
+                    or args[13] != sample.amount or args[14] != sample.code:
                 try:
                     sample.theme_id = args[0]
                     sample.user_id = args[1]
@@ -69,6 +70,7 @@ class SampleResource(BaseResource):
                     sample.analysis = args[11]
                     sample.temperature = args[12]
                     sample.amount = args[13]
+                    sample.code = args[14]
 
                     BaseModel.db.session.commit()
                     return BaseResource.send_json_message("Updated the Sample", 202)
@@ -82,8 +84,8 @@ class SampleResource(BaseResource):
             return BaseResource.send_json_message("No changes made", 304)
         return BaseResource.send_json_message("Sample not found", 404)
 
-    def delete(self, id):
-        sample = SampleResource.get_sample(id)
+    def delete(self, code):
+        sample = SampleResource.get_sample(code)
 
         if not sample:
             return BaseResource.send_json_message("Sample not found", 404)
@@ -110,6 +112,8 @@ class SampleResource(BaseResource):
         parser.add_argument('analysis', required=True)
         parser.add_argument('temperature', required=True)
         parser.add_argument('amount', required=True)
+        parser.add_argument('code', required=True)
+        
 
         args = parser.parse_args()
 
@@ -127,12 +131,14 @@ class SampleResource(BaseResource):
         analysis = args['analysis']
         temperature = float(args['temperature'])
         amount = int(args['amount'])
+        code = (args['code'])
 
         return [
             theme_id, user_id, box_id, animal_species, sample_type, sample_description, location_collected,
-            project, project_owner, retention_period, barcode, analysis, temperature, amount
+            project, project_owner, retention_period, barcode, analysis, temperature, amount, code
         ]
 
     @staticmethod
-    def get_sample(sample_id):
-        return BaseModel.db.session.query(Sample).get(sample_id)
+    def get_sample(sample_code):
+        return BaseModel.db.session.query(Sample).filter_by(code=sample_code).first()
+
