@@ -72,6 +72,7 @@ def register_resources(app):
     from api.resources.chamber_resource import ChamberResource
     from api.resources.freezer_resource import FreezerResource
     from api.resources.lab_resource import LaboratoryResource
+    from api.resources.quantity_type_resource import QuantityTypeResource
 
     api = Api(app)
     api.add_resource(HelloWorldResource, '/', '/index', '/welcome')
@@ -88,6 +89,7 @@ def register_resources(app):
     api.add_resource(ChamberResource, '/chamber', '/chambers', '/chamber/<code>')
     api.add_resource(FreezerResource, '/freezer', '/freezers', '/freezer/<code>')
     api.add_resource(LaboratoryResource, '/laboratory', '/laboratory/<code>')
+    api.add_resource(QuantityTypeResource, '/quantity-type')
 
     # Error handlers
     # api.handle_error(500)
