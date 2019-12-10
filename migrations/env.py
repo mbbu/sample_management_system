@@ -25,11 +25,13 @@ logger = logging.getLogger('alembic.env')
 from flask import current_app
 from api.models.database import BaseModel
 
-current_app.extensions['migrate'].db = BaseModel.migrate_db()
 config.set_main_option(
     'sqlalchemy.url', current_app.config.get(
         'SQLALCHEMY_DATABASE_URI').replace('%', '%%'))
-target_metadata = BaseModel.db_meta_data()
+
+models = BaseModel.migrate_db()
+for model in models:
+    target_metadata = model.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
