@@ -1,8 +1,8 @@
 from datetime import datetime
 
-from flask import current_app
+from flask import current_app, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
-from flask_restful import fields, marshal, reqparse, request
+from flask_restful import fields, marshal, reqparse
 
 from api import BaseResource, BaseModel
 from api.models import QuantityType
@@ -21,17 +21,20 @@ class QuantityTypeResource(BaseResource):
         data = marshal(quantity_type, self.fields)
         return BaseResource.send_json_message(data, 200)
 
+    @jwt_required
     def post(self):
         args = QuantityTypeResource.quantity_parser()
-        id = format_and_lower_str(args['code'])()
+        _id = format_and_lower_str(args['code'])()
         name = args['name']
         description = args['description']
 
-        if not QuantityType.exists(id):
+        if not QuantityType.exists(_id):
             try:
-                quantity_type = QuantityType(id=id, name=name, description=description)
+                quantity_type = QuantityType(id=_id, name=name, description=description)
                 BaseModel.db.session.add(quantity_type)
                 BaseModel.db.session.commit()
+                current_app.logger.info(
+                    "New {0} created by {1} at {2}".format(quantity_type, get_jwt_identity(), datetime.now()))
                 return BaseResource.send_json_message("Added quantity type successfully", 201)
 
             except Exception as e:
@@ -44,23 +47,23 @@ class QuantityTypeResource(BaseResource):
     @jwt_required
     def put(self):
         args = QuantityTypeResource.quantity_parser()
-        id = format_and_lower_str(args['code'])()
+        _id = format_and_lower_str(args['code'])()
         name = args['name']
         description = args['description']
 
-        quantity_type = QuantityTypeResource.get_quantity_type(id)
+        quantity_type = QuantityTypeResource.get_quantity_type(_id)
 
         if quantity_type is not None:
-            if id != quantity_type.id or name != quantity_type.name or description != quantity_type.description:
+            if _id != quantity_type.id or name != quantity_type.name or description != quantity_type.description:
                 try:
-                    quantity_type.id = id
+                    quantity_type.id = _id
                     quantity_type.name = name
                     quantity_type.description = description
 
                     BaseModel.db.session.commit()
                     current_app.logger.info("{0} updated some info;"
                                             "id={1}, name={2}, description={3}at time={4}"
-                                            .format(get_jwt_identity(), id, name, description, datetime.now()))
+                                            .format(get_jwt_identity(), _id, name, description, datetime.now()))
                     return BaseResource.send_json_message("Updated quantity type", 202)
 
                 except Exception as e:
@@ -76,15 +79,15 @@ class QuantityTypeResource(BaseResource):
 
     @jwt_required
     def delete(self):
-        id = format_and_lower_str(request.headers['code'])()
-        quantity_type = QuantityTypeResource.get_quantity_type(id)
+        _id = format_and_lower_str(request.headers['code'])()
+        quantity_type = QuantityTypeResource.get_quantity_type(_id)
 
         if quantity_type is None:
             return BaseResource.send_json_message("Quantity type not found", 404)
 
         BaseModel.db.session.delete(quantity_type)
         BaseModel.db.session.commit()
-        current_app.logger.info("{0} deleted {1}".format(get_jwt_identity(), quantity_type))
+        current_app.logger.info("{0} deleted {1} at {2}".format(get_jwt_identity(), quantity_type, datetime.now()))
         return BaseResource.send_json_message("Quantity Type Deleted", 200)
 
     @staticmethod
@@ -98,5 +101,5 @@ class QuantityTypeResource(BaseResource):
         return args
 
     @staticmethod
-    def get_quantity_type(id):
-        return BaseModel.db.session.query(QuantityType).filter_by(id=id).first()
+    def get_quantity_type(_id):
+        return BaseModel.db.session.query(QuantityType).filter_by(id=_id).first()
