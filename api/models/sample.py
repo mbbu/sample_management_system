@@ -7,17 +7,17 @@ class Sample(BaseModel.db.Model):
     theme_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('theme.id', ondelete='SET NULL'), nullable=True)
     user_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
     box_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('box.id', ondelete='SET NULL'), nullable=True)
-    animal_species = AppDb.Column(AppDb.String(100), nullable=False, index=True)
-    sample_type = AppDb.Column(AppDb.String(100), nullable=False, index=True)
-    sample_description = AppDb.Column(AppDb.String(150), nullable=False)
-    location_collected = AppDb.Column(AppDb.String(100), nullable=False)
-    project = AppDb.Column(AppDb.String(150), nullable=False, index=True)
-    project_owner = AppDb.Column(AppDb.String(100), nullable=False)
+    animal_species = AppDb.Column(AppDb.String(100), nullable=True, index=True)
+    sample_type = AppDb.Column(AppDb.String(100), nullable=True, index=True)
+    sample_description = AppDb.Column(AppDb.String(150), nullable=True)
+    location_collected = AppDb.Column(AppDb.String(100), nullable=True)
+    project = AppDb.Column(AppDb.String(150), nullable=True, index=True)
+    project_owner = AppDb.Column(AppDb.String(100), nullable=True)
     retention_period = AppDb.Column(AppDb.Integer, nullable=True)  # Default = Days
     barcode = AppDb.Column(AppDb.String(100), nullable=True)  # todo: changed to not nullable when module is done
     analysis = AppDb.Column(AppDb.String(100), nullable=True)
-    temperature = AppDb.Column(AppDb.DECIMAL(5, 2), nullable=False)  # Default = Celsius
-    amount = AppDb.Column(AppDb.Integer, nullable=False)
+    temperature = AppDb.Column(AppDb.DECIMAL(5, 2), nullable=True)  # Default = Celsius
+    amount = AppDb.Column(AppDb.Integer, nullable=True)  # todo set a default value
     quantity_type = AppDb.Column(AppDb.String, AppDb.ForeignKey('quantity_type.id', ondelete='SET NULL'), nullable=True)
     code = AppDb.Column(AppDb.String, nullable=True)
 
