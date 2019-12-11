@@ -27,10 +27,18 @@ class Sample(BaseModel.db.Model):
     box = AppDb.relationship('Box', backref='sample', lazy=True)
     quantity = AppDb.relationship('QuantityType', backref='quantity_type', lazy=True)
 
+    @staticmethod
+    def sample_exists(code):
+        if Sample.query.filter(
+                Sample.code == code
+        ).first():
+            return True
+        return False
+
     def __repr__(self):
         return '<< Sample: (type={0} || desc={1} || project={2} || barcode={3} || species={4} ||' \
                'box={5} || retention={6} || amount={7} || amount={8} || code={9} || location={10} || owner={11}' \
-               'analysis={12} || temperature={13} ) >>' \
+               '|| analysis={12} || temperature={13} ) >>' \
             .format(self.sample_type, self.sample_description,
                     self.project, self.barcode, self.animal_species,
                     self.box_id, self.retention_period, self.amount, self.quantity_type, self.code,

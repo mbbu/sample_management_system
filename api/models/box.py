@@ -10,5 +10,13 @@ class Box(BaseModel.db.Model):
     # relationship(s)
     tray = AppDb.relationship('Tray', backref='box', lazy=True)
 
+    @staticmethod
+    def box_exists(label):
+        if Box.query.filter(
+                Box.label == label
+        ).first():
+            return True
+        return False
+
     def __repr__(self):
         return '<< Box: (label={0} || tray={1}) >>'.format(self.label, self.tray_id)

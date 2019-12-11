@@ -93,5 +93,5 @@ def log_delete(record):
     return current_app.logger.info("{0} deleted {1} at {2}".format(get_jwt_identity(), record, datetime.now()))
 
 
-def log_duplicate():
-    return current_app.logger.error("Error while adding chamber :> Duplicate records")
+def log_duplicate(record):
+    return current_app.logger.error("Error while adding {0} :> Duplicate records".format(record))

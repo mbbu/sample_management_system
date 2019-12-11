@@ -1,9 +1,11 @@
-from flask import current_app
+from flask import current_app, request
+from flask_jwt_extended import jwt_required
 from flask_restful import fields, marshal, reqparse
 
 from api.models.database import BaseModel
 from api.models.tray import Tray
 from api.resources.base_resource import BaseResource
+from api.utils import format_and_lower_str, log_create, log_duplicate, log_update, log_delete, non_empty_string
 
 
 class TrayResource(BaseResource):
@@ -14,44 +16,56 @@ class TrayResource(BaseResource):
     }
 
     def get(self):
-        trays = Tray.query.all()
-        data = marshal(trays, self.fields)
-        return BaseResource.send_json_message(data, 200)
+        if request.headers.get('code') is not None:
+            code = format_and_lower_str(request.headers['code'])()
+            tray = TrayResource.get_tray(code)
+            data = marshal(tray, self.fields)
+            return BaseResource.send_json_message(data, 200)
+        else:
+            trays = Tray.query.all()
+            data = marshal(trays, self.fields)
+            return BaseResource.send_json_message(data, 200)
 
+    @jwt_required
     def post(self):
         args = TrayResource.tray_parser()
         rack = int(args['rack'])
         number = int(args['number'])
-        code = (args['code'])
+        code = format_and_lower_str(args['code'])()
 
-        if not Tray.tray_exists(number):
+        if not Tray.tray_exists(code):
             try:
-                tray = Tray(rack_id=rack, number=number)
+                tray = Tray(rack_id=rack, number=number, code=code)
                 BaseModel.db.session.add(tray)
                 BaseModel.db.session.commit()
+                log_create(tray)
                 return BaseResource.send_json_message("Added new tray", 201)
 
             except Exception as e:
                 current_app.logger.error(e)
                 BaseModel.db.session.rollback()
                 return BaseResource.send_json_message("Error while adding tray", 500)
-        current_app.logger.error("Error while adding tray :> Duplicate records")
+        log_duplicate()
         return BaseResource.send_json_message("Tray already exists", 500)
 
-    def put(self, code):
+    @jwt_required
+    def put(self):
+        code = format_and_lower_str(request.headers['code'])()
+        tray = TrayResource.get_tray(code)
+
         args = TrayResource.tray_parser()
         rack = int(args['rack'])
         number = int(args['number'])
-        code = (args['code'])
+        code = format_and_lower_str(args['code'])()
 
-        tray = TrayResource.get_tray(code)
         if tray is not None:
-            if rack != tray.rack_id or number != tray.number:
+            if rack != tray.rack_id or number != tray.number or code != tray.code:
                 try:
                     tray.rack_id = rack
                     tray.number = number
                     tray.code = code
                     BaseModel.db.session.commit()
+                    log_update(tray, tray)  # todo: log old record
                     return BaseResource.send_json_message("Updated tray", 202)
 
                 except Exception as e:
@@ -61,7 +75,9 @@ class TrayResource(BaseResource):
             return BaseResource.send_json_message("No changes made", 304)
         return BaseResource.send_json_message("Tray not found", 404)
 
-    def delete(self, code):
+    @jwt_required
+    def delete(self):
+        code = format_and_lower_str(request.headers['code'])()
         tray = TrayResource.get_tray(code)
 
         if not tray:
@@ -69,6 +85,7 @@ class TrayResource(BaseResource):
 
         BaseModel.db.session.delete(tray)
         BaseModel.db.session.commit()
+        log_delete(tray)
         return BaseResource.send_json_message("Tray deleted", 200)
 
     @staticmethod
@@ -76,8 +93,7 @@ class TrayResource(BaseResource):
         parser = reqparse.RequestParser()
         parser.add_argument('rack', required=True)
         parser.add_argument('number', required=True)
-        parser.add_argument('code', required=True)
-
+        parser.add_argument('code', required=True, type=non_empty_string)
 
         args = parser.parse_args()
         return args
