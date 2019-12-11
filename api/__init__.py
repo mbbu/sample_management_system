@@ -86,8 +86,8 @@ def register_resources(app):
     api.add_resource(RoleResource, '/role', '/roles', '/role/<code>')
     api.add_resource(TrayResource, '/tray', '/trays', '/tray/<code>')
     api.add_resource(RackResource, '/rack', '/racks', '/rack/<code>')
-    api.add_resource(ChamberResource, '/chamber', '/chambers', '/chamber/<code>')
-    api.add_resource(FreezerResource, '/freezer', '/freezers', '/freezer/<code>')
+    api.add_resource(ChamberResource, '/chamber', '/chambers')
+    api.add_resource(FreezerResource, '/freezer', '/freezers')
     api.add_resource(LaboratoryResource, '/lab', '/laboratory')
     api.add_resource(QuantityTypeResource, '/quantity-type')
 
