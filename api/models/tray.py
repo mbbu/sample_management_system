@@ -5,7 +5,7 @@ class Tray(BaseModel.db.Model):
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
     rack_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('rack.id', ondelete='SET NULL'), nullable=True)
-    number = AppDb.Column(AppDb.Integer, nullable=False)  # todo: should be unique?
+    number = AppDb.Column(AppDb.Integer, unique=True, nullable=False)
     code = AppDb.Column(AppDb.String, nullable=False)
 
     # relationship(s)
