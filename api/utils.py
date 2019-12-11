@@ -1,4 +1,7 @@
-from flask_jwt_extended import create_access_token, create_refresh_token, get_jti
+from datetime import datetime
+
+from flask import current_app
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jti, get_jwt_identity
 
 from api import revoked_store
 from api.constants import ACCESS_EXPIRES, REFRESH_EXPIRES
@@ -68,3 +71,27 @@ def log_in_user_jwt(user):
 
 def format_and_lower_str(string):
     return lambda: str(string).lower()
+
+
+"""
+    Logging Functions
+"""
+
+
+def log_create(record):
+    return current_app.logger.info(
+        "New {0} created by {1} at {2}".format(record, get_jwt_identity(), datetime.now()))
+
+
+def log_update(old_record, new_record):
+    return current_app.logger.info("{0} updated {1} to {2} at time={3}"
+                                   .format(get_jwt_identity(), old_record, new_record,
+                                           datetime.now()))
+
+
+def log_delete(record):
+    return current_app.logger.info("{0} deleted {1} at {2}".format(get_jwt_identity(), record, datetime.now()))
+
+
+def log_duplicate():
+    return current_app.logger.error("Error while adding chamber :> Duplicate records")
