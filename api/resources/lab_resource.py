@@ -70,7 +70,7 @@ class LaboratoryResource(BaseResource):
 
             name = args['name']
             room = args['room']
-            code = format_and_lower_str(args['code'])()
+            code = args['code']
 
             if name != laboratory.name or room != laboratory.room or code != laboratory.code:
                 try:
@@ -84,7 +84,7 @@ class LaboratoryResource(BaseResource):
                 except Exception as e:
                     current_app.logger.error(e)
                     BaseModel.db.session.rollback()
-                    return BaseResource.send_json_message("Error while updating Laboratory", 500)
+                    return BaseResource.send_json_message("Error while updationg Laboratory", 500)
             return BaseResource.send_json_message("No changes were made", 304)
 
     @jwt_required

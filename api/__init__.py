@@ -73,6 +73,7 @@ def register_resources(app):
     from api.resources.freezer_resource import FreezerResource
     from api.resources.lab_resource import LaboratoryResource
     from api.resources.quantity_type_resource import QuantityTypeResource
+    from api.resources.security_level_resource import SecurityLevelResource
 
     api = Api(app)
     api.add_resource(HelloWorldResource, '/', '/index', '/welcome')
@@ -81,15 +82,15 @@ def register_resources(app):
     api.add_resource(ThemeResource, '/theme', '/themes')
     api.add_resource(UserResource, '/user', '/users')
     api.add_resource(PublicationResource, '/publication', '/publications')
+    api.add_resource(BoxResource, '/box', '/boxes', '/box/<label>')
     api.add_resource(RoleResource, '/role', '/roles')
-    api.add_resource(SampleResource, '/sample', '/samples')
-    api.add_resource(BoxResource, '/box', '/boxes')
-    api.add_resource(TrayResource, '/tray', '/trays')
-    api.add_resource(RackResource, '/rack', '/racks')
-    api.add_resource(ChamberResource, '/chamber', '/chambers')
-    api.add_resource(FreezerResource, '/freezer', '/freezers')
-    api.add_resource(LaboratoryResource, '/lab', '/laboratory')
+    api.add_resource(TrayResource, '/tray', '/trays', '/tray/<code>')
+    api.add_resource(RackResource, '/rack', '/racks', '/rack/<code>')
+    api.add_resource(ChamberResource, '/chamber', '/chambers', '/chamber/<code>')
+    api.add_resource(FreezerResource, '/freezer', '/freezers', '/freezer/<code>')
+    api.add_resource(LaboratoryResource, '/laboratory', '/laboratory/<code>')
     api.add_resource(QuantityTypeResource, '/quantity-type')
+    api.add_resource(SecurityLevelResource, '/security-level', '/security-level/<code>')
 
     # Error handlers
     # api.handle_error(500)
