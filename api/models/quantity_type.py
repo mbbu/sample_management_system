@@ -8,9 +8,9 @@ class QuantityType(BaseModel.db.Model):
     description = AppDb.Column(AppDb.String(255), nullable=True)
 
     @staticmethod
-    def exists(id):
+    def exists(_id):
         if QuantityType.query.filter(
-                QuantityType.id == id
+                QuantityType.id == _id
         ).first():
             return True
         return False
