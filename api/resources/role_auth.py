@@ -1,26 +1,23 @@
-from flask import  current_app
-from flask_user import login_required,roles_required
-from flask_jwt_extended import current_user
-from flask_restful import fields, reqparse, marshal
-from functools import wraps
+from flask_login import current_user
+from flask_restful import fields
+from flask_principal import identity_loaded, RoleNeed, UserNeed
 
-from api.resources.auth_resource import BaseResource
+from api.resources.base_resource import BaseResource
 
 class RoleAuthResource(BaseResource):
     fields = {
-        'code ': fields.String,
-        'name': fields.String
+        'name': fields.String,
+        'code': fields.String
     }
 
-@roles_required('ANY')
-def login_required() :
-    def wrapper(fn):
-        @wraps(fn)
-        def decorated_view(*args, **kwargs):
-            if not current_user.is_authenticated():
-                return  current_app.login_manageer.unauthorized()
-            if ((current_user.role != role) and (role != "ANY")):
-                return current_app.login_manager.unauthorized()
-            return fn(*args, **kwargs)
-        return decorated_view
-    return wrapper
+    def on_identity_loaded(sender, identity_loaded):
+        identity_loaded.user = current_user
+
+    if hasattr(current_user, 'id'):
+        identity_loaded.provides.add(UserNeed(current_user.id))
+
+    if hasattr(current_user, 'roles'):
+        for role in current_user.roles:
+            identity_loaded.provides.add(RoleNeed(role.code))
+
+
