@@ -5,7 +5,8 @@ from flask_restful import fields, marshal, reqparse
 from api.models.database import BaseModel
 from api.models.rack import Rack
 from api.resources.base_resource import BaseResource
-from api.utils import format_and_lower_str, log_create, log_duplicate, log_update, log_delete, non_empty_string
+from api.utils import format_and_lower_str, log_create, log_duplicate, log_update, log_delete, non_empty_string, \
+    has_required_request_params
 
 
 class RackResource(BaseResource):
@@ -45,19 +46,21 @@ class RackResource(BaseResource):
                 current_app.logger.error(e)
                 BaseModel.db.session.rollback()
                 return BaseResource.send_json_message("Error while adding rack", 500)
-        log_duplicate()
+        log_duplicate(Rack.query.filter(Rack.code == code).first())
         return BaseResource.send_json_message("Rack already exists", 500)
 
     @jwt_required
+    @has_required_request_params
     def put(self):
-        args = RackResource.rack_parser()
-        chamber = int(args['chamber'])
-        number = int(args['number'])
-        code = format_and_lower_str(args['code'])()
-
+        code = format_and_lower_str(request.headers['code'])()
         rack = RackResource.get_rack(code)
 
         if rack is not None:
+            args = RackResource.rack_parser()
+            chamber = int(args['chamber'])
+            number = int(args['number'])
+            code = format_and_lower_str(args['code'])()
+
             if rack.chamber_id != chamber or rack.number != number or code.rack != code:
                 try:
                     rack.chamber_id = chamber
@@ -74,6 +77,7 @@ class RackResource(BaseResource):
         return BaseResource.send_json_message("Rack not found", 404)
 
     @jwt_required
+    @has_required_request_params
     def delete(self):
         code = format_and_lower_str(request.headers['code'])()
         rack = RackResource.get_rack(code)

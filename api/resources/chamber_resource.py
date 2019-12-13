@@ -5,7 +5,8 @@ from flask_restful import fields, marshal, reqparse
 from api.models.chamber import Chamber
 from api.models.database import BaseModel
 from api.resources.base_resource import BaseResource
-from api.utils import format_and_lower_str, non_empty_string, log_create, log_duplicate, log_update, log_delete
+from api.utils import format_and_lower_str, non_empty_string, log_create, log_duplicate, log_update, log_delete, \
+    has_required_request_params
 
 
 class ChamberResource(BaseResource):
@@ -47,19 +48,24 @@ class ChamberResource(BaseResource):
                 BaseModel.db.session.rollback()
                 return BaseResource.send_json_message("Error while adding chamber", 500)
         else:
-            log_duplicate()
+            log_duplicate(Chamber.query.filter(Chamber.code == code).first())
             return BaseResource.send_json_message("Chamber already exists", 500)
 
     @jwt_required
+    @has_required_request_params
     def put(self):
-        args = ChamberResource.chamber_parser()
-        freezer = int(args['freezer'])
-        _type = args['type']
-        code = format_and_lower_str(args['code'])()
-
+        code = format_and_lower_str(request.headers['code'])()
         chamber = ChamberResource.get_chamber(code)
 
-        if chamber is not None:
+        if chamber is None:
+            return BaseResource.send_json_message("Chamber not found", 404)
+
+        else:
+            args = ChamberResource.chamber_parser()
+            freezer = int(args['freezer'])
+            _type = args['type']
+            code = format_and_lower_str(args['code'])()
+
             if chamber.freezer_id != freezer or chamber.type != _type or code.chamber != code:
                 try:
                     chamber.freezer_id = freezer
@@ -74,9 +80,9 @@ class ChamberResource(BaseResource):
                     return BaseResource.send_json_message("Error while adding Chamber. Another chamber has that type",
                                                           500)
             return BaseResource.send_json_message("No changes made", 304)
-        return BaseResource.send_json_message("Chamber not found", 404)
 
     @jwt_required
+    @has_required_request_params
     def delete(self):
         code = format_and_lower_str(request.headers['code'])()
         chamber = ChamberResource.get_chamber(code)

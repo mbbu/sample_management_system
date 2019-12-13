@@ -5,7 +5,8 @@ from flask_restful import fields, marshal, reqparse
 from api.models.database import BaseModel
 from api.models.sample import Sample
 from api.resources.base_resource import BaseResource
-from api.utils import format_and_lower_str, log_create, log_update, log_delete, log_duplicate
+from api.utils import format_and_lower_str, log_create, log_update, log_delete, log_duplicate, \
+    has_required_request_params
 
 
 class SampleResource(BaseResource):
@@ -64,12 +65,13 @@ class SampleResource(BaseResource):
         return BaseResource.send_json_message("Sample already exists", 500)
 
     @jwt_required
+    @has_required_request_params
     def put(self):
         code = format_and_lower_str(request.headers['code'])()
         sample = SampleResource.get_sample(code)
-        args = SampleResource.sample_args()
 
         if sample is not None:
+            args = SampleResource.sample_args()
             if args[0] != sample.theme_id or args[1] != sample.user_id or \
                     args[2] != sample.box_id or args[3] != sample.animal_species or \
                     args[4] != sample.sample_type or args[5] != sample.sample_description \
@@ -109,6 +111,7 @@ class SampleResource(BaseResource):
         return BaseResource.send_json_message("Sample not found", 404)
 
     @jwt_required
+    @has_required_request_params
     def delete(self):
         code = format_and_lower_str(request.headers['code'])()
         sample = SampleResource.get_sample(code)

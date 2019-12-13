@@ -5,7 +5,8 @@ from flask_restful import fields, marshal, reqparse
 from api.models.box import Box
 from api.models.database import BaseModel
 from api.resources.base_resource import BaseResource
-from api.utils import format_and_lower_str, log_create, log_duplicate, log_update, log_delete
+from api.utils import format_and_lower_str, log_create, log_duplicate, log_update, log_delete, \
+    has_required_request_params
 
 
 class BoxResource(BaseResource):
@@ -46,11 +47,12 @@ class BoxResource(BaseResource):
             except Exception as e:
                 current_app.logger.error(e)
                 BaseModel.db.session.rollback()
-                return BaseResource.send_json_message("Error while adding tray", 500)
+                return BaseResource.send_json_message("Error while adding box", 500)
         log_duplicate()
-        return BaseResource.send_json_message("Tray already exists", 500)
+        return BaseResource.send_json_message("Box already exists", 500)
 
     @jwt_required
+    @has_required_request_params
     def put(self):
         label = format_and_lower_str(request.headers['label'])()
         box = BoxResource.get_box(label)

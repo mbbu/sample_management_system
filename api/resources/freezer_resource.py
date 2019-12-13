@@ -1,13 +1,12 @@
-from datetime import datetime
-
 from flask import current_app, request
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required
 from flask_restful import fields, marshal, reqparse
 
 from api.models.database import BaseModel
 from api.models.freezer import Freezer
 from api.resources.base_resource import BaseResource
-from api.utils import format_and_lower_str, non_empty_int, non_empty_string
+from api.utils import format_and_lower_str, non_empty_int, non_empty_string, log_create, has_required_request_params, \
+    log_update, log_delete, log_duplicate
 
 
 class FreezerResource(BaseResource):
@@ -33,53 +32,60 @@ class FreezerResource(BaseResource):
     @jwt_required
     def post(self):
         args = FreezerResource.freezer_args()
+        code = format_and_lower_str(args[3])()
 
-        freezer = Freezer(
-            laboratory_id=args[0],
-            number=args[1],
-            room=args[2],
-            code=args[3]
-        )
+        if not Freezer.freezer_exists(code):
+            try:
+                freezer = Freezer(
+                    laboratory_id=args[0],
+                    number=args[1],
+                    room=args[2],
+                    code=code
+                )
 
-        BaseModel.db.session.add(freezer)
-        BaseModel.db.session.commit()
-        current_app.logger.info(
-            "New {0} created by {1} at {2}".format(freezer, get_jwt_identity(), datetime.now()))
-        return BaseResource.send_json_message("Freezer Successfully Created", 201)
+                BaseModel.db.session.add(freezer)
+                BaseModel.db.session.commit()
+                log_create(freezer)
+                return BaseResource.send_json_message("Freezer Successfully Created", 201)
+            except Exception as e:
+                current_app.logger.error(e)
+                BaseModel.db.session.rollback()
+                return BaseResource.send_json_message("Error while adding freezer", 500)
+        log_duplicate(Freezer.query.filter(Freezer.code == args[3]).first())
+        return BaseResource.send_json_message("Freezer already exists", 500)
 
     @jwt_required
+    @has_required_request_params
     def put(self):
-        args = FreezerResource.freezer_args()
-        code = format_and_lower_str(args[3])()
+        code = format_and_lower_str(request.headers['code'])()
         freezer = FreezerResource.get_freezer(code)
 
         if freezer is None:
             return BaseResource.send_json_message("Freezer does not exist", 404)
 
-        elif args[0] != freezer.laboratory_id or args[1] != freezer.number or args[2] != freezer.room or args[
-            3] != freezer.code:
-            try:
-                freezer.laboratory_id = args[0]
-                freezer.number = args[1]
-                freezer.room = args[2]
-                freezer.code = args[3]
-                BaseModel.db.session.commit()
-                current_app.logger.info("{0} updated {1} to {2} at time={3}"
-                                        .format(get_jwt_identity(), freezer, freezer,
-                                                datetime.now()))
-                return BaseResource.send_json_message("Successfully updated Freezer", 202)
-
-            except Exception as e:
-                current_app.logger.error(e)
-                BaseModel.db.session.rollback()
-                return BaseResource.send_json_message("Error while updating freezer", 500)
         else:
+            args = FreezerResource.freezer_args()
+            if args[0] != freezer.laboratory_id or args[1] != freezer.number or args[2] != freezer.room or args[
+                3] != freezer.code:
+                try:
+                    freezer.laboratory_id = args[0]
+                    freezer.number = args[1]
+                    freezer.room = args[2]
+                    freezer.code = args[3]
+                    BaseModel.db.session.commit()
+                    log_update(freezer, freezer)
+                    return BaseResource.send_json_message("Successfully updated Freezer", 202)
+
+                except Exception as e:
+                    current_app.logger.error(e)
+                    BaseModel.db.session.rollback()
+                    return BaseResource.send_json_message("Error while updating freezer", 500)
             return BaseResource.send_json_message("No changes made", 304)
 
     @jwt_required
+    @has_required_request_params
     def delete(self):
-        args = FreezerResource.freezer_args()
-        code = format_and_lower_str(args[3])()
+        code = format_and_lower_str(request.headers['code'])()
         freezer = FreezerResource.get_freezer(code)
 
         if freezer is None:
@@ -87,7 +93,7 @@ class FreezerResource(BaseResource):
 
         BaseModel.db.session.delete(freezer)
         BaseModel.db.session.commit()
-        current_app.logger.info("{0} deleted {1} at {2}".format(get_jwt_identity(), freezer, datetime.now()))
+        log_delete(freezer)
         return BaseResource.send_json_message("Freezer deleted", 200)
 
     @staticmethod

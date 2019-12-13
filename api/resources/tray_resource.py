@@ -5,7 +5,8 @@ from flask_restful import fields, marshal, reqparse
 from api.models.database import BaseModel
 from api.models.tray import Tray
 from api.resources.base_resource import BaseResource
-from api.utils import format_and_lower_str, log_create, log_duplicate, log_update, log_delete, non_empty_string
+from api.utils import format_and_lower_str, log_create, log_duplicate, log_update, log_delete, non_empty_string, \
+    has_required_request_params
 
 
 class TrayResource(BaseResource):
@@ -45,20 +46,20 @@ class TrayResource(BaseResource):
                 current_app.logger.error(e)
                 BaseModel.db.session.rollback()
                 return BaseResource.send_json_message("Error while adding tray", 500)
-        log_duplicate()
+        log_duplicate(Tray.query.filter(Tray.code == code).first())
         return BaseResource.send_json_message("Tray already exists", 500)
 
     @jwt_required
+    @has_required_request_params
     def put(self):
         code = format_and_lower_str(request.headers['code'])()
         tray = TrayResource.get_tray(code)
-
-        args = TrayResource.tray_parser()
-        rack = int(args['rack'])
-        number = int(args['number'])
-        code = format_and_lower_str(args['code'])()
-
         if tray is not None:
+            args = TrayResource.tray_parser()
+            rack = int(args['rack'])
+            number = int(args['number'])
+            code = format_and_lower_str(args['code'])()
+
             if rack != tray.rack_id or number != tray.number or code != tray.code:
                 try:
                     tray.rack_id = rack
@@ -76,6 +77,7 @@ class TrayResource(BaseResource):
         return BaseResource.send_json_message("Tray not found", 404)
 
     @jwt_required
+    @has_required_request_params
     def delete(self):
         code = format_and_lower_str(request.headers['code'])()
         tray = TrayResource.get_tray(code)

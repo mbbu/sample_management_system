@@ -1,12 +1,11 @@
-from datetime import datetime
-
 from flask import current_app, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask_jwt_extended import jwt_required
 from flask_restful import fields, marshal, reqparse
 
 from api import BaseResource, BaseModel
 from api.models import QuantityType
-from api.utils import non_empty_string, format_and_lower_str
+from api.utils import non_empty_string, format_and_lower_str, log_delete, log_create, log_update, log_duplicate, \
+    has_required_request_params
 
 
 class QuantityTypeResource(BaseResource):
@@ -17,9 +16,15 @@ class QuantityTypeResource(BaseResource):
     }
 
     def get(self):
-        quantity_type = QuantityType.query.all()
-        data = marshal(quantity_type, self.fields)
-        return BaseResource.send_json_message(data, 200)
+        if request.headers.get('code') is not None:
+            code = format_and_lower_str(request.headers['code'])()
+            quantity_type = QuantityTypeResource.get_quantity_type(code)
+            data = marshal(quantity_type, self.fields)
+            return BaseResource.send_json_message(data, 200)
+        else:
+            quantity_type = QuantityType.query.all()
+            data = marshal(quantity_type, self.fields)
+            return BaseResource.send_json_message(data, 200)
 
     @jwt_required
     def post(self):
@@ -33,27 +38,31 @@ class QuantityTypeResource(BaseResource):
                 quantity_type = QuantityType(id=_id, name=name, description=description)
                 BaseModel.db.session.add(quantity_type)
                 BaseModel.db.session.commit()
-                current_app.logger.info(
-                    "New {0} created by {1} at {2}".format(quantity_type, get_jwt_identity(), datetime.now()))
+                log_create(quantity_type)
                 return BaseResource.send_json_message("Added quantity type successfully", 201)
 
             except Exception as e:
                 current_app.logger.error(e)
                 BaseModel.db.session.rollback()
                 return BaseResource.send_json_message("Error while adding role", 500)
-        current_app.logger.error("Error while adding role :> Duplicate records")
+        log_duplicate(QuantityType.query.filter(QuantityType.id == _id).first())
         return BaseResource.send_json_message("Role already exists", 500)
 
     @jwt_required
+    @has_required_request_params
     def put(self):
-        args = QuantityTypeResource.quantity_parser()
-        _id = format_and_lower_str(args['code'])()
-        name = args['name']
-        description = args['description']
+        code = format_and_lower_str(request.headers['code'])()
+        quantity_type = QuantityTypeResource.get_quantity_type(code)
 
-        quantity_type = QuantityTypeResource.get_quantity_type(_id)
+        if quantity_type is None:
+            return BaseResource.send_json_message("Quantity Type not found", 404)
 
-        if quantity_type is not None:
+        else:
+            args = QuantityTypeResource.quantity_parser()
+            _id = format_and_lower_str(args['code'])()
+            name = args['name']
+            description = args['description']
+
             if _id != quantity_type.id or name != quantity_type.name or description != quantity_type.description:
                 try:
                     quantity_type.id = _id
@@ -61,9 +70,7 @@ class QuantityTypeResource(BaseResource):
                     quantity_type.description = description
 
                     BaseModel.db.session.commit()
-                    current_app.logger.info("{0} updated some info;"
-                                            "id={1}, name={2}, description={3}at time={4}"
-                                            .format(get_jwt_identity(), _id, name, description, datetime.now()))
+                    log_update(quantity_type, quantity_type)
                     return BaseResource.send_json_message("Updated quantity type", 202)
 
                 except Exception as e:
@@ -71,23 +78,20 @@ class QuantityTypeResource(BaseResource):
                     BaseModel.db.session.rollback()
                     return BaseResource.send_json_message("Error while updating user. Another user has that email",
                                                           500)
-            else:
-                return BaseResource.send_json_message("No changes made", 304)
-        else:
-            current_app.logger.error("Error while updating quantity type. Record does not exist.")
-            return BaseResource.send_json_message("Quantity type already exists", 500)
+            return BaseResource.send_json_message("No changes made", 304)
 
     @jwt_required
+    @has_required_request_params
     def delete(self):
-        _id = format_and_lower_str(request.headers['code'])()
-        quantity_type = QuantityTypeResource.get_quantity_type(_id)
+        code = format_and_lower_str(request.headers['code'])()
+        quantity_type = QuantityTypeResource.get_quantity_type(code)
 
         if quantity_type is None:
             return BaseResource.send_json_message("Quantity type not found", 404)
 
         BaseModel.db.session.delete(quantity_type)
         BaseModel.db.session.commit()
-        current_app.logger.info("{0} deleted {1} at {2}".format(get_jwt_identity(), quantity_type, datetime.now()))
+        log_delete(quantity_type)
         return BaseResource.send_json_message("Quantity Type Deleted", 200)
 
     @staticmethod

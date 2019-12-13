@@ -1,13 +1,12 @@
-from datetime import datetime
-
 from flask import current_app, request
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required
 from flask_restful import marshal, reqparse, fields
 
 from api.models.database import BaseModel
 from api.models.laboratory import Laboratory
 from api.resources.base_resource import BaseResource
-from api.utils import format_and_lower_str
+from api.utils import format_and_lower_str, log_update, log_delete, log_duplicate, log_create, \
+    has_required_request_params
 
 
 class LaboratoryResource(BaseResource):
@@ -46,48 +45,50 @@ class LaboratoryResource(BaseResource):
 
                 BaseModel.db.session.add(laboratory)
                 BaseModel.db.session.commit()
-                current_app.logger.info(
-                    "New {0} created by {1} at {2}".format(laboratory, get_jwt_identity(), datetime.now()))
+                log_create(laboratory)
                 return BaseResource.send_json_message("Successfully Added Laboratory", 200)
 
             except Exception as e:
                 current_app.logger.error(e)
                 BaseModel.db.session.rollback()
                 return BaseResource.send_json_message("Error while adding Laboratory")
-        current_app.logger.error("Error while adding Laboratory :> Duplicate records")
+        log_duplicate(Laboratory.query.filter(Laboratory.code == code).first())
         return BaseResource.send_json_message("Laboratory already exists")
 
     @jwt_required
+    @has_required_request_params
     def put(self):
-        args = LaboratoryResource.laboratory_parser()
-
-        name = args['name']
-        room = args['room']
-        code = format_and_lower_str(args['code'])()
-
+        code = format_and_lower_str(request.headers['code'])()
         laboratory = LaboratoryResource.get_laboratory(code)
         old_info = laboratory
 
-        if laboratory is not None:
+        if laboratory is None:
+            return BaseResource.send_json_message("Lab not found", 404)
+
+        else:
+            args = LaboratoryResource.laboratory_parser()
+
+            name = args['name']
+            room = args['room']
+            code = format_and_lower_str(args['code'])()
+
             if name != laboratory.name or room != laboratory.room or code != laboratory.code:
                 try:
                     laboratory.name = name
                     laboratory.room = room
                     laboratory.code = code
                     BaseModel.db.session.commit()
-                    current_app.logger.info("{0} updated {1} to {2} at time={3}"
-                                            .format(get_jwt_identity(), old_info, laboratory,
-                                                    datetime.now()))  # todo: check how to log old values and new values for a change
+                    log_update(old_info, laboratory)  # todo: check how to log old values and new values for a change
                     return BaseResource.send_json_message("Update was successful", 202)
 
                 except Exception as e:
                     current_app.logger.error(e)
                     BaseModel.db.session.rollback()
                     return BaseResource.send_json_message("Error while updating Laboratory", 500)
-        current_app.logger.error("No changes were made", 304)
-        return BaseResource.send_json_message("No changes were made", 304)
+            return BaseResource.send_json_message("No changes were made", 304)
 
     @jwt_required
+    @has_required_request_params
     def delete(self):
         code = format_and_lower_str(request.headers['code'])()
         laboratory = LaboratoryResource.get_laboratory(code)
@@ -97,7 +98,7 @@ class LaboratoryResource(BaseResource):
 
         BaseModel.db.session.delete(laboratory)
         BaseModel.db.session.commit()
-        current_app.logger.info("{0} deleted {1} at {2}".format(get_jwt_identity(), laboratory, datetime.now()))
+        log_delete(laboratory)
         return BaseResource.send_json_message("Laboratory successfully deleted", 200)
 
     @staticmethod
