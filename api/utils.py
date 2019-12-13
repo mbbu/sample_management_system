@@ -1,9 +1,9 @@
 from datetime import datetime
 
-from flask import current_app
+from flask import current_app, request
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jti, get_jwt_identity
 
-from api import revoked_store
+from api import revoked_store, BaseResource
 from api.constants import ACCESS_EXPIRES, REFRESH_EXPIRES
 from api.models.database import BaseModel
 from api.models.user import User
@@ -95,3 +95,18 @@ def log_delete(record):
 
 def log_duplicate(record):
     return current_app.logger.error("Error while adding {0} :> Duplicate records".format(record))
+
+
+"""
+   Decorator functions
+"""
+
+
+def has_required_request_params(record_identity):
+    def wrapper(*args, **kwargs):
+        if (request.headers.get('code') or request.headers.get('label') or request.headers.get('pub_title')) is None:
+            return BaseResource.send_json_message(
+                "Expected an identifier i.e code or label to perform action. Pass the same in request header", 400)
+        return record_identity(*args, **kwargs)
+
+    return wrapper
