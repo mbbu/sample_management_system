@@ -19,7 +19,7 @@ class Sample(BaseModel.db.Model):
     temperature = AppDb.Column(AppDb.DECIMAL(5, 2), nullable=True)  # Default = Celsius
     amount = AppDb.Column(AppDb.Integer, nullable=True)  # todo set a default value
     quantity_type = AppDb.Column(AppDb.String, AppDb.ForeignKey('quantity_type.id', ondelete='SET NULL'), nullable=True)
-    security_level = AppDb.Column(AppDb.String, AppDb.ForeignKey('security_level.id', ondelete='SET NULL'), nullable=True)
+    security_level = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('security_level.id', ondelete='SET NULL'), nullable=True)
     code = AppDb.Column(AppDb.String, nullable=True)
 
     # relationship(s)

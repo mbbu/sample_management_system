@@ -2,7 +2,7 @@ from api.models.database import BaseModel
 
 class SecurityLevel(BaseModel.db.Model):
     AppDb = BaseModel.db
-    id = AppDb.Column(AppDb.String(65), primary_key=True)
+    id = AppDb.Column(AppDb.Integer, primary_key=True)
     code = AppDb.Column(AppDb.String(65), nullable=True)
     name = AppDb.Column(AppDb.String(65), nullable=True)
     description = AppDb.Column(AppDb.String(65), nullable=True)
