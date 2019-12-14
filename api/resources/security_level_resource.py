@@ -40,7 +40,7 @@ class SecurityLevelResource (BaseResource):
         return BaseResource.send_json_message("Security level already exists", 500)
 
     def put(self, code):
-        args = SecurityLevelResource.security_level_parser()
+        args = SecurityLevelResource.security_level_parser(code)
         code = args['code']
         name = args['name']
         description = args['description']
@@ -73,7 +73,7 @@ class SecurityLevelResource (BaseResource):
             return BaseResource.send_json_message("Security level already exists", 500)
 
 
-    def delete(self):
+    def delete(self, code):
         security_level = SecurityLevel.get_security_level(code)
 
         if security_level is None:
