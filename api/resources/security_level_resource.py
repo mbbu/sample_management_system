@@ -1,11 +1,9 @@
 from flask import current_app
-from flask_restful import fields, marshal, reqparse, request
+from flask_restful import fields, marshal, reqparse
 
 from api.models.security_level import SecurityLevel
 from api.models.database import BaseModel
 from api.resources.base_resource import BaseResource
-from api.utils import non_empty_string, format_and_lower_str
-
 
 class SecurityLevelResource (BaseResource):
     fields = {
@@ -25,22 +23,22 @@ class SecurityLevelResource (BaseResource):
         name = args['name']
         description = args['description']
 
-        if not SecurityLevel.exists(code):
+        if not SecurityLevel.security_level_exists(code):
             try:
                 security_level = SecurityLevel(code=code, name=name, description=description)
                 BaseModel.db.session.add(security_level)
                 BaseModel.db.session.commit()
-                return BaseResource.send_json_message("Added security level successfully", 201)
+                return BaseResource.send_json_message("Added new security level", 201)
 
             except Exception as e:
                 current_app.logger.error(e)
                 BaseModel.db.session.rollback()
                 return BaseResource.send_json_message("Error while adding security level", 500)
-        current_app.logger.error("Error while adding security level  :> Duplicate records")
-        return BaseResource.send_json_message("Security level already exists", 500)
+        current_app.logger.error("Error while adding security level :> Duplicate records")
+        return BaseResource.send_json_message("Security level already exists")
 
     def put(self, code):
-        args = SecurityLevelResource.security_level_parser(code)
+        args = SecurityLevelResource.security_level_parser()
         code = args['code']
         name = args['name']
         description = args['description']
@@ -74,7 +72,7 @@ class SecurityLevelResource (BaseResource):
 
 
     def delete(self, code):
-        security_level = SecurityLevel.get_security_level(code)
+        security_level = SecurityLevelResource.get_security_level(code)
 
         if security_level is None:
             return BaseResource.send_json_message("Security level not found", 404)
@@ -87,7 +85,7 @@ class SecurityLevelResource (BaseResource):
     @staticmethod
     def security_level_parser():
         parser = reqparse.RequestParser()
-        parser.add_argument('code', required=True, type=non_empty_string)
+        parser.add_argument('code', required=True)
         parser.add_argument('name', required=True)
         parser.add_argument('description')
 

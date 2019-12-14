@@ -27,7 +27,6 @@ class Sample(BaseModel.db.Model):
     publication = AppDb.relationship('Publication', backref='sample', lazy=True)
     box = AppDb.relationship('Box', backref='sample', lazy=True)
     quantity = AppDb.relationship('QuantityType', backref='quantity_type', lazy=True)
-    security = AppDb.relationship('SecurityLevel', backref='security_level', lazy=True)
 
     def __repr__(self):
         return '<< Sample: (type={0} || desc={1} || project={2} || barcode={3} || species={4} ||' \

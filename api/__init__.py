@@ -91,7 +91,7 @@ def register_resources(app):
     api.add_resource(FreezerResource, '/freezer', '/freezers', '/freezer/<code>')
     api.add_resource(LaboratoryResource, '/laboratory', '/laboratory/<code>')
     api.add_resource(QuantityTypeResource, '/quantity-type')
-    api.add_resource(SecurityLevelResource, '/security-level')
+    api.add_resource(SecurityLevelResource, '/security-level', '/security-level/<code>')
 
     # Error handlers
     # api.handle_error(500)
