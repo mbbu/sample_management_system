@@ -73,6 +73,7 @@ def register_resources(app):
     from api.resources.freezer_resource import FreezerResource
     from api.resources.lab_resource import LaboratoryResource
     from api.resources.quantity_type_resource import QuantityTypeResource
+    from api.resources.security_level_resource import SecurityLevelResource
 
     api = Api(app)
     api.add_resource(HelloWorldResource, '/', '/index', '/welcome')
@@ -90,6 +91,7 @@ def register_resources(app):
     api.add_resource(FreezerResource, '/freezer', '/freezers', '/freezer/<code>')
     api.add_resource(LaboratoryResource, '/laboratory', '/laboratory/<code>')
     api.add_resource(QuantityTypeResource, '/quantity-type')
+    api.add_resource(SecurityLevelResource, '/security-level')
 
     # Error handlers
     # api.handle_error(500)
