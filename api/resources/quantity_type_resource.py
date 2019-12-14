@@ -38,8 +38,8 @@ class QuantityTypeResource(BaseResource):
                 current_app.logger.error(e)
                 BaseModel.db.session.rollback()
                 return BaseResource.send_json_message("Error while adding role", 500)
-        current_app.logger.error("Error while adding role :> Duplicate records")
-        return BaseResource.send_json_message("Role already exists", 500)
+        current_app.logger.error("Error while adding quantity type :> Duplicate records")
+        return BaseResource.send_json_message("Quantity type already exists", 500)
 
     @jwt_required
     def put(self):
