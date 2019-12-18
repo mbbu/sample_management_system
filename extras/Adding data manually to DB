@@ -1,12 +1,13 @@
 INSERT INTO role(id, code, name, description) VALUES (1, 'SWC_453', 'Professor', 'I am a Bioinformatics expert'); - role
 
-INSERT INTO users(id, first_name, last_name, email, role_id, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by, is_deleted, password ) VALUES (1, 'cynthia', 'jones', 'cynthia@gmail.com', 1, 'DEFAULT,'John Doe', '0200','John Doe', '0200','John Doe', True,'dfgvcdfg'); - user
+INSERT INTO users(id, first_name, last_name, email, role_id, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by, is_deleted, password ) VALUES (1, 'cynthia', 'jones', 'cynthia@gmail.com', 1, DEFAULT NOW() ,'John Doe', DEFAULT,'John Doe', DEFAULT NOW() ,'John Doe', True,'dfgvcdfg'); - user
 
-INSERT INTO users(id, first_name, last_name, email, role_id, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by, is_deleted, password) VALUES (1, 'cynthia', 'jones', 'cynthia@gmail.com', 1,DEFAULT VALUES , 'dfgvcdfg'); - user
 
-INSERT INTO theme(id, code, name) VALUES (1, 'PLN_345', 'Plant Health'); - theme
+INSERT INTO theme(id, code, name) VALUES (3, 'EVN_345', 'Environmental Health'); - theme
 
-INSERT INTO sample(id, theme_id, user_id, box_id, animal_species, sample_type, sample_description, location_collected, project, project_owner, retention_period, barcode, analysis, temperature, amount, code) VALUES(2, 1, 1, 1,'Glossina palpalis gambiensis','tsetse fly', 'A big fly', 'kilifi', 'h3bionet', 'Duncan Masiga', 2, '123abc', 'Sequencing',12,100, 'EMB_758');
+INSERT INTO security_level(id, code,name, description) VALUES (3, '876NMK', 'Low', 'Friendly'); - securitylevel
+
+INSERT INTO sample(id, theme_id, user_id, box_id, animal_species, sample_type, sample_description, location_collected, project, project_owner, retention_period, barcode, analysis, temperature, amount,quantity_type, security_level, code) VALUES(2, 1, 1, 1,'Glossina palpalis gambiensis','tsetse fly', 'A big fly', 'kilifi', 'h3bionet', 'Duncan Masiga', 2, '123abc', 'Sequencing',12,100,'ML','1', 'EMB_758');
 
 INSERT INTO publication(id, sample_id, sample_results, publication_title, co_authors) VALUES (1,2,'Successful', 'The road to Locust Havest', 'Jeff K'); - publication
 
@@ -22,9 +23,5 @@ INSERT INTO tray(id, rack_id, number, code) VALUES (1, 1, 1, 'TRE_647'); -tray
 
 INSERT INTO box(id, tray_id, label) VALUES (1, 1, 'Top'); -box
 
-sample = Sample( theme_id =theme_id, user_id = user_id, box_id = box_id, animal_species =animal_species, sample_type= sample_type,
-                        sample_description = sample_description, location_collected= location_collected, project =project, project_owner = project_owner,
-                        retention_period = retention_period, barcode=barcode, temperature=temperature,amount= amount  )
-        BaseModel.db.session.add(sample)
-        BaseModel.db.session.commit()
-        return BaseResource.send_json_message("Updated the Sample", 200)
+sample = Sample( theme_id =theme_id, user_id = user_id, box_id = box_id, animal_species =animal_species, sample_type= sample_type,sample_description = sample_description, location_collected= location_collected, project =project, project_owner = project_owner,
+                       

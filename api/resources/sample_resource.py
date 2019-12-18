@@ -26,6 +26,7 @@ class SampleResource(BaseResource):
         'temperature': fields.String,
         'amount': fields.Integer,
         'quantity.id': fields.String,
+        'security_level': fields.Integer,
         'code': fields.String
     }
 
@@ -50,8 +51,8 @@ class SampleResource(BaseResource):
                 sample = Sample(theme_id=args[0], user_id=args[1], box_id=args[2], animal_species=args[3],
                                 sample_type=args[4], sample_description=args[5], location_collected=args[6],
                                 project=args[7], project_owner=args[8], retention_period=args[9], barcode=args[10],
-                                analysis=args[11], temperature=args[12], amount=args[13], code=args[14],
-                                quantity_type=args[15])
+                                analysis=args[11], temperature=args[12], amount=args[13],quantity_type=args[14],
+                                security_level=args[15], code=args[16])
 
                 BaseModel.db.session.add(sample)
                 BaseModel.db.session.commit()
@@ -78,7 +79,7 @@ class SampleResource(BaseResource):
                     or args[6] != sample.location_collected or args[7] != sample.project \
                     or args[8] != sample.project_owner or args[9] != sample.retention_period \
                     or args[10] != sample.barcode or args[11] != sample.analysis or args[12] != sample.temperature \
-                    or args[13] != sample.amount or args[14] != sample.code or args[15 != sample.quantity_type]:
+                    or args[13] != sample.amount or args[14] != sample.quantity_type or args[15] !=sample.security_level or args[16] != sample.code :
                 try:
                     sample.theme_id = args[0]
                     sample.user_id = args[1]
@@ -94,8 +95,10 @@ class SampleResource(BaseResource):
                     sample.analysis = args[11]
                     sample.temperature = args[12]
                     sample.amount = args[13]
-                    sample.code = args[14]
-                    sample.quantity_type = args[15]
+                    sample.quantity_type = args[14]
+                    sample.security_level = args[15]
+                    sample.code = args[16]
+
 
                     BaseModel.db.session.commit()
                     log_update(sample, sample)
@@ -142,7 +145,9 @@ class SampleResource(BaseResource):
         parser.add_argument('temperature', required=True)
         parser.add_argument('amount', required=True)
         parser.add_argument('quantity_type', required=True)
+        parser.add_argument('security_level', required=True)
         parser.add_argument('code', required=True)
+
 
         args = parser.parse_args()
 
@@ -161,11 +166,12 @@ class SampleResource(BaseResource):
         temperature = float(args['temperature'])
         amount = int(args['amount'])
         quantity_type = str(args['quantity_type'])
+        security_level = format_and_lower_str(args['security_level'])()
         code = format_and_lower_str(args['code'])()
 
         return [
             theme_id, user_id, box_id, animal_species, sample_type, sample_description, location_collected,
-            project, project_owner, retention_period, barcode, analysis, temperature, amount, code, quantity_type
+            project, project_owner, retention_period, barcode, analysis, temperature, amount, quantity_type, security_level, code
         ]
 
     @staticmethod
