@@ -1,6 +1,6 @@
 from api.models.database import BaseModel
 
-class Metadata(BaseModel.db.session):
+class Housedata(BaseModel.db.Model):
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
     user_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
@@ -16,9 +16,13 @@ class Metadata(BaseModel.db.session):
     social_economic_data = AppDb.Column(AppDb.Boolean, nullable=False, default=False)
     code = AppDb.Column(AppDb.String(20), nullable=False, unique=True, index=True) #id on badge
 
-
-    #relationships
-    user = AppDb.relationship('User', backref='metadata', lazy=True)
+    @staticmethod
+    def housedata_exists(code):
+        if Housedata.query.filter(
+                Housedata.code == code
+        ).first():
+            return True
+        return False
 
     def __repr__(self):
         return '<< Metadata: (education={0} || employment={1} || married={2} ||' \

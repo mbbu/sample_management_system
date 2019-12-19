@@ -3,14 +3,14 @@ from flask_jwt_extended import jwt_required
 from flask_restful import fields, marshal, reqparse
 
 from api.models.database import BaseModel
-from api.models.metadata import Metadata
+from api.models.housedata import Housedata
 from api.resources.base_resource import BaseResource
 from api.utils import format_and_lower_str, log_create, log_update, log_delete, log_duplicate, \
     has_required_request_params
 
-class MetadataResource(BaseResource):
+class HousedataResource(BaseResource):
     fields = {
-        'user.email': fields.String,
+        'user': fields.Integer,
         'education': fields.String,
         'employment': fields.String,
         'marital_status': fields.String,
@@ -27,67 +27,67 @@ class MetadataResource(BaseResource):
     def get(self):
             if request.headers.get('label') is not None:
                 code = format_and_lower_str(request.headers['code'])()
-                metadata = MetadataResource.get_meatadata(code)
+                metadata = HousedataResource.get_meatadata(code)
                 data = marshal(metadata, self.fields)
                 return BaseResource.send_json_message(data, 200)
             else:
-                metadata = Metadata.query.all()
-                data = marshal(metadata, self.fields)
+                house_metadata = Housedata.query.all()
+                data = marshal(house_metadata, self.fields)
                 return BaseResource.send_json_message(data, 200)
 
     @jwt_required
     def post(self):
-        args = MetadataResource.metadata_args()
+        args = HousedataResource.metadata_args()
         code = format_and_lower_str(args[11])()
 
-        if not Metadata.exists(code):
+        if not Housedata.housedata_exists(code):
             try:
-                metadata = Metadata(user_id=args[0], education=args[1], employment=args[2],
+                house_data = Housedata(user_id=args[0], education=args[1], employment=args[2],
                                  marital_status=args[3], number_of_people=args[4], number_of_children=args[5],
                                  number_of_animals=args[6], economic_activity=args[7], type_of_animals=args[8],
-                                 farming_activities=args[9], social_economic_data=args[10], code=args[11])
+                                 farming_activities=args[9], social_economic_data=bool(args[10]), code=args[11])
 
-                BaseModel.db.session.add(metadata)
+                BaseModel.db.session.add(house_data)
                 BaseModel.db.session.commit()
-                log_create(metadata)
+                log_create(house_data)
                 return BaseResource.send_json_message("Metadata added successfully", 201)
             except Exception as e:
                 current_app.logger.error(e)
                 BaseModel.db.session.rollback()
                 return BaseResource.send_json_message("Error while adding the Metadata", 500)
-        log_duplicate(Metadata.query.filter(Metadata.code == code).first())
+        log_duplicate(Housedata.query.filter(Housedata.code == code).first())
         return BaseResource.send_json_message("Metadata already exists", 500)
 
     @jwt_required
     @has_required_request_params
     def put(self):
         code = format_and_lower_str(request.headers['code'])()
-        metadata = Metadata.get_metadata(code)
+        house_data = Housedata.get_metadata(code)
 
-        if metadata is not None:
-            args = MetadataResource.metadata_args()
-            if args[0] != metadata.user_id or args[1] != metadata.education or args[2] != metadata.employment or \
-                args[3] != metadata.marital_status or args[4] !=metadata.number_of_people or args[5] !=metadata.number_of_children or \
-                args[6] != metadata.number_of_animals or args[7] !=metadata.economic_activity or \
-                args[8] != metadata.type_of_animals or args[9] != metadata.farming_activities or  \
-                args[10] != metadata.social_economic_data or args[11] != metadata.code :
+        if house_data is not None:
+            args = HousedataResource.metadata_args()
+            if args[0] != house_data.user_id or args[1] != house_data.education or args[2] != house_data.employment or \
+                args[3] != house_data.marital_status or args[4] != house_data.number_of_people or args[5] != house_data.number_of_children or \
+                args[6] != house_data.number_of_animals or args[7] != house_data.economic_activity or \
+                args[8] != house_data.type_of_animals or args[9] != house_data.farming_activities or  \
+                args[10] != house_data.social_economic_data or args[11] != house_data.code :
 
                 try:
-                    metadata.user_id = args[0]
-                    metadata.education = args[1]
-                    metadata.employment = args[2]
-                    metadata.marital_status = args[3]
-                    metadata.number_of_people = args[4]
-                    metadata.number_of_children = args[5]
-                    metadata.number_of_animals = args[6]
-                    metadata.economic_activity = args[7]
-                    metadata.type_of_animals = args[8]
-                    metadata.farming_activities = args[9]
-                    metadata.social_economic_data = args[10]
-                    metadata.code = args[11]
+                    house_data.user_id = args[0]
+                    house_data.education = args[1]
+                    house_data.employment = args[2]
+                    house_data.marital_status = args[3]
+                    house_data.number_of_people = args[4]
+                    house_data.number_of_children = args[5]
+                    house_data.number_of_animals = args[6]
+                    house_data.economic_activity = args[7]
+                    house_data.type_of_animals = args[8]
+                    house_data.farming_activities = args[9]
+                    house_data.social_economic_data = bool(args[10])
+                    house_data.code = args[11]
 
                     BaseModel.db.session.commit()
-                    log_update(metadata, metadata)
+                    log_update(house_data, house_data)
                     return BaseResource.send_json_message("Updated the Metadata", 202)
 
                 except Exception as e:
@@ -103,14 +103,14 @@ class MetadataResource(BaseResource):
     @has_required_request_params
     def __delete__(self):
         code = format_and_lower_str(request.headers['code'])()
-        metadata = MetadataResource.get_metadata(code)
+        house_metadata = HousedataResource.get_metadata(code)
 
-        if not metadata:
+        if not house_metadata:
             return BaseResource.send_json_message("Metadata does not exists")
 
-        BaseModel.db.session.delete(metadata)
+        BaseModel.db.session.delete(house_metadata)
         BaseModel.db.session.commit()
-        log_delete(metadata)
+        log_delete(house_metadata)
         return BaseResource.send_json_message("Metadata deleted successfully")
 
     @staticmethod
@@ -132,17 +132,17 @@ class MetadataResource(BaseResource):
         args = parser.parse_args()
 
         user_id = int(args['user'])
-        education = args(['education'])
-        employment = args(['employment'])
-        marital_status = args(['marital_status'])
-        number_of_people = args(['people'])
-        number_of_children = args(['children'])
-        number_of_animals = args(['animals'])
-        economic_activity = args(['economic_activity'])
-        type_of_animals = args(['type_of_animals'])
-        farming_activities = args(['farming_activities'])
-        social_economic_data = args(['social_economic_data'])
-        code = args(['code'])
+        education = args['education']
+        employment = args['employment']
+        marital_status = args['marital_status']
+        number_of_people = args['people']
+        number_of_children = args['children']
+        number_of_animals = args['animals']
+        economic_activity = args['economic_activity']
+        type_of_animals = args['type_of_animals']
+        farming_activities = args['farming_activities']
+        social_economic_data = args['social_economic_data']
+        code = args['code']
 
         return [
             user_id, education,employment,marital_status,number_of_people,
@@ -152,7 +152,7 @@ class MetadataResource(BaseResource):
 
     @staticmethod
     def get_metadata(code):
-        return BaseModel.db.session.query(Metadata).filter_by(code=code).first()
+        return BaseModel.db.session.query(Housedata).filter_by(code=code).first()
 
 
 
