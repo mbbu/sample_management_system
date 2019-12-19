@@ -44,7 +44,7 @@ class SampleResource(BaseResource):
     @jwt_required
     def post(self):
         args = SampleResource.sample_args()
-        code = format_and_lower_str(args[14])()
+        code = format_and_lower_str(args[16])()
 
         if not Sample.sample_exists(code):
             try:

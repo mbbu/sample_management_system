@@ -14,17 +14,19 @@ class Metadata(BaseModel.db.session):
     type_of_animals = AppDb.Column(AppDb.String(250), nullable=True)
     farming_activities = AppDb.Column(AppDb.String(250), nullable=True)
     social_economic_data = AppDb.Column(AppDb.Boolean, nullable=False, default=False)
+    code = AppDb.Column(AppDb.String(20), nullable=False, unique=True, index=True) #id on badge
+
 
     #relationships
     user = AppDb.relationship('User', backref='metadata', lazy=True)
 
     def __repr__(self):
-        return '<< Household_metadata: (education={0} || employment={1} || married={2} ||' \
+        return '<< Metadata: (education={0} || employment={1} || married={2} ||' \
                 'people={3} || children={4} || animals={5} || economic_activity={6} || '\
-                'animaltype={7} || farming_activities={8} || social_economic_data={9} ) >>' \
+                'animatype={7} || farming_activities={8} || social_economic_data={9} || code={10} ) >>' \
             .format(self.education, self.employment, self.marital_status, self.number_of_people,
                     self.number_of_children, self.number_of_animals, self.economic_activity,
-                    self.type_of_animals, self.farming_activities,self.social_economic_data)
+                    self.type_of_animals, self.farming_activities,self.social_economic_data, self.code)
 
 
 
