@@ -9,3 +9,5 @@ from api.models.chamber import Chamber
 from api.models.freezer import Freezer
 from api.models.laboratory import Laboratory
 from api.models.publication import Publication
+from api.models.quantity_type import QuantityType
+from api.models.security_level import SecurityLevel

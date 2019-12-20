@@ -24,17 +24,12 @@ class BaseModel(object):
         from api.models.freezer import Freezer
         from api.models.laboratory import Laboratory
         from api.models.publication import Publication
+        from api.models.quantity_type import QuantityType
         return [
             Role, User, Theme, Sample,
-            Box, Tray, Rack,
+            Box, Tray, Rack, QuantityType,
             Chamber, Freezer, Laboratory, Publication
         ]
-
-    @staticmethod
-    def db_meta_data():
-        models = BaseModel.migrate_db()
-        for model in models:
-            return model
 
     @staticmethod
     def init_app(app):

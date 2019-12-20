@@ -52,8 +52,16 @@ This is a web based application that interfaces samples available at ICIPE and a
 ---
 ***Adding new requirements to requirements.txt file***
 > The command below help fix bug by ubuntu which gives pip wrong metadata on pkg-resources.
->Run it every time you want to add new requirements to the project requirements.txt file.
+> Run it every time you want to add new requirements to the project requirements.txt file.
 ```
  >> pip freeze | grep -v "pkg-resources" > requirements.txt
+```
+
+***Update multiple packages in your virtual environment***
+> In case you have many outdated packages in your environment, you can do multiple
+> update by running this command.
+
+```
+ >> pip list --outdated --format=freeze | grep -v '^\-e' | cut -d = -f 1  | xargs -n1 pip install -U
 ```
 :+1:

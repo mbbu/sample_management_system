@@ -13,6 +13,7 @@ class User(BaseModel.db.Model):
     email = AppDb.Column(AppDb.String(65), index=True, unique=True, nullable=False)
     password = AppDb.Column(AppDb.String(128), nullable=False)
     role_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('role.id', ondelete='SET NULL'), nullable=True)
+    housedata_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('housedata.id', ondelete='SET NULL'), nullable=True)
     # Fields to help in audits
     created_at = AppDb.Column(AppDb.DateTime, nullable=False, default=datetime.now)
     created_by = AppDb.Column(AppDb.String(65), nullable=True)
@@ -25,7 +26,7 @@ class User(BaseModel.db.Model):
     # relationship(s)
     sample_owner = AppDb.relationship('Sample', backref='owner', lazy='dynamic')
     publication = AppDb.relationship('Publication', back_populates='user')
-    
+
     def __repr__(self):
         return '<< User: (name={0} || email={1}) >>'.format(self.first_name, self.email)
 

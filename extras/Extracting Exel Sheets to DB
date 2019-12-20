@@ -1,0 +1,30 @@
+Challenges in Copying data from CSV:
+1) Rename Columns in CSV to be the same as fields in the database. Convert file to CSV
+2) Create a temporary table in the database with all fields in the CSV file
+
+CREATE TEMPORARY TABLE sampletest (freezer varchar(60), chamber varchar(60), rack varchar(60), tray integer, box varchar(60), box_label varchar(60), sample_type varchar(60), sample_description varchar(60), project varchar(60), project_owner varchar(60), barcode varchar(60));
+
+
+3) Copy data from the CSV TO the temporary table
+
+\COPY sampletest (freezer, chamber, rack, tray , box , box_label, sample_type, sample_description, project , project_owner,barcode) FROM '/home/shiro/Documents/Freezer1.csv' WITH (format csv) ;
+
+4) Insert data from the temporary table to the definitive table.
+
+INSERT INTO sample (sample_type, sample_description, project, project_owner, barcode) SELECT sample_type, sample_description, project, project_owner, barcode FROM sampletest ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,6 +1,9 @@
-from flask_jwt_extended import create_access_token, create_refresh_token, get_jti
+from datetime import datetime
 
-from api import revoked_store
+from flask import current_app, request
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jti, get_jwt_identity
+
+from api import revoked_store, BaseResource
 from api.constants import ACCESS_EXPIRES, REFRESH_EXPIRES
 from api.models.database import BaseModel
 from api.models.user import User
@@ -68,3 +71,42 @@ def log_in_user_jwt(user):
 
 def format_and_lower_str(string):
     return lambda: str(string).lower()
+
+
+"""
+    Logging Functions
+"""
+
+
+def log_create(record):
+    return current_app.logger.info(
+        "New {0} created by {1} at {2}".format(record, get_jwt_identity(), datetime.now()))
+
+
+def log_update(old_record, new_record):
+    return current_app.logger.info("{0} updated {1} to {2} at time={3}"
+                                   .format(get_jwt_identity(), old_record, new_record,
+                                           datetime.now()))
+
+
+def log_delete(record):
+    return current_app.logger.info("{0} deleted {1} at {2}".format(get_jwt_identity(), record, datetime.now()))
+
+
+def log_duplicate(record):
+    return current_app.logger.error("Error while adding {0} :> Duplicate records".format(record))
+
+
+"""
+   Decorator functions
+"""
+
+
+def has_required_request_params(record_identity):
+    def wrapper(*args, **kwargs):
+        if (request.headers.get('code') or request.headers.get('label') or request.headers.get('pub_title')) is None:
+            return BaseResource.send_json_message(
+                "Expected an identifier i.e code or label to perform action. Pass the same in request header", 400)
+        return record_identity(*args, **kwargs)
+
+    return wrapper
