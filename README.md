@@ -18,13 +18,23 @@ This is a web based application that interfaces samples available at ICIPE and a
  ~> Using python2 install virtualenv tool (https://pypi.org/project/virtualenv/1.7.1.2/)
     >> virtualenv <<name_of_virtual_environment>>
 ```
+> After your virtual environment is ready, activate it by running this command :point_down:
+```
+   >> source venv/bin/activate
+```
 
-> [virtualenv tool](https://pypi.org/project/virtualenv/1.7.1.2/)
+> Read more about virtual environments :point_right: [virtualenv tool](https://pypi.org/project/virtualenv/1.7.1.2/)
 
 ***3.Install the requirements***
+> Before you install the requirements ensure you have the following in your machine.
+>>   1. postgres server for server-side application. [postgres](https://www.postgresql.org/download/) 
+>>   2. libpq-dev for client-side application. [libpq-dev](https://pypi.org/project/libpq-dev/)
+
+> If these are installed, run the command below to install the requirements for the application.
 ```
  >> pip install -r requirements.txt
 ```
+
 
 ***4.Export required variables***
 ```
