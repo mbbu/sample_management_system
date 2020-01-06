@@ -44,6 +44,9 @@ class BaseConfig(object):
     JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
     PROPAGATE_EXCEPTIONS = True
 
+    # REDCap API Token
+    REDCap_API_TOKEN = os.environ.get('REDCap_API_TOKEN')
+
 
 class DevelopmentConfig(BaseConfig):
     SQLALCHEMY_TRACK_MODIFICATIONS = True
