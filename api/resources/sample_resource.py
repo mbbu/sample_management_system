@@ -6,7 +6,7 @@ from api.models.database import BaseModel
 from api.models.sample import Sample
 from api.resources.base_resource import BaseResource
 from api.utils import format_and_lower_str, log_create, log_update, log_delete, log_duplicate, \
-    has_required_request_params
+    has_required_request_params, export_all_records, log_export_from_redcap
 
 
 class SampleResource(BaseResource):
@@ -51,7 +51,7 @@ class SampleResource(BaseResource):
                 sample = Sample(theme_id=args[0], user_id=args[1], box_id=args[2], animal_species=args[3],
                                 sample_type=args[4], sample_description=args[5], location_collected=args[6],
                                 project=args[7], project_owner=args[8], retention_period=args[9], barcode=args[10],
-                                analysis=args[11], temperature=args[12], amount=args[13],quantity_type=args[14],
+                                analysis=args[11], temperature=args[12], amount=args[13], quantity_type=args[14],
                                 security_level=args[15], code=args[16])
 
                 BaseModel.db.session.add(sample)
@@ -79,7 +79,8 @@ class SampleResource(BaseResource):
                     or args[6] != sample.location_collected or args[7] != sample.project \
                     or args[8] != sample.project_owner or args[9] != sample.retention_period \
                     or args[10] != sample.barcode or args[11] != sample.analysis or args[12] != sample.temperature \
-                    or args[13] != sample.amount or args[14] != sample.quantity_type or args[15] !=sample.security_level or args[16] != sample.code :
+                    or args[13] != sample.amount or args[14] != sample.quantity_type or args[
+                15] != sample.security_level or args[16] != sample.code:
                 try:
                     sample.theme_id = args[0]
                     sample.user_id = args[1]
@@ -98,7 +99,6 @@ class SampleResource(BaseResource):
                     sample.quantity_type = args[14]
                     sample.security_level = args[15]
                     sample.code = args[16]
-
 
                     BaseModel.db.session.commit()
                     log_update(sample, sample)
@@ -148,7 +148,6 @@ class SampleResource(BaseResource):
         parser.add_argument('security_level', required=True)
         parser.add_argument('code', required=True)
 
-
         args = parser.parse_args()
 
         theme_id = int(args['theme'])
@@ -171,9 +170,37 @@ class SampleResource(BaseResource):
 
         return [
             theme_id, user_id, box_id, animal_species, sample_type, sample_description, location_collected,
-            project, project_owner, retention_period, barcode, analysis, temperature, amount, quantity_type, security_level, code
+            project, project_owner, retention_period, barcode, analysis, temperature, amount, quantity_type,
+            security_level, code
         ]
 
     @staticmethod
     def get_sample(sample_code):
         return BaseModel.db.session.query(Sample).filter_by(code=sample_code).first()
+
+
+class SaveSampleFromREDCap(BaseResource):
+    def post(self):
+        sample_records = export_all_records()
+
+        for sample in sample_records:
+            user = int(sample['users'])
+            animal_species = sample['source_sample']
+            _type = sample['sample_type']
+            description = sample['sa_description']
+            location = sample['loc_sample']
+            owner = sample['pi']
+            amount = int(sample['number_samples_collected'].strip() or 0)
+            box = int(sample['box_number'])
+            theme = int(sample['theme'])
+            security_level = int(sample['risk_level'])
+            record_id = sample['identifier_sample']
+
+            sample = Sample(theme_id=theme, user_id=user, box_id=box, animal_species=animal_species,
+                            sample_type=_type, sample_description=description, location_collected=location,
+                            project_owner=owner, amount=amount, security_level=security_level)
+
+            BaseModel.db.session.add(sample)
+            BaseModel.db.session.commit()
+            log_export_from_redcap(sample)
+            return BaseResource.send_json_message("Samples created", 201)
