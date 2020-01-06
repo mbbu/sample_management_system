@@ -1,12 +1,14 @@
+import requests, json, os
 from datetime import datetime
 
 from flask import current_app, request
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jti, get_jwt_identity
 
 from api import revoked_store, BaseResource
-from api.constants import ACCESS_EXPIRES, REFRESH_EXPIRES
+from api.constants import ACCESS_EXPIRES, REFRESH_EXPIRES, REDCAP_URI
 from api.models.database import BaseModel
 from api.models.user import User
+from api.config import BaseConfig
 
 """
     Parser formatting methods for json fields sent in request. Plays the same role as 
@@ -97,6 +99,10 @@ def log_duplicate(record):
     return current_app.logger.error("Error while adding {0} :> Duplicate records".format(record))
 
 
+def log_export_from_redcap(record):
+    return current_app.logger.info(
+        "New {0} created from REDCap at {1}".format(record, datetime.now()))
+
 """
    Decorator functions
 """
@@ -110,3 +116,21 @@ def has_required_request_params(record_identity):
         return record_identity(*args, **kwargs)
 
     return wrapper
+
+
+"""
+    REDCap API functions
+"""
+
+
+# fetch all records
+def export_all_records():
+    data = {
+        'token': BaseConfig.REDCap_API_TOKEN,
+        'content': 'record',
+        'format': 'json',
+        'returnFormat': 'json'
+    }
+
+    response = requests.post(REDCAP_URI, data)
+    return response.json()
