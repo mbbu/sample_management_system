@@ -40,6 +40,7 @@ This is a web based application that interfaces samples available at ICIPE and a
 ```
  >> export SAMPLE_MANAGEMENT_SYSTEM_DATABASE_URI='<<postgresql://username:password@host:port/database>>'
  >> export SAMPLE_MANAGEMENT_SYSTEM_SECRET_KEY='<<random key generated locally (os.urandom(32) )>>'
+ >> export REDCap_API_TOKEN = 'Token to access given data set i.e. project or survey (contact admin)'
  >> export FLASK_APP=api/
 ```
 
