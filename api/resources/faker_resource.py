@@ -19,7 +19,7 @@ class FakeDataResource(BaseResource):
         elif model == 'freezer':
             db_model = Freezer
             return faker(count, db_model, model)
-        elif model == 'lab' or 'laboratory':
+        elif model == 'lab' or model == 'laboratory':
             db_model = Laboratory
             return faker(count, db_model, model)
         elif model == 'publication':
