@@ -182,18 +182,17 @@ class SampleResource(BaseResource):
 class SaveSampleFromREDCap(BaseResource):
     def post(self):
         sample_records = export_all_records()
-
         for sample in sample_records:
-            user = int(sample['users'])
+            user = int(sample['users'].strip() or 0) or None
             animal_species = sample['source_sample']
             _type = sample['sample_type']
             description = sample['sa_description']
             location = sample['loc_sample']
             owner = sample['pi']
-            amount = int(sample['number_samples_collected'].strip() or 0)
-            box = int(sample['box_number'])
-            theme = int(sample['theme'])
-            security_level = int(sample['risk_level'])
+            amount = int(sample['number_samples_collected'].strip() or 0) or None
+            box = int(sample['box_number'].strip() or 0) or None
+            theme = int(sample['theme'].strip() or 0) or None
+            security_level = int(sample['risk_level'].strip() or 0) or None
             record_id = sample['identifier_sample']
 
             sample = Sample(theme_id=theme, user_id=user, box_id=box, animal_species=animal_species,
@@ -203,4 +202,4 @@ class SaveSampleFromREDCap(BaseResource):
             BaseModel.db.session.add(sample)
             BaseModel.db.session.commit()
             log_export_from_redcap(sample)
-            return BaseResource.send_json_message("Samples created", 201)
+        return BaseResource.send_json_message("Samples created", 201)
