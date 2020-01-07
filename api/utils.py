@@ -126,13 +126,13 @@ def has_required_request_params(record_identity):
 
 # fetch all records
 def export_all_records():
+    token = request.headers.get('token')
     data = {
-        'token': BaseConfig.REDCap_API_TOKEN,
+        'token': BaseConfig.REDCap_API_TOKEN or token,
         'content': 'record',
         'format': 'json',
         'returnFormat': 'json'
     }
-
     response = requests.post(REDCAP_URI, data)
     return response.json()
 
