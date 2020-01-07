@@ -99,6 +99,9 @@ def register_resources(app):
 
     api.add_resource(HousedataResource, '/metadata', '/metadata/<code>')
 
+    from api.resources.faker_resource import FakeDataResource
+    api.add_resource(FakeDataResource, '/faker')
+
     # Error handlers
     # api.handle_error(500)
     # api.error_router()
