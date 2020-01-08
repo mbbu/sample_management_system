@@ -157,6 +157,7 @@
         ></b-form-input>
       </b-form-group>
 
+        <span> Enter Project Name </span>
         <b-form-select v-model="selected" class="mb-3" id="form-project-dropdown" label="Enter Project Name">
         <option :value="null">Please select your project</option>
         <option value="a"> H3Bionet</option>
@@ -228,6 +229,7 @@
         </div>
 
         <div col-sm-4>
+          <span> Please select the quantity type </span>
         <b-form-select v-model="selected" class="mb-3" id="form-quantity-dropdown">
         <option :value="null">Please select the quantity type</option>
         <option value="a"> ML</option>
@@ -237,6 +239,7 @@
         </b-form-select>
         </div>
 
+        <span> Add Security Level Needed </span>
         <b-form-select v-model="selected" class="mb-3" id="form-securityLevel-dropdown">
         <option :value="null">Please select the security level</option>
         <option value="a"> High </option>
