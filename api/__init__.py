@@ -78,7 +78,7 @@ def register_resources(app):
 
     api = Api(app)
     api.add_resource(HelloWorldResource, '/', '/index', '/welcome')
-    api.add_resource(AuthResource, '/auth', '/login', '/auth/login')
+    api.add_resource(AuthResource, '/auth','/login', '/auth/login')
     api.add_resource(LogOutResource, '/logout', '/log-out')
     api.add_resource(ThemeResource, '/theme', '/themes')
     api.add_resource(RoleResource, '/role', '/roles')

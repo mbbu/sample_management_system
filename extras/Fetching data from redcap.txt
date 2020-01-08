@@ -3,7 +3,6 @@
 theme - theme_id
 users - user_id
 sa_description - description
-theme - theme_id
 sample_type - sample_type
 loc_sample - location_collected
 pi - project_owner

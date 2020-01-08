@@ -12,7 +12,7 @@ from api.utils import format_and_lower_str, log_create, log_update, log_delete, 
 class SampleResource(BaseResource):
     fields = {
         'theme.name': fields.String,
-        'user.email': fields.Integer,
+        'user.email': fields.String,
         'box.label': fields.String,
         'animal_species': fields.String,
         'sample_type': fields.String,
