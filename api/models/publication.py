@@ -7,11 +7,11 @@ class Publication(BaseModel.db.Model):
     sample_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('sample.id', ondelete='SET NULL'), nullable=True)
     user_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('users.id'), nullable=True)
     sample_results = AppDb.Column(AppDb.String(150), nullable=False)
-    publication_title = AppDb.Column(AppDb.String(150), unique = True, nullable=True)
+    publication_title = AppDb.Column(AppDb.String(150), unique=True, nullable=True)
     co_authors = AppDb.Column(AppDb.String(150), nullable=True)
 
-    # # todo: relationships defined here
-    user= AppDb.relationship('User', back_populates='publication', uselist=False)
+    # relationships defined here
+    user = AppDb.relationship('User', back_populates='publication', uselist=False)
 
     @staticmethod
     def publication_exists(publication_title):
