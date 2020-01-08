@@ -1,12 +1,15 @@
 from datetime import datetime
 
+import requests
 from flask import current_app, request
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jti, get_jwt_identity
+from mixer.backend.flask import Mixer
 
 from api import revoked_store, BaseResource
-from api.constants import ACCESS_EXPIRES, REFRESH_EXPIRES
+from api.config import BaseConfig
+from api.constants import ACCESS_EXPIRES, REFRESH_EXPIRES, REDCAP_URI
+from api.models import *
 from api.models.database import BaseModel
-from api.models.user import User
 
 """
     Parser formatting methods for json fields sent in request. Plays the same role as 
@@ -97,6 +100,10 @@ def log_duplicate(record):
     return current_app.logger.error("Error while adding {0} :> Duplicate records".format(record))
 
 
+def log_export_from_redcap(record):
+    return current_app.logger.info(
+        "New {0} created from REDCap at {1}".format(record, datetime.now()))
+
 """
    Decorator functions
 """
@@ -110,3 +117,41 @@ def has_required_request_params(record_identity):
         return record_identity(*args, **kwargs)
 
     return wrapper
+
+
+"""
+    REDCap API functions
+"""
+
+
+# fetch all records
+def export_all_records():
+    token = request.headers.get('token')
+    data = {
+        'token': BaseConfig.REDCap_API_TOKEN or token,
+        'content': 'record',
+        'format': 'json',
+        'returnFormat': 'json'
+    }
+    response = requests.post(REDCAP_URI, data)
+    return response.json()
+
+
+"""
+    Faker function; helps to create new random records in the database. 
+    takes two argument;
+        a) count - number of records to create
+        b) model - the model to create records for
+"""
+
+
+def faker(count, model, model_name):
+    _mixer = Mixer(commit=False)
+    for num in range(0, count):
+        record = _mixer.blend(model)
+
+        BaseModel.db.session.add(record)
+        BaseModel.db.session.commit()
+        num += 1
+
+    return BaseResource.send_json_message("{}s created".format(model_name), 200)

@@ -62,7 +62,7 @@ def register_resources(app):
     from api.resources.hello_world_resource import HelloWorldResource
     from api.resources.auth_resource import AuthResource, LogOutResource
     from api.resources.theme_resource import ThemeResource
-    from api.resources.sample_resource import SampleResource
+    from api.resources.sample_resource import SampleResource, SaveSampleFromREDCap
     from api.resources.user_resource import UserResource
     from api.resources.publication_resource import PublicationResource
     from api.resources.box_resource import BoxResource
@@ -86,6 +86,7 @@ def register_resources(app):
 
     api.add_resource(PublicationResource, '/publication', '/publications')
     api.add_resource(SampleResource, '/sample', '/samples')
+    api.add_resource(SaveSampleFromREDCap, '/redcap-samples')
     api.add_resource(BoxResource, '/box', '/boxes')
     api.add_resource(TrayResource, '/tray', '/trays')
     api.add_resource(RackResource, '/rack', '/racks')
@@ -97,6 +98,9 @@ def register_resources(app):
     api.add_resource(SecurityLevelResource, '/security-level', '/security-level/<code>')
 
     api.add_resource(HousedataResource, '/metadata', '/metadata/<code>')
+
+    from api.resources.faker_resource import FakeDataResource
+    api.add_resource(FakeDataResource, '/faker')
 
     # Error handlers
     # api.handle_error(500)
