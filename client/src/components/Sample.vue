@@ -5,12 +5,13 @@
 
          <h1> Samples </h1>
          <hr> <br> <br>
+
+         {{ samples }}
          <button type="button" class="btn btn-success btn-sm" v-b-modal.sample-modal> Add Sample </button>
      <br> <br>
      <table class="table table-hover">
          <thead>
              <tr >
-             <th scope="col"> ID </th>
              <th scope="col"> Species </th>
              <th scope="col"> Description </th>
              <th scope="col"> Theme </th>
@@ -20,12 +21,10 @@
 
          <tbody>
              <tr v-for="(sample, index) in samples" :key="index">
-                 <td> {{ sample.theme}} </td>
-                 <td> {{ sample.id }}</td>
-                 <td> {{ sample.species }}</td>
-                 <td> {{ sample.description }}</td>
-                 <td> {{ theme.name }}</td>
-                 <td> {{ sample.project_owner }}</td>
+                 <td> {{ sample.animal_species }} </td>
+                 <td> {{ sample.sample_description }} </td>
+                 <td> {{ theme.theme.name }} </td>
+                 <td> {{ sample.project_owner }} </td>
                      
                  <td>
                      <div class="btn-group" role="group">
@@ -76,15 +75,13 @@
         ></b-form-input>
       </b-form-group>
 
-        <b-form-group id="form-chamber-group" label="Chamber:" label-for="form-chamber-input">
-        <b-form-input
-          id="form-chamber-input"
-          type="text"
-          v-model="addSampleForm.chamber"
-          required
-          placeholder="Enter Chamber"
-        ></b-form-input>
-      </b-form-group>
+        <span> Please select the chamber </span>
+        <b-form-select v-model="selected" class="mb-3" id="form-quantity-dropdown">
+        <option :value="null">Chamber</option>
+        <option value="a"> Middle</option>
+        <option value="b" > Top </option>
+        <option value="b" > Bottom </option>
+        </b-form-select>
 
         <b-form-group id="form-rack-group" label="Rack:" label-for="form-rack-input">
         <b-form-input
@@ -161,9 +158,9 @@
         <b-form-select v-model="selected" class="mb-3" id="form-project-dropdown" label="Enter Project Name">
         <option :value="null">Please select your project</option>
         <option value="a"> H3Bionet</option>
-        <option value="b" disabled>IENBit(disabled)</option>
-        <option value="b" disabled>Tsetse Launch(disabled)</option>
-        <option value="b" disabled>Africa Now (disabled)</option>
+        <option value="b" >IENBit</option>
+        <option value="b" >Tsetse Launch</option>
+        <option value="b" >Africa Now </option>
         </b-form-select>
 
         <b-form-group id="form-projectOwner-group" label="Project Owner:" label-for="form-projectOwner-input">
@@ -179,7 +176,7 @@
         <b-form-group id="form-retention-group" label="Retention:" label-for="form-retention-input">
         <b-form-input
           id="form-retention-input"
-          type="time"
+          type="number"
           v-model="addSampleForm.retention"
           required
           placeholder="Enter retention period in months "
@@ -228,23 +225,21 @@
       </b-form-group>
         </div>
 
-        <div col-sm-4>
-          <span> Please select the quantity type </span>
+        <span> Please select the quantity type </span>
         <b-form-select v-model="selected" class="mb-3" id="form-quantity-dropdown">
         <option :value="null">Please select the quantity type</option>
         <option value="a"> ML</option>
-        <option value="b" disabled> Meters </option>
-        <option value="b" disabled> Kilograms </option>
-        <option value="b" disabled> Actual  Number</option>
+        <option value="b" > Meters </option>
+        <option value="b" > Kilograms </option>
+        <option value="b" > Actual  Number</option>
         </b-form-select>
-        </div>
 
         <span> Add Security Level Needed </span>
         <b-form-select v-model="selected" class="mb-3" id="form-securityLevel-dropdown">
         <option :value="null">Please select the security level</option>
         <option value="a"> High </option>
-        <option value="b" disabled> Medium </option>
-        <option value="b" disabled> Low </option>
+        <option value="b" > Medium </option>
+        <option value="b" > Low </option>
         </b-form-select>
 
         <b-button type="submit" variant="primary"> Submit </b-button>
@@ -257,7 +252,6 @@
 
 <script>
 import axios from 'axios';
-
 export default {
     data() {
         return {
@@ -284,7 +278,6 @@ export default {
             quantity: '',
             securityLevel: '',
             },
-
         };
     },
     methods: {
@@ -331,20 +324,17 @@ export default {
         this.addSampleForm.quantity ='';
         this.addSampleForm.securityLevel ='';
     },
-
     onsubmit(evt) {
         evt.preventDefault();
         this.$refs.addSampleModal.hide();
         this.initForm();   
     },
-
     onReset(evt) {
         evt.preventDefault();
         this.$refs.addSampleModal.hide();
         this.initForm();
     },
     },
-
     created() {
         this.getSamples();
     },   

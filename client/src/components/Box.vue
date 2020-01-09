@@ -1,34 +1,48 @@
 <template>
-  <div class="container">
-    <button type="button" class="btn btn-primary"> {{ msg }}</button>
-  </div>
+ <table>
+   <thead>
+     <tr>
+       <th scope="col"> Tray </th>
+       <th scope="col"> Label </th>
+       <tr> 
+        </tr>
+   </thead>
+
+   <tbody>
+     <tr v-for="(box, index) in boxes" :key="index">
+        <td> box.tray</td>       
+        <td> box.label</td>       
+
+     </tr>
+   </tbody>
+
+ </table>
 </template>
 
 <script>
 import axios from 'axios';
 
 export default {
-  name: 'Box',
-  data() {
-    return {
-      msg: '',
+  data(){
+    return{
+      boxes: [],
     };
   },
-
+  
   methods: {
-    getMessage() {
-      const path = 'http://localhost:5000/box';
-      axios.get(path)
+    getBoxes() {
+        axios.get('http://localhost:5000/box')
         .then((res) => {
-          this.msg = res.data;
+          this.boxes = res.data.boxes;
+          console.log(this.boxes)
         })
         .catch((error) => {
           console.error(error);
-        });
-    },
+           });
+      },
   },
   created() {
-    this.getMessage();
+    this.getBoxes();
   },
 };
 </script>
