@@ -1,7 +1,7 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from flask import current_app, request
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restful import fields, marshal, reqparse
 
 from api.constants import DATE_TIME_NONE
@@ -9,7 +9,7 @@ from api.models.database import BaseModel
 from api.models.sample import Sample
 from api.resources.base_resource import BaseResource
 from api.utils import format_and_lower_str, log_create, log_update, log_delete, log_duplicate, \
-    has_required_request_params, export_all_records, log_export_from_redcap, format_str_to_date
+    has_required_request_params, export_all_records, log_export_from_redcap, format_str_to_date, get_samples_by_code
 
 
 class SampleResource(BaseResource):
@@ -103,6 +103,7 @@ class SampleResource(BaseResource):
                     sample.security_level = args[15]
                     sample.code = args[16]
 
+                    sample.updated_at = datetime.now()
                     BaseModel.db.session.commit()
                     log_update(sample, sample)
                     return BaseResource.send_json_message("Updated the Sample", 202)
@@ -125,10 +126,13 @@ class SampleResource(BaseResource):
         if not sample:
             return BaseResource.send_json_message("Sample not found", 404)
 
-        BaseModel.db.session.delete(sample)
-        BaseModel.db.session.commit()
-        log_delete(sample)
-        return BaseResource.send_json_message("Sample Successfully deleted", 200)
+        else:
+            sample.is_deleted = True
+            sample.deleted_at = datetime.now()
+            sample.deleted_by = get_jwt_identity()
+            BaseModel.db.session.commit()
+            current_app.logger.info("{0} deleted {1}".format(get_jwt_identity(), sample.user_id))
+            return BaseResource.send_json_message("Sample Successfully deleted", 200)
 
     @staticmethod
     def sample_args():
@@ -257,5 +261,4 @@ class SaveSampleFromREDCap(BaseResource):
             BaseModel.db.session.add(sample)
             BaseModel.db.session.commit()
             log_export_from_redcap(sample)
-
         return BaseResource.send_json_message("Samples created", 201)
