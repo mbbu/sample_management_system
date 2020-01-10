@@ -22,6 +22,7 @@ class Sample(BaseModel.db.Model):
     created_at = AppDb.Column(AppDb.DateTime, nullable=True, default=datetime.now)
     updated_at = AppDb.Column(AppDb.DateTime, nullable=True)
     deleted_at = AppDb.Column(AppDb.DateTime, nullable=True)
+    deleted_by = AppDb.Column(AppDb.String(65), nullable=True)
 
 
 # Default = Celsius
