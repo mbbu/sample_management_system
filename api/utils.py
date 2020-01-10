@@ -77,6 +77,15 @@ def format_and_lower_str(string):
 
 
 """
+    Date Formatter
+"""
+
+
+def format_str_to_date(date):
+    return datetime.strptime(date, '%Y-%m-%d %H:%M').date()
+
+
+"""
     Logging Functions
 """
 
@@ -103,6 +112,7 @@ def log_duplicate(record):
 def log_export_from_redcap(record):
     return current_app.logger.info(
         "New {0} created from REDCap at {1}".format(record, datetime.now()))
+
 
 """
    Decorator functions
