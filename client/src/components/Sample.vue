@@ -1,12 +1,12 @@
 <template>
-    <div class="container">
+    <div class="container-fluid">
      <div class="row">
      <div class="col-sm-12">
 
          <h1> Samples </h1>
          <hr>  <br> <br>
 
-         {{ samples }}
+         {{ sample }}
          <button type="button" class="btn btn-success btn-sm" v-b-modal.sample-modal> Add Sample </button>
      <br> <br>
      <table class="table table-hover">
@@ -23,7 +23,7 @@
              <tr v-for="(sample, index) in samples" :key="index">
                  <td> {{ sample.animal_species }} </td>
                  <td> {{ sample.sample_description }} </td>
-                 <td> {{ theme.theme.name }} </td>
+                 <td> {{ sample.theme.name }} </td>
                  <td> {{ sample.project_owner }} </td>
                      
                  <td>
@@ -283,7 +283,7 @@ export default {
     },
     methods: {
         getSamples() {
-         const path= 'http://localhost:5000/sample';
+         const path= 'http://localhost:5000/sample'  ;
         axios.get(path)
             .then((res) => {
                 this.samples = res.data.samples;
@@ -293,7 +293,7 @@ export default {
              });
         },
         addSample(payload) {
-            const path = 'http://localhost:5000/sample';
+            const path = 'http://localhost:5000/sample' || 'http://localhost:5000/samples' ;
             axios.post(path, payload)
             .then(() => {
                 this.getSamples();

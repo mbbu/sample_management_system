@@ -3,6 +3,7 @@ import Router from 'vue-router';
 import Box from './components/Box.vue';
 import Sample from './components/Sample.vue';
 import Index from './components/Index.vue';
+import Chamber from './components/Chamber.vue'
 
 Vue.use(Router);
 
@@ -10,11 +11,12 @@ export default new Router({
      mode: 'history',
      base: process.env.BASE_URL,
      routes: [
-     {
-        path: '/box',
-        name: 'Box',
-         component: Box,
-     },
+         {
+            path: '/box',
+            name: 'Box',
+            alias: ['/boxes'],
+            component: Box,
+         },
 
          {
              path: '/sample',
@@ -28,6 +30,12 @@ export default new Router({
              name: 'home',
              alias: ['/index', '/welcome'],
              component: Index,
+         },
+          {
+             path: '/chamber',
+             name: 'chamber',
+             alias: ['/chambers'],
+             component: Chamber,
          },
 
      ],
