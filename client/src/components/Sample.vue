@@ -4,7 +4,7 @@
      <div class="col-sm-12">
 
          <h1> Samples </h1>
-         <hr> <br> <br>
+         <hr>  <br> <br>
 
          {{ samples }}
          <button type="button" class="btn btn-success btn-sm" v-b-modal.sample-modal> Add Sample </button>
@@ -37,13 +37,11 @@
          </tbody>
      </table>
      </div>
-     </div>
 
-     <b-modal ref="addSampleModal" id="sample-modal" title="Add new Sample"
-        hide-footer>
 
-        
-    <b-form @submit="onSubmit" @reset="onReset" class="w-100">
+     <b-modal ref="addSampleModal" id="sample-modal" title="Add new Sample">
+
+         <b-form @submit="onSubmit" @reset="onReset" class="w-100">
     
         <b-form-group id="form-theme-group" label="Theme:" label-for="form-theme-input">
         <b-form-input
@@ -52,7 +50,7 @@
           v-model="addSampleForm.theme"
           required
           placeholder="Enter Theme"
-        ></b-form-input>
+        > </b-form-input>
       </b-form-group>
 
        <b-form-group id="form-lab-group" label="Lab:" label-for="form-lab-input">
@@ -62,7 +60,7 @@
           v-model="addSampleForm.lab"
           required
           placeholder="Enter Laboratory"
-        ></b-form-input>
+        > </b-form-input>
       </b-form-group>
 
         <b-form-group id="form-freezer-group" label="Freezer:" label-for="form-freezer-input">
@@ -72,7 +70,7 @@
           v-model="addSampleForm.freezer"
           required
           placeholder="Enter Freezer"
-        ></b-form-input>
+        > </b-form-input>
       </b-form-group>
 
         <span> Please select the chamber </span>
@@ -90,7 +88,7 @@
           v-model="addSampleForm.rack"
           required
           placeholder="Enter Rack"
-        ></b-form-input>
+        > </b-form-input>
       </b-form-group>
 
         <b-form-group id="form-tray-group" label="Tray:" label-for="form-tray-input">
@@ -100,7 +98,7 @@
           v-model="addSampleForm.tray"
           required
           placeholder="Enter Rack"
-        ></b-form-input>
+        > </b-form-input>
       </b-form-group>
 
         <b-form-group id="form-box-group" label="Box:" label-for="form-box-input">
@@ -110,7 +108,7 @@
           v-model="addSampleForm.box"
           required
           placeholder="Enter Box"
-        ></b-form-input>
+        > </b-form-input>
       </b-form-group>
 
         <b-form-group id="form-species-group" label="Sample Species:" label-for="form-species-input">
@@ -120,7 +118,7 @@
           v-model="addSampleForm.species"
           required
           placeholder="Enter Species"
-        ></b-form-input>
+        > </b-form-input>
       </b-form-group>
 
 
@@ -131,7 +129,7 @@
           v-model="addSampleForm.sampleType"
           required
           placeholder="Enter Sample Type"
-        ></b-form-input>
+        > </b-form-input>
       </b-form-group>
 
         <b-form-group id="form-description-group" label="Sample description:" label-for="form-description-input">
@@ -141,7 +139,7 @@
           v-model="addSampleForm.description"
           required
           placeholder="Enter description"
-        ></b-form-input>
+        > </b-form-input>
       </b-form-group>
 
         <b-form-group id="form-locationCollected-group" label="Location collected:" label-for="form-locationCollected-input">
@@ -151,7 +149,7 @@
           v-model="addSampleForm.locationcollected"
           required
           placeholder="Enter Location Collected"
-        ></b-form-input>
+        > </b-form-input>
       </b-form-group>
 
         <span> Enter Project Name </span>
@@ -170,7 +168,7 @@
           v-model="addSampleForm.projectOwner"
           required
           placeholder="Enter Project Owner"
-        ></b-form-input>
+        > </b-form-input>
       </b-form-group>
 
         <b-form-group id="form-retention-group" label="Retention:" label-for="form-retention-input">
@@ -180,7 +178,7 @@
           v-model="addSampleForm.retention"
           required
           placeholder="Enter retention period in months "
-        ></b-form-input>
+        > </b-form-input>
       </b-form-group>
 
         <b-form-group id="form-barcode-group" label="Barcode:" label-for="form-barcode-input">
@@ -190,7 +188,7 @@
           v-model="addSampleForm.barcode"
           required
           placeholder="Enter barcode number "
-        ></b-form-input>
+        > </b-form-input>
       </b-form-group>
 
         <b-form-group id="form-analysis-group" label="Analysis:" label-for="form-analysis-input">
@@ -200,7 +198,7 @@
           v-model="addSampleForm.analysis"
           required
           placeholder="Enter analysis carried out "
-        ></b-form-input>
+        > </b-form-input>
       </b-form-group>
 
         <b-form-group id="form-temperature-group" label="Temperature:" label-for="form-temperature-input">
@@ -210,10 +208,10 @@
           v-model="addSampleForm.temperature"
           required
           placeholder="Enter temperature "
-        ></b-form-input>
+        > </b-form-input>
       </b-form-group>
 
-        <div col-sm-4>
+
         <b-form-group id="form-amount-group" label="Amount:" label-for="form-amount-input">
         <b-form-input
           id="form-amount-input"
@@ -221,9 +219,9 @@
           v-model="addSampleForm.amount"
           required
           placeholder="Enter amount of sample "
-        ></b-form-input>
+        > </b-form-input>
       </b-form-group>
-        </div>
+
 
         <span> Please select the quantity type </span>
         <b-form-select v-model="selected" class="mb-3" id="form-quantity-dropdown">
@@ -248,10 +246,13 @@
     </b-form>
      </b-modal>
     </div>
+</div>
 </template>
+
 
 <script>
 import axios from 'axios';
+
 export default {
     data() {
         return {
