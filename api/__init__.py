@@ -5,7 +5,7 @@ from logging.handlers import SMTPHandler
 
 from flask import Flask
 from flask_cors import CORS
-from flask_jwt_extended import JWTManager, jwt_required
+from flask_jwt_extended import JWTManager
 from flask_restful import Api
 from werkzeug.exceptions import NotFound, InternalServerError
 
@@ -14,7 +14,6 @@ from api.constants import APP_CONFIG_ENV_VAR, DEV_CONFIG_VAR, PROD_CONFIG_VAR, A
 from api.models.database import BaseModel
 from api.resources.base_resource import BaseResource
 from .resources import sample_resource, chamber_resource
-
 
 def get_config_type():
     return os.environ.get(APP_CONFIG_ENV_VAR, PROD_CONFIG_VAR).lower().strip()
@@ -60,7 +59,7 @@ def mail_admin(app):
 # noinspection PyTypeChecker
 def register_resources(app):
     # TODO: import resources here
-    from api.resources.hello_world_resource import HelloWorldResource
+    from api.resources.index_resource import IndexResource
     from api.resources.auth_resource import AuthResource, LogOutResource
     from api.resources.theme_resource import ThemeResource
     from api.resources.sample_resource import SampleResource, SaveSampleFromREDCap
@@ -78,9 +77,8 @@ def register_resources(app):
     from api.resources.housedata_resource import HousedataResource
 
     api = Api(app)
-    CORS(app, resources=r'/api/*')
-    api.add_resource(HelloWorldResource, '/', '/index', '/welcome')
-    api.add_resource(AuthResource, '/auth','/login', '/auth/login')
+    api.add_resource(IndexResource, '/', '/index', '/welcome')
+    api.add_resource(AuthResource, '/auth', '/login', '/auth/login')
     api.add_resource(LogOutResource, '/logout', '/log-out')
     api.add_resource(ThemeResource, '/theme', '/themes')
     api.add_resource(RoleResource, '/role', '/roles')
@@ -154,6 +152,9 @@ def create_app(test_config=None):
     app.config['SECRET_KEY'] = os.getenv(SECRET_KEY)
     jwt = JWTManager(app)
 
+    # Cross-Origin Resource Sharing
+    CORS(app, resources={r'/*': {'origins': '*'}})
+
     @jwt.token_in_blacklist_loader
     def check_if_token_is_revoked(decrypted_token):
         jti = decrypted_token['jti']
@@ -173,11 +174,8 @@ def create_app(test_config=None):
         }
 
     @app.route('/home')
-    @jwt_required
-    def index():
-        from flask_jwt_extended import get_jwt_identity
-        app.logger.info('Welcome Page Accessed!By {0}'.format(get_jwt_identity()))
-        return 'Hello, Welcome to MBBU Sample Management System!'
+    def home():
+        return 'Hello, Welcome to MBBU Sample Management System! From index route'
 
     @app.errorhandler(NotFound)
     def not_found_error(error):
