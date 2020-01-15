@@ -3,7 +3,7 @@ import os
 from logging.handlers import RotatingFileHandler
 from logging.handlers import SMTPHandler
 
-from flask import Flask
+from flask import Flask, Blueprint
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, jwt_required
 from flask_restful import Api
@@ -13,7 +13,7 @@ from api.config import BaseConfig
 from api.constants import APP_CONFIG_ENV_VAR, DEV_CONFIG_VAR, PROD_CONFIG_VAR, APP_NAME, SECRET_KEY, revoked_store
 from api.models.database import BaseModel
 from api.resources.base_resource import BaseResource
-
+from .resources import sample_resource, chamber_resource
 
 
 def get_config_type():
@@ -57,7 +57,6 @@ def mail_admin(app):
         app.logger.addHandler(mail_handler)
     pass
 
-
 # noinspection PyTypeChecker
 def register_resources(app):
     # TODO: import resources here
@@ -93,6 +92,7 @@ def register_resources(app):
     api.add_resource(BoxResource, '/box', '/boxes')
     api.add_resource(TrayResource, '/tray', '/trays')
     api.add_resource(RackResource, '/rack', '/racks')
+
     api.add_resource(ChamberResource, '/chamber', '/chambers')
     api.add_resource(FreezerResource, '/freezer', '/freezers')
     api.add_resource(LaboratoryResource, '/lab', '/laboratory')
@@ -105,11 +105,21 @@ def register_resources(app):
     from api.resources.faker_resource import FakeDataResource
     api.add_resource(FakeDataResource, '/faker')
 
-    # Error handlers
+      # Error handlers
     # api.handle_error(500)
     # api.error_router()
 
     # TODO: register resources here
+
+    sample = Blueprint('sample', __name__, template_folder='templates/index.html')
+
+app = Flask(__name__)
+
+from api.resources.tray_resource import tray_bp
+from api.resources.sample_resource import samples_page
+
+app.register_blueprint(tray_bp, url_prefix='/pages')
+app.register_blueprint(samples_page, url_prefix='/pages')
 
 
 def config_app(app_instance):

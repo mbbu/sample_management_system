@@ -1,4 +1,4 @@
-from flask import current_app, request, Blueprint
+from flask import current_app, request, Blueprint, render_template
 from flask_jwt_extended import jwt_required
 from flask_restful import Api, fields, marshal, reqparse
 
@@ -8,9 +8,6 @@ from api.resources.base_resource import BaseResource
 from api.utils import format_and_lower_str, log_create, log_duplicate, log_update, log_delete, non_empty_string, \
     has_required_request_params
 
-api_bp = Blueprint('api', __name__)
-api = Api(api_bp)
-
 
 class TrayResource(BaseResource):
     fields = {
@@ -18,13 +15,13 @@ class TrayResource(BaseResource):
         'rack.number': fields.Integer,
         'code': fields.String
     }
-
     def get(self):
         if request.headers.get('code') is not None:
             code = format_and_lower_str(request.headers['code'])()
             tray = TrayResource.get_tray(code)
             data = marshal(tray, self.fields)
-            return BaseResource.send_json_message(data, 200)
+            return render_template('index.html')
+            #return BaseResource.send_json_message(data, 200)
         else:
             trays = Tray.query.all()
             data = marshal(trays, self.fields)

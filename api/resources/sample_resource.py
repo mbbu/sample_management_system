@@ -1,8 +1,9 @@
 from datetime import timedelta, datetime
 
-from flask import current_app, request
+from flask import current_app, request, Blueprint
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restful import fields, marshal, reqparse
+
 
 from api.constants import DATE_TIME_NONE
 from api.models.database import BaseModel
@@ -10,6 +11,8 @@ from api.models.sample import Sample
 from api.resources.base_resource import BaseResource
 from api.utils import format_and_lower_str, log_create, log_update, log_delete, log_duplicate, \
     has_required_request_params, export_all_records, log_export_from_redcap, format_str_to_date, get_samples_by_code
+
+samples_page = Blueprint('samples_bp', __name__, template_folder ='templates')
 
 
 class SampleResource(BaseResource):
@@ -39,6 +42,7 @@ class SampleResource(BaseResource):
             sample = SampleResource.get_sample(code)
             data = marshal(sample, self.fields)
             return BaseResource.send_json_message(data, 200)
+
         else:
             samples = Sample.query.all()
             data = marshal(samples, self.fields)
@@ -184,7 +188,6 @@ class SampleResource(BaseResource):
     @staticmethod
     def get_sample(sample_code):
         return BaseModel.db.session.query(Sample).filter_by(code=sample_code).first()
-
 
 class SaveSampleFromREDCap(BaseResource):
     def post(self):
