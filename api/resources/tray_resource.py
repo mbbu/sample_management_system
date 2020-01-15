@@ -1,12 +1,15 @@
-from flask import current_app, request
+from flask import current_app, request, Blueprint
 from flask_jwt_extended import jwt_required
-from flask_restful import fields, marshal, reqparse
+from flask_restful import Api, fields, marshal, reqparse
 
 from api.models.database import BaseModel
 from api.models.tray import Tray
 from api.resources.base_resource import BaseResource
 from api.utils import format_and_lower_str, log_create, log_duplicate, log_update, log_delete, non_empty_string, \
     has_required_request_params
+
+api_bp = Blueprint('api', __name__)
+api = Api(api_bp)
 
 
 class TrayResource(BaseResource):
