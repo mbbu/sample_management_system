@@ -3,7 +3,7 @@ import os
 from logging.handlers import RotatingFileHandler
 from logging.handlers import SMTPHandler
 
-from flask import Flask, Blueprint
+from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, jwt_required
 from flask_restful import Api
@@ -110,17 +110,6 @@ def register_resources(app):
     # api.error_router()
 
     # TODO: register resources here
-
-    sample = Blueprint('sample', __name__, template_folder='templates/index.html')
-
-app = Flask(__name__)
-
-from api.resources.tray_resource import tray_bp
-from api.resources.sample_resource import samples_page
-
-app.register_blueprint(tray_bp, url_prefix='/pages')
-app.register_blueprint(samples_page, url_prefix='/pages')
-
 
 def config_app(app_instance):
     config_type = get_config_type()
