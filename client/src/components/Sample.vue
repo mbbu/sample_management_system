@@ -20,7 +20,7 @@
          </thead>
 
          <tbody>
-             <tr v-for="(sample, index) in samples" :key="index">
+             <tr v-for="sample in samples.message" :key="sample.id">
                  <td> {{ sample.animal_species }} </td>
                  <td> {{ sample.sample_description }} </td>
                  <td> {{ sample.theme.name }} </td>
@@ -286,7 +286,7 @@ export default {
          const path= 'http://localhost:5000/sample'  ;
         axios.get(path)
             .then((res) => {
-                this.samples = res.data.samples;
+                this.samples = res.data;
             })
              .catch((error) => {
                  console.error(error);

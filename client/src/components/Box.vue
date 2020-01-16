@@ -1,4 +1,5 @@
 <template>
+
  <table class=" table table-hover">
    <thead>
      <tr>
@@ -9,19 +10,19 @@
        <th scope="col"> Freezer </th>
        <th scope="col"> Lab Name </th>
        <th scope="col"> Lab Room </th>
-
+     {{ response }}
        </tr>
    </thead>
-
    <tbody>
-     <tr v-for="(message, value) in boxes" :key="message">
+     <tr v-for="box in response.box" :key="box.id">
+<!--        <p> {{ value }} </p>-->
         <td> {{message.label}} </td>
-        <td> {{message.tray.number}} </td>
-        <td> {{message.tray.rack.number}} </td>
-         <td> {{message.tray.rack.chamber.type}} </td>
-         <td> {{message.tray.rack.chamber.freezer.number}} </td>
-         <td> {{message.tray.rack.chamber.freezer.lab.name}} </td>
-         <td> {{message.tray.rack.chamber.freezer.lab.room}} </td>
+        <td> {{box.tray.number}} </td>
+        <td> {{box.tray.rack.number}} </td>
+         <td> {{box.tray.rack.chamber.type}} </td>
+         <td> {{box.tray.rack.chamber.freezer.number}} </td>
+         <td> {{box.tray.rack.chamber.freezer.lab.name}} </td>
+         <td> {{box.tray.rack.chamber.freezer.lab.room}} </td>
      </tr>
    </tbody>
 
@@ -34,7 +35,7 @@ import axios from 'axios';
 export default {
   data() {
     return{
-      boxes: [],
+      response: [],
     };
   },
   
@@ -42,8 +43,8 @@ export default {
     getBoxes() {
         axios.get('http://localhost:5000/box')
         .then((res) => {
-          this.boxes = res.data.boxes;
-          console.log(this.boxes)
+          this.response = res.data;
+          console.log(this.response)
         })
         .catch((error) => {
           console.error(error);
