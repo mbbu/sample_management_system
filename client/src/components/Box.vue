@@ -14,37 +14,37 @@
    </thead>
 
    <tbody>
-     <tr v-for="(message, value) in boxes" :key="message">
-        <td> {{message.label}} </td>
-        <td> {{message.tray.number}} </td>
-        <td> {{message.tray.rack.number}} </td>
-         <td> {{message.tray.rack.chamber.type}} </td>
-         <td> {{message.tray.rack.chamber.freezer.number}} </td>
-         <td> {{message.tray.rack.chamber.freezer.lab.name}} </td>
-         <td> {{message.tray.rack.chamber.freezer.lab.room}} </td>
-     </tr>
+   <tr :key="box.id" v-for="box in response.message">
+       <td> {{box.label}}</td>
+       <td> {{box['tray.number']}}</td>
+       <td> {{box['tray.rack.number']}}</td>
+       <td> {{box['tray.rack.chamber.type']}}</td>
+       <td> {{box['tray.rack.chamber.freezer.number']}}</td>
+       <td> {{box['tray.rack.chamber.freezer.lab.name']}}</td>
+       <td> {{box['tray.rack.chamber.freezer.lab.room']}}</td>
+   </tr>
    </tbody>
 
  </table>
 </template>
 
 <script>
-import axios from 'axios';
+    import axios from 'axios';
 
-export default {
-  data() {
-    return{
-      boxes: [],
-    };
-  },
-  
-  methods: {
-    getBoxes() {
-        axios.get('http://localhost:5000/box')
-        .then((res) => {
-          this.boxes = res.data.boxes;
-          console.log(this.boxes)
-        })
+    export default {
+        data() {
+            return {
+                response: [],
+            };
+        },
+
+        methods: {
+            getBoxes() {
+                axios.get('http://localhost:5000/box')
+                    .then((res) => {
+                        this.response = res.data;
+                        console.log(this.response)
+                    })
         .catch((error) => {
           console.error(error);
            });
