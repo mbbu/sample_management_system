@@ -20,10 +20,10 @@
          </thead>
 
          <tbody>
-             <tr v-for="sample in samples.message" :key="sample.id">
+             <tr v-for="sample in response.message" :key="sample.id">
                  <td> {{ sample.animal_species }} </td>
-                 <td> {{ sample.sample_description }} </td>
-                 <td> {{ sample.theme.name }} </td>
+                 <td> {{ sample['sample_description'] }} </td>
+                 <td> {{ sample['theme.name'] }} </td>
                  <td> {{ sample.project_owner }} </td>
                      
                  <td>
@@ -256,7 +256,7 @@ import axios from 'axios';
 export default {
     data() {
         return {
-            samples: [],
+            response: [],
             addSampleForm: {
             theme: '',
             lab: '',
@@ -286,7 +286,7 @@ export default {
          const path= 'http://localhost:5000/sample'  ;
         axios.get(path)
             .then((res) => {
-                this.samples = res.data;
+                this.response = res.data;
             })
              .catch((error) => {
                  console.error(error);

@@ -9,12 +9,12 @@
        </tr>
    </thead>
    <tbody>
-     <tr v-for="chamber in response.chamber" :key="chamber.id">
+     <tr v-for="chamber in response.message" :key="chamber.id">
 <!--        <p> {{ value }} </p>-->
         <td> {{chamber.type}} </td>
-        <td> {{chamber.freezer.room}} </td>
-        <td> {{chamber.freezer.number}} </td>
-         <td> {{chamber.code}} </td>
+        <td> {{chamber['freezer.room']}} </td>
+        <td> {{chamber['freezer.number']}} </td>
+         <td> {{chamber['code']}} </td>
      </tr>
    </tbody>
 
