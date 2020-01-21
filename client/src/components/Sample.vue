@@ -43,10 +43,10 @@
                    <span> Please select a Theme </span>
                     <b-form-select v-model="theme" class="mb-3" id="theme-dropdown">
                     <option :value="null">Please select a Theme</option>
-                    <option value="Plant Health"> Plant Health</option>
-                    <option value="Animal Health" > Animal Health </option>
-                    <option value="Environmental Health" > Environmental Health </option>
-                    <option value="Human Health" > Human Health </option>
+                    <option value="1"> Plant Health</option>
+                    <option value="2" > Animal Health </option>
+                    <option value="3" > Environmental Health </option>
+                    <option value="4" > Human Health </option>
                     </b-form-select>
 
                    <b-form-group id="form-lab-group" label="Lab:" label-for="form-lab-input">
@@ -205,7 +205,7 @@
 
 
                     <span> Please select the quantity type </span>
-                    <b-form-select v-model="quantity" class="mb-3" id="form-quantity-dropdown">
+                    <b-form-select v-model="quantity_type" class="mb-3" id="form-quantity-dropdown">
                     <option :value="null">Please select the quantity type</option>
                     <option value="ML"> ML</option>
                     <option value="Meters" > Meters </option>
@@ -220,6 +220,15 @@
                     <option value="Medium" > Medium </option>
                     <option value="Low" > Low </option>
                     </b-form-select>
+
+                    <b-form-group id="form-code-group" label="Code:" label-for="form-code-input">
+                    <b-form-input
+                      id="form-code-input"
+                      type="number" min="0"
+                      v-model="code"
+                      placeholder="Enter code "
+                    > </b-form-input>
+                  </b-form-group>
 
                     <div class="btn-group" role="group">
                      <b-button type="submit" variant="primary"> Submit </b-button>
@@ -238,7 +247,6 @@
 
 <script>
 import axios from 'axios';
-
 export default {
     data() {
         return {
@@ -261,8 +269,9 @@ export default {
             analysis: '',
             temperature: '',
             amount: '',
-            quantity: '',
+            quantity_type: '',
             securityLevel: '',
+            code: '',
             };
     },
     methods: {
@@ -276,7 +285,6 @@ export default {
                  console.error(error);
              });
         },
-
         formSubmit(e) {
             e.preventDefault();
             let currentObj = this;
@@ -298,9 +306,9 @@ export default {
             analysis: this.analysis,
             temperature: this.temperature,
             amount: this.amount,
-            quantity: this.quantity,
+            quantity_type: this.quantity_type,
             security_level: this.securityLevel,
-
+            code: this.code,
             })
             .then(function (response) {
             currentObj.output = response.data;
