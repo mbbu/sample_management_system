@@ -45,6 +45,8 @@ export default {
         });
     },
   },
+
+
   created() {
     this.getMessage();
   },

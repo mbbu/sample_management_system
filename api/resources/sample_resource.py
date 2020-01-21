@@ -48,7 +48,7 @@ class SampleResource(BaseResource):
             data = marshal(samples, self.fields)
             return BaseResource.send_json_message(data, 200)
 
-    @jwt_required
+    #@jwt_required
     def post(self):
         args = SampleResource.sample_args()
         code = format_and_lower_str(args[16])()
