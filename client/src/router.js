@@ -4,6 +4,7 @@ import Box from './components/Box.vue';
 import Sample from './components/Sample.vue';
 import Index from './components/Index.vue';
 import Chamber from './components/Chamber.vue'
+import Theme from './components/Theme.vue'
 
 Vue.use(Router);
 
@@ -36,6 +37,12 @@ export default new Router({
              name: 'chamber',
              alias: ['/chambers'],
              component: Chamber,
+         },
+         {
+             path: '/theme',
+             name: 'theme',
+             alias: ['/themes'],
+             component: Theme,
          },
 
      ],
