@@ -11,7 +11,9 @@
    <thead>
      <tr>
          <th scope="col"> Name </th>
-       <th scope="col"> Code </th>
+         <th scope="col"> Code </th>
+         <th scope="col"> Update </th>
+         <th scope="col"> Delete </th>
        </tr>
    </thead>
    <tbody>
@@ -20,12 +22,8 @@
         <td> {{ theme.name }} </td>
         <td> {{ theme.code }} </td>
 
-         <td>
-              <div class="btn-group" role="group">
-                  <button type="button" class="btn btn-warning btn-sm"> Update </button>
-                  <button type="button" class="btn btn-danger btn-sm"> Delete </button>
-              </div>
-         </td>
+         <td><button type="button" class="btn btn-warning btn-sm"> Update </button></td>
+         <td ><button @click="deleteTheme(name)" type="button" class="btn btn-danger btn-sm" > Delete </button> </td>
      </tr>
    </tbody>
 
@@ -56,7 +54,7 @@
                   </b-form-group>
 
          <div class="btn-group" role="group">
-                     <b-button type="submit" variant="primary"> Submit </b-button>
+                     <b-button type="submit" variant="primary"> Submit </b-button> <br>
                      <b-button type="reset" variant="danger"> Reset </b-button>
                     </div>
         </form>
@@ -105,7 +103,18 @@ export default {
             currentObj.output = error;
             });
         },
+    deleteTheme: function(name) {
+    axios.delete('localhost:5000/theme'/+name)
+    .then((response) => {
+      this.getTheme();
+        console.log(response)
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 },
+},
+
     created() {
         this.getTheme();
       },
