@@ -1,10 +1,10 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Box from './components/Box.vue';
-import Sample from './components/Sample.vue';
-import Index from './components/Index.vue';
-import Chamber from './components/Chamber.vue'
-import Theme from './components/Theme.vue'
+import Box from './pages/Box.vue';
+import Sample from './pages/Sample.vue';
+import Index from './pages/Index.vue';
+import Chamber from './pages/Chamber.vue'
+import Theme from './pages/Theme.vue'
 
 Vue.use(Router);
 
