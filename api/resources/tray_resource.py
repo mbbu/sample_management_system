@@ -1,6 +1,6 @@
-from flask import current_app, request
+from flask import current_app, request, Blueprint, render_template
 from flask_jwt_extended import jwt_required
-from flask_restful import fields, marshal, reqparse
+from flask_restful import Api, fields, marshal, reqparse
 
 from api.models.database import BaseModel
 from api.models.tray import Tray
@@ -15,13 +15,13 @@ class TrayResource(BaseResource):
         'rack.number': fields.Integer,
         'code': fields.String
     }
-
     def get(self):
         if request.headers.get('code') is not None:
             code = format_and_lower_str(request.headers['code'])()
             tray = TrayResource.get_tray(code)
             data = marshal(tray, self.fields)
-            return BaseResource.send_json_message(data, 200)
+            return render_template('index.html')
+            #return BaseResource.send_json_message(data, 200)
         else:
             trays = Tray.query.all()
             data = marshal(trays, self.fields)

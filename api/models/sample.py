@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from api.models.database import BaseModel
 
 
@@ -16,7 +18,14 @@ class Sample(BaseModel.db.Model):
     retention_period = AppDb.Column(AppDb.Integer, nullable=True)  # Default = Days
     barcode = AppDb.Column(AppDb.String(100), nullable=True)  # todo: changed to not nullable when module is done
     analysis = AppDb.Column(AppDb.String(100), nullable=True)
-    temperature = AppDb.Column(AppDb.DECIMAL(5, 2), nullable=True)  # Default = Celsius
+    temperature = AppDb.Column(AppDb.DECIMAL(5, 2), nullable=True)
+    created_at = AppDb.Column(AppDb.DateTime, nullable=True, default=datetime.now)
+    updated_at = AppDb.Column(AppDb.DateTime, nullable=True)
+    deleted_at = AppDb.Column(AppDb.DateTime, nullable=True)
+    deleted_by = AppDb.Column(AppDb.String(65), nullable=True)
+
+
+# Default = Celsius
     amount = AppDb.Column(AppDb.Integer, nullable=True)  # todo set a default value
     quantity_type = AppDb.Column(AppDb.String, AppDb.ForeignKey('quantity_type.id', ondelete='SET NULL'), nullable=True)
     security_level = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('security_level.id', ondelete='SET NULL'), nullable=True)

@@ -66,7 +66,8 @@ def log_in_user_jwt(user):
 
     return {'access_token': access_token, 'refresh_token': refresh_token}
 
-
+def get_samples_by_code(code):
+    return BaseModel.db.session.query(Sample).filter(Sample.is_deleted == code).all()
 """
     String formatters
 """
@@ -74,6 +75,15 @@ def log_in_user_jwt(user):
 
 def format_and_lower_str(string):
     return lambda: str(string).lower()
+
+
+"""
+    Date Formatter
+"""
+
+
+def format_str_to_date(date):
+    return datetime.strptime(date, '%Y-%m-%d %H:%M').date()
 
 
 """
@@ -103,6 +113,7 @@ def log_duplicate(record):
 def log_export_from_redcap(record):
     return current_app.logger.info(
         "New {0} created from REDCap at {1}".format(record, datetime.now()))
+
 
 """
    Decorator functions

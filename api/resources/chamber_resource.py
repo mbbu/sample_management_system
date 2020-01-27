@@ -2,6 +2,7 @@ from flask import current_app, request
 from flask_jwt_extended import jwt_required
 from flask_restful import fields, marshal, reqparse
 
+
 from api.models.chamber import Chamber
 from api.models.database import BaseModel
 from api.resources.base_resource import BaseResource
@@ -108,3 +109,4 @@ class ChamberResource(BaseResource):
     @staticmethod
     def get_chamber(code):
         return BaseModel.db.session.query(Chamber).filter_by(code=code).first()
+
