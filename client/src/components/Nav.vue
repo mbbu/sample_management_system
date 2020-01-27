@@ -2,55 +2,38 @@
     <div class="menu-container">
         <ul class="menu">
             <li class="menu__top">
-                <router-link to="/" class="menu__logo">
-                    <i class="fas fa-user"> </i>
+                <router-link to="/index" class="menu__logo">
+                    <img :src="require('../assets/logo.png')" />
                 </router-link>
             </li>
 
             <li>
-            <a href="#"
-                @click.prevent="updateMenu('home')"
-                :class="highlightSection('home')"
-                >
-            <i class="fa fa-home menu__icon" aria-hidden="true"> </i>
-                Home </a>
+            <router-link to="/sample" class="context-menu__link"> 
+            <i class="fa fa-home menu__icon" aria-hidden="true"> </i>  
+            Home </router-link> 
             </li>
 
             <li>
-            <a href="#"
-                @click.prevent="updateMenu('search_samples')"
-                :class="highlightSection('search_samples')"
-                >
+            <router-link to="/sample" class="context-menu__link"> 
             <i class="fa fa-home menu__icon" aria-hidden="true"> </i>
-                Search Samples </a>
+             Search Samples </router-link>
             </li>
 
             <li>
-            <a href="#"
-                @click.prevent="updateMenu('sample_requests')"
-                :class="highlightSection('sample_requests')"
-                >
+            <a href="https://redcap.icipe.org/surveys/?s=W7A7TFJ89J" class="context-menu__link"> 
             <i class="fa fa-home menu__icon" aria-hidden="true"> </i>
-                Sample Requests </a>
+             Sample Requests </a>
             </li>
 
             <li>
-            <a href="#"
-                @click.prevent="updateMenu('add_sample')"
-                :class="highlightSection('add_sample')"
-                >
+            <router-link to="/addsample" class="context-menu__link"> 
             <i class="fa fa-home menu__icon" aria-hidden="true"> </i>
-               Add New Sample </a>
-            </li>
+             Add New Sample </router-link></li>
 
             <li>
-            <a href="#"
-                @click.prevent="updateMenu('update_profile')"
-                :class="highlightSection('update_profile')"
-                >
+             <router-link to="/sample" class="context-menu__link"> 
             <i class="fa fa-home menu__icon" aria-hidden="true"> </i>
-               Update Profile </a>
-            </li>
+            Update Profile </router-link></li>
 
 
         </ul>
@@ -58,9 +41,11 @@
 </template>
 
 <script>
+
 export default {
         contentSection: '',
         name: 'Menu',
+        
 
 methods: {
     openProjectLink() {
