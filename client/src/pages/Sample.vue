@@ -3,8 +3,7 @@
      <div class="row">
      <div class="col-sm-12">
 
-         <h1> Samples </h1>
-         <hr>  <br> <br>
+         <h1 style="text-align: center"> Samples </h1>
      <br> <br>
      <table class="table table-hover">
          <thead>
@@ -34,14 +33,10 @@
          </tbody>
      </table>
      </div>
-   
-
 
      </div>
     </div>
 </template>
-
-
 
 <script>
 import axios from 'axios';
