@@ -3,7 +3,7 @@
      <div class="row">
      <div class="col-sm-12">
 
-         <h1 style="text-align: center"> Samples </h1>
+         <h2 style="text-align: center"> Samples </h2>
      <br> <br>
      <table class="table table-hover">
          <thead>
@@ -44,27 +44,6 @@ export default {
     data() {
         return {
             response: [],
-            theme: '',
-            lab: '',
-            freezer:'',
-            chamber:'',
-            rack: '',
-            tray: '',
-            box: '',
-            species: '',
-            sampleType: '',
-            description: '',
-            locationCollected: '',
-            project: '',
-            projectOwner: '',
-            retention: '',
-            barcode: '',
-            analysis: '',
-            temperature: '',
-            amount: '',
-            quantity_type: '',
-            securityLevel: '',
-            code: '',
             };
     },
     methods: {

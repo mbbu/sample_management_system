@@ -31,30 +31,33 @@
 
 <script>
 
-
 export default {
   name: 'form-wizard',
   
   data(){
     return{
         tabs: [],
+        response: [],
         currentActive: 0,
         totalTabs: 0,
-         response: [],
         formData: {
             theme: '',
+            project: '',
+            projectOwner: '',
+            sampleType: '',
+            species: '',
+            description: '',
             lab: '',
             freezer:'',
             chamber:'',
             rack: '',
             tray: '',
             box: '',
-            species: '',
-            sampleType: '',
-            description: '',
+            
+            
+            
             locationCollected: '',
-            project: '',
-            projectOwner: '',
+            
             retention: '',
             barcode: '',
             analysis: '',
@@ -85,7 +88,7 @@ export default {
             this.tabs.forEach(tab => {
                 tab.isActive = true;
             });
-                this.tabs[this.currentActive].isActive = true;
+                this.tabs[this.currentActive].isActive = false;
 
         },
 
@@ -111,7 +114,8 @@ export default {
                     alert("Everything passes ! Ready to Submit")
                 }
             });
-        }  
+        },
+
     }
 }
 </script>
