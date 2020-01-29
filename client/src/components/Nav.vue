@@ -8,7 +8,7 @@
             </li>
 
             <li>
-            <router-link to="/sample" class="context-menu__link"> 
+            <router-link to="/home" class="context-menu__link"> 
             <i class="fa fa-home menu__icon" aria-hidden="true"> </i>  
             Home </router-link> 
             </li>

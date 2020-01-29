@@ -2,11 +2,12 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Box from './pages/Box.vue';
 import Sample from './pages/Sample.vue';
-import Index from './pages/Index.vue';
 import Chamber from './pages/Chamber.vue';
 import Theme from './pages/Theme.vue';
 import Login from './pages/Login.vue';
 import AddSample from './pages/AddSample.vue';
+import Map from './pages/Map.vue'
+
 
 Vue.use(Router);
 
@@ -22,9 +23,9 @@ export default new Router({
          },
          {
              path: '/home',
-             name: 'home',
+             name: 'Map',
              alias: ['/welcome'],
-             component: Index,
+             component: Map,
          },
          {
             path: '/box',

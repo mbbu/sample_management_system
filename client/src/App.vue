@@ -2,7 +2,6 @@
   <div id="wrapper" :class="wrapperClass">
       <TopNav> </TopNav>
       <Nav></Nav>
-      <NavToggleBtn></NavToggleBtn>
       <ContentOverlay></ContentOverlay>
       <router-view/>
   </div>
@@ -10,7 +9,6 @@
 
 <script>
 
-import NavToggleBtn from '@/components/NavToggleBtn.vue'
 import Nav from '@/components/Nav.vue';
 import ContentOverlay from '@/components/ContentOverlay.vue';
 import TopNav from '@/components/TopNav.vue';
@@ -18,7 +16,6 @@ import TopNav from '@/components/TopNav.vue';
 export default {
 
     components: {
-    NavToggleBtn,
     ContentOverlay,
     Nav,
     TopNav,
