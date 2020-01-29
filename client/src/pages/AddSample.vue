@@ -1,10 +1,19 @@
 <template>
   <div id="sampleform">
   <b-container>
-    <form-wizard @submit="formSubmit" title="Sample Data Form" subtitle="Kindly input the correct information" >
+    <form-wizard @submit="checkForm" title="Sample Data Form" subtitle="Kindly input the correct information" >
         <tab-content title="Sample Details">
+
+          <p v-if="errors.length">
+            <b> Please correct the following error(s): </b>
+            <ul> 
+              <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
+            </ul>
+          </p>
+
+
                    <span> Please select a Theme </span>
-                    <b-form-select v-model="formData.theme" id="theme" >
+                    <b-form-select v-model="formData.theme" id="Theme" >
                     <option :value="null">Please select a Theme</option>
                     <option value="1"> Plant Health</option>
                     <option value="2" > Animal Health </option>
@@ -15,9 +24,9 @@
                     
                     <b-form-group id="form-projectOwner-group" label="Project Owner:" label-for="form-projectOwner-input">
                     <b-form-input
-                      id="form-projectOwner-input"
+                      id="ProjectOwner"
                       type="text"
-                      v-model="formData.projectOwner"
+                      v-model="formData.projectOwner" 
                       label="Enter Project Owner"
                     > </b-form-input>
                   </b-form-group>
@@ -25,27 +34,27 @@
 
                     <b-form-group id="form-sampleType-group" label="Sample Type:" label-for="form-sampleType-input">
                     <b-form-input
-                      id="form-sampleType-input"
+                      id="SampleType"
                       type="text"
-                      v-model="formData.sampleType"
+                      v-model="formData.sampleType" 
                       label="Enter Sample Type"
                     > </b-form-input>
                   </b-form-group>
 
                   <b-form-group id="form-species-group" label="Sample Species:" label-for="form-species-input">
                     <b-form-input
-                      id="form-species-input"
+                      id="Species"
                       type="text"
-                      v-model="formData.species"
+                      v-model="formData.species" 
                       label="Enter Species"
                     > </b-form-input>
                   </b-form-group>
 
                     <b-form-group id="form-description-group" label="Sample description:" label-for="form-description-input">
                     <b-form-input
-                      id="form-description-input"
+                      id="Description"
                       type="text"
-                      v-model="formData.description"
+                      v-model="formData.description" :state="validation"
                       label="Enter description"
                     > </b-form-input>
                   </b-form-group>
@@ -56,7 +65,7 @@
                   <b-form-group id="form-locationCollected-group" label="Location collected:" label-for="form-locationCollected-input">
                     <b-form-input
                       id="form-locationCollected-input"
-                      type="text" 
+                      type="text" required 
                       v-model="formData.locationCollected" 
                       label="Enter Location Collected"
                     > </b-form-input>
@@ -166,6 +175,8 @@
                     </b-row>
          </tab-content>
 
+         
+
           <tab-content title="Finishing Up" >
             
                    <span> Add Security Level Needed </span>
@@ -245,6 +256,12 @@ export default {
   data(){
     return{
         response: [],
+        errors: [],
+        Theme: null,
+        ProjectOwner: null,
+        SampleType: null,
+        Description: null,
+
         formData: {
             theme: '',
             project: '',
@@ -268,11 +285,36 @@ export default {
             securityLevel: '',
             code: '',
             terms:'',
-     }
-        
-    };
-},
-methods : {
+     },
+    }  
+    },
+
+  methods : {
+        checkForm: function (e) {
+          if (this.Theme && this.ProjectOwner && this.SampleType && this.Species && this.Description) {
+            return true;
+          }
+
+            this.errors = [];
+
+            if (!this.Theme) {
+              this.error.push('Theme Required');
+            }
+            if (!this.ProjectOwner) {
+              this.error.push('Project Owner Required');
+            }
+            if (!this.SampleType) {
+              this.error.push('Sample Type Required');
+            }
+            if (!this.Species) {
+              this.error.push('Species Required');
+            }
+
+            e.preventDefault();
+
+          } 
+        },
+
          formSubmit(e) {
             e.preventDefault();
             let currentObj = this;
@@ -305,7 +347,7 @@ methods : {
             currentObj.output = error;
             });
         },
-},
-}
+};
+
 
 </script>
