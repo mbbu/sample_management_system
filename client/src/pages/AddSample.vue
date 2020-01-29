@@ -1,29 +1,10 @@
 <template>
   <div id="sampleform">
   <b-container>
-    <form-wizard>
-      <template v-slot="{formData}">
-
-        <tab name="Step 1" info="Project Information" :selected="true" :formData="formData">
-              <div id="form-step-1" >
-
-                   <b-form-group id="theme-input-group-2" label="Theme" label-for="theme-input-2">
-                      <b-form-select
-                        id="theme-input-2"
-                        name="theme-input-2"
-                        v-model="formData.theme"
-                        v-validate="{ required: true }"
-                        :options="themes"
-                        :state="validateState('theme-input-2')"
-                        aria-describedby="theme-2-live-feedback"
-                        data-vv-as="Theme"
-                      ></b-form-select>
-
-                      <b-form-invalid-feedback id="theme-2-live-feedback">{{ veeErrors.first('theme-input-2') }}</b-form-invalid-feedback>
-                    </b-form-group>
-            
+    <form-wizard @submit="formSubmit" title="Sample Data Form" subtitle="Kindly input the correct information" >
+        <tab-content title="Sample Details">
                    <span> Please select a Theme </span>
-                    <b-form-select v-model="formData.theme" id="theme" v-validate="{ required: true }" data-vv-scope="step1" class="input" >
+                    <b-form-select v-model="formData.theme" id="theme" >
                     <option :value="null">Please select a Theme</option>
                     <option value="1"> Plant Health</option>
                     <option value="2" > Animal Health </option>
@@ -31,79 +12,52 @@
                     <option value="4" > Human Health </option>
                     </b-form-select>
 
-                    <span> Enter Project Name </span>
-                    <b-form-select v-model="formData.project" v-validate="{ required: true }" data-vv-scope="step1" class="input" id="project" label="Enter Project Name" >
-                    <option :value="null">Please select your project</option>
-                    <option value="H3Bionet"> H3Bionet</option>
-                    <option value="IENBit" >IENBit</option>
-                    <option value="Tsetse Launch" >Tsetse Launch</option>
-                    <option value="Africa Now" >Africa Now </option>
-                    </b-form-select>
+                    
+                    <b-form-group id="form-projectOwner-group" label="Project Owner:" label-for="form-projectOwner-input">
+                    <b-form-input
+                      id="form-projectOwner-input"
+                      type="text"
+                      v-model="formData.projectOwner"
+                      label="Enter Project Owner"
+                    > </b-form-input>
+                  </b-form-group>
 
-                     <b-form-group id="projectOwner-input-group" label="Project Owner" label-for="projectOwner-input-1">
-                      <b-form-input
-                        id="projectOwner"
-                        name="projectOwner-input-1"
-                        v-model="formData.projectOwner"
-                        v-validate="{ required: true, min: 3 }"
-                        :state="validateState('projectOwner-input-1')"
-                        aria-describedby="input-1-live-feedback"
-                        data-vv-as="projectOwner"
-                      ></b-form-input>
-                      <b-form-invalid-feedback id="projectOwner-1-live-feedback">{{ veeErrors.first('projectOwner-input-1') }}</b-form-invalid-feedback>
-                    </b-form-group>
 
-                     <b-form-group id="sampleType-input-group" label="sample Type" label-for="sampleType-input-1">
-                      <b-form-input
-                        id="sampleType"
-                        name="sampleType-input-1"
-                        v-model="formData.sampleType"
-                        v-validate="{ required: true, min: 3 }"
-                        :state="validateState('sampleType-input-1')"
-                        aria-describedby="input-1-live-feedback"
-                        data-vv-as="sampleType"
-                      ></b-form-input>
-                      <b-form-invalid-feedback id="sampleType-1-live-feedback">{{ veeErrors.first('sampleType-input-1') }}</b-form-invalid-feedback>
-                    </b-form-group>
+                    <b-form-group id="form-sampleType-group" label="Sample Type:" label-for="form-sampleType-input">
+                    <b-form-input
+                      id="form-sampleType-input"
+                      type="text"
+                      v-model="formData.sampleType"
+                      label="Enter Sample Type"
+                    > </b-form-input>
+                  </b-form-group>
 
-                     <b-form-group id="species-input-group" label="species" label-for="species-input-1">
-                      <b-form-input
-                        id="species"
-                        name="species-input-1"
-                        v-model="formData.species"
-                        v-validate="{ required: true, min: 3 }"
-                        :state="validateState('species-input-1')"
-                        aria-describedby="input-1-live-feedback"
-                        data-vv-as="species"
-                      ></b-form-input>
-                      <b-form-invalid-feedback id="species-1-live-feedback">{{ veeErrors.first('species-input-1') }}</b-form-invalid-feedback>
-                    </b-form-group>
+                  <b-form-group id="form-species-group" label="Sample Species:" label-for="form-species-input">
+                    <b-form-input
+                      id="form-species-input"
+                      type="text"
+                      v-model="formData.species"
+                      label="Enter Species"
+                    > </b-form-input>
+                  </b-form-group>
 
-                     <b-form-group id="description-input-group" label="description" label-for="description-input-1">
-                      <b-form-input
-                        id="description"
-                        name="description-input-1"
-                        v-model="formData.description"
-                        v-validate="{ required: true, min: 10 }"
-                        :state="validateState('description-input-1')"
-                        aria-describedby="input-1-live-feedback"
-                        data-vv-as="description"
-                      ></b-form-input>
-                      <b-form-invalid-feedback id="description-1-live-feedback">{{ veeErrors.first('description-input-1') }}</b-form-invalid-feedback>
-                    </b-form-group>
+                    <b-form-group id="form-description-group" label="Sample description:" label-for="form-description-input">
+                    <b-form-input
+                      id="form-description-input"
+                      type="text"
+                      v-model="formData.description"
+                      label="Enter description"
+                    > </b-form-input>
+                  </b-form-group>
+        </tab-content>
 
-              </div>
-         </tab>
-
-         <tab name="Step 2" info="Sample Location in Institution" data-vv-scope="step2">
-              <div id="form-step-2">
+         <tab-content title="Sample Location in Institution" >
 
                   <b-form-group id="form-locationCollected-group" label="Location collected:" label-for="form-locationCollected-input">
                     <b-form-input
                       id="form-locationCollected-input"
-                      v-validate="{ required: true }"
                       type="text" 
-                      v-model="formData.locationCollected" data-vv-scope="step2"
+                      v-model="formData.locationCollected" 
                       label="Enter Location Collected"
                     > </b-form-input>
                   </b-form-group>
@@ -112,7 +66,7 @@
                         <b-form-input
                             id="form-lab-input"
                             type="text"
-                            v-model="formData.lab" data-vv-scope="step2"
+                            v-model="formData.lab" 
                             label="Enter Laboratory"
                          > </b-form-input>
                     </b-form-group>
@@ -123,7 +77,7 @@
                                 <b-form-input
                                 id="form-freezer-input"
                                 type="text"
-                                v-model="formData.freezer" data-vv-scope="step2"
+                                v-model="formData.freezer" 
                                 label="Enter Freezer"
                                 > </b-form-input>
                                 </b-form-group>
@@ -146,7 +100,7 @@
                             <b-form-input
                             id="form-rack-input"
                             type="number" min="0"
-                            v-model="formData.rack" data-vv-scope="step2"
+                            v-model="formData.rack" 
                             label="Enter Rack"
                             > </b-form-input>
                            </b-form-group>
@@ -157,7 +111,7 @@
                             <b-form-input
                             id="form-tray-input"
                             type="number" min="0"
-                            v-model="formData.tray" data-vv-scope="step2"
+                            v-model="formData.tray" 
                             label="Enter Rack"
                             > </b-form-input>
                          </b-form-group>
@@ -168,7 +122,7 @@
                             <b-form-input
                             id="form-box-input"
                             type="number" min="0"
-                            v-model="formData.box" data-vv-scope="step2"
+                            v-model="formData.box" 
                             label="Enter Box"
                             > </b-form-input>
                             </b-form-group>
@@ -182,7 +136,7 @@
                             <b-form-input
                             id="form-temperature-input"
                             type="number"
-                            v-model="formData.temperature" data-vv-scope="step2"
+                            v-model="formData.temperature" 
                             label="Enter temperature "
                             > </b-form-input>
                           </b-form-group>
@@ -193,7 +147,7 @@
                             <b-form-input
                             id="form-amount-input"
                             type="number" min="0"
-                            v-model="formData.amount" data-vv-scope="step2"
+                            v-model="formData.amount" 
                             label="Enter amount of sample "
                             > </b-form-input>
                           </b-form-group>
@@ -201,7 +155,7 @@
 
                         <b-col>
                              <span> Please select the quantity type </span>
-                            <b-form-select v-model="formData.quantity_type" data-vv-scope="step2" class="mb-3" id="form-quantity-dropdown">
+                            <b-form-select v-model="formData.quantity_type" class="mb-3" id="form-quantity-dropdown">
                             <option :value="null">Please select the quantity type</option>
                             <option value="ML"> ML</option>
                             <option value="Meters" > Meters </option>
@@ -210,15 +164,12 @@
                             </b-form-select>
                         </b-col>
                     </b-row>
+         </tab-content>
 
-                </div>
-          </tab>
-
-          <tab name="Step 3" info="Finishing Up" >
-              <div id="form-step-3">
-
+          <tab-content title="Finishing Up" >
+            
                    <span> Add Security Level Needed </span>
-                    <b-form-select v-model="formData.securityLevel" data-vv-scope="step3" class="mb-3" id="form-securityLevel-dropdown">
+                    <b-form-select v-model="formData.securityLevel"  class="mb-3" id="form-securityLevel-dropdown">
                     <option :value="null">Please select the security level</option>
                     <option value="High"> High </option>
                     <option value="Medium" > Medium </option>
@@ -229,7 +180,7 @@
                     <b-form-input
                       id="form-code-input"
                       type="number" min="0"
-                      v-model="formData.code" data-vv-scope="step3"
+                      v-model="formData.code" 
                       label="Enter code "
                     > </b-form-input>
                   </b-form-group>
@@ -238,7 +189,7 @@
                     <b-form-input
                       id="form-barcode-input"
                       type="text"
-                      v-model="formData.barcode" data-vv-scope="step3"
+                      v-model="formData.barcode" 
                       label="Enter barcode number "
                     > </b-form-input>
                   </b-form-group>
@@ -247,7 +198,7 @@
                     <b-form-input
                       id="form-analysis-input"
                       type="text"
-                      v-model="formData.analysis" data-vv-scope="step3"
+                      v-model="formData.analysis" 
                       label="Enter analysis carried out "
                     > </b-form-input>
                   </b-form-group>
@@ -257,18 +208,21 @@
                     <b-form-input
                       id="form-retention-input"
                       type="number" min="0"
-                      v-model="formData.retention" data-vv-scope="step3"
+                      v-model="formData.retention" 
                       label="Enter retention period in months "
                     > </b-form-input>
                   </b-form-group>
 
-                   <div class="btn-group" role="group">
-                     <b-button type="submit" variant="primary"> Submit </b-button>
-                     <b-button type="reset" variant="danger"> Reset </b-button>
-                    </div>
-                  
-             </div>
-        </tab>
+          </tab-content>
+          <template slot="footer" scope="props">
+            <div class=wizard-footer-left>
+                <wizard-button  v-if="props.activeTabIndex > 0 && !props.isLastStep" :style="props.fillButtonStyle">Previous</wizard-button>
+            </div>
+              <div class="wizard-footer-right">
+                <wizard-button v-if="!props.isLastStep" @click.native="props.nextTab()" class="wizard-footer-right" :style="props.fillButtonStyle">Next</wizard-button>
+                
+                <wizard-button v-else @click.native="alert('Done')" class="wizard-footer-right finish-button" :style="props.fillButtonStyle">{{props.isLastStep ? 'Done' : 'Next'}}</wizard-button>
+              </div>
           </template>
           </form-wizard>
   </b-container>
@@ -277,32 +231,81 @@
 
 <script>
 import Vue from 'vue';
-import  VeeValidate from 'vee-validate';
-import FormWizard from '../components/FormWizard.vue';
-import Tab from '../components/Tab.vue';
-import 'bulma/css/bulma.css';
+import VueFormWizard, { TabContent } from 'vue-form-wizard'
+import 'vue-form-wizard/dist/vue-form-wizard.min.css'
 
-Vue.use(VeeValidate, {
-    // This is the default
-  inject: true,
-  // Important to name this something other than 'fields'
-  fieldsBagName: 'veeFields',
-  // This is not required but avoids possible naming conflicts
-  errorBagName: 'veeErrors'
-});
+import axios from 'axios';
+
+Vue.use(VueFormWizard)
+Vue.use(TabContent)
 
 export default {
   name: 'sampleform',
-  components: {
-    FormWizard, Tab
-  },
+     
+  data(){
+    return{
+        response: [],
+        formData: {
+            theme: '',
+            project: '',
+            projectOwner: '',
+            sampleType: '',
+            species: '',
+            description: '',
+            lab: '',
+            freezer:'',
+            chamber:'',
+            rack: '',
+            tray: '',
+            box: '',   
+            locationCollected: '',
+            retention: '',
+            barcode: '',
+            analysis: '',
+            temperature: '',
+            amount: '',
+            quantity_type: '',
+            securityLevel: '',
+            code: '',
+            terms:'',
+     }
+        
+    };
+},
+methods : {
+         formSubmit(e) {
+            e.preventDefault();
+            let currentObj = this;
+            axios.post('http://localhost:5000/sample' || 'http://localhost:5000/samples', {
+            theme: this.theme,
+            lab: this.lab,
+            freezer: this.freezer,
+            chamber: this.chamber,
+            rack: this.rack,
+            tray: this.tray,
+            box: this.box,
+            animal_species: this.species,
+            sample_type: this.sampleType,
+            sample_description: this.description,
+            project: this.project,
+            project_owner: this.projectOwner,
+            retention_period: this.retention,
+            barcode: this.barcode,
+            analysis: this.analysis,
+            temperature: this.temperature,
+            amount: this.amount,
+            quantity_type: this.quantity_type,
+            security_level: this.securityLevel,
+            code: this.code,
+            })
+            .then(function (response) {
+            currentObj.output = response.data;
+            })
+            .catch(function (error) {
+            currentObj.output = error;
+            });
+        },
+},
 }
+
 </script>
-
-<style lang="scss">
-@import "../../node_modules/bulma/bulma.sass";
-@import "../../node_modules/bulma-steps-component/bulma-steps.sass";
-
-
-[v-cloak] { display: none; }
-</style>
