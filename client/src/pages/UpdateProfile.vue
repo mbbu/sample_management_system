@@ -31,13 +31,13 @@
                                 </div>
                             </div>
 
-                            <label for="role"> Theme </label>
+                            <label for="role"> Role </label>
                             <div class="form-group">
                                 <select v-model="user.role" id="role" name="role" class="form-control" :class="{ 'is-invlaid': submitted && $v.user.role.$error }">  
-                                <option value="1"> Plant Health </option>
-                                <option value="2"> Animal Health</option>
-                                <option value="3"> Environmental Health </option>
-                                <option value="4"> Human Health</option>
+                                <option value="1"> PI </option>
+                                <option value="2"> Scientist </option>
+                                <option value="3"> Lab Manager </option>
+                                <option value="4"> Student </option>
                                 </select>
                                 <div v-if="submitted && $v.user.role.$error" class="invaid-feedback">
                                     <span v-if="!$v.user.role.required"> Role is required </span>
@@ -64,7 +64,7 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <button class="btn btn-primary">Register</button>
+                                <button class="btn btn-primary">Update</button>
                             </div>
                         </form>
                     </div>
