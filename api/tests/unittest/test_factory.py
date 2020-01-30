@@ -1,10 +1,11 @@
 from api import create_app
+from api.tests.unittest.conftest import configs
 
 
 def test_config():
     """Test create_app without passing test config"""
     assert not create_app().testing
-    assert create_app({"TESTING": True}).testing
+    assert create_app(configs).testing
 
 
 def test_home(client):
