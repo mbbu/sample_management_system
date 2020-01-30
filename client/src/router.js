@@ -6,7 +6,8 @@ import Chamber from './pages/Chamber.vue';
 import Theme from './pages/Theme.vue';
 import Login from './pages/Login.vue';
 import AddSample from './pages/AddSample.vue';
-import Map from './pages/Map.vue'
+import Map from './pages/Map.vue';
+import UpdateProfile from './pages/UpdateProfile.vue';
 
 
 Vue.use(Router);
@@ -18,8 +19,13 @@ export default new Router({
         {
              path: '/login',
              name: 'login',
-             alias: ['/login'],
+             alias: ['/signin'],
              component: Login,
+         },
+         {
+             path: '/updateprofile',
+             name: 'updateprofile',
+             component: UpdateProfile,
          },
          {
              path: '/home',

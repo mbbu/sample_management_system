@@ -1,19 +1,11 @@
 <template>
   <div id="sampleform">
   <b-container>
-    <form-wizard @submit="checkForm" title="Sample Data Form" subtitle="Kindly input the correct information" >
+    <form-wizard title="Sample Data Form" subtitle="Kindly input the correct information" >
         <tab-content title="Sample Details">
 
-          <p v-if="errors.length">
-            <b> Please correct the following error(s): </b>
-            <ul> 
-              <li v-for="error in errors" v-bind:key="error">{{ error }}</li>
-            </ul>
-          </p>
-
-
                    <span> Please select a Theme </span>
-                    <b-form-select v-model="formData.theme" id="Theme" >
+                    <b-form-select v-model="theme" id="Theme" >
                     <option :value="null">Please select a Theme</option>
                     <option value="1"> Plant Health</option>
                     <option value="2" > Animal Health </option>
@@ -25,27 +17,29 @@
                     <b-form-group id="form-projectOwner-group" label="Project Owner:" label-for="form-projectOwner-input">
                     <b-form-input
                       id="ProjectOwner"
-                      type="text"
-                      v-model="formData.projectOwner" 
+                      type="text" 
+                      v-model="projectOwner" 
                       label="Enter Project Owner"
                     > </b-form-input>
+                    
                   </b-form-group>
 
 
                     <b-form-group id="form-sampleType-group" label="Sample Type:" label-for="form-sampleType-input">
                     <b-form-input
                       id="SampleType"
-                      type="text"
-                      v-model="formData.sampleType" 
+                      type="text" 
+                      v-model="sampleType" 
                       label="Enter Sample Type"
                     > </b-form-input>
+                    
                   </b-form-group>
 
                   <b-form-group id="form-species-group" label="Sample Species:" label-for="form-species-input">
                     <b-form-input
                       id="Species"
-                      type="text"
-                      v-model="formData.species" 
+                      type="text" 
+                      v-model="species" 
                       label="Enter Species"
                     > </b-form-input>
                   </b-form-group>
@@ -53,8 +47,8 @@
                     <b-form-group id="form-description-group" label="Sample description:" label-for="form-description-input">
                     <b-form-input
                       id="Description"
-                      type="text"
-                      v-model="formData.description" :state="validation"
+                      type="text" 
+                      v-model="description" 
                       label="Enter description"
                     > </b-form-input>
                   </b-form-group>
@@ -66,7 +60,7 @@
                     <b-form-input
                       id="form-locationCollected-input"
                       type="text" required 
-                      v-model="formData.locationCollected" 
+                      v-model="locationCollected" 
                       label="Enter Location Collected"
                     > </b-form-input>
                   </b-form-group>
@@ -75,7 +69,7 @@
                         <b-form-input
                             id="form-lab-input"
                             type="text"
-                            v-model="formData.lab" 
+                            v-model="lab" 
                             label="Enter Laboratory"
                          > </b-form-input>
                     </b-form-group>
@@ -86,7 +80,7 @@
                                 <b-form-input
                                 id="form-freezer-input"
                                 type="text"
-                                v-model="formData.freezer" 
+                                v-model="freezer" 
                                 label="Enter Freezer"
                                 > </b-form-input>
                                 </b-form-group>
@@ -94,7 +88,7 @@
 
                         <b-col>
                                 <span> Please select the chamber </span>
-                                <b-form-select data-vv-scope="step2" class="field" id="formData.chamber">
+                                <b-form-select data-vv-scope="step2" class="field" id="chamber">
                                 <option :value="null">Chamber</option>
                                 <option value="Middle"> Middle</option>
                                 <option value="Top" > Top </option>
@@ -105,11 +99,11 @@
 
                      <b-row>
                           <b-col>
-                                <b-form-group id="form-rack-group" label="Rack:" label-for="form-rack-input">
+                            <b-form-group id="form-rack-group" label="Rack:" label-for="form-rack-input">
                             <b-form-input
                             id="form-rack-input"
                             type="number" min="0"
-                            v-model="formData.rack" 
+                            v-model="rack" 
                             label="Enter Rack"
                             > </b-form-input>
                            </b-form-group>
@@ -120,7 +114,7 @@
                             <b-form-input
                             id="form-tray-input"
                             type="number" min="0"
-                            v-model="formData.tray" 
+                            v-model="tray" 
                             label="Enter Rack"
                             > </b-form-input>
                          </b-form-group>
@@ -131,7 +125,7 @@
                             <b-form-input
                             id="form-box-input"
                             type="number" min="0"
-                            v-model="formData.box" 
+                            v-model="box" 
                             label="Enter Box"
                             > </b-form-input>
                             </b-form-group>
@@ -145,7 +139,7 @@
                             <b-form-input
                             id="form-temperature-input"
                             type="number"
-                            v-model="formData.temperature" 
+                            v-model="temperature" 
                             label="Enter temperature "
                             > </b-form-input>
                           </b-form-group>
@@ -156,7 +150,7 @@
                             <b-form-input
                             id="form-amount-input"
                             type="number" min="0"
-                            v-model="formData.amount" 
+                            v-model="amount" 
                             label="Enter amount of sample "
                             > </b-form-input>
                           </b-form-group>
@@ -164,7 +158,7 @@
 
                         <b-col>
                              <span> Please select the quantity type </span>
-                            <b-form-select v-model="formData.quantity_type" class="mb-3" id="form-quantity-dropdown">
+                            <b-form-select v-model="quantity_type" class="mb-3" id="form-quantity-dropdown">
                             <option :value="null">Please select the quantity type</option>
                             <option value="ML"> ML</option>
                             <option value="Meters" > Meters </option>
@@ -175,12 +169,11 @@
                     </b-row>
          </tab-content>
 
-         
 
           <tab-content title="Finishing Up" >
             
                    <span> Add Security Level Needed </span>
-                    <b-form-select v-model="formData.securityLevel"  class="mb-3" id="form-securityLevel-dropdown">
+                    <b-form-select v-model="securityLevel"  class="mb-3" id="form-securityLevel-dropdown">
                     <option :value="null">Please select the security level</option>
                     <option value="High"> High </option>
                     <option value="Medium" > Medium </option>
@@ -191,7 +184,7 @@
                     <b-form-input
                       id="form-code-input"
                       type="number" min="0"
-                      v-model="formData.code" 
+                      v-model="code" 
                       label="Enter code "
                     > </b-form-input>
                   </b-form-group>
@@ -200,7 +193,7 @@
                     <b-form-input
                       id="form-barcode-input"
                       type="text"
-                      v-model="formData.barcode" 
+                      v-model="barcode" 
                       label="Enter barcode number "
                     > </b-form-input>
                   </b-form-group>
@@ -209,7 +202,7 @@
                     <b-form-input
                       id="form-analysis-input"
                       type="text"
-                      v-model="formData.analysis" 
+                      v-model="analysis" 
                       label="Enter analysis carried out "
                     > </b-form-input>
                   </b-form-group>
@@ -219,22 +212,24 @@
                     <b-form-input
                       id="form-retention-input"
                       type="number" min="0"
-                      v-model="formData.retention" 
+                      v-model="retention" 
                       label="Enter retention period in months "
                     > </b-form-input>
                   </b-form-group>
 
           </tab-content>
-          <template slot="footer" scope="props">
+
+           <template slot="footer" scope="props">
             <div class=wizard-footer-left>
                 <wizard-button  v-if="props.activeTabIndex > 0 && !props.isLastStep" :style="props.fillButtonStyle">Previous</wizard-button>
             </div>
+            
               <div class="wizard-footer-right">
                 <wizard-button v-if="!props.isLastStep" @click.native="props.nextTab()" class="wizard-footer-right" :style="props.fillButtonStyle">Next</wizard-button>
                 
                 <wizard-button v-else @click.native="alert('Done')" class="wizard-footer-right finish-button" :style="props.fillButtonStyle">{{props.isLastStep ? 'Done' : 'Next'}}</wizard-button>
               </div>
-          </template>
+          </template> 
           </form-wizard>
   </b-container>
   </div>
@@ -242,7 +237,7 @@
 
 <script>
 import Vue from 'vue';
-import VueFormWizard, { TabContent } from 'vue-form-wizard'
+import VueFormWizard, { TabContent } from 'vue-form-wizard';
 import 'vue-form-wizard/dist/vue-form-wizard.min.css'
 
 import axios from 'axios';
@@ -253,16 +248,8 @@ Vue.use(TabContent)
 export default {
   name: 'sampleform',
      
-  data(){
+  data: function() {
     return{
-        response: [],
-        errors: [],
-        Theme: null,
-        ProjectOwner: null,
-        SampleType: null,
-        Description: null,
-
-        formData: {
             theme: '',
             project: '',
             projectOwner: '',
@@ -285,35 +272,11 @@ export default {
             securityLevel: '',
             code: '',
             terms:'',
-     },
-    }  
+            
+     };
     },
 
   methods : {
-        checkForm: function (e) {
-          if (this.Theme && this.ProjectOwner && this.SampleType && this.Species && this.Description) {
-            return true;
-          }
-
-            this.errors = [];
-
-            if (!this.Theme) {
-              this.error.push('Theme Required');
-            }
-            if (!this.ProjectOwner) {
-              this.error.push('Project Owner Required');
-            }
-            if (!this.SampleType) {
-              this.error.push('Sample Type Required');
-            }
-            if (!this.Species) {
-              this.error.push('Species Required');
-            }
-
-            e.preventDefault();
-
-          } 
-        },
 
          formSubmit(e) {
             e.preventDefault();
@@ -347,6 +310,7 @@ export default {
             currentObj.output = error;
             });
         },
+  },
 };
 
 

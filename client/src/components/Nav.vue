@@ -31,7 +31,7 @@
              Add New Sample </router-link></li>
 
             <li>
-             <router-link to="/sample" class="context-menu__link"> 
+             <router-link to="/updateprofile" class="context-menu__link"> 
             <i class="fa fa-home menu__icon" aria-hidden="true"> </i>
             Update Profile </router-link></li>
 
