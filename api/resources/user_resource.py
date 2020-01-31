@@ -188,6 +188,8 @@ class UserResource(BaseResource):
     def get_response(user):
         if user is None:
             return BaseResource.send_json_message("User not found", 404)
+        elif type(user) is [] and len(user) >= 1:
+            return BaseResource.send_json_message("Users not found", 404)
         else:
             data = marshal(user, UserResource.fields)
             return BaseResource.send_json_message(data, 200)
