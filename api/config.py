@@ -3,7 +3,7 @@ import os
 
 from flask import has_request_context, request
 
-from api.constants import APP_NAME, DATABASE_URI_ENV_NAME, SECRET_KEY, ACCESS_EXPIRES, REFRESH_EXPIRES
+from api.constants import DATABASE_URI_ENV_NAME, SECRET_KEY, ACCESS_EXPIRES, REFRESH_EXPIRES
 
 
 # override default log formats
@@ -48,6 +48,12 @@ class BaseConfig(object):
     REDCap_API_TOKEN = os.environ.get('REDCap_API_TOKEN')
 
 
+class TestConfig(BaseConfig):
+    configs = {"TESTING": True,
+               'SQLALCHEMY_DATABASE_URI': BaseConfig.SQLALCHEMY_DATABASE_URI,
+               'SQLALCHEMY_TRACK_MODIFICATIONS': False}
+
+
 class DevelopmentConfig(BaseConfig):
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     ENV = "development"
@@ -58,4 +64,3 @@ class ProductionConfig(BaseConfig):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     ENV = "production"
     DEBUG = False
-
