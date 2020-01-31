@@ -22,18 +22,13 @@
             <li>
             <a href="https://redcap.icipe.org/surveys/?s=W7A7TFJ89J" class="context-menu__link"> 
             <i class="fa fa-home menu__icon" aria-hidden="true"> </i>
-             Sample Requests </a>
+            Request Sample </a>
             </li>
 
             <li>
             <router-link to="/addsample" class="context-menu__link"> 
             <i class="fa fa-home menu__icon" aria-hidden="true"> </i>
              Add New Sample </router-link></li>
-
-            <li>
-             <router-link to="/updateprofile" class="context-menu__link"> 
-            <i class="fa fa-home menu__icon" aria-hidden="true"> </i>
-            Update Profile </router-link></li>
 
 
         </ul>

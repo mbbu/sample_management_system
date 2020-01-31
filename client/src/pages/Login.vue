@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <h2> Login </h2>
     <b-form @submit="onSubmit" @reset="onReset" v-if="show">
       <b-form-group
@@ -22,14 +22,23 @@
         ></b-form-input>
       </b-form-group>
 
-      <b-form-group id="input-group-4">
+      <div class="wrapper">
+
+        <b-form-group id="input-group-4">
         <b-form-checkbox-group v-model="form.checked" id="checkboxes-4">
           <b-form-checkbox value="me">Remember Me</b-form-checkbox>
         </b-form-checkbox-group>
       </b-form-group>
 
-      <b-button type="submit" variant="primary">Submit</b-button>
-      <b-button type="register" variant="danger">Register</b-button>
+          <b-button type="submit" variant="primary">Submit</b-button>
+
+          <p> Don't have an account yet?</p>
+
+          <b-button type="register" variant="danger">Register</b-button> 
+      </div>
+    
+ 
+      
     </b-form>
    
   </div>
@@ -41,11 +50,8 @@
       return {
         form: {
           email: '',
-          name: '',
-          food: null,
           checked: []
         },
-        foods: [{ text: 'Select One', value: null }, 'Carrots', 'Beans', 'Tomatoes', 'Corn'],
         show: true
       }
     },
@@ -58,8 +64,6 @@
         evt.preventDefault()
         // Reset our form values
         this.form.email = ''
-        this.form.name = ''
-        this.form.food = null
         this.form.checked = []
         // Trick to reset/clear native browser form validation state
         this.show = false
@@ -70,3 +74,13 @@
     }
   }
 </script>
+
+<style>
+.wrapper {
+  text-align: center;
+  display: inline-block;
+
+}
+
+
+</style>

@@ -1,60 +1,60 @@
 <template>
-  <div id="sampleform">
+  <div id="sampleForm">
   <b-container>
-    <form-wizard title="Sample Data Form" subtitle="Kindly input the correct information" >
+    <form-wizard title="Sample Data Form" subtitle="Kindly input the correct information" @submit.prevent="handleSubmit" >
         <tab-content title="Sample Details">
 
-                   <span> Please select a Theme </span>
-                    <b-form-select v-model="theme" id="Theme" >
-                    <option :value="null">Please select a Theme</option>
+                   <label for="theme"> Please select a Theme </label>
+                   <div class="form">
+                     <select v-model="sample.theme" id="theme" name="theme" class="form-control" :class="{ 'is-invlaid' : submitted && $v.sample.theme.$error }" >
                     <option value="1"> Plant Health</option>
                     <option value="2" > Animal Health </option>
                     <option value="3" > Environmental Health </option>
                     <option value="4" > Human Health </option>
-                    </b-form-select>
-
+                     </select>
+                     <span v-if="!$v.sample.theme.required"> Theme is required </span>
+                     <span v-if="!$v.sample.theme.theme"> Select one </span>
+                   </div>
                     
-                    <b-form-group id="form-projectOwner-group" label="Project Owner:" label-for="form-projectOwner-input">
-                    <b-form-input
-                      id="ProjectOwner"
-                      type="text" 
-                      v-model="projectOwner" 
-                      label="Enter Project Owner"
-                    > </b-form-input>
-                    
-                  </b-form-group>
+                    <div class="form-group">
+                      <div class="form">
+                        <label for="projectOwner"> Project Owner</label>
+                        <input type="text" v-model="sample.projectOwner" id="projectOwner" class="form-control" :class="{ 'is-invalid': submitted && $sample.projectOwner.$error}" />
+                        <div v-if="submitted && !v.sample.projectOwner.required" class="invalid-feedback"> Project owner is required </div> 
+                      </div>
+                    </div>
 
+                    <div class="form-group">
+                      <div class="form">
+                        <label for="sampleType"> Sample Type</label>
+                        <input type="text" v-model="sample.sampleType" id="sampleType" class="form-control" :class="{ 'is-invalid': submitted && $sample.sampleType.$error}" />
+                        <div v-if="submitted && !v.sample.sampleType.required" class="invalid-feedback"> Sample Type is required </div> 
+                      </div>
+                    </div>
 
-                    <b-form-group id="form-sampleType-group" label="Sample Type:" label-for="form-sampleType-input">
-                    <b-form-input
-                      id="SampleType"
-                      type="text" 
-                      v-model="sampleType" 
-                      label="Enter Sample Type"
-                    > </b-form-input>
-                    
-                  </b-form-group>
+                    <div class="form-group">
+                      <div class="form">
+                        <label for="species"> Species</label>
+                        <input type="text" v-model="sample.species" id="species" class="form-control" :class="{ 'is-invalid': submitted && $sample.species.$error}" />
+                        <div v-if="submitted && !v.sample.species.required" class="invalid-feedback"> Species is required </div> 
+                      </div>
+                    </div>
 
-                  <b-form-group id="form-species-group" label="Sample Species:" label-for="form-species-input">
-                    <b-form-input
-                      id="Species"
-                      type="text" 
-                      v-model="species" 
-                      label="Enter Species"
-                    > </b-form-input>
-                  </b-form-group>
-
-                    <b-form-group id="form-description-group" label="Sample description:" label-for="form-description-input">
-                    <b-form-input
-                      id="Description"
-                      type="text" 
-                      v-model="description" 
-                      label="Enter description"
-                    > </b-form-input>
-                  </b-form-group>
+                    <div class="form-group">
+                      <div class="form">
+                        <label for="description"> Description</label>
+                        <input type="text" v-model="sample.description" id="description" class="form-control" :class="{ 'is-invalid': submitted && $sample.description.$error}" />
+                        <div v-if="submitted && !v.sample.description.required" class="invalid-feedback"> Description is required </div> 
+                        <span v-if="!$sample.description.required"> Description is required </span>
+                        <span v-if="!$sample.description.minLength"> Description must be at least 25 words </span>
+                      </div>
+                    </div>
+                      
         </tab-content>
 
          <tab-content title="Sample Location in Institution" >
+
+
 
                   <b-form-group id="form-locationCollected-group" label="Location collected:" label-for="form-locationCollected-input">
                     <b-form-input
@@ -227,7 +227,7 @@
               <div class="wizard-footer-right">
                 <wizard-button v-if="!props.isLastStep" @click.native="props.nextTab()" class="wizard-footer-right" :style="props.fillButtonStyle">Next</wizard-button>
                 
-                <wizard-button v-else @click.native="alert('Done')" class="wizard-footer-right finish-button" :style="props.fillButtonStyle">{{props.isLastStep ? 'Done' : 'Next'}}</wizard-button>
+                <wizard-button v-else @click.native="formSubmit" class="wizard-footer-right finish-button" :style="props.fillButtonStyle">{{props.isLastStep ? 'Done' : 'Next'}}</wizard-button>
               </div>
           </template> 
           </form-wizard>
@@ -239,44 +239,73 @@
 import Vue from 'vue';
 import VueFormWizard, { TabContent } from 'vue-form-wizard';
 import 'vue-form-wizard/dist/vue-form-wizard.min.css'
-
+import { required, minLength } from "vuelidate/lib/validators";
 import axios from 'axios';
 
 Vue.use(VueFormWizard)
 Vue.use(TabContent)
 
 export default {
-  name: 'sampleform',
+  name: "sampleForm",
      
-  data: function() {
-    return{
-            theme: '',
-            project: '',
-            projectOwner: '',
-            sampleType: '',
-            species: '',
-            description: '',
-            lab: '',
-            freezer:'',
-            chamber:'',
-            rack: '',
-            tray: '',
-            box: '',   
-            locationCollected: '',
-            retention: '',
-            barcode: '',
-            analysis: '',
-            temperature: '',
-            amount: '',
-            quantity_type: '',
-            securityLevel: '',
-            code: '',
-            terms:'',
-            
+  data() {
+    return {
+        sample: {
+            theme: "",
+            project: "",
+            projectOwner: "",
+            sampleType: "",
+            species: "",
+            description: "",
+            lab: "",
+            freezer: "",
+            chamber: "",
+            rack: "",
+            tray: "",
+            box: "",   
+            locationCollected: "",
+            retention: "",
+            barcode: "",
+            analysis: "",
+            temperature: "",
+            amount: "",
+            quantity_type: "",
+            securityLevel: "",
+            code: "",
+            terms: "",
+      },
+      submitted: false     
      };
     },
 
+    validations: {
+      sample: {
+        theme: { required } ,
+        projectOwner: { required } ,
+        project: { required } ,
+        sampleType: { required } ,
+        species: { required } ,
+        description: { required, minLength: minLength(25) } ,
+        lab: { required } ,
+        freezer: { required } ,
+
+
+      },
+    },
+
   methods : {
+
+        handleSubmit(e) {
+          this.submitted = true;
+
+          this.$v.$touch(e);
+          if (this.$v.$invalid) {
+            return;
+          }
+        alert ("Sucsess! :-)\n\n" + JSON.stringify(this.sample));
+
+          }
+    },
 
          formSubmit(e) {
             e.preventDefault();
@@ -310,7 +339,6 @@ export default {
             currentObj.output = error;
             });
         },
-  },
 };
 
 
