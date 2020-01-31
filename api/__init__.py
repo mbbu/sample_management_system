@@ -156,6 +156,7 @@ def create_app(test_config=None):
     jwt = JWTManager(app)
 
     # Cross-Origin Resource Sharing
+    # todo: proper CORS config, to ensure requests to the api are only sent by verified clients
     CORS(app, resources={r'/*': {'origins': '*'}})
 
     @jwt.token_in_blacklist_loader

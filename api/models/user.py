@@ -12,11 +12,11 @@ class User(BaseModel.db.Model):
     last_name = AppDb.Column(AppDb.String(65), nullable=False)
     email = AppDb.Column(AppDb.String(65), index=True, unique=True, nullable=False)
     password = AppDb.Column(AppDb.String(128), nullable=False)
-    role_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('role.id', ondelete='SET NULL'), nullable=True)
+    role_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('role.id', ondelete='SET NULL'), nullable=False)
     housedata_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('housedata.id', ondelete='SET NULL'), nullable=True)
     # Fields to help in audits
     created_at = AppDb.Column(AppDb.DateTime, nullable=False, default=datetime.now)
-    created_by = AppDb.Column(AppDb.String(65), nullable=True)
+    created_by = AppDb.Column(AppDb.String(65), nullable=False)
     updated_at = AppDb.Column(AppDb.DateTime, nullable=True)
     updated_by = AppDb.Column(AppDb.String(65), nullable=True)
     deleted_at = AppDb.Column(AppDb.DateTime, nullable=True)
