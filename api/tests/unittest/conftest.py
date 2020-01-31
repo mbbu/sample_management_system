@@ -1,33 +1,19 @@
-import os
-import tempfile
-
 import pytest
 
 from api import create_app
+from api.config import TestConfig
 from api.models.database import BaseModel
-
-
-db_fd, db_path = tempfile.mkstemp()  # create a temporary file to isolate the database for each test
-basedir = os.path.abspath(os.path.dirname(__file__))
-configs = {"TESTING": True,
-           "DATABASE": db_path,
-           'SQLALCHEMY_DATABASE_URI': 'sqlite:///' + os.path.join(basedir, 'test.db'),
-           'SQLALCHEMY_TRACK_MODIFICATIONS': False}
 
 
 @pytest.fixture
 def app():
     """create and configure a new app instance for each test"""
     # create the app with common test config
-    app = create_app(configs)
+    app = create_app(TestConfig.configs)
 
     with app.app_context():
         BaseModel.init_app(app)
     yield app
-
-    # close and remove the temporary database
-    os.close(db_fd)
-    os.unlink(db_path)
 
 
 @pytest.fixture
