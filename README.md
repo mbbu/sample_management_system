@@ -75,4 +75,13 @@ This is a web based application that interfaces samples available at ICIPE and a
 ```
  >> pip list --outdated --format=freeze | grep -v '^\-e' | cut -d = -f 1  | xargs -n1 pip install -U
 ```
+
+
+## RUN THE TESTS ##
+***1.Export required variables***
+```
+ >> export SAMPLE_MANAGEMENT_SYSTEM_DATABASE_URI='<<postgresql://username:password@host:port/database>>'
+```
+
+
 :+1:
