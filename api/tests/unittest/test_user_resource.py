@@ -2,6 +2,14 @@ from flask import json, request
 
 from api import create_app as app
 
+"""
+# ****************************
+# ***                      ***
+# ***  TEST GET REQUESTS   ***
+# ***                      ***
+# ****************************
+"""
+
 
 def test_get_user(client):
     response = client.get('/users')
@@ -42,3 +50,61 @@ def test_get_user_by_params(client):
         assert data['message']['first_name']
         assert data['message']['last_name']
         assert data['message']['role.name']
+
+
+"""
+# ****************************
+# ***                      ***
+# ***  TEST POST REQUESTS  ***
+# ***                      ***
+# ****************************
+"""
+
+
+def test_create_user_with_half_info(client):
+    response = client.post('/user', json={
+        'first_name': 'ICIPE',
+        'last_name': 'ADMIN',
+        'email': 'admin@icipe.org',
+        # 'role': '1',  <-- missing required parameter
+        'password': 'Admin1sMa3str0'
+    })
+
+    assert response.status_code == 400
+
+
+def test_create_user_with_all_info(client):
+    response = client.post('/user', json={
+        'first_name': 'ICIPE',
+        'last_name': 'ADMIN',
+        'email': 'admin@icipe.org',
+        'role': '1',
+        'password': 'Admin1sMa3str0'
+    })
+
+    data = json.loads(response.data)
+
+    assert response.status_code == 201
+    assert data['message']['first_name'] and data['message']['first_name'] == 'ICIPE'
+    assert data['message']['last_name'] and data['message']['last_name'] == 'ADMIN'
+    assert data['message']['email'] and data['message']['email'] == 'admin@icipe.org'
+    assert data['message']['role.name']
+    assert data['message']['token']
+    assert data['message']['refresh_token']
+    assert data['message']['response'] and data['message']['response'] == 'Registered user'
+
+
+def test_create_duplicate_user(client):
+    response = client.post('/user', json={
+        'first_name': 'ICIPE',
+        'last_name': 'ADMIN',
+        'email': 'admin@icipe.org',
+        'role': '1',
+        'password': 'Admin1sMa3str0'
+    })
+
+    data = json.loads(response.data)
+    assert response.status_code == 409
+    assert data['message'] == 'User already exists'
+
+# todo: test if passwords are hashed
