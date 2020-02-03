@@ -1,6 +1,21 @@
 from flask import json, request
+from flask_jwt_extended import create_access_token
 
 from api import create_app as app
+
+USER_DATA = {
+    'first_name': 'ICIPE',
+    'last_name': 'ADMIN',
+    'email': 'admin@icipe.org',
+    'role': '1',
+    'password': 'Admin1sMa3str0'
+}
+
+with app().test_request_context():
+    access_token = create_access_token(identity='admin@icipe.org')
+headers = {
+    'Authorization': 'Bearer {}'.format(access_token)
+}
 
 """
 # ****************************
@@ -74,14 +89,7 @@ def test_create_user_with_half_info(client):
 
 
 def test_create_user_with_all_info(client):
-    response = client.post('/user', json={
-        'first_name': 'ICIPE',
-        'last_name': 'ADMIN',
-        'email': 'admin@icipe.org',
-        'role': '1',
-        'password': 'Admin1sMa3str0'
-    })
-
+    response = client.post('/user', json=USER_DATA)
     data = json.loads(response.data)
 
     assert response.status_code == 201
@@ -95,16 +103,40 @@ def test_create_user_with_all_info(client):
 
 
 def test_create_duplicate_user(client):
-    response = client.post('/user', json={
-        'first_name': 'ICIPE',
-        'last_name': 'ADMIN',
-        'email': 'admin@icipe.org',
-        'role': '1',
-        'password': 'Admin1sMa3str0'
-    })
-
+    response = client.post('/user', json=USER_DATA)
     data = json.loads(response.data)
     assert response.status_code == 409
     assert data['message'] == 'User already exists'
+
+
+"""
+# ****************************
+# ***                      ***
+# ***  TEST PUT REQUESTS   ***
+# ***                      ***
+# ****************************
+"""
+
+
+def test_updating_user_without_jwt_token(client):
+    response = client.put('/user', json=USER_DATA)
+    assert response.status_code == 401
+
+
+def test_updating_user_without_any_field_changes(client):
+    response = client.put('/user', json=USER_DATA, headers=headers)
+    assert response.status_code == 304
+
+
+def test_updating_user_with_field_changes(client):
+    response = client.put('/user', json={
+        'first_name': 'I.C.I.P.E',
+        'last_name': 'ADMIN',
+        'email': 'admins@icipe.org',
+        'role': '1',
+        'password': 'Admin1sMa3str0'
+    }, headers=headers)
+
+    assert response.status_code == 202
 
 # todo: test if passwords are hashed
