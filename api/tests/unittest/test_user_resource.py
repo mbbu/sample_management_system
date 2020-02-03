@@ -139,4 +139,38 @@ def test_updating_user_with_field_changes(client):
 
     assert response.status_code == 202
 
+
+"""
+# *****************************
+# ***                       ***
+# ***  TEST DELETE REQUESTS ***
+# ***                       ***
+# *****************************
+"""
+
+
+def test_deleting_user_without_jwt_token(client):
+    response = client.delete('/user')
+    assert response.status_code == 401
+
+
+def test_deleting_another_user(client):
+    with app().test_request_context():
+        updated_access_token = create_access_token(identity='admin@icipe.org')
+    updated_headers = {
+        'Authorization': 'Bearer {}'.format(updated_access_token)
+    }
+    response = client.delete('/user', headers=updated_headers)
+    assert response.status_code == 403
+
+
+def test_deleting_user(client):
+    with app().test_request_context():
+        updated_access_token = create_access_token(identity='admins@icipe.org')
+    updated_headers = {
+        'Authorization': 'Bearer {}'.format(updated_access_token)
+    }
+    response = client.delete('/user', headers=updated_headers)
+    assert response.status_code == 200
+
 # todo: test if passwords are hashed
