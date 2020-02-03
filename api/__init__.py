@@ -15,6 +15,7 @@ from api.models.database import BaseModel
 from api.resources.base_resource import BaseResource
 from .resources import sample_resource, chamber_resource
 
+
 def get_config_type():
     return os.environ.get(APP_CONFIG_ENV_VAR, PROD_CONFIG_VAR).lower().strip()
 
@@ -55,6 +56,7 @@ def mail_admin(app):
         mail_handler.setLevel(logging.ERROR)
         app.logger.addHandler(mail_handler)
     pass
+
 
 # noinspection PyTypeChecker
 def register_resources(app):
@@ -103,11 +105,12 @@ def register_resources(app):
     from api.resources.faker_resource import FakeDataResource
     api.add_resource(FakeDataResource, '/faker')
 
-      # Error handlers
+    # Error handlers
     # api.handle_error(500)
     # api.error_router()
 
     # TODO: register resources here
+
 
 def config_app(app_instance):
     config_type = get_config_type()
@@ -153,6 +156,7 @@ def create_app(test_config=None):
     jwt = JWTManager(app)
 
     # Cross-Origin Resource Sharing
+    # todo: proper CORS config, to ensure requests to the api are only sent by verified clients
     CORS(app, resources={r'/*': {'origins': '*'}})
 
     @jwt.token_in_blacklist_loader
@@ -175,7 +179,7 @@ def create_app(test_config=None):
 
     @app.route('/home')
     def home():
-        return 'Hello, Welcome to MBBU Sample Management System! From index route'
+        return 'Hello, Welcome to M.B.B.U Sample Management System!'
 
     @app.errorhandler(NotFound)
     def not_found_error(error):

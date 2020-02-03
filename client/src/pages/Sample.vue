@@ -1,5 +1,5 @@
 <template>
-    <div class="container-fluid">
+    <div class="container">
      <div class="row">
      <div class="col-sm-12">
 
@@ -57,41 +57,9 @@ export default {
                  console.error(error);
              });
         },
-        formSubmit(e) {
-            e.preventDefault();
-            let currentObj = this;
-            axios.post('http://localhost:5000/sample' || 'http://localhost:5000/samples', {
-            theme: this.theme,
-            lab: this.lab,
-            freezer: this.freezer,
-            chamber: this.chamber,
-            rack: this.rack,
-            tray: this.tray,
-            box: this.box,
-            animal_species: this.species,
-            sample_type: this.sampleType,
-            sample_description: this.description,
-            project: this.project,
-            project_owner: this.projectOwner,
-            retention_period: this.retention,
-            barcode: this.barcode,
-            analysis: this.analysis,
-            temperature: this.temperature,
-            amount: this.amount,
-            quantity_type: this.quantity_type,
-            security_level: this.securityLevel,
-            code: this.code,
-            })
-            .then(function (response) {
-            currentObj.output = response.data;
-            })
-            .catch(function (error) {
-            currentObj.output = error;
-            });
-        },
-},
-    created() {
+     created() {
     this.getSamples ();
 },
+    },
 };
 </script>
