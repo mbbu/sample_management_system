@@ -14,6 +14,7 @@ def app():
     with app.app_context():
         BaseModel.init_app(app)
     yield app
+    BaseModel.db.session.rollback()
 
 
 @pytest.fixture
