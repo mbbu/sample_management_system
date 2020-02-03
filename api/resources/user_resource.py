@@ -169,7 +169,7 @@ class UserResource(BaseResource):
                 current_app.logger.info("{0} deleted {1}".format(get_jwt_identity(), user.email))
                 return BaseResource.send_json_message("User deleted", 200)
 
-        current_app.logger.info("{0} trying to update {1} but does not exist".format(get_jwt_identity(), email))
+        current_app.logger.info("{0} trying to delete {1} but does not exist".format(get_jwt_identity(), email))
         return BaseResource.send_json_message("User not found", 404)
 
     @staticmethod
