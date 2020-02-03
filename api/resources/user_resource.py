@@ -101,8 +101,8 @@ class UserResource(BaseResource):
                                     "name={0}, email={1} at time={2}".format(first_name, email, datetime.now()))
             return BaseResource.send_json_message(data, 201)
         else:
-            current_app.logger.error("Error while adding theme :> Duplicate records")
-            return BaseResource.send_json_message('User already exists', 500)
+            current_app.logger.error("Error while adding User :> Duplicate records")
+            return BaseResource.send_json_message('User already exists', 409)
 
     @jwt_required
     def put(self):
