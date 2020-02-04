@@ -146,7 +146,7 @@ class UserResource(BaseResource):
                         current_app.logger.error(e)
                         BaseModel.db.session.rollback()
                         return BaseResource.send_json_message("Error while updating user. Another user has that email",
-                                                              500)
+                                                              409)
 
                 return BaseResource.send_json_message("No changes made", 304)
         current_app.logger.info("{0} trying to update {1} but does not exist".format(get_jwt_identity(), email))
