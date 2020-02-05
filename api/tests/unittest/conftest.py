@@ -46,15 +46,8 @@ def create_database(db_file):
 
         with current_app.open_resource("./models/schema/schema.sql", 'rb') as f:
             conn.executescript(f.read().decode("utf8"))
-            if conn.executescript(f.read().decode("utf8")):
-                print("Success")
-            else:
-                print('failed')
-
-        print('DB Ready!')
     except Error as e:
         print(e)
     finally:
         if conn:
             conn.close()
-            print('True and closed')
