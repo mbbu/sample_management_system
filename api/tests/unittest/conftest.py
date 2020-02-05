@@ -1,3 +1,6 @@
+import os
+import tempfile
+
 import pytest
 
 from api import create_app
@@ -9,12 +12,18 @@ from api.models.database import BaseModel
 def app():
     """create and configure a new app instance for each test"""
     # create the app with common test config
+    db_path = os.getcwd()
+    db_fd, db_name = tempfile.mkstemp(dir=db_path, suffix='.db')
+
     app = create_app(TestConfig.configs)
+    TestConfig.configs.update({'SQLALCHEMY_DATABASE_URI': 'sqlite:////' + db_name})
 
     with app.app_context():
         BaseModel.init_app(app)
     yield app
-    BaseModel.db.session.rollback()
+
+    os.close(db_fd)
+    os.unlink(db_name)
 
 
 @pytest.fixture
