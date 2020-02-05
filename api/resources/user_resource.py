@@ -101,8 +101,8 @@ class UserResource(BaseResource):
                                     "name={0}, email={1} at time={2}".format(first_name, email, datetime.now()))
             return BaseResource.send_json_message(data, 201)
         else:
-            current_app.logger.error("Error while adding theme :> Duplicate records")
-            return BaseResource.send_json_message('User already exists', 500)
+            current_app.logger.error("Error while adding User :> Duplicate records")
+            return BaseResource.send_json_message('User already exists', 409)
 
     @jwt_required
     def put(self):
@@ -146,7 +146,7 @@ class UserResource(BaseResource):
                         current_app.logger.error(e)
                         BaseModel.db.session.rollback()
                         return BaseResource.send_json_message("Error while updating user. Another user has that email",
-                                                              500)
+                                                              409)
 
                 return BaseResource.send_json_message("No changes made", 304)
         current_app.logger.info("{0} trying to update {1} but does not exist".format(get_jwt_identity(), email))
@@ -169,7 +169,7 @@ class UserResource(BaseResource):
                 current_app.logger.info("{0} deleted {1}".format(get_jwt_identity(), user.email))
                 return BaseResource.send_json_message("User deleted", 200)
 
-        current_app.logger.info("{0} trying to update {1} but does not exist".format(get_jwt_identity(), email))
+        current_app.logger.info("{0} trying to delete {1} but does not exist".format(get_jwt_identity(), email))
         return BaseResource.send_json_message("User not found", 404)
 
     @staticmethod
