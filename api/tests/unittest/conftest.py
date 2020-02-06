@@ -23,8 +23,10 @@ def app():
     with app.app_context():
         create_database(db_name)
     yield app
+
     os.close(db_fd)
-    os.unlink(db_fd)
+    # todo : check error raised due to this
+    # os.unlink(db_name)
 
 
 @pytest.fixture
