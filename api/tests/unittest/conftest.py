@@ -9,24 +9,18 @@ from flask import current_app
 from api import create_app
 from api.config import TestConfig
 
+base_dir = os.path.dirname(os.path.abspath(__file__))
+db_fd, db_name = tempfile.mkstemp(dir=base_dir, suffix='.db')
+
 
 @pytest.fixture
 def app():
     """create and configure a new app instance for each test"""
     # create the app with common test config
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    db_fd, db_name = tempfile.mkstemp(dir=base_dir, suffix='.db')
-
     app = create_app(TestConfig.configs)
     TestConfig.configs.update({'SQLALCHEMY_DATABASE_URI': 'sqlite:///' + db_name})
 
-    with app.app_context():
-        create_database(db_name)
     yield app
-
-    os.close(db_fd)
-    # todo : check error raised due to this
-    # os.unlink(db_name)
 
 
 @pytest.fixture
@@ -53,3 +47,11 @@ def create_database(db_file):
     finally:
         if conn:
             conn.close()
+
+
+# let the database be created once for every test round
+with create_app().app_context():
+    create_database(db_name)
+
+# os.close(db_fd)
+# os.unlink(db_name)
