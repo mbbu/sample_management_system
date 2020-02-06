@@ -47,7 +47,7 @@ class RoleResource(BaseResource):
                 BaseModel.db.session.rollback()
                 return BaseResource.send_json_message("Error while adding role", 500)
         log_duplicate(Role.query.filter(Role.code == code).first())
-        return BaseResource.send_json_message("Role already exists", 500)
+        return BaseResource.send_json_message("Role already exists", 409)
 
     @jwt_required
     @has_required_request_params
@@ -91,7 +91,7 @@ class RoleResource(BaseResource):
         BaseModel.db.session.delete(role)
         BaseModel.db.session.commit()
         log_delete(role)
-        return BaseResource.send_json_message("Role Deleted", 200)
+        return BaseResource.send_json_message("Role deleted", 200)
 
     @staticmethod
     def role_parser():

@@ -20,9 +20,9 @@ class UserResource(BaseResource):
     }
 
     def get(self):
-        email = request.args.get('email')
-        role = request.args.get('role')
-        deleted = request.args.get('deleted')
+        email = request.headers.get('email')
+        role = request.headers.get('role')
+        deleted = request.headers.get('deleted')
 
         if email is not None:
             email = format_and_lower_str(email)()
