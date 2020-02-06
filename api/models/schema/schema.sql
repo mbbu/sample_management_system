@@ -34,6 +34,8 @@ CREATE TABLE users
     is_deleted   boolean                     NOT NULL,
     deleted_at   timestamp without time zone,
     deleted_by   character varying(65),
-    housedata_id integer
+    housedata_id integer,
+
+    foreign key (role_id) references role (id)
 );
 
