@@ -130,18 +130,17 @@ def test_updating_role_with_field_changes(client):
 # *****************************
 """
 
-
-def test_deleting_role_without_jwt_token(client):
-    response = client.delete('/role')
-    assert response.status_code == 401
-
-
-def test_deleting_role(client):
-    response = client.delete('/role', headers=headers)
-    data = json.loads(response.data)
-
-    if response.status_code == 404:
-        assert data['message'] == 'Role not found'
-
-    elif response.status_code == 200:
-        assert data['message'] == 'Role deleted'
+# def test_deleting_role_without_jwt_token(client):
+#     response = client.delete('/role')
+#     assert response.status_code == 401
+#
+#
+# def test_deleting_role(client):
+#     response = client.delete('/role', headers=headers)
+#     data = json.loads(response.data)
+#
+#     if response.status_code == 404:
+#         assert data['message'] == 'Role not found'
+#
+#     elif response.status_code == 200:
+#         assert data['message'] == 'Role deleted'
