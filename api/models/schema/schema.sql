@@ -8,11 +8,20 @@
 --
 -- Name: users; Type: TABLE; Schema: public; Owner: jeffkim
 --
+DROP TABLE IF EXISTS role;
+CREATE TABLE role
+(
+    id          integer primary key autoincrement,
+    code        character varying(20) NOT NULL,
+    name        character varying(50) NOT NULL,
+    description character varying(255)
+);
+
 
 DROP TABLE IF EXISTS users;
 CREATE TABLE users
 (
-    id           integer                     NOT NULL,
+    id           integer PRIMARY KEY AUTOINCREMENT,
     role_id      integer                     NOT NULL,
     email        character varying(65)       NOT NULL,
     first_name   character varying(65)       NOT NULL,
