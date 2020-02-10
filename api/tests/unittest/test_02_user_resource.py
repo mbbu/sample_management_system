@@ -2,43 +2,7 @@ from flask import json
 from flask_jwt_extended import create_access_token
 
 from api import create_app as app
-from api.tests.unittest.test_01_role_resource import create_role
-
-USER_DATA = {
-    'first_name': 'ICIPE',
-    'last_name': 'ADMIN',
-    'email': 'admin@icipe.org',
-    'role': '1',
-    'password': 'Admin1sMa3str0'
-}
-
-with app().test_request_context():
-    access_token = create_access_token(identity='admin@icipe.org')
-    email = 'admin@icipe.org'
-
-headers = {
-    'Authorization': 'Bearer {}'.format(access_token),
-    'email': email
-}
-
-"""
-# ****************************
-# ***                      ***
-# ***  HELPER FUNCTIONS    ***
-# ***                      ***
-# ****************************
-"""
-
-
-def create_user(client):
-    response = client.post('/user', json=USER_DATA, headers=headers)
-    return response
-
-
-def prepare_user_test(client):
-    create_role(client)
-    create_user(client)
-
+from api.tests.unittest.utils_for_tests import headers, USER_DATA, create_role, create_user, prepare_user_test
 
 """
 # ****************************

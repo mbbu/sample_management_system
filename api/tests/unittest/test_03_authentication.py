@@ -1,6 +1,6 @@
 from flask import json
 
-from api.tests.unittest.test_02_user_resource import prepare_user_test
+from api.tests.unittest.utils_for_tests import prepare_user_test
 
 login_details = {
     'email': 'admin@icipe.org',

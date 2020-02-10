@@ -1,36 +1,7 @@
 from flask import json, request
-from flask_jwt_extended import create_access_token
 
 from api import create_app as app
-
-role_data = {
-    'code': '101',
-    'name': 'Admin',
-    'description': 'In Charge of the system'
-}
-
-with app().test_request_context():
-    access_token = create_access_token(identity='admin@icipe.org')
-    code = '101'
-
-headers = {
-    'Authorization': 'Bearer {}'.format(access_token),
-    'code': code
-}
-
-"""
-# ****************************
-# ***                      ***
-# ***  HELPER FUNCTIONS    ***
-# ***                      ***
-# ****************************
-"""
-
-
-def create_role(client):
-    response = client.post('/role', json=role_data, headers=headers)
-    return response
-
+from api.tests.unittest.utils_for_tests import role_data, headers, create_role
 
 """
 # ****************************
