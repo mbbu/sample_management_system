@@ -20,7 +20,16 @@ def app():
     app = create_app(TestConfig.configs)
     TestConfig.configs.update({'SQLALCHEMY_DATABASE_URI': 'sqlite:///' + db_name})
 
+    with create_app().app_context():
+        create_database(db_name)
     yield app
+    tear_down()
+
+
+def tear_down():
+    # unlink the database and delete it after test.
+    os.close(db_fd)
+    os.unlink(db_name)
 
 
 @pytest.fixture
@@ -42,16 +51,9 @@ def create_database(db_file):
 
         with current_app.open_resource("./models/schema/schema.sql", 'rb') as f:
             conn.executescript(f.read().decode("utf8"))
+
     except Error as e:
         print(e)
     finally:
         if conn:
             conn.close()
-
-
-# let the database be created once for every test round
-with create_app().app_context():
-    create_database(db_name)
-
-# os.close(db_fd)
-# os.unlink(db_name)
