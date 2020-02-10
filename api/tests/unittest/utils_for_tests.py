@@ -5,13 +5,15 @@ from api import create_app as app
 with app().test_request_context():
     access_token = create_access_token(identity='admin@icipe.org')
     email = 'admin@icipe.org'
-    code = '101'
+    role_code = '101'
+    lab_code = 'abc'
 
 headers = {
     'Authorization': 'Bearer {}'.format(access_token),
     'email': email,
-    'code': code
+    'code': role_code
 }
+
 
 """
 # ************************************
@@ -56,3 +58,27 @@ def create_user(client):
 def prepare_user_test(client):
     create_role(client)
     create_user(client)
+
+
+"""
+# ************************************
+# ***                              ***
+# ***  HELPER FUNCTIONS FOR LAB   ***
+# ***                              ***
+# ************************************
+"""
+lab_headers = {
+    'Authorization': 'Bearer {}'.format(access_token),
+    'code': lab_code
+}
+
+lab_data = {
+    'name': 'R & D',
+    'room': '202',
+    'code': 'ABC'
+}
+
+
+def create_lab(client):
+    response = client.post('/lab', json=lab_data, headers=lab_headers)
+    return response
