@@ -2,6 +2,7 @@ from flask import json
 from flask_jwt_extended import create_access_token
 
 from api import create_app as app
+from api.tests.unittest.test_01_role_resource import create_role
 
 USER_DATA = {
     'first_name': 'ICIPE',
@@ -19,6 +20,25 @@ headers = {
     'Authorization': 'Bearer {}'.format(access_token),
     'email': email
 }
+
+"""
+# ****************************
+# ***                      ***
+# ***  HELPER FUNCTIONS    ***
+# ***                      ***
+# ****************************
+"""
+
+
+def create_user(client):
+    response = client.post('/user', json=USER_DATA, headers=headers)
+    return response
+
+
+def prepare_user_test(client):
+    create_role(client)
+    create_user(client)
+
 
 """
 # ****************************
@@ -45,7 +65,8 @@ def test_create_user_with_half_info(client):
 
 
 def test_create_user_with_all_info(client):
-    response = client.post('/user', json=USER_DATA)
+    create_role(client)
+    response = create_user(client)
     data = json.loads(response.data)
 
     assert response.status_code == 201
@@ -59,7 +80,8 @@ def test_create_user_with_all_info(client):
 
 
 def test_create_duplicate_user(client):
-    response = client.post('/user', json=USER_DATA)
+    prepare_user_test(client)
+    response = create_user(client)
     data = json.loads(response.data)
     assert response.status_code == 409
     assert data['message'] == 'User already exists'
@@ -75,6 +97,7 @@ def test_create_duplicate_user(client):
 
 
 def test_get_user(client):
+    prepare_user_test(client)
     response = client.get('/users')
     assert b'message' in response.data
     data = json.loads(response.data)
@@ -95,11 +118,12 @@ def test_get_user(client):
 
 
 def test_get_user_by_params(client):
+    prepare_user_test(client)
     response = client.get('/user', headers=headers)
     data = json.loads(response.data)
 
     if response.status_code == 404:
-        assert data['message'] == 'Users not found'
+        assert data['message'] == 'User not found'
 
     elif response.status_code == 200:
         assert data['message']['email']
@@ -123,11 +147,13 @@ def test_updating_user_without_jwt_token(client):
 
 
 def test_updating_user_without_any_field_changes(client):
+    prepare_user_test(client)
     response = client.put('/user', json=USER_DATA, headers=headers)
     assert response.status_code == 304
 
 
 def test_updating_user_with_field_changes(client):
+    prepare_user_test(client)
     response = client.put('/user', json={
         'first_name': 'I.C.I.P.E',
         'last_name': 'ADMIN',
@@ -136,7 +162,7 @@ def test_updating_user_with_field_changes(client):
         'password': 'Admin1sMa3str0'
     }, headers=headers)
 
-    assert response.status_code == 202 or 409
+    assert response.status_code == 202
 
 
 """
@@ -147,28 +173,25 @@ def test_updating_user_with_field_changes(client):
 # *****************************
 """
 
-# def test_deleting_user_without_jwt_token(client):
-#     response = client.delete('/user')
-#     assert response.status_code == 401
-#
-#
-# def test_deleting_another_user(client):
-#     with app().test_request_context():
-#         updated_access_token = create_access_token(identity='admin@icipe.org')
-#     updated_headers = {
-#         'Authorization': 'Bearer {}'.format(updated_access_token)
-#     }
-#     response = client.delete('/user', headers=updated_headers)
-#     assert response.status_code == 404
-#
-#
-# def test_deleting_user(client):
-#     with app().test_request_context():
-#         updated_access_token = create_access_token(identity='admins@icipe.org')
-#     updated_headers = {
-#         'Authorization': 'Bearer {}'.format(updated_access_token)
-#     }
-#     response = client.delete('/user', headers=updated_headers)
-#     assert response.status_code == 200 or 404
+
+def test_deleting_user_without_jwt_token(client):
+    response = client.delete('/user')
+    assert response.status_code == 401
+
+
+def test_deleting_another_user(client):
+    with app().test_request_context():
+        updated_access_token = create_access_token(identity='admin@icipe.org')
+    updated_headers = {
+        'Authorization': 'Bearer {}'.format(updated_access_token)
+    }
+    response = client.delete('/user', headers=updated_headers)
+    assert response.status_code == 404
+
+
+def test_deleting_user(client):
+    prepare_user_test(client)
+    response = client.delete('/user', headers=headers)
+    assert response.status_code == 200
 
 # todo: test if passwords are hashed
