@@ -39,3 +39,23 @@ CREATE TABLE users
     foreign key (role_id) references role (id)
 );
 
+DROP TABLE IF EXISTS laboratory;
+CREATE TABLE laboratory
+(
+    id   integer PRIMARY KEY AUTOINCREMENT,
+    name character varying(65) NOT NULL,
+    room integer               NOT NULL,
+    code character varying(65) NOT NULL
+);
+
+
+DROP TABLE IF EXISTS freezer;
+CREATE TABLE freezer
+(
+    id            integer               NOT NULL,
+    laboratory_id integer,
+    room          character varying(65) NOT NULL,
+    number        integer               NOT NULL,
+    code          character varying(65) NOT NULL,
+    foreign key (laboratory_id) references laboratory (id)
+);
