@@ -9,6 +9,7 @@ with app().test_request_context():
     lab_code = 'L1'
     freezer_code = 'L1F1'
     chamber_code = 'L1F1C1'
+    rack_code = 'L1F1C1R1'
 
 headers = {
     'Authorization': 'Bearer {}'.format(access_token),
@@ -96,14 +97,14 @@ freezer_data = {
     'laboratory': '1',
     'room': '303',
     'number': '1',
-    'code': 'L1F1'
+    'code': freezer_code
 }
 
 freezer_updated_data = {
     'laboratory': '1',
     'room': '304',  # <-- updated value
     'number': '12',  # <-- updated value
-    'code': 'L1F1'
+    'code': freezer_code
 }
 
 freezer_headers = {
@@ -132,13 +133,13 @@ def prepare_freezer_test(client):
 chamber_data = {
     'freezer': '1',
     'type': 'Animal Species',
-    'code': 'L1F1C1'
+    'code': chamber_code
 }
 
 chamber_updated_data = {
     'freezer': '1',
     'type': 'Plant Species',  # <-- updated value
-    'code': 'L1F1C1'
+    'code': chamber_code
 }
 
 chamber_headers = {
@@ -156,3 +157,40 @@ def prepare_chamber_test(client):
     create_lab(client)
     create_freezer(client)
     create_chamber(client)
+
+
+"""
+# ************************************
+# ***                              ***
+# ***  HELPER FUNCTIONS FOR RACK***
+# ***                              ***
+# ************************************
+"""
+rack_data = {
+    'chamber': '1',
+    'number': '404',
+    'code': 'L1F1C1R1'
+}
+
+rack_updated_data = {
+    'chamber': '1',
+    'number': '405',  # <-- updated value
+    'code': 'L1F1C1R1'
+}
+
+rack_headers = {
+    'Authorization': 'Bearer {}'.format(access_token),
+    'code': rack_code
+}
+
+
+def create_rack(client):
+    response = client.post('/rack', json=rack_data, headers=rack_headers)
+    return response
+
+
+def prepare_rack_test(client):
+    create_lab(client)
+    create_freezer(client)
+    create_chamber(client)
+    create_rack(client)
