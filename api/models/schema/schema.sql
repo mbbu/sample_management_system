@@ -70,3 +70,13 @@ CREATE TABLE chamber
     code       character varying(65) NOT NULL,
     foreign key (freezer_id) references freezer (id)
 );
+
+DROP TABLE IF EXISTS rack;
+CREATE TABLE rack
+(
+    id         integer primary key autoincrement,
+    chamber_id integer,
+    number     integer               NOT NULL,
+    code       character varying(65) NOT NULL,
+    foreign key (chamber_id) references chamber (id)
+);

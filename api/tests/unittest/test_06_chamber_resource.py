@@ -167,10 +167,11 @@ def test_deleting_non_existent_chamber(client):
     assert response.status_code == 404
     assert data['message'] == 'Chamber not found'
 
-# def test_deleting_chamber(client):
-#     prepare_chamber_test(client)
-#     response = client.delete('/chamber', headers=chamber_headers)
-#
-#     data = json.loads(response.data)
-#     assert response.status_code == 200
-#     assert data['message'] == 'Chamber deleted'
+
+def test_deleting_chamber(client):
+    prepare_chamber_test(client)
+    response = client.delete('/chamber', headers=chamber_headers)
+
+    data = json.loads(response.data)
+    assert response.status_code == 200
+    assert data['message'] == 'Chamber deleted'
