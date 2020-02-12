@@ -52,10 +52,21 @@ CREATE TABLE laboratory
 DROP TABLE IF EXISTS freezer;
 CREATE TABLE freezer
 (
-    id            integer               NOT NULL,
+    id            integer primary key autoincrement,
     laboratory_id integer,
     room          character varying(65) NOT NULL,
     number        integer               NOT NULL,
     code          character varying(65) NOT NULL,
     foreign key (laboratory_id) references laboratory (id)
+);
+
+DROP TABLE IF EXISTS chamber;
+
+CREATE TABLE chamber
+(
+    id         integer PRIMARY KEY AUTOINCREMENT,
+    freezer_id integer,
+    type       character varying(50) NOT NULL,
+    code       character varying(65) NOT NULL,
+    foreign key (freezer_id) references freezer (id)
 );
