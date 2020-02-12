@@ -5,15 +5,15 @@ from api import create_app as app
 with app().test_request_context():
     access_token = create_access_token(identity='admin@icipe.org')
     email = 'admin@icipe.org'
-    role_code = '101'
-    lab_code = 'abc'
+    role_code = 'Admin1'
+    lab_code = 'L1'
+    freezer_code = 'L1F1'
 
 headers = {
     'Authorization': 'Bearer {}'.format(access_token),
     'email': email,
     'code': role_code
 }
-
 
 """
 # ************************************
@@ -23,7 +23,7 @@ headers = {
 # ************************************
 """
 role_data = {
-    'code': '101',
+    'code': 'Admin1',
     'name': 'Admin',
     'description': 'In Charge of the system'
 }
@@ -75,10 +75,47 @@ lab_headers = {
 lab_data = {
     'name': 'R & D',
     'room': '202',
-    'code': 'ABC'
+    'code': 'L1'
 }
 
 
 def create_lab(client):
     response = client.post('/lab', json=lab_data, headers=lab_headers)
     return response
+
+
+"""
+# ************************************
+# ***                              ***
+# ***  HELPER FUNCTIONS FOR FREEZER***
+# ***                              ***
+# ************************************
+"""
+freezer_data = {
+    'laboratory': '1',
+    'room': '303',
+    'number': '1',
+    'code': 'L1F1'
+}
+
+freezer_updated_data = {
+    'laboratory': '1',
+    'room': '304',  # <-- updated value
+    'number': '12',  # <-- updated value
+    'code': 'L1F1'
+}
+
+freezer_headers = {
+    'Authorization': 'Bearer {}'.format(access_token),
+    'code': freezer_code
+}
+
+
+def create_freezer(client):
+    response = client.post('/freezer', json=freezer_data, headers=freezer_headers)
+    return response
+
+
+def prepare_freezer_test(client):
+    create_lab(client)
+    create_freezer(client)
