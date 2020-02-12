@@ -30,7 +30,7 @@ class RoleResource(BaseResource):
     @jwt_required
     def post(self):
         args = RoleResource.role_parser()
-        code = args['code']
+        code = format_and_lower_str(args['code'])()
         name = args['name']
         description = args['description']
 
