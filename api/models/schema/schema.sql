@@ -80,3 +80,13 @@ CREATE TABLE rack
     code       character varying(65) NOT NULL,
     foreign key (chamber_id) references chamber (id)
 );
+
+DROP TABLE IF EXISTS tray;
+CREATE TABLE tray
+(
+    id      integer PRIMARY KEY AUTOINCREMENT,
+    rack_id integer,
+    number  integer               NOT NULL,
+    code    character varying(65) NOT NULL,
+    foreign key (rack_id) references rack (id)
+);
