@@ -90,3 +90,12 @@ CREATE TABLE tray
     code    character varying(65) NOT NULL,
     foreign key (rack_id) references rack (id)
 );
+
+DROP TABLE IF EXISTS box;
+CREATE TABLE box
+(
+    id      integer PRIMARY KEY AUTOINCREMENT,
+    tray_id integer,
+    label   character varying(65) NOT NULL,
+    FOREIGN KEY (tray_id) references tray (id)
+);
