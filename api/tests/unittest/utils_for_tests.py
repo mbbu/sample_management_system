@@ -10,6 +10,7 @@ with app().test_request_context():
     freezer_code = 'L1F1'
     chamber_code = 'L1F1C1'
     rack_code = 'L1F1C1R1'
+    tray_code = 'L1F1C1R1T1'
 
 headers = {
     'Authorization': 'Bearer {}'.format(access_token),
@@ -162,20 +163,20 @@ def prepare_chamber_test(client):
 """
 # ************************************
 # ***                              ***
-# ***  HELPER FUNCTIONS FOR RACK***
+# ***  HELPER FUNCTIONS FOR RACK   ***
 # ***                              ***
 # ************************************
 """
 rack_data = {
     'chamber': '1',
     'number': '404',
-    'code': 'L1F1C1R1'
+    'code': rack_code
 }
 
 rack_updated_data = {
     'chamber': '1',
     'number': '405',  # <-- updated value
-    'code': 'L1F1C1R1'
+    'code': rack_code
 }
 
 rack_headers = {
@@ -194,3 +195,41 @@ def prepare_rack_test(client):
     create_freezer(client)
     create_chamber(client)
     create_rack(client)
+
+
+"""
+# ************************************
+# ***                              ***
+# ***  HELPER FUNCTIONS FOR TRAY   ***
+# ***                              ***
+# ************************************
+"""
+tray_data = {
+    'rack': '1',
+    'number': '404',
+    'code': tray_code
+}
+
+tray_updated_data = {
+    'rack': '1',
+    'number': '405',  # <-- updated value
+    'code': tray_code
+}
+
+tray_headers = {
+    'Authorization': 'Bearer {}'.format(access_token),
+    'code': tray_code
+}
+
+
+def create_tray(client):
+    response = client.post('/tray', json=tray_data, headers=tray_headers)
+    return response
+
+
+def prepare_tray_test(client):
+    create_lab(client)
+    create_freezer(client)
+    create_chamber(client)
+    create_rack(client)
+    create_tray(client)
