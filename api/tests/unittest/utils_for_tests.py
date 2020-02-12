@@ -8,6 +8,7 @@ with app().test_request_context():
     role_code = 'Admin1'
     lab_code = 'L1'
     freezer_code = 'L1F1'
+    chamber_code = 'L1F1C1'
 
 headers = {
     'Authorization': 'Bearer {}'.format(access_token),
@@ -119,3 +120,39 @@ def create_freezer(client):
 def prepare_freezer_test(client):
     create_lab(client)
     create_freezer(client)
+
+
+"""
+# ************************************
+# ***                              ***
+# ***  HELPER FUNCTIONS FOR CHAMBER***
+# ***                              ***
+# ************************************
+"""
+chamber_data = {
+    'freezer': '1',
+    'type': 'Animal Species',
+    'code': 'L1F1C1'
+}
+
+chamber_updated_data = {
+    'freezer': '1',
+    'type': 'Plant Species',  # <-- updated value
+    'code': 'L1F1C1'
+}
+
+chamber_headers = {
+    'Authorization': 'Bearer {}'.format(access_token),
+    'code': chamber_code
+}
+
+
+def create_chamber(client):
+    response = client.post('/chamber', json=chamber_data, headers=chamber_headers)
+    return response
+
+
+def prepare_chamber_test(client):
+    create_lab(client)
+    create_freezer(client)
+    create_chamber(client)
