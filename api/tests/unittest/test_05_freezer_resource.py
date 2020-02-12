@@ -69,14 +69,22 @@ def test_non_existing_freezer(client):
 
 def test_get_freezer(client):
     prepare_freezer_test(client)
-    response = client.get('/freezer', headers=freezer_headers)
+    response = client.get('/freezer')
     data = json.loads(response.data)
 
-    assert response.status_code == 200
-    assert data['message']['lab.name'] == 'R & D'
-    assert data['message']['room'] == '303'
-    assert data['message']['number'] == 1
-    assert data['message']['code'] == 'l1f1'
+    if response.status_code == 404:
+        assert data['message'] == 'Freezers not found'
+
+    elif response.status_code == 200:
+        # check that the list is more than 1 item
+        assert len(data['message']) >= 1
+
+        # check that each element in the list contains; freezer, type and code
+        for item in range(len(data['message'])):
+            assert data['message'][item]['lab.name'] == 'R & D'
+            assert data['message'][item]['room'] == '303'
+            assert data['message'][item]['number'] == 1
+            assert data['message'][item]['code'] == 'l1f1'
 
 
 def test_get_freezer_by_param(client):
