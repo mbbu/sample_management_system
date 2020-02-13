@@ -147,3 +147,21 @@ CREATE TABLE security_level
     name        character varying(65),
     description character varying(65)
 );
+
+DROP TABLE IF EXISTS housedata;
+CREATE TABLE housedata
+(
+    id                   integer PRIMARY KEY AUTOINCREMENT,
+    user_id              integer,
+    education            character varying(150),
+    employment           character varying(150),
+    marital_status       character varying(150),
+    number_of_people     integer,
+    number_of_children   integer,
+    number_of_animals    integer,
+    economic_activity    character varying(250),
+    type_of_animals      character varying(250),
+    farming_activities   character varying(250),
+    social_economic_data boolean               NOT NULL,
+    code                 character varying(20) NOT NULL
+);
