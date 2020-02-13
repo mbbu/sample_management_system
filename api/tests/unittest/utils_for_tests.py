@@ -5,6 +5,7 @@ from api import create_app as app
 with app().test_request_context():
     access_token = create_access_token(identity='admin@icipe.org')
     email = 'admin@icipe.org'
+    theme_code = "AH"
     role_code = 'Admin1'
     lab_code = 'L1'
     freezer_code = 'L1F1'
@@ -12,6 +13,7 @@ with app().test_request_context():
     rack_code = 'L1F1C1R1'
     tray_code = 'L1F1C1R1T1'
     box_code = 'L1F1C1R1T1B1'
+    security_level_code = 'A1'
 
 headers = {
     'Authorization': 'Bearer {}'.format(access_token),
@@ -273,3 +275,61 @@ def prepare_box_test(client):
     create_rack(client)
     create_tray(client)
     create_box(client)
+
+
+"""
+# ************************************
+# ***                              ***
+# ***  HELPER FUNCTIONS FOR THEME  ***
+# ***                              ***
+# ************************************
+"""
+theme_data = {
+    'name': 'Animal Health',
+    'code': theme_code
+}
+
+theme_updated_data = {
+    'name': 'Human Health',  # <-- updated value
+    'code': theme_code
+}
+
+theme_headers = {
+    'Authorization': 'Bearer {}'.format(access_token),
+    'code': theme_code
+}
+
+
+def create_theme(client):
+    response = client.post('/theme', json=theme_data, headers=theme_headers)
+    return response
+
+
+"""
+# *********************************************
+# ***                                       ***
+# ***  HELPER FUNCTIONS FOR SECURITY LEVEL  ***
+# ***                                       ***
+# *********************************************
+"""
+security_level_data = {
+    'name': 'Ebola',
+    'code': security_level_code,
+    'description': 'CDC L1'
+}
+
+security_level_updated_data = {
+    'name': 'Corona Virus',  # <-- updated value
+    'code': security_level_code,
+    'description': 'CDC L1'
+}
+
+security_level_headers = {
+    'Authorization': 'Bearer {}'.format(access_token),
+    'code': security_level_code
+}
+
+
+def create_security_level(client):
+    response = client.post('/security-level', json=security_level_data, headers=security_level_headers)
+    return response
