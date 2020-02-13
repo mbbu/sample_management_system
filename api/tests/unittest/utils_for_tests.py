@@ -11,6 +11,7 @@ with app().test_request_context():
     chamber_code = 'L1F1C1'
     rack_code = 'L1F1C1R1'
     tray_code = 'L1F1C1R1T1'
+    box_code = 'L1F1C1R1T1B1'
 
 headers = {
     'Authorization': 'Bearer {}'.format(access_token),
@@ -233,3 +234,42 @@ def prepare_tray_test(client):
     create_chamber(client)
     create_rack(client)
     create_tray(client)
+
+
+"""
+# ************************************
+# ***                              ***
+# ***  HELPER FUNCTIONS FOR BOX    ***
+# ***                              ***
+# ************************************
+"""
+box_data = {
+    'tray': '1',
+    'label': 'human skin',
+    'code': box_code
+}
+
+box_updated_data = {
+    'tray': '1',
+    'label': 'animal tissue',  # <-- updated value
+    'code': box_code
+}
+
+box_headers = {
+    'Authorization': 'Bearer {}'.format(access_token),
+    'code': box_code
+}
+
+
+def create_box(client):
+    response = client.post('/box', json=box_data, headers=box_headers)
+    return response
+
+
+def prepare_box_test(client):
+    create_lab(client)
+    create_freezer(client)
+    create_chamber(client)
+    create_rack(client)
+    create_tray(client)
+    create_box(client)
