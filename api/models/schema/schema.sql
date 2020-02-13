@@ -17,6 +17,13 @@ CREATE TABLE role
     description character varying(255)
 );
 
+DROP TABLE IF EXISTS theme;
+CREATE TABLE theme
+(
+    id   integer               NOT NULL,
+    name character varying(65) NOT NULL,
+    code character varying(10)
+);
 
 DROP TABLE IF EXISTS users;
 CREATE TABLE users
@@ -97,5 +104,36 @@ CREATE TABLE box
     id      integer PRIMARY KEY AUTOINCREMENT,
     tray_id integer,
     label   character varying(65) NOT NULL,
+    code    character varying(65) NOT NULL,
     FOREIGN KEY (tray_id) references tray (id)
+);
+
+DROP TABLE IF EXISTS sample;
+CREATE TABLE sample
+(
+    id                 integer PRIMARY KEY AUTOINCREMENT,
+    user_id            integer,
+    animal_species     character varying(100),
+    sample_type        character varying(100),
+    sample_description character varying(150),
+    location_collected character varying(100),
+    project            character varying(150),
+    project_owner      character varying(100),
+    barcode            character varying(100),
+    analysis           character varying(100),
+    amount             integer,
+    temperature        numeric(5, 2),
+    box_id             integer,
+    retention_period   integer,
+    theme_id           integer,
+    code               character varying,
+    quantity_type      character varying,
+    security_level     integer,
+    created_at         timestamp without time zone,
+    deleted_at         timestamp without time zone,
+    updated_at         timestamp without time zone,
+    deleted_by         character varying(65),
+    foreign key (user_id) references users (id),
+    foreign key (box_id) references box (id),
+    foreign key (theme_id) references theme (id)
 );
