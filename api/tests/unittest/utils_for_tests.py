@@ -14,6 +14,7 @@ with app().test_request_context():
     tray_code = 'L1F1C1R1T1'
     box_code = 'L1F1C1R1T1B1'
     security_level_code = 'A1'
+    house_data_code = 'H1'
 
 headers = {
     'Authorization': 'Bearer {}'.format(access_token),
@@ -332,4 +333,53 @@ security_level_headers = {
 
 def create_security_level(client):
     response = client.post('/security-level', json=security_level_data, headers=security_level_headers)
+    return response
+
+
+"""
+# *********************************************
+# ***                                       ***
+# ***  HELPER FUNCTIONS FOR HOUSE DATA      ***
+# ***                                       ***
+# *********************************************
+"""
+house_data_data = {
+    'code': house_data_code,
+    'user': 1,
+    'education': 'Tertiary',
+    'employment': 'Formal',
+    'marital_status': 'Married',
+    'people': 3,
+    'children': 1,
+    'animals': 5,
+    'economic_activity': 'farming',
+    'type_of_animals': 'cattle',
+    'farming_activities': 'cattle farming',
+    'social_economic_data': 'Data set 02'
+}
+
+house_data_updated_data = {
+    'code': house_data_code,
+    'user': 1,
+    'education': 'Tertiary',
+    'employment': 'Formal',
+    'marital_status': 'Married',
+    'people': 3,
+    'children': '1',
+    'animals': '5',
+    'economic_activity': 'farming',
+    'type_of_animals': 'cattle',
+    'farming_activities': 'cattle farming',
+    'social_economic_data': 'Data set 020'  # <-- updated value
+}
+
+house_data_headers = {
+    'Authorization': 'Bearer {}'.format(access_token),
+    'code': house_data_code
+}
+
+
+def create_house_data(client):
+    create_user(client)
+    response = client.post('/house-data', json=house_data_data, headers=house_data_headers)
     return response
