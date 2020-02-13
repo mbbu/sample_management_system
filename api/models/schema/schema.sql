@@ -20,7 +20,7 @@ CREATE TABLE role
 DROP TABLE IF EXISTS theme;
 CREATE TABLE theme
 (
-    id   integer               NOT NULL,
+    id   integer PRIMARY KEY AUTOINCREMENT,
     name character varying(65) NOT NULL,
     code character varying(10)
 );
@@ -135,5 +135,15 @@ CREATE TABLE sample
     deleted_by         character varying(65),
     foreign key (user_id) references users (id),
     foreign key (box_id) references box (id),
-    foreign key (theme_id) references theme (id)
+    foreign key (theme_id) references theme (id),
+    foreign key (security_level) references security_level (id)
+);
+
+DROP TABLE IF EXISTS security_level;
+CREATE TABLE security_level
+(
+    id          integer PRIMARY KEY AUTOINCREMENT,
+    code        character varying(65),
+    name        character varying(65),
+    description character varying(65)
 );
