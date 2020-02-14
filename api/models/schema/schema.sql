@@ -125,7 +125,7 @@ CREATE TABLE sample
     temperature        numeric(5, 2),
     box_id             integer,
     retention_period   integer,
-    theme_id           integer,
+--     theme_id           integer,
     code               character varying,
     quantity_type      character varying,
     security_level     integer,
@@ -135,7 +135,7 @@ CREATE TABLE sample
     deleted_by         character varying(65),
     foreign key (user_id) references users (id),
     foreign key (box_id) references box (id),
-    foreign key (theme_id) references theme (id),
+--     foreign key (theme_id) references theme (id),
     foreign key (security_level) references security_level (id)
 );
 
@@ -164,4 +164,12 @@ CREATE TABLE housedata
     farming_activities   character varying(250),
     social_economic_data boolean               NOT NULL,
     code                 character varying(20) NOT NULL
+);
+
+DROP TABLE IF EXISTS quantity_type;
+CREATE TABLE quantity_type
+(
+    id          character varying(5) PRIMARY KEY,
+    name        character varying(30) NOT NULL,
+    description character varying(255)
 );

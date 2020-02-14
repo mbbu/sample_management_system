@@ -15,6 +15,8 @@ with app().test_request_context():
     box_code = 'L1F1C1R1T1B1'
     security_level_code = 'A1'
     house_data_code = 'H1'
+    quantity_type_code = 'L'
+    sample_code = 'S1'
 
 headers = {
     'Authorization': 'Bearer {}'.format(access_token),
@@ -333,6 +335,81 @@ security_level_headers = {
 
 def create_security_level(client):
     response = client.post('/security-level', json=security_level_data, headers=security_level_headers)
+    return response
+
+
+"""
+# *********************************************
+# ***                                       ***
+# ***  HELPER FUNCTIONS FOR QUANTITY TYPE   ***
+# ***                                       ***
+# *********************************************
+"""
+quantity_type_resource_route = '/quantity-type'
+quantity_type_data = {
+    'code': quantity_type_code,
+    'name': 'Liters',
+    'description': 'For fluids in large quantities'
+}
+
+quantity_type_updated_data = {
+    'code': quantity_type_code,
+    'name': 'Litres',  # <-- updated value
+    'description': 'For fluids in large quantities'
+}
+
+quantity_type_headers = {
+    'Authorization': 'Bearer {}'.format(access_token),
+    'code': quantity_type_code
+}
+
+
+def create_quantity_type(client):
+    response = client.post(quantity_type_resource_route, json=quantity_type_data, headers=quantity_type_headers)
+    return response
+
+
+"""
+# *********************************************
+# ***                                       ***
+# ***  HELPER FUNCTIONS FOR SAMPLE          ***
+# ***                                       ***
+# *********************************************
+"""
+sample_data = {
+    # 'theme_id': 1,
+    'user_id': 1,
+    'box_id': 1,
+    'animal_species': 'Insects',
+    'sample_type': 'Mosquito',
+    'sample_description': 'Kwale mosquito samples',
+    'location_collected': 'Kwale',
+    'project': 'H3ABNet',
+    'project_owner': 'Dr Careen',
+    'retention_period': 3,
+    'barcode': '12254DS5774SDFS',
+    'analysis': 'Incomplete',
+    'temperature': 35.0,
+    'amount': 100,
+    'quantity_type': 'Ebola',
+    'security_level': 1,
+    'code': sample_code
+}
+
+sample_updated_data = {
+    'name': 'Corona Virus',  # <-- updated value
+    'code': sample_code,
+    'description': 'CDC L1'
+}
+
+sample_headers = {
+    'Authorization': 'Bearer {}'.format(access_token),
+    'code': sample_code
+}
+
+
+def create_sample(client):
+    response = client.post('/sample', json=sample_data, headers=sample_headers)
     return response
 
 
