@@ -28,14 +28,23 @@ class Sample(BaseModel.db.Model):
 # Default = Celsius
     amount = AppDb.Column(AppDb.Integer, nullable=True)  # todo set a default value
     quantity_type = AppDb.Column(AppDb.String, AppDb.ForeignKey('quantity_type.id', ondelete='SET NULL'), nullable=True)
-    security_level = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('security_level.id', ondelete='SET NULL'), nullable=True)
-    code = AppDb.Column(AppDb.String, nullable=True)
+    security_level = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('security_level.id', ondelete='SET NULL'),
+                                  nullable=True)
+    code = AppDb.Column(AppDb.String, nullable=False, unique=True)
 
     # relationship(s)
     user = AppDb.relationship('User', backref='sample', lazy=True)
     publication = AppDb.relationship('Publication', backref='sample', lazy=True)
     box = AppDb.relationship('Box', backref='sample', lazy=True)
     quantity = AppDb.relationship('QuantityType', backref='quantity_type', lazy=True)
+
+    @staticmethod
+    def sample_exists(code):
+        if Sample.query.filter(
+                Sample.code == code
+        ).first():
+            return True
+        return False
 
     def __repr__(self):
         return '<< Sample: (type={0} || desc={1} || project={2} || barcode={3} || species={4} ||' \

@@ -376,10 +376,11 @@ def create_quantity_type(client):
 # ***                                       ***
 # *********************************************
 """
+sample_resource_route = '/sample'
 sample_data = {
-    # 'theme_id': 1,
-    'user_id': 1,
-    'box_id': 1,
+    'theme': 1,
+    'user': 1,
+    'box': 1,
     'animal_species': 'Insects',
     'sample_type': 'Mosquito',
     'sample_description': 'Kwale mosquito samples',
@@ -391,15 +392,29 @@ sample_data = {
     'analysis': 'Incomplete',
     'temperature': 35.0,
     'amount': 100,
-    'quantity_type': 'Ebola',
+    'quantity_type': 'l',
     'security_level': 1,
     'code': sample_code
 }
 
 sample_updated_data = {
-    'name': 'Corona Virus',  # <-- updated value
-    'code': sample_code,
-    'description': 'CDC L1'
+    'theme': 1,
+    'user': 1,
+    'box': 1,
+    'animal_species': 'Insects',
+    'sample_type': 'Mosquito',
+    'sample_description': 'Kwale mosquito samples',
+    'location_collected': 'Kwale',
+    'project': 'H3ABNet',
+    'project_owner': 'Dr Careen',
+    'retention_period': 3,
+    'barcode': '12254DS5774SDFS',
+    'analysis': 'Complete',  # <-- updated value
+    'temperature': 35.0,
+    'amount': 100,
+    'quantity_type': 'l',
+    'security_level': 1,
+    'code': sample_code
 }
 
 sample_headers = {
@@ -409,8 +424,17 @@ sample_headers = {
 
 
 def create_sample(client):
-    response = client.post('/sample', json=sample_data, headers=sample_headers)
+    response = client.post(sample_resource_route, json=sample_data, headers=sample_headers)
     return response
+
+
+def prepare_sample_test(client):
+    create_user(client)
+    create_box(client)
+    create_theme(client)
+    create_quantity_type(client)
+    create_security_level(client)
+    create_sample(client)
 
 
 """

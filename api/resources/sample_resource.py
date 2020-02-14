@@ -4,15 +4,14 @@ from flask import current_app, request, Blueprint
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restful import fields, marshal, reqparse
 
-
 from api.constants import DATE_TIME_NONE
 from api.models.database import BaseModel
 from api.models.sample import Sample
 from api.resources.base_resource import BaseResource
-from api.utils import format_and_lower_str, log_create, log_update, log_delete, log_duplicate, \
-    has_required_request_params, export_all_records, log_export_from_redcap, format_str_to_date, get_samples_by_code
+from api.utils import format_and_lower_str, log_create, log_update, log_duplicate, \
+    has_required_request_params, export_all_records, log_export_from_redcap, format_str_to_date, non_empty_int
 
-samples_page = Blueprint('samples_bp', __name__, template_folder ='templates')
+samples_page = Blueprint('samples_bp', __name__, template_folder='templates')
 
 
 class SampleResource(BaseResource):
@@ -29,7 +28,7 @@ class SampleResource(BaseResource):
         'retention_period': fields.Integer,
         'barcode': fields.String,
         'analysis': fields.String,
-        'temperature': fields.String,
+        'temperature': fields.String,  # todo: check temp return i.e. float
         'amount': fields.Integer,
         'quantity.id': fields.String,
         'security_level': fields.Integer,
@@ -37,18 +36,22 @@ class SampleResource(BaseResource):
     }
 
     def get(self):
-        if request.headers.get('label') is not None:
+        if request.headers.get('code') is not None:
             code = format_and_lower_str(request.headers['code'])()
             sample = SampleResource.get_sample(code)
+            if sample is None:
+                return BaseResource.send_json_message("Sample not found", 404)
             data = marshal(sample, self.fields)
             return BaseResource.send_json_message(data, 200)
 
         else:
             samples = Sample.query.all()
+            if samples is None:
+                return BaseResource.send_json_message("Samples not found", 404)
             data = marshal(samples, self.fields)
             return BaseResource.send_json_message(data, 200)
 
-    jwt_required
+    @jwt_required
     def post(self):
         args = SampleResource.sample_args()
         code = format_and_lower_str(args[16])()
@@ -59,18 +62,18 @@ class SampleResource(BaseResource):
                                 sample_type=args[4], sample_description=args[5], location_collected=args[6],
                                 project=args[7], project_owner=args[8], retention_period=args[9], barcode=args[10],
                                 analysis=args[11], temperature=args[12], amount=args[13], quantity_type=args[14],
-                                security_level=args[15], code=args[16])
+                                security_level=args[15], code=code)
 
                 BaseModel.db.session.add(sample)
                 BaseModel.db.session.commit()
                 log_create(sample)
-                return BaseResource.send_json_message("Sample created", 201)
+                return BaseResource.send_json_message("Sample successfully created", 201)
             except Exception as e:
                 current_app.logger.error(e)
                 BaseModel.db.session.rollback()
                 return BaseResource.send_json_message("Error while adding sample", 500)
         log_duplicate(Sample.query.filter(Sample.code == code).first())
-        return BaseResource.send_json_message("Sample already exists", 500)
+        return BaseResource.send_json_message("Sample already exists", 409)
 
     @jwt_required
     @has_required_request_params
@@ -110,7 +113,7 @@ class SampleResource(BaseResource):
                     sample.updated_at = datetime.now()
                     BaseModel.db.session.commit()
                     log_update(sample, sample)
-                    return BaseResource.send_json_message("Updated the Sample", 202)
+                    return BaseResource.send_json_message("Sample successfully updated", 202)
 
                 except Exception as e:
                     current_app.logger.error(e)
@@ -136,13 +139,13 @@ class SampleResource(BaseResource):
             sample.deleted_by = get_jwt_identity()
             BaseModel.db.session.commit()
             current_app.logger.info("{0} deleted {1}".format(get_jwt_identity(), sample.user_id))
-            return BaseResource.send_json_message("Sample Successfully deleted", 200)
+            return BaseResource.send_json_message("Sample deleted", 200)
 
     @staticmethod
     def sample_args():
         parser = reqparse.RequestParser()
-        parser.add_argument('theme', required=False)
-        parser.add_argument('user', required=False)
+        parser.add_argument('theme', required=True)
+        parser.add_argument('user', required=False, type=non_empty_int)
         parser.add_argument('box', required=False)
         parser.add_argument('animal_species', required=False)
         parser.add_argument('sample_type', required=False)
@@ -188,6 +191,7 @@ class SampleResource(BaseResource):
     @staticmethod
     def get_sample(sample_code):
         return BaseModel.db.session.query(Sample).filter_by(code=sample_code).first()
+
 
 class SaveSampleFromREDCap(BaseResource):
     def post(self):
