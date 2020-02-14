@@ -17,6 +17,7 @@ with app().test_request_context():
     house_data_code = 'H1'
     quantity_type_code = 'L'
     sample_code = 'S1'
+    publication_code = 'rNA'
 
 headers = {
     'Authorization': 'Bearer {}'.format(access_token),
@@ -435,6 +436,48 @@ def prepare_sample_test(client):
     create_quantity_type(client)
     create_security_level(client)
     create_sample(client)
+
+
+"""
+# *********************************************
+# ***                                       ***
+# ***  HELPER FUNCTIONS FOR PUBLICATION     ***
+# ***                                       ***
+# *********************************************
+"""
+publication_resource_route = '/publication'
+publication_data = {
+    'user': 1,
+    'sample': 1,
+    'sample_results': 'In progress',
+    'publication_title': publication_code,
+    'co_authors': 'Dr Gilbert'
+}
+
+publication_updated_data = {
+    'user': 1,
+    'sample': 1,
+    'sample_results': 'Complete',  # <-- updated value
+    'publication_title': publication_code,
+    'co_authors': 'Dr Gilbert'
+}
+
+publication_headers = {
+    'Authorization': 'Bearer {}'.format(access_token),
+    'title': publication_code
+}
+
+
+def create_publication(client):
+    response = client.post(publication_resource_route, json=publication_data, headers=publication_headers)
+    return response
+
+
+def prepare_publication_test(client):
+    create_user(client)
+    create_theme(client)
+    create_sample(client)
+    create_publication(client)
 
 
 """

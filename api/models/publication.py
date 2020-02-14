@@ -7,7 +7,7 @@ class Publication(BaseModel.db.Model):
     sample_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('sample.id', ondelete='SET NULL'), nullable=True)
     user_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('users.id'), nullable=True)
     sample_results = AppDb.Column(AppDb.String(150), nullable=False)
-    publication_title = AppDb.Column(AppDb.String(150), unique=True, nullable=True)
+    publication_title = AppDb.Column(AppDb.String(150), unique=True, nullable=False)
     co_authors = AppDb.Column(AppDb.String(150), nullable=True)
 
     # relationships defined here
@@ -22,5 +22,6 @@ class Publication(BaseModel.db.Model):
         return False
 
     def __repr__(self):
-        return '<Publication {}>'.format(self.sample_id, self.user_id, self.sample_results, self.publication_title,
-                                         self.co_authors)
+        return '<Publication (sample={0} || user={1} || sample_results={2} || pub_title={3} || co_authors={4})>'.format(
+            self.sample_id, self.user_id, self.sample_results, self.publication_title,
+            self.co_authors)

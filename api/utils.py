@@ -122,7 +122,7 @@ def log_export_from_redcap(record):
 
 def has_required_request_params(record_identity):
     def wrapper(*args, **kwargs):
-        if (request.headers.get('code') or request.headers.get('label') or request.headers.get('pub_title')) is None:
+        if (request.headers.get('code') or request.headers.get('label') or request.headers.get('title')) is None:
             return BaseResource.send_json_message(
                 "Expected an identifier i.e code or label to perform action. Pass the same in request header", 400)
         return record_identity(*args, **kwargs)

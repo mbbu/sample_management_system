@@ -6,7 +6,7 @@ from api.models.database import BaseModel
 from api.models.publication import Publication
 from api.resources.base_resource import BaseResource
 from api.utils import log_create, log_duplicate, log_update, log_delete, format_and_lower_str, \
-    has_required_request_params
+    has_required_request_params, non_empty_int
 
 
 class PublicationResource(BaseResource):
@@ -24,11 +24,17 @@ class PublicationResource(BaseResource):
     def get(self):
         if request.headers.get('title') is not None:
             title = format_and_lower_str(request.headers['title'])()
+            print(title)
             publication = PublicationResource.get_publication(title)
+            print(publication)
+            if publication is None:
+                return BaseResource.send_json_message("Publication not found", 404)
             data = marshal(publication, self.fields)
             return BaseResource.send_json_message(data, 200)
         else:
             publications = Publication.query.all()
+            if publications is None:
+                return BaseResource.send_json_message("Publications not found", 404)
             data = marshal(publications, self.fields)
             return BaseResource.send_json_message(data, 200)
 
@@ -54,19 +60,19 @@ class PublicationResource(BaseResource):
                 BaseModel.db.session.add(publication)
                 BaseModel.db.session.commit()
                 log_create(publication)
-                return BaseResource.send_json_message("Successfully Added a Publication", 201)
+                return BaseResource.send_json_message("Publication successfully created", 201)
 
             except Exception as e:
                 current_app.logger.error(e)
                 BaseModel.db.session.rollback()
                 return BaseResource.send_json_message("Error while adding publication", 500)
         log_duplicate(Publication.query.filter(Publication.publication_title == publication_title).first())
-        return BaseResource.send_json_message('Publication already exists', 500)
+        return BaseResource.send_json_message('Publication already exists', 409)
 
     @jwt_required
     @has_required_request_params
     def put(self):
-        pub_title = format_and_lower_str(request.headers['pub_title'])()
+        pub_title = format_and_lower_str(request.headers['title'])()
         publication = PublicationResource.get_publication(pub_title)
 
         if publication is not None:
@@ -90,23 +96,24 @@ class PublicationResource(BaseResource):
                     publication.co_authors = co_authors
                     BaseModel.db.session.commit()
                     log_update(publication, publication)
-                    return BaseResource.send_json_message("Successfully Updated a Publication", 202)
+                    return BaseResource.send_json_message("Publication successfully updated", 202)
 
                 except Exception as e:
                     current_app.logger.error(e)
                     BaseModel.db.session.rollback()
                     return BaseResource.send_json_message("Error while updating publication", 500)
-            current_app.logger.error("No changes were made", 304)
+            current_app.logger.info("No changes were made", 304)
             return BaseResource.send_json_message("No changes found", 404)
+        return BaseResource.send_json_message("Publication not found", 404)
 
     @jwt_required
     @has_required_request_params
     def delete(self):
-        pub_title = format_and_lower_str(request.headers['pub_title'])()
+        pub_title = format_and_lower_str(request.headers['title'])()
         publication = PublicationResource.get_publication(pub_title)
 
         if not publication:
-            return BaseResource.send_json_message("Publication does not exist", 404)
+            return BaseResource.send_json_message("Publication not found", 404)
 
         BaseModel.db.session.delete(publication)
         BaseModel.db.session.commit()
@@ -116,11 +123,11 @@ class PublicationResource(BaseResource):
     @staticmethod
     def publication_parser():
         parser = reqparse.RequestParser()
-        parser.add_argument('sample')
-        parser.add_argument('user')
-        parser.add_argument('sample_results', required=True)
+        parser.add_argument('sample', type=non_empty_int)
+        parser.add_argument('user', type=non_empty_int)
+        parser.add_argument('sample_results', required=False)
         parser.add_argument('publication_title', required=True)
-        parser.add_argument('co_authors')
+        parser.add_argument('co_authors', required=False)
 
         args = parser.parse_args()
         return args
