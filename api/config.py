@@ -50,7 +50,7 @@ class BaseConfig(object):
 
 class TestConfig(BaseConfig):
     configs = {"TESTING": True,
-               'SQLALCHEMY_DATABASE_URI': BaseConfig.SQLALCHEMY_DATABASE_URI,
+               'SQLALCHEMY_DATABASE_URI': 'sqlite:////',
                'SQLALCHEMY_TRACK_MODIFICATIONS': False}
 
 

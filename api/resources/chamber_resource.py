@@ -2,7 +2,6 @@ from flask import current_app, request
 from flask_jwt_extended import jwt_required
 from flask_restful import fields, marshal, reqparse
 
-
 from api.models.chamber import Chamber
 from api.models.database import BaseModel
 from api.resources.base_resource import BaseResource
@@ -22,12 +21,18 @@ class ChamberResource(BaseResource):
         if request.headers.get('code') is not None:
             code = format_and_lower_str(request.headers['code'])()
             chamber = ChamberResource.get_chamber(code)
-            data = marshal(chamber, self.fields)
-            return BaseResource.send_json_message(data, 200)
+            if chamber is None:
+                return BaseResource.send_json_message("Chamber not found", 404)
+            else:
+                data = marshal(chamber, self.fields)
+                return BaseResource.send_json_message(data, 200)
         else:
             chambers = Chamber.query.all()
-            data = marshal(chambers, self.fields)
-            return BaseResource.send_json_message(data, 200)
+            if chambers is None:
+                return BaseResource.send_json_message("Chambers not found", 404)
+            else:
+                data = marshal(chambers, self.fields)
+                return BaseResource.send_json_message(data, 200)
 
     @jwt_required
     def post(self):
@@ -42,7 +47,7 @@ class ChamberResource(BaseResource):
                 BaseModel.db.session.add(chamber)
                 BaseModel.db.session.commit()
                 log_create(chamber)
-                return BaseResource.send_json_message("Created new chamber", 201)
+                return BaseResource.send_json_message("Chamber successfully created", 201)
 
             except Exception as e:
                 current_app.logger.error(e)
@@ -50,13 +55,15 @@ class ChamberResource(BaseResource):
                 return BaseResource.send_json_message("Error while adding chamber", 500)
         else:
             log_duplicate(Chamber.query.filter(Chamber.code == code).first())
-            return BaseResource.send_json_message("Chamber already exists", 500)
+            return BaseResource.send_json_message("Chamber already exists", 409)
 
     @jwt_required
     @has_required_request_params
     def put(self):
         code = format_and_lower_str(request.headers['code'])()
         chamber = ChamberResource.get_chamber(code)
+        print(chamber)
+        print(type(chamber))
 
         if chamber is None:
             return BaseResource.send_json_message("Chamber not found", 404)
@@ -67,14 +74,14 @@ class ChamberResource(BaseResource):
             _type = args['type']
             code = format_and_lower_str(args['code'])()
 
-            if chamber.freezer_id != freezer or chamber.type != _type or code.chamber != code:
+            if chamber.freezer_id != freezer or chamber.type != _type or chamber.code != code:
                 try:
                     chamber.freezer_id = freezer
                     chamber.type = _type
                     chamber.commit = code
                     BaseModel.db.session.commit()
                     log_update(chamber, chamber)  # todo: log old update
-                    return BaseResource.send_json_message("Updated chamber", 202)
+                    return BaseResource.send_json_message("Chamber successfully updated", 202)
                 except Exception as e:
                     current_app.logger.error(e)
                     BaseModel.db.session.rollback()

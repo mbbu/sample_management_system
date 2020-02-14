@@ -22,12 +22,18 @@ class FreezerResource(BaseResource):
         if request.headers.get('code') is not None:
             code = format_and_lower_str(request.headers['code'])()
             freezer = FreezerResource.get_freezer(code)
-            data = marshal(freezer, self.fields)
-            return BaseResource.send_json_message(data, 200)
+            if freezer is None:
+                return BaseResource.send_json_message("Freezer not found", 404)
+            else:
+                data = marshal(freezer, self.fields)
+                return BaseResource.send_json_message(data, 200)
         else:
             freezer = Freezer.query.all()
-            data = marshal(freezer, self.fields)
-            return BaseResource.send_json_message(data, 200)
+            if freezer is None:
+                return BaseResource.send_json_message("Freezers not found", 404)
+            else:
+                data = marshal(freezer, self.fields)
+                return BaseResource.send_json_message(data, 200)
 
     @jwt_required
     def post(self):
@@ -52,7 +58,7 @@ class FreezerResource(BaseResource):
                 BaseModel.db.session.rollback()
                 return BaseResource.send_json_message("Error while adding freezer", 500)
         log_duplicate(Freezer.query.filter(Freezer.code == args[3]).first())
-        return BaseResource.send_json_message("Freezer already exists", 500)
+        return BaseResource.send_json_message("Freezer already exists", 409)
 
     @jwt_required
     @has_required_request_params
@@ -74,7 +80,7 @@ class FreezerResource(BaseResource):
                     freezer.code = args[3]
                     BaseModel.db.session.commit()
                     log_update(freezer, freezer)
-                    return BaseResource.send_json_message("Successfully updated Freezer", 202)
+                    return BaseResource.send_json_message("Successfully updated freezer", 202)
 
                 except Exception as e:
                     current_app.logger.error(e)

@@ -76,7 +76,7 @@ def register_resources(app):
     from api.resources.lab_resource import LaboratoryResource
     from api.resources.quantity_type_resource import QuantityTypeResource
     from api.resources.security_level_resource import SecurityLevelResource
-    from api.resources.housedata_resource import HousedataResource
+    from api.resources.housedata_resource import HouseDataResource
 
     api = Api(app)
     api.add_resource(IndexResource, '/', '/index', '/welcome')
@@ -98,9 +98,9 @@ def register_resources(app):
     api.add_resource(LaboratoryResource, '/lab', '/laboratory')
 
     api.add_resource(QuantityTypeResource, '/quantity-type')
-    api.add_resource(SecurityLevelResource, '/security-level', '/security-level/<code>')
+    api.add_resource(SecurityLevelResource, '/security-level')
 
-    api.add_resource(HousedataResource, '/metadata', '/metadata/<code>')
+    api.add_resource(HouseDataResource, '/house-data')
 
     from api.resources.faker_resource import FakeDataResource
     api.add_resource(FakeDataResource, '/faker')

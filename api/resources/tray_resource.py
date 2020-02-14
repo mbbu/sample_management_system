@@ -1,6 +1,6 @@
-from flask import current_app, request, Blueprint, render_template
+from flask import current_app, request
 from flask_jwt_extended import jwt_required
-from flask_restful import Api, fields, marshal, reqparse
+from flask_restful import fields, marshal, reqparse
 
 from api.models.database import BaseModel
 from api.models.tray import Tray
@@ -15,15 +15,20 @@ class TrayResource(BaseResource):
         'rack.number': fields.Integer,
         'code': fields.String
     }
+
     def get(self):
         if request.headers.get('code') is not None:
             code = format_and_lower_str(request.headers['code'])()
             tray = TrayResource.get_tray(code)
+            if tray is None:
+                return BaseResource.send_json_message("Tray not found", 404)
+            # else:
             data = marshal(tray, self.fields)
-            return render_template('index.html')
-            #return BaseResource.send_json_message(data, 200)
+            return BaseResource.send_json_message(data, 200)
         else:
             trays = Tray.query.all()
+            if trays is None:
+                return BaseResource.send_json_message("Trays not found", 404)
             data = marshal(trays, self.fields)
             return BaseResource.send_json_message(data, 200)
 
@@ -40,14 +45,14 @@ class TrayResource(BaseResource):
                 BaseModel.db.session.add(tray)
                 BaseModel.db.session.commit()
                 log_create(tray)
-                return BaseResource.send_json_message("Added new tray", 201)
+                return BaseResource.send_json_message("Tray successfully created", 201)
 
             except Exception as e:
                 current_app.logger.error(e)
                 BaseModel.db.session.rollback()
                 return BaseResource.send_json_message("Error while adding tray", 500)
         log_duplicate(Tray.query.filter(Tray.code == code).first())
-        return BaseResource.send_json_message("Tray already exists", 500)
+        return BaseResource.send_json_message("Tray already exists", 409)
 
     @jwt_required
     @has_required_request_params
@@ -67,7 +72,7 @@ class TrayResource(BaseResource):
                     tray.code = code
                     BaseModel.db.session.commit()
                     log_update(tray, tray)  # todo: log old record
-                    return BaseResource.send_json_message("Updated tray", 202)
+                    return BaseResource.send_json_message("Tray successfully updated", 202)
 
                 except Exception as e:
                     current_app.logger.error(e)

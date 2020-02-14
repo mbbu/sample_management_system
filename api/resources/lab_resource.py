@@ -20,12 +20,18 @@ class LaboratoryResource(BaseResource):
         if request.headers.get('code') is not None:
             code = format_and_lower_str(request.headers['code'])()
             lab = LaboratoryResource.get_laboratory(code)
-            data = marshal(lab, self.fields)
-            return BaseResource.send_json_message(data, 200)
+            if lab is None:
+                return BaseResource.send_json_message("Lab not found", 404)
+            else:
+                data = marshal(lab, self.fields)
+                return BaseResource.send_json_message(data, 200)
         else:
             laboratory = Laboratory.query.all()
-            data = marshal(laboratory, self.fields)
-            return BaseResource.send_json_message(data, 200)
+            if laboratory is None:
+                return BaseResource.send_json_message("Lab not found", 404)
+            else:
+                data = marshal(laboratory, self.fields)
+                return BaseResource.send_json_message(data, 200)
 
     @jwt_required
     def post(self):
@@ -51,9 +57,9 @@ class LaboratoryResource(BaseResource):
             except Exception as e:
                 current_app.logger.error(e)
                 BaseModel.db.session.rollback()
-                return BaseResource.send_json_message("Error while adding Laboratory")
+                return BaseResource.send_json_message("Error while adding Laboratory", 500)
         log_duplicate(Laboratory.query.filter(Laboratory.code == code).first())
-        return BaseResource.send_json_message("Laboratory already exists")
+        return BaseResource.send_json_message("Laboratory already exists", 409)
 
     @jwt_required
     @has_required_request_params
@@ -79,12 +85,12 @@ class LaboratoryResource(BaseResource):
                     laboratory.code = code
                     BaseModel.db.session.commit()
                     log_update(old_info, laboratory)  # todo: check how to log old values and new values for a change
-                    return BaseResource.send_json_message("Update was successful", 202)
+                    return BaseResource.send_json_message("Lab updated successfully", 202)
 
                 except Exception as e:
                     current_app.logger.error(e)
                     BaseModel.db.session.rollback()
-                    return BaseResource.send_json_message("Error while updationg Laboratory", 500)
+                    return BaseResource.send_json_message("Error while updating Laboratory", 500)
             return BaseResource.send_json_message("No changes were made", 304)
 
     @jwt_required

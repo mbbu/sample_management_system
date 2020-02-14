@@ -20,12 +20,18 @@ class RackResource(BaseResource):
         if request.headers.get('code') is not None:
             code = format_and_lower_str(request.headers['code'])()
             rack = RackResource.get_rack(code)
-            data = marshal(rack, self.fields)
-            return BaseResource.send_json_message(data, 200)
+            if rack is None:
+                return BaseResource.send_json_message("Rack not found", 404)
+            else:
+                data = marshal(rack, self.fields)
+                return BaseResource.send_json_message(data, 200)
         else:
             racks = Rack.query.all()
-            data = marshal(racks, self.fields)
-            return BaseResource.send_json_message(data, 200)
+            if racks is None:
+                return BaseResource.send_json_message("Racks not found", 404)
+            else:
+                data = marshal(racks, self.fields)
+                return BaseResource.send_json_message(data, 200)
 
     @jwt_required
     def post(self):
@@ -40,14 +46,14 @@ class RackResource(BaseResource):
                 BaseModel.db.session.add(rack)
                 BaseModel.db.session.commit()
                 log_create(rack)
-                return BaseResource.send_json_message("Created new rack", 201)
+                return BaseResource.send_json_message("Rack successfully created", 201)
 
             except Exception as e:
                 current_app.logger.error(e)
                 BaseModel.db.session.rollback()
                 return BaseResource.send_json_message("Error while adding rack", 500)
         log_duplicate(Rack.query.filter(Rack.code == code).first())
-        return BaseResource.send_json_message("Rack already exists", 500)
+        return BaseResource.send_json_message("Rack already exists", 409)
 
     @jwt_required
     @has_required_request_params
@@ -68,7 +74,7 @@ class RackResource(BaseResource):
                     rack.code = code
                     BaseModel.db.session.commit()
                     log_update(rack, rack)  # todo: log old update
-                    return BaseResource.send_json_message("Updated rack", 202)
+                    return BaseResource.send_json_message("Rack successfully updated", 202)
                 except Exception as e:
                     current_app.logger.error(e)
                     BaseModel.db.session.rollback()

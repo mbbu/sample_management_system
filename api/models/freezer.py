@@ -21,5 +21,5 @@ class Freezer(BaseModel.db.Model):
         return False
 
     def __repr__(self):
-        return '<< Freezer: (number={0} || room={1} || lab={2} || code={3}) >>'\
-            .format(self.freezer, self.room, self.laboratory_id, self.code)
+        return '<< Freezer: (number={0} || room={1} || lab={2} || code={3}) >>' \
+            .format(self.number, self.room, self.laboratory_id, self.code)
