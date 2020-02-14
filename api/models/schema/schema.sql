@@ -125,7 +125,7 @@ CREATE TABLE sample
     temperature        numeric(5, 2),
     box_id             integer,
     retention_period   integer,
---     theme_id           integer,
+    theme_id           integer,
     code               character varying,
     quantity_type      character varying,
     security_level     integer,
@@ -135,7 +135,7 @@ CREATE TABLE sample
     deleted_by         character varying(65),
     foreign key (user_id) references users (id),
     foreign key (box_id) references box (id),
---     foreign key (theme_id) references theme (id),
+    foreign key (theme_id) references theme (id),
     foreign key (security_level) references security_level (id)
 );
 
@@ -172,4 +172,17 @@ CREATE TABLE quantity_type
     id          character varying(5) PRIMARY KEY,
     name        character varying(30) NOT NULL,
     description character varying(255)
+);
+
+DROP TABLE IF EXISTS publication;
+CREATE TABLE publication
+(
+    id                integer PRIMARY KEY AUTOINCREMENT,
+    sample_id         integer,
+    user_id           integer,
+    sample_results    character varying(150) NOT NULL,
+    publication_title character varying(150) UNIQUE,
+    co_authors        character varying(150),
+    FOREIGN KEY (sample_id) references sample (id),
+    FOREIGN KEY (user_id) references users (id)
 );
