@@ -121,7 +121,6 @@ def test_update_publication_by_non_logged_in_user(client):
     assert response.status_code == 401
 
 
-# todo: error
 def test_update_publication(client):
     prepare_publication_test(client)
     response = client.put(publication_resource_route, json=publication_updated_data, headers=publication_headers)
