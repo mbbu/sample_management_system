@@ -6,7 +6,7 @@ from api.models.database import BaseModel
 from api.models.publication import Publication
 from api.resources.base_resource import BaseResource
 from api.utils import log_create, log_duplicate, log_update, log_delete, format_and_lower_str, \
-    has_required_request_params, non_empty_int
+    has_required_request_params, non_empty_int, log_304
 
 
 class PublicationResource(BaseResource):
@@ -24,9 +24,7 @@ class PublicationResource(BaseResource):
     def get(self):
         if request.headers.get('title') is not None:
             title = format_and_lower_str(request.headers['title'])()
-            print(title)
             publication = PublicationResource.get_publication(title)
-            print(publication)
             if publication is None:
                 return BaseResource.send_json_message("Publication not found", 404)
             data = marshal(publication, self.fields)
@@ -78,33 +76,32 @@ class PublicationResource(BaseResource):
         if publication is not None:
             args = PublicationResource.publication_parser()
 
-            sample_id = args['sample']
-            user_id = args['user']
+            sample = args['sample']
+            user = args['user']
             sample_results = args['sample_results']
             publication_title = format_and_lower_str(args['publication_title'])()
             co_authors = args['co_authors']
 
-            if sample_id != publication.sample_id or user_id != publication.user_id or \
-                    sample_results != publication.sample_results or publication_title != publication.publication_title or \
-                    co_authors != publication.co_authors:
-
+            if sample != publication.sample_id or user != publication.user_id or \
+                    sample_results != publication.sample_results or publication_title != publication.publication_title \
+                    or co_authors != publication.co_authors:
                 try:
-                    publication.sample_id = sample_id,
-                    publication.user_id = user_id,
-                    publication.sample_results = sample_results,
-                    publication.publication_title = publication_title,
+                    publication.sample_id = sample
+                    publication.user_id = user
+                    publication.sample_results = sample_results
+                    publication.publication_title = publication_title
                     publication.co_authors = co_authors
+
                     BaseModel.db.session.commit()
                     log_update(publication, publication)
-                    return BaseResource.send_json_message("Publication successfully updated", 202)
-
+                    return BaseResource.send_json_message("Publication successfully updated", 200)
                 except Exception as e:
                     current_app.logger.error(e)
                     BaseModel.db.session.rollback()
                     return BaseResource.send_json_message("Error while updating publication", 500)
-            current_app.logger.info("No changes were made", 304)
-            return BaseResource.send_json_message("No changes found", 404)
-        return BaseResource.send_json_message("Publication not found", 404)
+            log_304()
+            return BaseResource.send_json_message('No changes were made', 304)
+        return BaseResource.send_json_message('Publication not found', 404)
 
     @jwt_required
     @has_required_request_params
