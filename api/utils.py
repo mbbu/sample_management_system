@@ -66,8 +66,11 @@ def log_in_user_jwt(user):
 
     return {'access_token': access_token, 'refresh_token': refresh_token}
 
+
 def get_samples_by_code(code):
     return BaseModel.db.session.query(Sample).filter(Sample.is_deleted == code).all()
+
+
 """
     String formatters
 """
@@ -89,6 +92,10 @@ def format_str_to_date(date):
 """
     Logging Functions
 """
+
+
+def log_304():
+    return current_app.logger.info("No changes were made")
 
 
 def log_create(record):
