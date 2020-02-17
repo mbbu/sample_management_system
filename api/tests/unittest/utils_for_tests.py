@@ -288,6 +288,7 @@ def prepare_box_test(client):
 # ***                              ***
 # ************************************
 """
+theme_resource_route = '/theme'
 theme_data = {
     'name': 'Animal Health',
     'code': theme_code
@@ -305,7 +306,7 @@ theme_headers = {
 
 
 def create_theme(client):
-    response = client.post('/theme', json=theme_data, headers=theme_headers)
+    response = client.post(theme_resource_route, json=theme_data, headers=theme_headers)
     return response
 
 
