@@ -103,6 +103,7 @@ def log_create(record):
         "New {0} created by {1} at {2}".format(record, get_jwt_identity(), datetime.now()))
 
 
+# todo: log old value and new value
 def log_update(old_record, new_record):
     return current_app.logger.info("{0} updated {1} to {2} at time={3}"
                                    .format(get_jwt_identity(), old_record, new_record,
