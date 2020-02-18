@@ -6,7 +6,7 @@ from api.models.database import BaseModel
 from api.models.role import Role
 from api.resources.base_resource import BaseResource
 from api.utils import format_and_lower_str, log_create, log_duplicate, \
-    log_update, log_delete, has_required_request_params
+    log_update, log_delete, has_required_request_params, standard_non_empty_string
 
 
 class RoleResource(BaseResource):
@@ -30,7 +30,7 @@ class RoleResource(BaseResource):
     @jwt_required
     def post(self):
         args = RoleResource.role_parser()
-        code = format_and_lower_str(args['code'])
+        code = args['code']
         name = args['name']
         description = args['description']
 
@@ -96,7 +96,7 @@ class RoleResource(BaseResource):
     @staticmethod
     def role_parser():
         parser = reqparse.RequestParser()
-        parser.add_argument('code', required=True)
+        parser.add_argument('code', required=True, type=standard_non_empty_string)
         parser.add_argument('name', required=True)
         parser.add_argument('description')
 

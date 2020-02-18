@@ -32,6 +32,7 @@ headers = {
 # ***                              ***
 # ************************************
 """
+role_resource_route = '/role'
 role_data = {
     'code': 'Admin1',
     'name': 'Admin',
@@ -40,7 +41,7 @@ role_data = {
 
 
 def create_role(client):
-    response = client.post('/role', json=role_data, headers=headers)
+    response = client.post(role_resource_route, json=role_data, headers=headers)
     return response
 
 
