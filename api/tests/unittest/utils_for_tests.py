@@ -101,17 +101,18 @@ def create_lab(client):
 # ***                              ***
 # ************************************
 """
+freezer_resource_route = '/freezer'
 freezer_data = {
-    'laboratory': '1',
+    'laboratory': 1,
     'room': '303',
-    'number': '1',
+    'number': 1,
     'code': freezer_code
 }
 
 freezer_updated_data = {
-    'laboratory': '1',
+    'laboratory': 1,
     'room': '304',  # <-- updated value
-    'number': '12',  # <-- updated value
+    'number': 12,  # <-- updated value
     'code': freezer_code
 }
 
@@ -122,7 +123,7 @@ freezer_headers = {
 
 
 def create_freezer(client):
-    response = client.post('/freezer', json=freezer_data, headers=freezer_headers)
+    response = client.post(freezer_resource_route, json=freezer_data, headers=freezer_headers)
     return response
 
 

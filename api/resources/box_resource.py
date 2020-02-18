@@ -56,7 +56,7 @@ class BoxResource(BaseResource):
                 BaseModel.db.session.rollback()
                 return BaseResource.send_json_message("Error while adding box", 500)
         else:
-            log_duplicate(Box)
+            log_duplicate(Box.query.filter(Box.code == code).first())
             return BaseResource.send_json_message("Box already exists", 409)
 
     @jwt_required
