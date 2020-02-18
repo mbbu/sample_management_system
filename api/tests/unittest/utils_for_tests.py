@@ -177,6 +177,7 @@ def prepare_chamber_test(client):
 # ***                              ***
 # ************************************
 """
+rack_resource_route = '/rack'
 rack_data = {
     'chamber': '1',
     'number': '404',
@@ -196,7 +197,7 @@ rack_headers = {
 
 
 def create_rack(client):
-    response = client.post('/rack', json=rack_data, headers=rack_headers)
+    response = client.post(rack_resource_route, json=rack_data, headers=rack_headers)
     return response
 
 

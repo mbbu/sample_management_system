@@ -5,8 +5,8 @@ from flask_restful import fields, marshal, reqparse
 from api.models.database import BaseModel
 from api.models.rack import Rack
 from api.resources.base_resource import BaseResource
-from api.utils import format_and_lower_str, log_create, log_duplicate, log_update, log_delete, non_empty_string, \
-    has_required_request_params
+from api.utils import format_and_lower_str, log_create, log_duplicate, log_update, log_delete, \
+    has_required_request_params, standard_non_empty_string
 
 
 class RackResource(BaseResource):
@@ -38,7 +38,7 @@ class RackResource(BaseResource):
         args = RackResource.rack_parser()
         chamber = int(args['chamber'])
         number = int(args['number'])
-        code = format_and_lower_str(args['code'])
+        code = args['code']
 
         if not Rack.rack_exists(code):
             try:
@@ -65,7 +65,7 @@ class RackResource(BaseResource):
             args = RackResource.rack_parser()
             chamber = int(args['chamber'])
             number = int(args['number'])
-            code = format_and_lower_str(args['code'])
+            code = args['code']
 
             if rack.chamber_id != chamber or rack.number != number or code.rack != code:
                 try:
@@ -73,7 +73,7 @@ class RackResource(BaseResource):
                     rack.number = number
                     rack.code = code
                     BaseModel.db.session.commit()
-                    log_update(rack, rack)  # todo: log old update
+                    log_update(rack, rack)
                     return BaseResource.send_json_message("Rack successfully updated", 202)
                 except Exception as e:
                     current_app.logger.error(e)
@@ -100,7 +100,7 @@ class RackResource(BaseResource):
         parser = reqparse.RequestParser()
         parser.add_argument('chamber', required=True)
         parser.add_argument('number', required=True)
-        parser.add_argument('code', required=True, type=non_empty_string)
+        parser.add_argument('code', required=True, type=standard_non_empty_string)
 
         args = parser.parse_args()
         return args
