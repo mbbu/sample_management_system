@@ -1,7 +1,6 @@
 from flask_jwt_extended import create_access_token
 
 from api import create_app as app
-from api.utils import format_and_lower_str
 
 with app().test_request_context():
     access_token = create_access_token(identity='admin@icipe.org')
@@ -13,7 +12,7 @@ with app().test_request_context():
     chamber_code = 'L1F1C1'
     rack_code = 'L1F1C1R1'
     tray_code = 'L1F1C1R1T1'
-    box_code = format_and_lower_str('L1F1C1R1T1B1')
+    box_code = 'L1F1C1R1T1B1'
     security_level_code = 'A1'
     house_data_code = 'H1'
     quantity_type_code = 'L'
@@ -139,6 +138,7 @@ def prepare_freezer_test(client):
 # ***                              ***
 # ************************************
 """
+chamber_resource_route = '/chamber'
 chamber_data = {
     'freezer': '1',
     'type': 'Animal Species',
@@ -158,7 +158,7 @@ chamber_headers = {
 
 
 def create_chamber(client):
-    response = client.post('/chamber', json=chamber_data, headers=chamber_headers)
+    response = client.post(chamber_resource_route, json=chamber_data, headers=chamber_headers)
     return response
 
 

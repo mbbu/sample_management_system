@@ -23,6 +23,12 @@ def non_empty_string(s: str):
     return s
 
 
+def standard_non_empty_string(s: str):
+    if not s:
+        raise ValueError("Expected a non empty string")
+    return format_and_lower_str(s)
+
+
 def non_empty_int(i: int):
     if not i:
         raise ValueError("Expected an integer")

@@ -6,7 +6,7 @@ from api.models.box import Box
 from api.models.database import BaseModel
 from api.resources.base_resource import BaseResource
 from api.utils import format_and_lower_str, log_create, log_duplicate, log_update, log_delete, \
-    has_required_request_params, non_empty_string, non_empty_int
+    has_required_request_params, non_empty_string, non_empty_int, standard_non_empty_string
 
 
 class BoxResource(BaseResource):
@@ -40,8 +40,8 @@ class BoxResource(BaseResource):
     def post(self):
         args = BoxResource.box_args()
         tray = args['tray']
-        label = format_and_lower_str(args['label'])
-        code = format_and_lower_str(args['code'])
+        label = args['label']
+        code = args['code']
 
         if not Box.box_exists(code):
             try:
@@ -70,8 +70,8 @@ class BoxResource(BaseResource):
 
         args = BoxResource.box_args()
         tray = args['tray']
-        label = format_and_lower_str(args['label'])
-        code = format_and_lower_str(args['code'])
+        label = args['label']
+        code = args['code']
 
         if tray != box.tray_id or label != box.label or code != box.code:
             try:
@@ -107,7 +107,7 @@ class BoxResource(BaseResource):
         parser = reqparse.RequestParser()
         parser.add_argument('tray', required=True, type=non_empty_int)
         parser.add_argument('label', required=True, type=non_empty_string)
-        parser.add_argument('code', required=True, type=non_empty_string)
+        parser.add_argument('code', required=True, type=standard_non_empty_string)
 
         args = parser.parse_args()
         return args

@@ -6,7 +6,7 @@ from api.models.chamber import Chamber
 from api.models.database import BaseModel
 from api.resources.base_resource import BaseResource
 from api.utils import format_and_lower_str, non_empty_string, log_create, log_duplicate, log_update, log_delete, \
-    has_required_request_params
+    has_required_request_params, non_empty_int, standard_non_empty_string
 
 
 class ChamberResource(BaseResource):
@@ -37,9 +37,9 @@ class ChamberResource(BaseResource):
     @jwt_required
     def post(self):
         args = ChamberResource.chamber_parser()
-        freezer = int(args['freezer'])
+        freezer = args['freezer']
         _type = args['type']
-        code = format_and_lower_str(args['code'])
+        code = args['code']
 
         if not Chamber.chamber_exists(code):
             try:
@@ -62,17 +62,15 @@ class ChamberResource(BaseResource):
     def put(self):
         code = format_and_lower_str(request.headers['code'])
         chamber = ChamberResource.get_chamber(code)
-        print(chamber)
-        print(type(chamber))
 
         if chamber is None:
             return BaseResource.send_json_message("Chamber not found", 404)
 
         else:
             args = ChamberResource.chamber_parser()
-            freezer = int(args['freezer'])
+            freezer = args['freezer']
             _type = args['type']
-            code = format_and_lower_str(args['code'])
+            code = args['code']
 
             if chamber.freezer_id != freezer or chamber.type != _type or chamber.code != code:
                 try:
@@ -80,7 +78,7 @@ class ChamberResource(BaseResource):
                     chamber.type = _type
                     chamber.commit = code
                     BaseModel.db.session.commit()
-                    log_update(chamber, chamber)  # todo: log old update
+                    log_update(chamber, chamber)
                     return BaseResource.send_json_message("Chamber successfully updated", 202)
                 except Exception as e:
                     current_app.logger.error(e)
@@ -106,9 +104,9 @@ class ChamberResource(BaseResource):
     @staticmethod
     def chamber_parser():
         parser = reqparse.RequestParser()
-        parser.add_argument('freezer', required=True)
-        parser.add_argument('type', required=True)
-        parser.add_argument('code', required=True, type=non_empty_string)
+        parser.add_argument('freezer', required=True, type=non_empty_int)
+        parser.add_argument('type', required=True, type=non_empty_string)
+        parser.add_argument('code', required=True, type=standard_non_empty_string)
 
         args = parser.parse_args()
         return args
