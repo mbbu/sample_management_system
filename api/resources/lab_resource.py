@@ -6,7 +6,7 @@ from api.models.database import BaseModel
 from api.models.laboratory import Laboratory
 from api.resources.base_resource import BaseResource
 from api.utils import format_and_lower_str, log_update, log_delete, log_duplicate, log_create, \
-    has_required_request_params
+    has_required_request_params, standard_non_empty_string
 
 
 class LaboratoryResource(BaseResource):
@@ -39,7 +39,7 @@ class LaboratoryResource(BaseResource):
 
         name = args['name']
         room = args['room']
-        code = format_and_lower_str(args['code'])
+        code = args['code']
 
         if not Laboratory.code_exists(code):
             try:
@@ -84,7 +84,7 @@ class LaboratoryResource(BaseResource):
                     laboratory.room = room
                     laboratory.code = code
                     BaseModel.db.session.commit()
-                    log_update(old_info, laboratory)  # todo: check how to log old values and new values for a change
+                    log_update(old_info, laboratory)
                     return BaseResource.send_json_message("Lab updated successfully", 202)
 
                 except Exception as e:
@@ -112,7 +112,7 @@ class LaboratoryResource(BaseResource):
         parser = reqparse.RequestParser()
         parser.add_argument('name', required=True)
         parser.add_argument('room', required=True)
-        parser.add_argument('code', required=True)
+        parser.add_argument('code', required=True, type=standard_non_empty_string)
 
         args = parser.parse_args()
         return args

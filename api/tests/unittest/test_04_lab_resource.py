@@ -1,6 +1,6 @@
 from flask import json
 
-from api.tests.unittest.utils_for_tests import lab_headers, lab_data, create_lab, access_token
+from api.tests.unittest.utils_for_tests import lab_headers, lab_data, create_lab, access_token, lab_resource_route
 
 """
 # ****************************
@@ -12,12 +12,12 @@ from api.tests.unittest.utils_for_tests import lab_headers, lab_data, create_lab
 
 
 def test_create_lab_by_non_logged_in_user(client):
-    response = client.post('/lab', json=lab_data)
+    response = client.post(lab_resource_route, json=lab_data)
     assert response.status_code == 401
 
 
 def test_create_lab_with_missing_info(client):
-    response = client.post('/lab', json={
+    response = client.post(lab_resource_route, json={
         'name': 'R & D',
         # 'room': '202',  <-- required field
         'code': 'ABC'
@@ -57,7 +57,7 @@ def test_create_duplicate_lab(client):
 
 def test_get_lab(client):
     create_lab(client)
-    response = client.get('/lab')
+    response = client.get(lab_resource_route)
     assert b'message' in response.data
     data = json.loads(response.data)
 
@@ -77,7 +77,7 @@ def test_get_lab(client):
 
 def test_get_user_by_params(client):
     create_lab(client)
-    response = client.get('/lab', headers=lab_headers)
+    response = client.get(lab_resource_route, headers=lab_headers)
     data = json.loads(response.data)
 
     if response.status_code == 404:
@@ -99,13 +99,13 @@ def test_get_user_by_params(client):
 
 
 def test_update_lab_by_non_logged_in_user(client):
-    response = client.put('/lab', json=lab_data)
+    response = client.put(lab_resource_route, json=lab_data)
     assert response.status_code == 401
 
 
 def test_update_lab(client):
     create_lab(client)
-    response = client.put('/lab', json={
+    response = client.put(lab_resource_route, json={
         'name': 'R & D',
         'room': 'LDH1',
         'code': 'ABC'
@@ -118,7 +118,7 @@ def test_update_lab(client):
 
 def test_update_non_existing_lab(client):
     create_lab(client)
-    response = client.put('/lab', json={
+    response = client.put(lab_resource_route, json={
         'name': 'R & D',
         'room': '202',
         'code': 'ABC'
@@ -130,7 +130,7 @@ def test_update_non_existing_lab(client):
 
 def test_update_without_lab_identity(client):
     create_lab(client)
-    response = client.put('/lab', json={
+    response = client.put(lab_resource_route, json={
         'name': 'R & D',
         'room': '202',
         'code': 'ABC'
@@ -149,19 +149,19 @@ def test_update_without_lab_identity(client):
 
 
 def test_deleting_lab_without_jwt_token(client):
-    response = client.delete('/lab')
+    response = client.delete(lab_resource_route)
     assert response.status_code == 401
 
 
 def test_deleting_lab_without_identity(client):
-    response = client.delete('/lab', headers={'Authorization': 'Bearer {}'.format(access_token)})
+    response = client.delete(lab_resource_route, headers={'Authorization': 'Bearer {}'.format(access_token)})
     assert response.status_code == 400
 
 
 def test_deleting_non_existent_lab(client):
     create_lab(client)
-    response = client.delete('/lab', headers={'Authorization': 'Bearer {}'.format(access_token),
-                                              'code': '123'})
+    response = client.delete(lab_resource_route, headers={'Authorization': 'Bearer {}'.format(access_token),
+                                                          'code': '123'})
     data = json.loads(response.data)
     assert response.status_code == 404
     assert data['message'] == 'Laboratory does not exist'
@@ -169,7 +169,7 @@ def test_deleting_non_existent_lab(client):
 
 def test_deleting_lab(client):
     create_lab(client)
-    response = client.delete('/lab', headers=lab_headers)
+    response = client.delete(lab_resource_route, headers=lab_headers)
 
     data = json.loads(response.data)
     assert response.status_code == 200

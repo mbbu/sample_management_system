@@ -77,6 +77,7 @@ def prepare_user_test(client):
 # ***                              ***
 # ************************************
 """
+lab_resource_route = '/lab'
 lab_headers = {
     'Authorization': 'Bearer {}'.format(access_token),
     'code': lab_code
@@ -90,7 +91,7 @@ lab_data = {
 
 
 def create_lab(client):
-    response = client.post('/lab', json=lab_data, headers=lab_headers)
+    response = client.post(lab_resource_route, json=lab_data, headers=lab_headers)
     return response
 
 
