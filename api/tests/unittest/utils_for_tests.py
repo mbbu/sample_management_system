@@ -52,6 +52,7 @@ def create_role(client):
 # ***                              ***
 # ************************************
 """
+user_resource_route = '/user'
 USER_DATA = {
     'first_name': 'ICIPE',
     'last_name': 'ADMIN',
@@ -62,7 +63,7 @@ USER_DATA = {
 
 
 def create_user(client):
-    response = client.post('/user', json=USER_DATA, headers=headers)
+    response = client.post(user_resource_route, json=USER_DATA, headers=headers)
     return response
 
 
@@ -216,6 +217,7 @@ def prepare_rack_test(client):
 # ***                              ***
 # ************************************
 """
+tray_resource_route = '/tray'
 tray_data = {
     'rack': '1',
     'number': '404',
@@ -235,7 +237,7 @@ tray_headers = {
 
 
 def create_tray(client):
-    response = client.post('/tray', json=tray_data, headers=tray_headers)
+    response = client.post(tray_resource_route, json=tray_data, headers=tray_headers)
     return response
 
 
@@ -323,6 +325,7 @@ def create_theme(client):
 # ***                                       ***
 # *********************************************
 """
+security_level_resource_route = '/security-level'
 security_level_data = {
     'name': 'Ebola',
     'code': security_level_code,
@@ -342,7 +345,7 @@ security_level_headers = {
 
 
 def create_security_level(client):
-    response = client.post('/security-level', json=security_level_data, headers=security_level_headers)
+    response = client.post(security_level_resource_route, json=security_level_data, headers=security_level_headers)
     return response
 
 

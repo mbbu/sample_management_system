@@ -5,7 +5,8 @@ from flask_restful import fields, marshal, reqparse
 from api.models.database import BaseModel
 from api.models.security_level import SecurityLevel
 from api.resources.base_resource import BaseResource
-from api.utils import format_and_lower_str, has_required_request_params, log_update, log_delete
+from api.utils import format_and_lower_str, has_required_request_params, log_update, log_delete, \
+    standard_non_empty_string
 
 
 class SecurityLevelResource(BaseResource):
@@ -33,7 +34,7 @@ class SecurityLevelResource(BaseResource):
     @jwt_required
     def post(self):
         args = SecurityLevelResource.security_level_parser()
-        code = format_and_lower_str(args['code'])
+        code = args['code']
         name = args['name']
         description = args['description']
 
@@ -57,7 +58,15 @@ class SecurityLevelResource(BaseResource):
         code = format_and_lower_str(request.headers['code'])
         security_level = SecurityLevelResource.get_security_level(code)
 
-        if security_level is not None:
+        print(code)
+        print('********')
+        print(security_level)
+
+        if security_level is None:
+            current_app.logger.error("Error while updating security level. Record does not exist.")
+            return BaseResource.send_json_message("Security level not found", 404)
+
+        else:
             args = SecurityLevelResource.security_level_parser()
             code = args['code']
             name = args['name']
@@ -77,8 +86,7 @@ class SecurityLevelResource(BaseResource):
                     current_app.logger.error(e)
                     BaseModel.db.session.rollback()
                     return BaseResource.send_json_message("Error while updating security level", 500)
-        current_app.logger.error("Error while updating security level. Record does not exist.")
-        return BaseResource.send_json_message("Security level not found", 404)
+            return BaseResource.send_json_message("No changes made", 304)
 
     @jwt_required
     @has_required_request_params
@@ -96,7 +104,7 @@ class SecurityLevelResource(BaseResource):
     @staticmethod
     def security_level_parser():
         parser = reqparse.RequestParser()
-        parser.add_argument('code', required=True)
+        parser.add_argument('code', required=True, type=standard_non_empty_string)
         parser.add_argument('name', required=True)
         parser.add_argument('description')
 

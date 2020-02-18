@@ -8,7 +8,7 @@ from api.models.database import BaseModel
 from api.models.user import User
 from api.resources.base_resource import BaseResource
 from api.utils import get_active_users, get_user_by_email, get_users_by_role, get_users_by_status, get_deactivated_user, \
-    log_in_user_jwt, format_and_lower_str
+    log_in_user_jwt, format_and_lower_str, standard_non_empty_string
 
 
 class UserResource(BaseResource):
@@ -44,7 +44,7 @@ class UserResource(BaseResource):
 
         first_name = args['first_name']
         last_name = args['last_name']
-        email = str(args['email']).lower()
+        email = args['email']
         role = args['role']
         password = args['password']
 
@@ -119,7 +119,7 @@ class UserResource(BaseResource):
 
                 first_name = args['first_name']
                 last_name = args['last_name']
-                user_email = str(args['email']).lower()
+                user_email = args['email']
                 role = int(args['role'])
                 password = args['password']
 
@@ -177,7 +177,7 @@ class UserResource(BaseResource):
         parser = reqparse.RequestParser()
         parser.add_argument('first_name', required=True)
         parser.add_argument('last_name', required=True)
-        parser.add_argument('email', required=True)
+        parser.add_argument('email', required=True, type=standard_non_empty_string)
         parser.add_argument('role', required=True)
         parser.add_argument('password', required=True)
 

@@ -5,8 +5,8 @@ from flask_restful import fields, marshal, reqparse
 from api.models.database import BaseModel
 from api.models.tray import Tray
 from api.resources.base_resource import BaseResource
-from api.utils import format_and_lower_str, log_create, log_duplicate, log_update, log_delete, non_empty_string, \
-    has_required_request_params
+from api.utils import format_and_lower_str, log_create, log_duplicate, log_update, log_delete, \
+    has_required_request_params, standard_non_empty_string
 
 
 class TrayResource(BaseResource):
@@ -37,7 +37,7 @@ class TrayResource(BaseResource):
         args = TrayResource.tray_parser()
         rack = int(args['rack'])
         number = int(args['number'])
-        code = format_and_lower_str(args['code'])
+        code = args['code']
 
         if not Tray.tray_exists(code):
             try:
@@ -59,11 +59,12 @@ class TrayResource(BaseResource):
     def put(self):
         code = format_and_lower_str(request.headers['code'])
         tray = TrayResource.get_tray(code)
+
         if tray is not None:
             args = TrayResource.tray_parser()
             rack = int(args['rack'])
             number = int(args['number'])
-            code = format_and_lower_str(args['code'])
+            code = args['code']
 
             if rack != tray.rack_id or number != tray.number or code != tray.code:
                 try:
@@ -71,7 +72,7 @@ class TrayResource(BaseResource):
                     tray.number = number
                     tray.code = code
                     BaseModel.db.session.commit()
-                    log_update(tray, tray)  # todo: log old record
+                    log_update(tray, tray)
                     return BaseResource.send_json_message("Tray successfully updated", 202)
 
                 except Exception as e:
@@ -100,7 +101,7 @@ class TrayResource(BaseResource):
         parser = reqparse.RequestParser()
         parser.add_argument('rack', required=True)
         parser.add_argument('number', required=True)
-        parser.add_argument('code', required=True, type=non_empty_string)
+        parser.add_argument('code', required=True, type=standard_non_empty_string)
 
         args = parser.parse_args()
         return args
