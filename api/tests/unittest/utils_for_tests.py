@@ -1,6 +1,7 @@
 from flask_jwt_extended import create_access_token
 
 from api import create_app as app
+from api.utils import format_and_lower_str
 
 with app().test_request_context():
     access_token = create_access_token(identity='admin@icipe.org')
@@ -12,7 +13,7 @@ with app().test_request_context():
     chamber_code = 'L1F1C1'
     rack_code = 'L1F1C1R1'
     tray_code = 'L1F1C1R1T1'
-    box_code = 'L1F1C1R1T1B1'
+    box_code = format_and_lower_str('L1F1C1R1T1B1')
     security_level_code = 'A1'
     house_data_code = 'H1'
     quantity_type_code = 'L'
@@ -249,6 +250,7 @@ def prepare_tray_test(client):
 # ***                              ***
 # ************************************
 """
+box_resource_route = '/box'
 box_data = {
     'tray': '1',
     'label': 'human skin',
@@ -268,7 +270,7 @@ box_headers = {
 
 
 def create_box(client):
-    response = client.post('/box', json=box_data, headers=box_headers)
+    response = client.post(box_resource_route, json=box_data, headers=box_headers)
     return response
 
 
