@@ -18,7 +18,7 @@ class LaboratoryResource(BaseResource):
 
     def get(self):
         if request.headers.get('code') is not None:
-            code = format_and_lower_str(request.headers['code'])()
+            code = format_and_lower_str(request.headers['code'])
             lab = LaboratoryResource.get_laboratory(code)
             if lab is None:
                 return BaseResource.send_json_message("Lab not found", 404)
@@ -39,7 +39,7 @@ class LaboratoryResource(BaseResource):
 
         name = args['name']
         room = args['room']
-        code = format_and_lower_str(args['code'])()
+        code = format_and_lower_str(args['code'])
 
         if not Laboratory.code_exists(code):
             try:
@@ -64,7 +64,7 @@ class LaboratoryResource(BaseResource):
     @jwt_required
     @has_required_request_params
     def put(self):
-        code = format_and_lower_str(request.headers['code'])()
+        code = format_and_lower_str(request.headers['code'])
         laboratory = LaboratoryResource.get_laboratory(code)
         old_info = laboratory
 
@@ -96,7 +96,7 @@ class LaboratoryResource(BaseResource):
     @jwt_required
     @has_required_request_params
     def delete(self):
-        code = format_and_lower_str(request.headers['code'])()
+        code = format_and_lower_str(request.headers['code'])
         laboratory = LaboratoryResource.get_laboratory(code)
 
         if laboratory is None:

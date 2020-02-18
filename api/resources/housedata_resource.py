@@ -26,7 +26,7 @@ class HouseDataResource(BaseResource):
 
     def get(self):
         if request.headers.get('code') is not None:
-            code = format_and_lower_str(request.headers['code'])()
+            code = format_and_lower_str(request.headers['code'])
             metadata = HouseDataResource.get_metadata(code)
             if metadata is None:
                 return BaseResource.send_json_message("House data not found", 404)
@@ -42,7 +42,7 @@ class HouseDataResource(BaseResource):
     @jwt_required
     def post(self):
         args = HouseDataResource.metadata_args()
-        code = format_and_lower_str(args[11])()
+        code = format_and_lower_str(args[11])
 
         if not Housedata.housedata_exists(code):
             try:
@@ -64,7 +64,7 @@ class HouseDataResource(BaseResource):
     @jwt_required
     @has_required_request_params
     def put(self):
-        code = format_and_lower_str(request.headers['code'])()
+        code = format_and_lower_str(request.headers['code'])
         house_data = HouseDataResource.get_metadata(code)
 
         if house_data is not None:
@@ -107,7 +107,7 @@ class HouseDataResource(BaseResource):
     @jwt_required
     @has_required_request_params
     def delete(self):
-        code = format_and_lower_str(request.headers['code'])()
+        code = format_and_lower_str(request.headers['code'])
         house_metadata = HouseDataResource.get_metadata(code)
 
         if not house_metadata:

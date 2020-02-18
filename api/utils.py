@@ -77,7 +77,7 @@ def get_samples_by_code(code):
 
 
 def format_and_lower_str(string):
-    return lambda: str(string).lower()
+    return str(string).strip().lower()
 
 
 """

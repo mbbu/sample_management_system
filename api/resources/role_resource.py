@@ -18,7 +18,7 @@ class RoleResource(BaseResource):
 
     def get(self):
         if request.headers.get('code') is not None:
-            code = format_and_lower_str(request.headers['code'])()
+            code = format_and_lower_str(request.headers['code'])
             role = RoleResource.get_role(code)
             data = marshal(role, self.fields)
             return BaseResource.send_json_message(data, 200)
@@ -30,7 +30,7 @@ class RoleResource(BaseResource):
     @jwt_required
     def post(self):
         args = RoleResource.role_parser()
-        code = format_and_lower_str(args['code'])()
+        code = format_and_lower_str(args['code'])
         name = args['name']
         description = args['description']
 
@@ -52,7 +52,7 @@ class RoleResource(BaseResource):
     @jwt_required
     @has_required_request_params
     def put(self):
-        code = format_and_lower_str(request.headers['code'])()
+        code = format_and_lower_str(request.headers['code'])
         role = RoleResource.get_role(code)
 
         if role is None:
@@ -82,7 +82,7 @@ class RoleResource(BaseResource):
     @jwt_required
     @has_required_request_params
     def delete(self):
-        code = format_and_lower_str(request.headers['code'])()
+        code = format_and_lower_str(request.headers['code'])
         role = RoleResource.get_role(code)
 
         if not role:

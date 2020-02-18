@@ -18,7 +18,7 @@ class RackResource(BaseResource):
 
     def get(self):
         if request.headers.get('code') is not None:
-            code = format_and_lower_str(request.headers['code'])()
+            code = format_and_lower_str(request.headers['code'])
             rack = RackResource.get_rack(code)
             if rack is None:
                 return BaseResource.send_json_message("Rack not found", 404)
@@ -38,7 +38,7 @@ class RackResource(BaseResource):
         args = RackResource.rack_parser()
         chamber = int(args['chamber'])
         number = int(args['number'])
-        code = format_and_lower_str(args['code'])()
+        code = format_and_lower_str(args['code'])
 
         if not Rack.rack_exists(code):
             try:
@@ -58,14 +58,14 @@ class RackResource(BaseResource):
     @jwt_required
     @has_required_request_params
     def put(self):
-        code = format_and_lower_str(request.headers['code'])()
+        code = format_and_lower_str(request.headers['code'])
         rack = RackResource.get_rack(code)
 
         if rack is not None:
             args = RackResource.rack_parser()
             chamber = int(args['chamber'])
             number = int(args['number'])
-            code = format_and_lower_str(args['code'])()
+            code = format_and_lower_str(args['code'])
 
             if rack.chamber_id != chamber or rack.number != number or code.rack != code:
                 try:
@@ -85,7 +85,7 @@ class RackResource(BaseResource):
     @jwt_required
     @has_required_request_params
     def delete(self):
-        code = format_and_lower_str(request.headers['code'])()
+        code = format_and_lower_str(request.headers['code'])
         rack = RackResource.get_rack(code)
 
         if rack is None:

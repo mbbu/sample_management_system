@@ -84,7 +84,7 @@ def test_get_publication(client):
         # check that each element in the list contains; freezer, type and code
         for item in range(len(data['message'])):
             assert data['message'][item]['sample.project'] == 'H3ABNet'
-            assert data['message'][item]['sample.code'] == format_and_lower_str(sample_code)()
+            assert data['message'][item]['sample.code'] == format_and_lower_str(sample_code)
             assert data['message'][item]['user.email'] == 'admin@icipe.org'
             assert data['message'][item]['sample_results'] == 'In progress'
             assert data['message'][item]['publication_title'] == 'rna'
@@ -99,7 +99,7 @@ def test_get_publication_by_param(client):
 
     assert response.status_code == 200
     assert data['message']['sample.project'] == 'H3ABNet'
-    assert data['message']['sample.code'] == format_and_lower_str(sample_code)()
+    assert data['message']['sample.code'] == format_and_lower_str(sample_code)
     assert data['message']['user.email'] == 'admin@icipe.org'
     assert data['message']['sample_results'] == 'In progress'
     assert data['message']['publication_title'] == 'rna'

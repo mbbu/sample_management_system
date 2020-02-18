@@ -25,7 +25,7 @@ class UserResource(BaseResource):
         deleted = request.headers.get('deleted')
 
         if email is not None:
-            email = format_and_lower_str(email)()
+            email = format_and_lower_str(email)
             user = get_user_by_email(email)
             return UserResource.get_response(user)
         elif role is not None:
@@ -106,7 +106,7 @@ class UserResource(BaseResource):
 
     @jwt_required
     def put(self):
-        email = format_and_lower_str(get_jwt_identity())()
+        email = format_and_lower_str(get_jwt_identity())
         user = get_user_by_email(email)
 
         if user is not None:
@@ -154,7 +154,7 @@ class UserResource(BaseResource):
 
     @jwt_required
     def delete(self):
-        email = format_and_lower_str(get_jwt_identity())()
+        email = format_and_lower_str(get_jwt_identity())
         user = get_user_by_email(email)
 
         if user is not None:

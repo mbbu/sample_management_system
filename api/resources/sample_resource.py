@@ -37,7 +37,7 @@ class SampleResource(BaseResource):
 
     def get(self):
         if request.headers.get('code') is not None:
-            code = format_and_lower_str(request.headers['code'])()
+            code = format_and_lower_str(request.headers['code'])
             sample = SampleResource.get_sample(code)
             if sample is None:
                 return BaseResource.send_json_message("Sample not found", 404)
@@ -54,7 +54,7 @@ class SampleResource(BaseResource):
     @jwt_required
     def post(self):
         args = SampleResource.sample_args()
-        code = format_and_lower_str(args[16])()
+        code = format_and_lower_str(args[16])
 
         if not Sample.sample_exists(code):
             try:
@@ -78,7 +78,7 @@ class SampleResource(BaseResource):
     @jwt_required
     @has_required_request_params
     def put(self):
-        code = format_and_lower_str(request.headers['code'])()
+        code = format_and_lower_str(request.headers['code'])
         sample = SampleResource.get_sample(code)
 
         if sample is not None:
@@ -127,7 +127,7 @@ class SampleResource(BaseResource):
     @jwt_required
     @has_required_request_params
     def delete(self):
-        code = format_and_lower_str(request.headers['code'])()
+        code = format_and_lower_str(request.headers['code'])
         sample = SampleResource.get_sample(code)
 
         if not sample:
@@ -179,8 +179,8 @@ class SampleResource(BaseResource):
         temperature = float(args['temperature'])
         amount = int(args['amount'])
         quantity_type = str(args['quantity_type'])
-        security_level = format_and_lower_str(args['security_level'])()
-        code = format_and_lower_str(args['code'])()
+        security_level = format_and_lower_str(args['security_level'])
+        code = format_and_lower_str(args['code'])
 
         return [
             theme_id, user_id, box_id, animal_species, sample_type, sample_description, location_collected,

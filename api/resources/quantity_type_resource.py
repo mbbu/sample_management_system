@@ -17,7 +17,7 @@ class QuantityTypeResource(BaseResource):
 
     def get(self):
         if request.headers.get('code') is not None:
-            code = format_and_lower_str(request.headers['code'])()
+            code = format_and_lower_str(request.headers['code'])
             quantity_type = QuantityTypeResource.get_quantity_type(code)
             if quantity_type is None:
                 return BaseResource.send_json_message("Quantity type not found", 404)
@@ -33,7 +33,7 @@ class QuantityTypeResource(BaseResource):
     @jwt_required
     def post(self):
         args = QuantityTypeResource.quantity_parser()
-        _id = format_and_lower_str(args['code'])()
+        _id = format_and_lower_str(args['code'])
         name = args['name']
         description = args['description']
 
@@ -55,14 +55,14 @@ class QuantityTypeResource(BaseResource):
     @jwt_required
     @has_required_request_params
     def put(self):
-        code = format_and_lower_str(request.headers['code'])()
+        code = format_and_lower_str(request.headers['code'])
         quantity_type = QuantityTypeResource.get_quantity_type(code)
 
         if quantity_type is None:
             return BaseResource.send_json_message("Quantity type not found", 404)
         else:
             args = QuantityTypeResource.quantity_parser()
-            _id = format_and_lower_str(args['code'])()
+            _id = format_and_lower_str(args['code'])
             name = args['name']
             description = args['description']
 
@@ -85,7 +85,7 @@ class QuantityTypeResource(BaseResource):
     @jwt_required
     @has_required_request_params
     def delete(self):
-        code = format_and_lower_str(request.headers['code'])()
+        code = format_and_lower_str(request.headers['code'])
         quantity_type = QuantityTypeResource.get_quantity_type(code)
 
         if quantity_type is None:

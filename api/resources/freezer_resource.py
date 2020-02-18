@@ -20,7 +20,7 @@ class FreezerResource(BaseResource):
 
     def get(self):
         if request.headers.get('code') is not None:
-            code = format_and_lower_str(request.headers['code'])()
+            code = format_and_lower_str(request.headers['code'])
             freezer = FreezerResource.get_freezer(code)
             if freezer is None:
                 return BaseResource.send_json_message("Freezer not found", 404)
@@ -38,7 +38,7 @@ class FreezerResource(BaseResource):
     @jwt_required
     def post(self):
         args = FreezerResource.freezer_args()
-        code = format_and_lower_str(args[3])()
+        code = format_and_lower_str(args[3])
 
         if not Freezer.freezer_exists(code):
             try:
@@ -63,7 +63,7 @@ class FreezerResource(BaseResource):
     @jwt_required
     @has_required_request_params
     def put(self):
-        code = format_and_lower_str(request.headers['code'])()
+        code = format_and_lower_str(request.headers['code'])
         freezer = FreezerResource.get_freezer(code)
 
         if freezer is None:
@@ -91,7 +91,7 @@ class FreezerResource(BaseResource):
     @jwt_required
     @has_required_request_params
     def delete(self):
-        code = format_and_lower_str(request.headers['code'])()
+        code = format_and_lower_str(request.headers['code'])
         freezer = FreezerResource.get_freezer(code)
 
         if freezer is None:
@@ -115,7 +115,7 @@ class FreezerResource(BaseResource):
         laboratory = args['laboratory']
         number = args['number']
         room = args['room']
-        code = format_and_lower_str(args['code'])()
+        code = format_and_lower_str(args['code'])
 
         return [
             laboratory, number, room, code

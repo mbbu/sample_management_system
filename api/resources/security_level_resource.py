@@ -17,7 +17,7 @@ class SecurityLevelResource(BaseResource):
 
     def get(self):
         if request.headers.get('code') is not None:
-            code = format_and_lower_str(request.headers['code'])()
+            code = format_and_lower_str(request.headers['code'])
             security_level = SecurityLevelResource.get_security_level(code)
             if security_level is None:
                 return BaseResource.send_json_message("Security level not found", 404)
@@ -33,7 +33,7 @@ class SecurityLevelResource(BaseResource):
     @jwt_required
     def post(self):
         args = SecurityLevelResource.security_level_parser()
-        code = format_and_lower_str(args['code'])()
+        code = format_and_lower_str(args['code'])
         name = args['name']
         description = args['description']
 
@@ -54,7 +54,7 @@ class SecurityLevelResource(BaseResource):
     @jwt_required
     @has_required_request_params
     def put(self):
-        code = format_and_lower_str(request.headers['code'])()
+        code = format_and_lower_str(request.headers['code'])
         security_level = SecurityLevelResource.get_security_level(code)
 
         if security_level is not None:
@@ -83,7 +83,7 @@ class SecurityLevelResource(BaseResource):
     @jwt_required
     @has_required_request_params
     def delete(self):
-        code = format_and_lower_str(request.headers['code'])()
+        code = format_and_lower_str(request.headers['code'])
         security_level = SecurityLevelResource.get_security_level(code)
 
         if security_level is None:

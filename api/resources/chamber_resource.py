@@ -19,7 +19,7 @@ class ChamberResource(BaseResource):
 
     def get(self):
         if request.headers.get('code') is not None:
-            code = format_and_lower_str(request.headers['code'])()
+            code = format_and_lower_str(request.headers['code'])
             chamber = ChamberResource.get_chamber(code)
             if chamber is None:
                 return BaseResource.send_json_message("Chamber not found", 404)
@@ -39,7 +39,7 @@ class ChamberResource(BaseResource):
         args = ChamberResource.chamber_parser()
         freezer = int(args['freezer'])
         _type = args['type']
-        code = format_and_lower_str(args['code'])()
+        code = format_and_lower_str(args['code'])
 
         if not Chamber.chamber_exists(code):
             try:
@@ -60,7 +60,7 @@ class ChamberResource(BaseResource):
     @jwt_required
     @has_required_request_params
     def put(self):
-        code = format_and_lower_str(request.headers['code'])()
+        code = format_and_lower_str(request.headers['code'])
         chamber = ChamberResource.get_chamber(code)
         print(chamber)
         print(type(chamber))
@@ -72,7 +72,7 @@ class ChamberResource(BaseResource):
             args = ChamberResource.chamber_parser()
             freezer = int(args['freezer'])
             _type = args['type']
-            code = format_and_lower_str(args['code'])()
+            code = format_and_lower_str(args['code'])
 
             if chamber.freezer_id != freezer or chamber.type != _type or chamber.code != code:
                 try:
@@ -92,7 +92,7 @@ class ChamberResource(BaseResource):
     @jwt_required
     @has_required_request_params
     def delete(self):
-        code = format_and_lower_str(request.headers['code'])()
+        code = format_and_lower_str(request.headers['code'])
         chamber = ChamberResource.get_chamber(code)
 
         if chamber is None:

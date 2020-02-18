@@ -23,7 +23,7 @@ class PublicationResource(BaseResource):
 
     def get(self):
         if request.headers.get('title') is not None:
-            title = format_and_lower_str(request.headers['title'])()
+            title = format_and_lower_str(request.headers['title'])
             publication = PublicationResource.get_publication(title)
             if publication is None:
                 return BaseResource.send_json_message("Publication not found", 404)
@@ -42,7 +42,7 @@ class PublicationResource(BaseResource):
         sample_id = args['sample']
         user_id = args['user']
         sample_results = args['sample_results']
-        publication_title = format_and_lower_str(args['publication_title'])()
+        publication_title = format_and_lower_str(args['publication_title'])
         co_authors = args['co_authors']
 
         if not Publication.publication_exists(publication_title):
@@ -70,7 +70,7 @@ class PublicationResource(BaseResource):
     @jwt_required
     @has_required_request_params
     def put(self):
-        pub_title = format_and_lower_str(request.headers['title'])()
+        pub_title = format_and_lower_str(request.headers['title'])
         publication = PublicationResource.get_publication(pub_title)
 
         if publication is not None:
@@ -79,7 +79,7 @@ class PublicationResource(BaseResource):
             sample = args['sample']
             user = args['user']
             sample_results = args['sample_results']
-            publication_title = format_and_lower_str(args['publication_title'])()
+            publication_title = format_and_lower_str(args['publication_title'])
             co_authors = args['co_authors']
 
             if sample != publication.sample_id or user != publication.user_id or \
@@ -106,7 +106,7 @@ class PublicationResource(BaseResource):
     @jwt_required
     @has_required_request_params
     def delete(self):
-        pub_title = format_and_lower_str(request.headers['title'])()
+        pub_title = format_and_lower_str(request.headers['title'])
         publication = PublicationResource.get_publication(pub_title)
 
         if not publication:

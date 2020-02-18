@@ -18,7 +18,7 @@ class TrayResource(BaseResource):
 
     def get(self):
         if request.headers.get('code') is not None:
-            code = format_and_lower_str(request.headers['code'])()
+            code = format_and_lower_str(request.headers['code'])
             tray = TrayResource.get_tray(code)
             if tray is None:
                 return BaseResource.send_json_message("Tray not found", 404)
@@ -37,7 +37,7 @@ class TrayResource(BaseResource):
         args = TrayResource.tray_parser()
         rack = int(args['rack'])
         number = int(args['number'])
-        code = format_and_lower_str(args['code'])()
+        code = format_and_lower_str(args['code'])
 
         if not Tray.tray_exists(code):
             try:
@@ -57,13 +57,13 @@ class TrayResource(BaseResource):
     @jwt_required
     @has_required_request_params
     def put(self):
-        code = format_and_lower_str(request.headers['code'])()
+        code = format_and_lower_str(request.headers['code'])
         tray = TrayResource.get_tray(code)
         if tray is not None:
             args = TrayResource.tray_parser()
             rack = int(args['rack'])
             number = int(args['number'])
-            code = format_and_lower_str(args['code'])()
+            code = format_and_lower_str(args['code'])
 
             if rack != tray.rack_id or number != tray.number or code != tray.code:
                 try:
@@ -84,7 +84,7 @@ class TrayResource(BaseResource):
     @jwt_required
     @has_required_request_params
     def delete(self):
-        code = format_and_lower_str(request.headers['code'])()
+        code = format_and_lower_str(request.headers['code'])
         tray = TrayResource.get_tray(code)
 
         if not tray:

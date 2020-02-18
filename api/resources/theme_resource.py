@@ -16,7 +16,7 @@ class ThemeResource(BaseResource):
 
     def get(self):
         if request.headers.get('code') is not None:
-            code = format_and_lower_str(request.headers['code'])()
+            code = format_and_lower_str(request.headers['code'])
             theme = ThemeResource.get_theme(code)
             if theme is None:
                 return BaseResource.send_json_message("Theme not found", 404)
@@ -34,7 +34,7 @@ class ThemeResource(BaseResource):
     @jwt_required
     def post(self):
         args = ThemeResource.theme_parser()
-        code = format_and_lower_str(args['code'])()
+        code = format_and_lower_str(args['code'])
         name = args['name']
 
         if not Theme.theme_exists(code):
@@ -57,7 +57,7 @@ class ThemeResource(BaseResource):
     def put(self):
         args = ThemeResource.theme_parser()
         name = args['name']
-        code = format_and_lower_str(request.headers.get('code'))()
+        code = format_and_lower_str(request.headers.get('code'))
 
         theme = ThemeResource.get_theme(code)
         if theme is not None:
@@ -81,7 +81,7 @@ class ThemeResource(BaseResource):
     @jwt_required
     @has_required_request_params
     def delete(self):
-        code = format_and_lower_str(request.headers.get('code'))()
+        code = format_and_lower_str(request.headers.get('code'))
         theme = ThemeResource.get_theme(code)
 
         if not theme:
