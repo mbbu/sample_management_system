@@ -120,7 +120,7 @@ def log_duplicate(record):
 
 def log_export_from_redcap(record):
     return current_app.logger.info(
-        "New {0} created from REDCap at {1}".format(record, datetime.now()))
+        "New sample {0} created from REDCap at {1} by {2}".format(record, datetime.now(), get_jwt_identity()))
 
 
 """
@@ -153,7 +153,10 @@ def export_all_records():
         'returnFormat': 'json'
     }
     response = requests.post(REDCAP_URI, data)
-    return response.json()
+
+    if response.status_code == 200:
+        return response.json()
+    return 404
 
 
 """
