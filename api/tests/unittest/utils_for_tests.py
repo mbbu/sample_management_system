@@ -442,6 +442,30 @@ def prepare_sample_test(client):
 """
 # *********************************************
 # ***                                       ***
+# ***  HELPER FUNCTIONS FOR REDCAP SAMPLES  ***
+# ***                                       ***
+# *********************************************
+"""
+redcap_sample_resource_route = '/redcap-samples'
+redcap_sample_data = {
+    'from': '2019-12-11',
+    'to': '2019-12-13',
+    'record_id': 1
+}
+
+redcap_sample_headers = {
+    'Authorization': 'Bearer {}'.format(access_token),
+}
+
+
+def create_sample_from_redcap(client):
+    response = client.post(redcap_sample_resource_route, headers=redcap_sample_headers)
+    return response
+
+
+"""
+# *********************************************
+# ***                                       ***
 # ***  HELPER FUNCTIONS FOR PUBLICATION     ***
 # ***                                       ***
 # *********************************************
