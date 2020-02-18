@@ -515,6 +515,7 @@ def prepare_publication_test(client):
 # ***                                       ***
 # *********************************************
 """
+house_data_resource_route = '/house-data'
 house_data_data = {
     'code': house_data_code,
     'user': 1,
@@ -553,5 +554,5 @@ house_data_headers = {
 
 def create_house_data(client):
     create_user(client)
-    response = client.post('/house-data', json=house_data_data, headers=house_data_headers)
+    response = client.post(house_data_resource_route, json=house_data_data, headers=house_data_headers)
     return response

@@ -43,9 +43,6 @@ class FreezerResource(BaseResource):
         room = args['room']
         code = args['code']
 
-        print(room)
-        print(type(room))
-
         if not Freezer.freezer_exists(code):
             try:
                 freezer = Freezer(
@@ -84,23 +81,6 @@ class FreezerResource(BaseResource):
 
             if laboratory != freezer.laboratory_id or number != freezer.number or \
                     room != freezer.room or code != freezer.code:
-
-                print("lab (old): " + str(freezer.laboratory_id) + " of type " + str(
-                    type(freezer.laboratory_id)) + "\nlab (new): " + str(laboratory) + " of type " + str(
-                    type(laboratory)))
-
-                print("number (old): " + str(freezer.number) + " of type " + str(
-                    type(freezer.number)) + "\nnumber (new): " + str(number) + " of type " + str(
-                    type(number)))
-
-                print("room (old): " + str(freezer.room) + " of type " + str(
-                    type(freezer.room)) + "\nroom (new): " + str(room) + " of type " + str(
-                    type(room)))
-
-                print("code (old): " + str(freezer.code) + " of type " + str(
-                    type(freezer.code)) + "\ncode (new): " + str(code) + " of type " + str(
-                    type(code)))
-
                 try:
                     freezer.laboratory_id = laboratory
                     freezer.number = number

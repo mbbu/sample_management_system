@@ -1,7 +1,7 @@
 from flask import json
 
 from api.tests.unittest.utils_for_tests import house_data_data, create_house_data, house_data_headers, \
-    house_data_updated_data, access_token
+    house_data_updated_data, access_token, house_data_resource_route
 
 """
 # ****************************
@@ -13,7 +13,7 @@ from api.tests.unittest.utils_for_tests import house_data_data, create_house_dat
 
 
 def test_create_house_data_by_non_logged_in_user(client):
-    response = client.post('/house-data', json=house_data_data)
+    response = client.post(house_data_resource_route, json=house_data_data)
     assert response.status_code == 401
 
 
@@ -26,7 +26,7 @@ def test_create_house_data(client):
 
 
 def test_create_house_data_with_missing_info(client):
-    response = client.post('/house-data', json={
+    response = client.post(house_data_resource_route, json={
         # 'code': house_data_code, <-- missing required param
         'user': 1,
         'education': 'Tertiary',
@@ -67,7 +67,7 @@ def test_create_duplicate_house_data(client):
 
 
 def test_get_non_existing_house_data(client):
-    response = client.get('/house-data', headers={'code': 'house_data_code'})
+    response = client.get(house_data_resource_route, headers={'code': 'house_data_code'})
     data = json.loads(response.data)
 
     assert response.status_code == 404
@@ -76,7 +76,7 @@ def test_get_non_existing_house_data(client):
 
 def test_get_house_data(client):
     create_house_data(client)
-    response = client.get('/house-data')
+    response = client.get(house_data_resource_route)
     data = json.loads(response.data)
 
     if response.status_code == 404:
@@ -104,7 +104,7 @@ def test_get_house_data(client):
 
 def test_get_house_data_by_param(client):
     create_house_data(client)
-    response = client.get('/house-data', headers=house_data_headers)
+    response = client.get(house_data_resource_route, headers=house_data_headers)
     data = json.loads(response.data)
 
     assert response.status_code == 200
@@ -132,13 +132,13 @@ def test_get_house_data_by_param(client):
 
 
 def test_update_house_data_by_non_logged_in_user(client):
-    response = client.put('/house-data', json=house_data_updated_data)
+    response = client.put(house_data_resource_route, json=house_data_updated_data)
     assert response.status_code == 401
 
 
 def test_update_house_data(client):
     create_house_data(client)
-    response = client.put('/house-data', json=house_data_updated_data, headers=house_data_headers)
+    response = client.put(house_data_resource_route, json=house_data_updated_data, headers=house_data_headers)
     data = json.loads(response.data)
 
     assert response.status_code == 202
@@ -147,7 +147,7 @@ def test_update_house_data(client):
 
 def test_update_non_existing_house_data(client):
     create_house_data(client)
-    response = client.put('/house-data', json=house_data_headers, headers={
+    response = client.put(house_data_resource_route, json=house_data_headers, headers={
         'Authorization': 'Bearer {}'.format(access_token),
         'code': 'house_data_code'  # <-- wrong/non-existing code
     })
@@ -159,7 +159,7 @@ def test_update_non_existing_house_data(client):
 
 def test_update_house_data_without_identity(client):
     create_house_data(client)
-    response = client.put('/house-data', json=house_data_updated_data, headers={
+    response = client.put(house_data_resource_route, json=house_data_updated_data, headers={
         'Authorization': 'Bearer {}'.format(access_token)  # <-- missing house_data code in header
     })
     assert response.status_code == 400
@@ -175,19 +175,19 @@ def test_update_house_data_without_identity(client):
 
 
 def test_deleting_house_data_by_non_logged_in_user(client):
-    response = client.delete('/house-data')
+    response = client.delete(house_data_resource_route)
     assert response.status_code == 401
 
 
 def test_deleting_house_data_without_identity(client):
-    response = client.delete('/house-data', headers={'Authorization': 'Bearer {}'.format(access_token)})
+    response = client.delete(house_data_resource_route, headers={'Authorization': 'Bearer {}'.format(access_token)})
     assert response.status_code == 400
 
 
 def test_deleting_non_existent_house_data(client):
     create_house_data(client)
-    response = client.delete('/house-data', headers={'Authorization': 'Bearer {}'.format(access_token),
-                                                     'code': '123'})
+    response = client.delete(house_data_resource_route, headers={'Authorization': 'Bearer {}'.format(access_token),
+                                                                 'code': '123'})
     data = json.loads(response.data)
     assert response.status_code == 404
     assert data['message'] == 'House data not found'
@@ -195,7 +195,7 @@ def test_deleting_non_existent_house_data(client):
 
 def test_deleting_house_data(client):
     create_house_data(client)
-    response = client.delete('/house-data', headers=house_data_headers)
+    response = client.delete(house_data_resource_route, headers=house_data_headers)
 
     data = json.loads(response.data)
     assert response.status_code == 200
