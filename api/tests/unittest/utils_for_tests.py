@@ -15,6 +15,9 @@ with app().test_request_context():
     box_code = 'L1F1C1R1T1B1'
     security_level_code = 'A1'
     house_data_code = 'H1'
+    quantity_type_code = 'L'
+    sample_code = 'S1'
+    publication_code = 'rNA'
 
 headers = {
     'Authorization': 'Bearer {}'.format(access_token),
@@ -285,6 +288,7 @@ def prepare_box_test(client):
 # ***                              ***
 # ************************************
 """
+theme_resource_route = '/theme'
 theme_data = {
     'name': 'Animal Health',
     'code': theme_code
@@ -302,7 +306,7 @@ theme_headers = {
 
 
 def create_theme(client):
-    response = client.post('/theme', json=theme_data, headers=theme_headers)
+    response = client.post(theme_resource_route, json=theme_data, headers=theme_headers)
     return response
 
 
@@ -334,6 +338,147 @@ security_level_headers = {
 def create_security_level(client):
     response = client.post('/security-level', json=security_level_data, headers=security_level_headers)
     return response
+
+
+"""
+# *********************************************
+# ***                                       ***
+# ***  HELPER FUNCTIONS FOR QUANTITY TYPE   ***
+# ***                                       ***
+# *********************************************
+"""
+quantity_type_resource_route = '/quantity-type'
+quantity_type_data = {
+    'code': quantity_type_code,
+    'name': 'Liters',
+    'description': 'For fluids in large quantities'
+}
+
+quantity_type_updated_data = {
+    'code': quantity_type_code,
+    'name': 'Litres',  # <-- updated value
+    'description': 'For fluids in large quantities'
+}
+
+quantity_type_headers = {
+    'Authorization': 'Bearer {}'.format(access_token),
+    'code': quantity_type_code
+}
+
+
+def create_quantity_type(client):
+    response = client.post(quantity_type_resource_route, json=quantity_type_data, headers=quantity_type_headers)
+    return response
+
+
+"""
+# *********************************************
+# ***                                       ***
+# ***  HELPER FUNCTIONS FOR SAMPLE          ***
+# ***                                       ***
+# *********************************************
+"""
+sample_resource_route = '/sample'
+sample_data = {
+    'theme': 1,
+    'user': 1,
+    'box': 1,
+    'animal_species': 'Insects',
+    'sample_type': 'Mosquito',
+    'sample_description': 'Kwale mosquito samples',
+    'location_collected': 'Kwale',
+    'project': 'H3ABNet',
+    'project_owner': 'Dr Careen',
+    'retention_period': 3,
+    'barcode': '12254DS5774SDFS',
+    'analysis': 'Incomplete',
+    'temperature': 35.0,
+    'amount': 100,
+    'quantity_type': 'l',
+    'security_level': 1,
+    'code': sample_code
+}
+
+sample_updated_data = {
+    'theme': 1,
+    'user': 1,
+    'box': 1,
+    'animal_species': 'Insects',
+    'sample_type': 'Mosquito',
+    'sample_description': 'Kwale mosquito samples',
+    'location_collected': 'Kwale',
+    'project': 'H3ABNet',
+    'project_owner': 'Dr Careen',
+    'retention_period': 3,
+    'barcode': '12254DS5774SDFS',
+    'analysis': 'Complete',  # <-- updated value
+    'temperature': 35.0,
+    'amount': 100,
+    'quantity_type': 'l',
+    'security_level': 1,
+    'code': sample_code
+}
+
+sample_headers = {
+    'Authorization': 'Bearer {}'.format(access_token),
+    'code': sample_code
+}
+
+
+def create_sample(client):
+    response = client.post(sample_resource_route, json=sample_data, headers=sample_headers)
+    return response
+
+
+def prepare_sample_test(client):
+    create_user(client)
+    create_box(client)
+    create_theme(client)
+    create_quantity_type(client)
+    create_security_level(client)
+    create_sample(client)
+
+
+"""
+# *********************************************
+# ***                                       ***
+# ***  HELPER FUNCTIONS FOR PUBLICATION     ***
+# ***                                       ***
+# *********************************************
+"""
+publication_resource_route = '/publication'
+publication_data = {
+    'user': 1,
+    'sample': 1,
+    'sample_results': 'In progress',
+    'publication_title': publication_code,
+    'co_authors': 'Dr Gilbert'
+}
+
+publication_updated_data = {
+    'user': 1,
+    'sample': 1,
+    'sample_results': 'Complete',  # <-- updated value
+    'publication_title': publication_code,
+    'co_authors': 'Dr Gilbert'
+}
+
+publication_headers = {
+    'Authorization': 'Bearer {}'.format(access_token),
+    'title': publication_code
+}
+
+
+def create_publication(client):
+    response = client.post(publication_resource_route, json=publication_data, headers=publication_headers)
+    return response
+
+
+def prepare_publication_test(client):
+    create_user(client)
+    create_theme(client)
+    create_sample(client)
+    create_publication(client)
 
 
 """

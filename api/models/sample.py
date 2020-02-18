@@ -24,12 +24,12 @@ class Sample(BaseModel.db.Model):
     deleted_at = AppDb.Column(AppDb.DateTime, nullable=True)
     deleted_by = AppDb.Column(AppDb.String(65), nullable=True)
 
-
-# Default = Celsius
+    # Default = Celsius
     amount = AppDb.Column(AppDb.Integer, nullable=True)  # todo set a default value
     quantity_type = AppDb.Column(AppDb.String, AppDb.ForeignKey('quantity_type.id', ondelete='SET NULL'), nullable=True)
-    security_level = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('security_level.id', ondelete='SET NULL'), nullable=True)
-    code = AppDb.Column(AppDb.String, nullable=True)
+    security_level = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('security_level.id', ondelete='SET NULL'),
+                                  nullable=True)
+    code = AppDb.Column(AppDb.String, nullable=False, unique=True)
 
     # relationship(s)
     user = AppDb.relationship('User', backref='sample', lazy=True)
@@ -37,13 +37,20 @@ class Sample(BaseModel.db.Model):
     box = AppDb.relationship('Box', backref='sample', lazy=True)
     quantity = AppDb.relationship('QuantityType', backref='quantity_type', lazy=True)
 
+    @staticmethod
+    def sample_exists(code):
+        if Sample.query.filter(
+                Sample.code == code
+        ).first():
+            return True
+        return False
+
     def __repr__(self):
         return '<< Sample: (type={0} || desc={1} || project={2} || barcode={3} || species={4} ||' \
                'box={5} || retention={6} || amount={7} || quantity={8} || code={9} || location={10} || owner={11}' \
-               'analysis={12} || temperature={13} ) >>' \
+               '|| analysis={12} || temperature={13} ) >>' \
             .format(self.sample_type, self.sample_description,
                     self.project, self.barcode, self.animal_species,
-                    self.box_id, self.retention_period, self.amount, self.quantity_type, self.security_level, self.code,
-                    # not represented
-                    self.location_collected, self.project_owner,
-                    self.analysis, self.temperature)
+                    self.box_id, self.retention_period, self.amount, self.quantity_type, self.code,
+                    self.location_collected,
+                    self.project_owner, self.analysis, self.temperature)

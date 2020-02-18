@@ -66,8 +66,11 @@ def log_in_user_jwt(user):
 
     return {'access_token': access_token, 'refresh_token': refresh_token}
 
+
 def get_samples_by_code(code):
     return BaseModel.db.session.query(Sample).filter(Sample.is_deleted == code).all()
+
+
 """
     String formatters
 """
@@ -91,11 +94,16 @@ def format_str_to_date(date):
 """
 
 
+def log_304():
+    return current_app.logger.info("No changes were made")
+
+
 def log_create(record):
     return current_app.logger.info(
         "New {0} created by {1} at {2}".format(record, get_jwt_identity(), datetime.now()))
 
 
+# todo: log old value and new value
 def log_update(old_record, new_record):
     return current_app.logger.info("{0} updated {1} to {2} at time={3}"
                                    .format(get_jwt_identity(), old_record, new_record,
@@ -122,7 +130,7 @@ def log_export_from_redcap(record):
 
 def has_required_request_params(record_identity):
     def wrapper(*args, **kwargs):
-        if (request.headers.get('code') or request.headers.get('label') or request.headers.get('pub_title')) is None:
+        if (request.headers.get('code') or request.headers.get('label') or request.headers.get('title')) is None:
             return BaseResource.send_json_message(
                 "Expected an identifier i.e code or label to perform action. Pass the same in request header", 400)
         return record_identity(*args, **kwargs)

@@ -165,3 +165,24 @@ CREATE TABLE housedata
     social_economic_data boolean               NOT NULL,
     code                 character varying(20) NOT NULL
 );
+
+DROP TABLE IF EXISTS quantity_type;
+CREATE TABLE quantity_type
+(
+    id          character varying(5) PRIMARY KEY,
+    name        character varying(30) NOT NULL,
+    description character varying(255)
+);
+
+DROP TABLE IF EXISTS publication;
+CREATE TABLE publication
+(
+    id                integer PRIMARY KEY AUTOINCREMENT,
+    sample_id         integer,
+    user_id           integer,
+    sample_results    character varying(150) NOT NULL,
+    publication_title character varying(150) UNIQUE,
+    co_authors        character varying(150),
+    FOREIGN KEY (sample_id) references sample (id),
+    FOREIGN KEY (user_id) references users (id)
+);

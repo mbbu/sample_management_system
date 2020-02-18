@@ -19,10 +19,14 @@ class QuantityTypeResource(BaseResource):
         if request.headers.get('code') is not None:
             code = format_and_lower_str(request.headers['code'])()
             quantity_type = QuantityTypeResource.get_quantity_type(code)
+            if quantity_type is None:
+                return BaseResource.send_json_message("Quantity type not found", 404)
             data = marshal(quantity_type, self.fields)
             return BaseResource.send_json_message(data, 200)
         else:
             quantity_type = QuantityType.query.all()
+            if quantity_type is None:
+                return BaseResource.send_json_message("Quantity types not found", 404)
             data = marshal(quantity_type, self.fields)
             return BaseResource.send_json_message(data, 200)
 
@@ -39,14 +43,14 @@ class QuantityTypeResource(BaseResource):
                 BaseModel.db.session.add(quantity_type)
                 BaseModel.db.session.commit()
                 log_create(quantity_type)
-                return BaseResource.send_json_message("Added quantity type successfully", 201)
+                return BaseResource.send_json_message("Quantity type successfully created", 201)
 
             except Exception as e:
                 current_app.logger.error(e)
                 BaseModel.db.session.rollback()
-                return BaseResource.send_json_message("Error while adding role", 500)
+                return BaseResource.send_json_message("Error while adding quantity type", 500)
         log_duplicate(QuantityType.query.filter(QuantityType.id == _id).first())
-        return BaseResource.send_json_message("Role already exists", 500)
+        return BaseResource.send_json_message("Quantity type already exists", 409)
 
     @jwt_required
     @has_required_request_params
@@ -55,8 +59,7 @@ class QuantityTypeResource(BaseResource):
         quantity_type = QuantityTypeResource.get_quantity_type(code)
 
         if quantity_type is None:
-            return BaseResource.send_json_message("Quantity Type not found", 404)
-
+            return BaseResource.send_json_message("Quantity type not found", 404)
         else:
             args = QuantityTypeResource.quantity_parser()
             _id = format_and_lower_str(args['code'])()
@@ -71,13 +74,12 @@ class QuantityTypeResource(BaseResource):
 
                     BaseModel.db.session.commit()
                     log_update(quantity_type, quantity_type)
-                    return BaseResource.send_json_message("Updated quantity type", 202)
+                    return BaseResource.send_json_message("Quantity type successfully updated", 202)
 
                 except Exception as e:
                     current_app.logger.error(e)
                     BaseModel.db.session.rollback()
-                    return BaseResource.send_json_message("Error while updating user. Another user has that email",
-                                                          500)
+                    return BaseResource.send_json_message("Error while updating quantity type.", 500)
             return BaseResource.send_json_message("No changes made", 304)
 
     @jwt_required
@@ -92,13 +94,13 @@ class QuantityTypeResource(BaseResource):
         BaseModel.db.session.delete(quantity_type)
         BaseModel.db.session.commit()
         log_delete(quantity_type)
-        return BaseResource.send_json_message("Quantity Type Deleted", 200)
+        return BaseResource.send_json_message("Quantity type deleted", 200)
 
     @staticmethod
     def quantity_parser():
         parser = reqparse.RequestParser()
         parser.add_argument('code', required=True, type=non_empty_string)
-        parser.add_argument('name', required=True)
+        parser.add_argument('name', required=True, type=non_empty_string)
         parser.add_argument('description')
 
         args = parser.parse_args()
