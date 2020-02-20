@@ -18,9 +18,9 @@ from api.models.database import BaseModel
 
 
 def non_empty_string(s: str):
-    if not s:
+    if not s.strip():
         raise ValueError("Expected a non empty string")
-    return s
+    return s.strip()
 
 
 def standard_non_empty_string(s: str):
@@ -29,10 +29,23 @@ def standard_non_empty_string(s: str):
     return format_and_lower_str(s)
 
 
+def format_and_lower_str(string):
+    return str(string).strip().lower()
+
+
 def non_empty_int(i: int):
     if not i:
         raise ValueError("Expected an integer")
     return i
+
+
+"""
+    Date Formatter
+"""
+
+
+def format_str_to_date(date):
+    return datetime.strptime(date, '%Y-%m-%d %H:%M').date()
 
 
 """
@@ -73,26 +86,8 @@ def log_in_user_jwt(user):
     return {'access_token': access_token, 'refresh_token': refresh_token}
 
 
-def get_samples_by_code(code):
-    return BaseModel.db.session.query(Sample).filter(Sample.is_deleted == code).all()
-
-
-"""
-    String formatters
-"""
-
-
-def format_and_lower_str(string):
-    return str(string).strip().lower()
-
-
-"""
-    Date Formatter
-"""
-
-
-def format_str_to_date(date):
-    return datetime.strptime(date, '%Y-%m-%d %H:%M').date()
+def get_sample_by_code(code):
+    return BaseModel.db.session.query(Sample).filter(Sample.code == code).first()
 
 
 """
