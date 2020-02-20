@@ -387,6 +387,21 @@ def create_quantity_type(client):
 # ***                                       ***
 # *********************************************
 """
+
+# class DecimalEncoder(json.JSONEncoder):
+#     def _iterencode(self, o, markers=None):
+#         if isinstance(o, decimal.Decimal):
+#             # wanted a simple yield str(o) in the next line,
+#             # but that would mean a yield on the line with super(...),
+#             # which wouldn't work (see my comment below), so...
+#             return (str(o) for o in [o])
+#         return super(DecimalEncoder, self)._iterencode(o, markers)
+
+# from api.tests.unittest.conftest import D
+# temp = D('35.00')
+# temp_val = adapt_decimal(temp)
+# temp_val = json.dumps({'temperature': decimal.Decimal('5.5')}, cls=DecimalEncoder)
+
 sample_resource_route = '/sample'
 sample_data = {
     'theme': 1,
@@ -401,11 +416,13 @@ sample_data = {
     'retention_period': 3,
     'barcode': '12254DS5774SDFS',
     'analysis': 'Incomplete',
-    'temperature': 35.0,
+    'temperature': '35.00',
+    # 'temp_str': temp_val,
     'amount': 100,
     'quantity_type': 'l',
     'security_level': 1,
-    'code': sample_code
+    'code': sample_code,
+
 }
 
 sample_updated_data = {
@@ -421,7 +438,7 @@ sample_updated_data = {
     'retention_period': 3,
     'barcode': '12254DS5774SDFS',
     'analysis': 'Complete',  # <-- updated value
-    'temperature': 35.0,
+    'temperature': '35.00',
     'amount': 100,
     'quantity_type': 'l',
     'security_level': 1,
