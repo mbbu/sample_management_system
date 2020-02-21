@@ -5,8 +5,8 @@ class Laboratory(BaseModel.db.Model):
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
     name = AppDb.Column(AppDb.String(65), nullable=False)
-    room = AppDb.Column(AppDb.Integer, nullable=False)
-    code = AppDb.Column(AppDb.String(65), nullable=False)
+    room = AppDb.Column(AppDb.String(65), nullable=False)
+    code = AppDb.Column(AppDb.String(65), nullable=False, unique=True)
 
     @staticmethod
     def code_exists(code):
