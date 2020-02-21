@@ -29,7 +29,7 @@ def test_create_publication(client):
 def test_create_publication_with_missing_info(client):
     response = client.post(publication_resource_route, json={
         # 'publication_title': publication_code,   <-- missing required info
-        'user': 'Dr Careen',
+        'user': 1,
         'sample_results': 'In progress',
         'sample': 1,
         'co_authors': 'Dr Gilbert, Dr Pauline',
