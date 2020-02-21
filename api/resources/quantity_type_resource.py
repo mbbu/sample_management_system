@@ -5,7 +5,7 @@ from flask_restful import fields, marshal, reqparse
 from api import BaseResource, BaseModel
 from api.models import QuantityType
 from api.utils import non_empty_string, format_and_lower_str, log_delete, log_create, log_update, log_duplicate, \
-    has_required_request_params, standard_non_empty_string
+    has_required_request_params, standard_non_empty_string, log_304
 
 
 class QuantityTypeResource(BaseResource):
@@ -67,19 +67,21 @@ class QuantityTypeResource(BaseResource):
             description = args['description']
 
             if _id != quantity_type.id or name != quantity_type.name or description != quantity_type.description:
+                old_info = str(quantity_type)
                 try:
                     quantity_type.id = _id
                     quantity_type.name = name
                     quantity_type.description = description
 
                     BaseModel.db.session.commit()
-                    log_update(quantity_type, quantity_type)
+                    log_update(old_info, quantity_type)
                     return BaseResource.send_json_message("Quantity type successfully updated", 202)
 
                 except Exception as e:
                     current_app.logger.error(e)
                     BaseModel.db.session.rollback()
                     return BaseResource.send_json_message("Error while updating quantity type.", 500)
+            log_304(quantity_type)
             return BaseResource.send_json_message("No changes made", 304)
 
     @jwt_required

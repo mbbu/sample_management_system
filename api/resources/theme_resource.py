@@ -65,11 +65,12 @@ class ThemeResource(BaseResource):
             code = args['code']
 
             if name != theme.name or code != theme.code:
+                old_info = str(theme)
                 try:
                     theme.code = code
                     theme.name = name
                     BaseModel.db.session.commit()
-                    log_update(theme, theme)
+                    log_update(old_info, theme)
                     return BaseResource.send_json_message("Theme successfully updated", 200)
 
                 except Exception as e:
@@ -77,7 +78,7 @@ class ThemeResource(BaseResource):
                     BaseModel.db.session.rollback()
                     return BaseResource.send_json_message("Error while adding theme. Another theme has that name or "
                                                           "code", 500)
-            log_304()
+            log_304(theme)
             return BaseResource.send_json_message("No changes made", 304)
         return BaseResource.send_json_message("Theme not found", 404)
 

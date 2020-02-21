@@ -9,7 +9,7 @@ from api.models.database import BaseModel
 from api.models.sample import Sample
 from api.resources.base_resource import BaseResource
 from api.utils import format_and_lower_str, log_create, log_update, log_duplicate, \
-    has_required_request_params, export_all_records, log_export_from_redcap, format_str_to_date, non_empty_int
+    has_required_request_params, export_all_records, log_export_from_redcap, format_str_to_date, non_empty_int, log_304
 
 samples_page = Blueprint('samples_bp', __name__, template_folder='templates')
 
@@ -92,6 +92,7 @@ class SampleResource(BaseResource):
                     or args[13] != sample.amount or args[14] != sample.quantity_type or args[
                 15] != sample.security_level or args[16] != sample.code:
                 try:
+                    old_info = str(sample)
                     sample.theme_id = args[0]
                     sample.user_id = args[1]
                     sample.box_id = args[2]
@@ -112,7 +113,7 @@ class SampleResource(BaseResource):
 
                     sample.updated_at = datetime.now()
                     BaseModel.db.session.commit()
-                    log_update(sample, sample)
+                    log_update(old_info, sample)
                     return BaseResource.send_json_message("Sample successfully updated", 202)
 
                 except Exception as e:
@@ -120,7 +121,7 @@ class SampleResource(BaseResource):
                     BaseModel.db.session.rollback()
                     return BaseResource.send_json_message("Error while adding sample. Another sample has that name or "
                                                           "code", 500)
-
+            log_304(sample)
             return BaseResource.send_json_message("No changes made", 304)
         return BaseResource.send_json_message("Sample not found", 404)
 
@@ -166,7 +167,7 @@ class SampleResource(BaseResource):
 
         theme_id = int(args['theme'])
         user_id = int(args['user'])
-        box_id = int(args['box'])
+        box_id = args['box']
         animal_species = args['animal_species']
         sample_type = args['sample_type']
         sample_description = args['sample_description']

@@ -6,7 +6,7 @@ from api.models.box import Box
 from api.models.database import BaseModel
 from api.resources.base_resource import BaseResource
 from api.utils import format_and_lower_str, log_create, log_duplicate, log_update, log_delete, \
-    has_required_request_params, non_empty_string, non_empty_int, standard_non_empty_string
+    has_required_request_params, non_empty_string, non_empty_int, standard_non_empty_string, log_304
 
 
 class BoxResource(BaseResource):
@@ -74,18 +74,20 @@ class BoxResource(BaseResource):
         code = args['code']
 
         if tray != box.tray_id or label != box.label or code != box.code:
+            old_info = str(box)
             try:
                 box.tray_id = tray
                 box.label = label
                 box.code = code
                 BaseModel.db.session.commit()
-                log_update(box, box)
+                log_update(old_info, box)
                 return BaseResource.send_json_message("Box successfully updated", 202)
 
             except Exception as e:
                 current_app.logger.error(e)
                 BaseModel.db.session.rollback()
                 return BaseResource.send_json_message("Error while updating box.", 500)
+        log_304(box)
         return BaseResource.send_json_message("No changes made", 304)
 
     @jwt_required

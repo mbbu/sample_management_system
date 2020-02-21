@@ -36,7 +36,7 @@ def format_and_lower_str(string):
 def non_empty_int(i: int):
     if not i:
         raise ValueError("Expected an integer")
-    return i
+    return int(i)
 
 
 """
@@ -95,8 +95,8 @@ def get_sample_by_code(code):
 """
 
 
-def log_304():
-    return current_app.logger.info("No changes were made")
+def log_304(record):
+    return current_app.logger.info("No changes were made to {0}".format(record))
 
 
 def log_create(record):
@@ -104,7 +104,6 @@ def log_create(record):
         "New {0} created by {1} at {2}".format(record, get_jwt_identity(), datetime.now()))
 
 
-# todo: log old value and new value
 def log_update(old_record, new_record):
     return current_app.logger.info("{0} updated {1} to {2} at time={3}"
                                    .format(get_jwt_identity(), old_record, new_record,

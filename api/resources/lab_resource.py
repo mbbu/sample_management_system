@@ -6,7 +6,7 @@ from api.models.database import BaseModel
 from api.models.laboratory import Laboratory
 from api.resources.base_resource import BaseResource
 from api.utils import format_and_lower_str, log_update, log_delete, log_duplicate, log_create, \
-    has_required_request_params, standard_non_empty_string
+    has_required_request_params, standard_non_empty_string, log_304
 
 
 class LaboratoryResource(BaseResource):
@@ -66,7 +66,6 @@ class LaboratoryResource(BaseResource):
     def put(self):
         code = format_and_lower_str(request.headers['code'])
         laboratory = LaboratoryResource.get_laboratory(code)
-        old_info = laboratory
 
         if laboratory is None:
             return BaseResource.send_json_message("Lab not found", 404)
@@ -79,6 +78,7 @@ class LaboratoryResource(BaseResource):
             code = args['code']
 
             if name != laboratory.name or room != laboratory.room or code != laboratory.code:
+                old_info = str(laboratory)
                 try:
                     laboratory.name = name
                     laboratory.room = room
@@ -91,6 +91,7 @@ class LaboratoryResource(BaseResource):
                     current_app.logger.error(e)
                     BaseModel.db.session.rollback()
                     return BaseResource.send_json_message("Error while updating Laboratory", 500)
+            log_304(laboratory)
             return BaseResource.send_json_message("No changes were made", 304)
 
     @jwt_required

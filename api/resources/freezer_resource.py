@@ -6,7 +6,7 @@ from api.models.database import BaseModel
 from api.models.freezer import Freezer
 from api.resources.base_resource import BaseResource
 from api.utils import format_and_lower_str, non_empty_int, log_create, has_required_request_params, \
-    log_update, log_delete, log_duplicate, standard_non_empty_string, non_empty_string
+    log_update, log_delete, log_duplicate, standard_non_empty_string, non_empty_string, log_304
 
 
 class FreezerResource(BaseResource):
@@ -81,19 +81,21 @@ class FreezerResource(BaseResource):
 
             if laboratory != freezer.laboratory_id or number != freezer.number or \
                     room != freezer.room or code != freezer.code:
+                old_info = str(freezer)
                 try:
                     freezer.laboratory_id = laboratory
                     freezer.number = number
                     freezer.room = room
                     freezer.code = code
                     BaseModel.db.session.commit()
-                    log_update(freezer, freezer)
+                    log_update(old_info, freezer)
                     return BaseResource.send_json_message("Successfully updated freezer", 202)
 
                 except Exception as e:
                     current_app.logger.error(e)
                     BaseModel.db.session.rollback()
                     return BaseResource.send_json_message("Error while updating freezer", 500)
+            log_304(freezer)
             return BaseResource.send_json_message("No changes made", 304)
 
     @jwt_required

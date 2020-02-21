@@ -8,7 +8,7 @@ from api.models.database import BaseModel
 from api.models.user import User
 from api.resources.base_resource import BaseResource
 from api.utils import get_active_users, get_user_by_email, get_users_by_role, get_users_by_status, get_deactivated_user, \
-    log_in_user_jwt, format_and_lower_str, standard_non_empty_string
+    log_in_user_jwt, format_and_lower_str, standard_non_empty_string, log_update
 
 
 class UserResource(BaseResource):
@@ -126,7 +126,7 @@ class UserResource(BaseResource):
                 if first_name != user.first_name or last_name != user.last_name or \
                         user_email != user.email or role != user.role_id \
                         or not user.verify_password(password):
-
+                    old_info = str(user)
                     try:
                         user.first_name = first_name
                         user.last_name = last_name
@@ -137,9 +137,7 @@ class UserResource(BaseResource):
                         user.updated_by = user.email
 
                         BaseModel.db.session.commit()
-                        current_app.logger.info("{0} updated some info;"
-                                                "email={1}, role={2} at time={3}"
-                                                .format(get_jwt_identity(), email, role, datetime.now()))
+                        log_update(old_info, user)
                         return BaseResource.send_json_message("Updated user", 202)
 
                     except Exception as e:

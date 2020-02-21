@@ -85,6 +85,7 @@ class PublicationResource(BaseResource):
             if sample != publication.sample_id or user != publication.user_id or \
                     sample_results != publication.sample_results or publication_title != publication.publication_title \
                     or co_authors != publication.co_authors:
+                old_info = str(publication)
                 try:
                     publication.sample_id = sample
                     publication.user_id = user
@@ -93,13 +94,13 @@ class PublicationResource(BaseResource):
                     publication.co_authors = co_authors
 
                     BaseModel.db.session.commit()
-                    log_update(publication, publication)
+                    log_update(old_info, publication)
                     return BaseResource.send_json_message("Publication successfully updated", 200)
                 except Exception as e:
                     current_app.logger.error(e)
                     BaseModel.db.session.rollback()
                     return BaseResource.send_json_message("Error while updating publication", 500)
-            log_304()
+            log_304(publication)
             return BaseResource.send_json_message('No changes were made', 304)
         return BaseResource.send_json_message('Publication not found', 404)
 

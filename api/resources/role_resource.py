@@ -6,7 +6,7 @@ from api.models.database import BaseModel
 from api.models.role import Role
 from api.resources.base_resource import BaseResource
 from api.utils import format_and_lower_str, log_create, log_duplicate, \
-    log_update, log_delete, has_required_request_params, standard_non_empty_string
+    log_update, log_delete, has_required_request_params, standard_non_empty_string, log_304
 
 
 class RoleResource(BaseResource):
@@ -65,18 +65,20 @@ class RoleResource(BaseResource):
             description = args['description']
 
             if role_code != role.code or name != role.name or description != role.description:
+                old_info = str(role)
                 try:
                     role.code = role_code
                     role.name = name
                     role.description = description
                     BaseModel.db.session.commit()
-                    log_update(role, role)
+                    log_update(old_info, role)
                     return BaseResource.send_json_message("Updated Role Successfully", 202)
 
                 except Exception as e:
                     current_app.logger.error(e)
                     BaseModel.db.session.rollback()
                     return BaseResource.send_json_message("Error while updating role", 500)
+            log_304(role)
             return BaseResource.send_json_message("No changes made", 304)
 
     @jwt_required

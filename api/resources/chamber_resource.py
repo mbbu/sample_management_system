@@ -6,7 +6,7 @@ from api.models.chamber import Chamber
 from api.models.database import BaseModel
 from api.resources.base_resource import BaseResource
 from api.utils import format_and_lower_str, non_empty_string, log_create, log_duplicate, log_update, log_delete, \
-    has_required_request_params, non_empty_int, standard_non_empty_string
+    has_required_request_params, non_empty_int, standard_non_empty_string, log_304
 
 
 class ChamberResource(BaseResource):
@@ -73,18 +73,20 @@ class ChamberResource(BaseResource):
             code = args['code']
 
             if chamber.freezer_id != freezer or chamber.type != _type or chamber.code != code:
+                old_info = str(chamber)
                 try:
                     chamber.freezer_id = freezer
                     chamber.type = _type
-                    chamber.commit = code
+                    chamber.code = code
                     BaseModel.db.session.commit()
-                    log_update(chamber, chamber)
+                    log_update(old_info, chamber)
                     return BaseResource.send_json_message("Chamber successfully updated", 202)
                 except Exception as e:
                     current_app.logger.error(e)
                     BaseModel.db.session.rollback()
                     return BaseResource.send_json_message("Error while adding Chamber. Another chamber has that type",
                                                           500)
+            log_304(chamber)
             return BaseResource.send_json_message("No changes made", 304)
 
     @jwt_required
