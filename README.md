@@ -3,7 +3,9 @@ This is a web based application that interfaces samples available at I.C.I.P.E
 and acts as an intermediate tool for data management and laboratory information 
 management system for I.C.I.P.E.
 
-## HOW TO RUN THE API ##
+___
+*HOW TO RUN THE API*
+---
 ***1.Clone the repository and move into the project directory***
 
 > While here, locally checkout a new branch and pull from origin develop to update the code.
@@ -61,7 +63,8 @@ management system for I.C.I.P.E.
  >> curl --url http://127.0.0.1:5000/welcome
 ```
 ___
-## HOW TO RUN THE CLIENT ##
+*HOW TO RUN THE CLIENT*
+---
 > From the root directory run ```cd client``` and run the following commands 
 >depending on the need i.e. development or production:
 
@@ -76,7 +79,8 @@ ___
 >> Lints and fixes files ```npm run lint```
 
 ___
-## RUN THE API TESTS ##
+*RUN THE API TESTS*
+---
 ***1.Export required variables***
 
 > While in the root dir of the project, export the following required variables.
