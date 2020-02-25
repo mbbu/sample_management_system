@@ -95,8 +95,8 @@ def get_sample_by_code(code):
 """
 
 
-def log_304():
-    return current_app.logger.info("No changes were made")
+def log_304(record):
+    return current_app.logger.info("No changes were made to {0}".format(record))
 
 
 def log_create(record):
