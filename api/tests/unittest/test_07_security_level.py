@@ -1,7 +1,7 @@
 from flask import json
 
 from api.tests.unittest.utils_for_tests import security_level_data, create_security_level, security_level_headers, \
-    security_level_code, security_level_updated_data, access_token
+    security_level_code, security_level_updated_data, access_token, security_level_resource_route
 
 """
 # ****************************
@@ -13,7 +13,7 @@ from api.tests.unittest.utils_for_tests import security_level_data, create_secur
 
 
 def test_create_security_level_by_non_logged_in_user(client):
-    response = client.post('/security-level', json=security_level_data)
+    response = client.post(security_level_resource_route, json=security_level_data)
     assert response.status_code == 401
 
 
@@ -26,7 +26,7 @@ def test_create_security_level(client):
 
 
 def test_create_security_level_with_missing_info(client):
-    response = client.post('/security-level', json={
+    response = client.post(security_level_resource_route, json={
         # 'name': 'Ebola',  <-- missing required param
         'code': security_level_code,
         'description': 'CDC L1'
@@ -58,7 +58,7 @@ def test_create_duplicate_security_level(client):
 
 
 def test_get_non_existing_security_level(client):
-    response = client.get('/security-level', headers={'code': 'security_level_code'})
+    response = client.get(security_level_resource_route, headers={'code': 'security_level_code'})
     data = json.loads(response.data)
 
     assert response.status_code == 404
@@ -67,7 +67,7 @@ def test_get_non_existing_security_level(client):
 
 def test_get_security_level(client):
     create_security_level(client)
-    response = client.get('/security-level')
+    response = client.get(security_level_resource_route)
     data = json.loads(response.data)
 
     if response.status_code == 404:
@@ -86,7 +86,7 @@ def test_get_security_level(client):
 
 def test_get_security_level_by_param(client):
     create_security_level(client)
-    response = client.get('/security-level', headers=security_level_headers)
+    response = client.get(security_level_resource_route, headers=security_level_headers)
     data = json.loads(response.data)
 
     assert response.status_code == 200
@@ -105,22 +105,30 @@ def test_get_security_level_by_param(client):
 
 
 def test_update_security_level_by_non_logged_in_user(client):
-    response = client.put('/security-level', json=security_level_updated_data)
+    response = client.put(security_level_resource_route, json=security_level_updated_data)
     assert response.status_code == 401
 
 
 def test_update_security_level(client):
     create_security_level(client)
-    response = client.put('/security-level', json=security_level_updated_data, headers=security_level_headers)
+    response = client.put(security_level_resource_route, json=security_level_updated_data,
+                          headers=security_level_headers)
     data = json.loads(response.data)
 
     assert response.status_code == 202
     assert data['message'] == 'Security level successfully updated'
 
 
+def test_updating_security_level_without_any_field_changes(client):
+    create_security_level(client)
+    response = client.put(security_level_resource_route, json=security_level_data, headers=security_level_headers)
+    print(response.data)
+    assert response.status_code == 304
+
+
 def test_update_non_existing_security_level(client):
     create_security_level(client)
-    response = client.put('/security-level', json=security_level_headers, headers={
+    response = client.put(security_level_resource_route, json=security_level_headers, headers={
         'Authorization': 'Bearer {}'.format(access_token),
         'code': 'security_level_code'  # <-- wrong/non-existing code
     })
@@ -132,7 +140,7 @@ def test_update_non_existing_security_level(client):
 
 def test_update_security_level_without_identity(client):
     create_security_level(client)
-    response = client.put('/security-level', json=security_level_updated_data, headers={
+    response = client.put(security_level_resource_route, json=security_level_updated_data, headers={
         'Authorization': 'Bearer {}'.format(access_token)  # <-- missing security_level code in header
     })
     assert response.status_code == 400
@@ -148,19 +156,19 @@ def test_update_security_level_without_identity(client):
 
 
 def test_deleting_security_level_by_non_logged_in_user(client):
-    response = client.delete('/security-level')
+    response = client.delete(security_level_resource_route)
     assert response.status_code == 401
 
 
 def test_deleting_security_level_without_identity(client):
-    response = client.delete('/security-level', headers={'Authorization': 'Bearer {}'.format(access_token)})
+    response = client.delete(security_level_resource_route, headers={'Authorization': 'Bearer {}'.format(access_token)})
     assert response.status_code == 400
 
 
 def test_deleting_non_existent_security_level(client):
     create_security_level(client)
-    response = client.delete('/security-level', headers={'Authorization': 'Bearer {}'.format(access_token),
-                                                         'code': '123'})
+    response = client.delete(security_level_resource_route, headers={'Authorization': 'Bearer {}'.format(access_token),
+                                                                     'code': '123'})
     data = json.loads(response.data)
     assert response.status_code == 404
     assert data['message'] == 'Security level not found'
@@ -168,7 +176,7 @@ def test_deleting_non_existent_security_level(client):
 
 def test_deleting_security_level(client):
     create_security_level(client)
-    response = client.delete('/security-level', headers=security_level_headers)
+    response = client.delete(security_level_resource_route, headers=security_level_headers)
 
     data = json.loads(response.data)
     assert response.status_code == 200

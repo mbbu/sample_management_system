@@ -6,7 +6,7 @@ from api.models.database import BaseModel
 from api.models.role import Role
 from api.resources.base_resource import BaseResource
 from api.utils import format_and_lower_str, log_create, log_duplicate, \
-    log_update, log_delete, has_required_request_params
+    log_update, log_delete, has_required_request_params, standard_non_empty_string, log_304
 
 
 class RoleResource(BaseResource):
@@ -18,7 +18,7 @@ class RoleResource(BaseResource):
 
     def get(self):
         if request.headers.get('code') is not None:
-            code = format_and_lower_str(request.headers['code'])()
+            code = format_and_lower_str(request.headers['code'])
             role = RoleResource.get_role(code)
             data = marshal(role, self.fields)
             return BaseResource.send_json_message(data, 200)
@@ -30,7 +30,7 @@ class RoleResource(BaseResource):
     @jwt_required
     def post(self):
         args = RoleResource.role_parser()
-        code = format_and_lower_str(args['code'])()
+        code = args['code']
         name = args['name']
         description = args['description']
 
@@ -52,7 +52,7 @@ class RoleResource(BaseResource):
     @jwt_required
     @has_required_request_params
     def put(self):
-        code = format_and_lower_str(request.headers['code'])()
+        code = format_and_lower_str(request.headers['code'])
         role = RoleResource.get_role(code)
 
         if role is None:
@@ -65,24 +65,26 @@ class RoleResource(BaseResource):
             description = args['description']
 
             if role_code != role.code or name != role.name or description != role.description:
+                old_info = str(role)
                 try:
                     role.code = role_code
                     role.name = name
                     role.description = description
                     BaseModel.db.session.commit()
-                    log_update(role, role)
+                    log_update(old_info, role)
                     return BaseResource.send_json_message("Updated Role Successfully", 202)
 
                 except Exception as e:
                     current_app.logger.error(e)
                     BaseModel.db.session.rollback()
                     return BaseResource.send_json_message("Error while updating role", 500)
+            log_304(role)
             return BaseResource.send_json_message("No changes made", 304)
 
     @jwt_required
     @has_required_request_params
     def delete(self):
-        code = format_and_lower_str(request.headers['code'])()
+        code = format_and_lower_str(request.headers['code'])
         role = RoleResource.get_role(code)
 
         if not role:
@@ -96,7 +98,7 @@ class RoleResource(BaseResource):
     @staticmethod
     def role_parser():
         parser = reqparse.RequestParser()
-        parser.add_argument('code', required=True)
+        parser.add_argument('code', required=True, type=standard_non_empty_string)
         parser.add_argument('name', required=True)
         parser.add_argument('description')
 

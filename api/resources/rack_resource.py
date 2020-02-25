@@ -5,8 +5,8 @@ from flask_restful import fields, marshal, reqparse
 from api.models.database import BaseModel
 from api.models.rack import Rack
 from api.resources.base_resource import BaseResource
-from api.utils import format_and_lower_str, log_create, log_duplicate, log_update, log_delete, non_empty_string, \
-    has_required_request_params
+from api.utils import format_and_lower_str, log_create, log_duplicate, log_update, log_delete, \
+    has_required_request_params, standard_non_empty_string, log_304, non_empty_int
 
 
 class RackResource(BaseResource):
@@ -18,7 +18,7 @@ class RackResource(BaseResource):
 
     def get(self):
         if request.headers.get('code') is not None:
-            code = format_and_lower_str(request.headers['code'])()
+            code = format_and_lower_str(request.headers['code'])
             rack = RackResource.get_rack(code)
             if rack is None:
                 return BaseResource.send_json_message("Rack not found", 404)
@@ -36,9 +36,9 @@ class RackResource(BaseResource):
     @jwt_required
     def post(self):
         args = RackResource.rack_parser()
-        chamber = int(args['chamber'])
-        number = int(args['number'])
-        code = format_and_lower_str(args['code'])()
+        chamber = args['chamber']
+        number = args['number']
+        code = args['code']
 
         if not Rack.rack_exists(code):
             try:
@@ -58,34 +58,36 @@ class RackResource(BaseResource):
     @jwt_required
     @has_required_request_params
     def put(self):
-        code = format_and_lower_str(request.headers['code'])()
+        code = format_and_lower_str(request.headers['code'])
         rack = RackResource.get_rack(code)
 
         if rack is not None:
             args = RackResource.rack_parser()
-            chamber = int(args['chamber'])
-            number = int(args['number'])
-            code = format_and_lower_str(args['code'])()
+            chamber = args['chamber']
+            number = args['number']
+            code = args['code']
 
-            if rack.chamber_id != chamber or rack.number != number or code.rack != code:
+            if rack.chamber_id != chamber or rack.number != number or rack.code != code:
+                old_info = str(rack)
                 try:
                     rack.chamber_id = chamber
                     rack.number = number
                     rack.code = code
                     BaseModel.db.session.commit()
-                    log_update(rack, rack)  # todo: log old update
+                    log_update(old_info, rack)
                     return BaseResource.send_json_message("Rack successfully updated", 202)
                 except Exception as e:
                     current_app.logger.error(e)
                     BaseModel.db.session.rollback()
                     return BaseResource.send_json_message("Error while adding rack. Another rack has that number", 500)
+            log_304(rack)
             return BaseResource.send_json_message("No changes made", 304)
         return BaseResource.send_json_message("Rack not found", 404)
 
     @jwt_required
     @has_required_request_params
     def delete(self):
-        code = format_and_lower_str(request.headers['code'])()
+        code = format_and_lower_str(request.headers['code'])
         rack = RackResource.get_rack(code)
 
         if rack is None:
@@ -98,9 +100,9 @@ class RackResource(BaseResource):
     @staticmethod
     def rack_parser():
         parser = reqparse.RequestParser()
-        parser.add_argument('chamber', required=True)
-        parser.add_argument('number', required=True)
-        parser.add_argument('code', required=True, type=non_empty_string)
+        parser.add_argument('chamber', required=True, type=non_empty_int)
+        parser.add_argument('number', required=True, type=non_empty_int)
+        parser.add_argument('code', required=True, type=standard_non_empty_string)
 
         args = parser.parse_args()
         return args

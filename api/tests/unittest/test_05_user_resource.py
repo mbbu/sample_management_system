@@ -2,7 +2,8 @@ from flask import json
 from flask_jwt_extended import create_access_token
 
 from api import create_app as app
-from api.tests.unittest.utils_for_tests import headers, USER_DATA, create_role, create_user, prepare_user_test
+from api.tests.unittest.utils_for_tests import headers, USER_DATA, create_role, create_user, prepare_user_test, \
+    user_resource_route
 
 """
 # ****************************
@@ -14,7 +15,7 @@ from api.tests.unittest.utils_for_tests import headers, USER_DATA, create_role, 
 
 
 def test_create_user_with_half_info(client):
-    response = client.post('/user', json={
+    response = client.post(user_resource_route, json={
         'first_name': 'ICIPE',
         'last_name': 'ADMIN',
         'email': 'admin@icipe.org',
@@ -62,7 +63,7 @@ def test_create_duplicate_user(client):
 
 def test_get_user(client):
     prepare_user_test(client)
-    response = client.get('/users')
+    response = client.get(user_resource_route)
     assert b'message' in response.data
     data = json.loads(response.data)
 
@@ -83,7 +84,7 @@ def test_get_user(client):
 
 def test_get_user_by_params(client):
     prepare_user_test(client)
-    response = client.get('/user', headers=headers)
+    response = client.get(user_resource_route, headers=headers)
     data = json.loads(response.data)
 
     if response.status_code == 404:
@@ -106,19 +107,19 @@ def test_get_user_by_params(client):
 
 
 def test_updating_user_without_jwt_token(client):
-    response = client.put('/user', json=USER_DATA)
+    response = client.put(user_resource_route, json=USER_DATA)
     assert response.status_code == 401
 
 
 def test_updating_user_without_any_field_changes(client):
     prepare_user_test(client)
-    response = client.put('/user', json=USER_DATA, headers=headers)
+    response = client.put(user_resource_route, json=USER_DATA, headers=headers)
     assert response.status_code == 304
 
 
 def test_updating_user_with_field_changes(client):
     prepare_user_test(client)
-    response = client.put('/user', json={
+    response = client.put(user_resource_route, json={
         'first_name': 'I.C.I.P.E',
         'last_name': 'ADMIN',
         'email': 'admins@icipe.org',
@@ -139,7 +140,7 @@ def test_updating_user_with_field_changes(client):
 
 
 def test_deleting_user_without_jwt_token(client):
-    response = client.delete('/user')
+    response = client.delete(user_resource_route)
     assert response.status_code == 401
 
 
@@ -149,13 +150,13 @@ def test_deleting_another_user(client):
     updated_headers = {
         'Authorization': 'Bearer {}'.format(updated_access_token)
     }
-    response = client.delete('/user', headers=updated_headers)
+    response = client.delete(user_resource_route, headers=updated_headers)
     assert response.status_code == 404
 
 
 def test_deleting_user(client):
     prepare_user_test(client)
-    response = client.delete('/user', headers=headers)
+    response = client.delete(user_resource_route, headers=headers)
     assert response.status_code == 200
 
 # todo: test if passwords are hashed

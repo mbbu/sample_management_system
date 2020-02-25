@@ -6,7 +6,7 @@ from api.models.database import BaseModel
 from api.models.laboratory import Laboratory
 from api.resources.base_resource import BaseResource
 from api.utils import format_and_lower_str, log_update, log_delete, log_duplicate, log_create, \
-    has_required_request_params
+    has_required_request_params, standard_non_empty_string, log_304
 
 
 class LaboratoryResource(BaseResource):
@@ -18,7 +18,7 @@ class LaboratoryResource(BaseResource):
 
     def get(self):
         if request.headers.get('code') is not None:
-            code = format_and_lower_str(request.headers['code'])()
+            code = format_and_lower_str(request.headers['code'])
             lab = LaboratoryResource.get_laboratory(code)
             if lab is None:
                 return BaseResource.send_json_message("Lab not found", 404)
@@ -39,7 +39,7 @@ class LaboratoryResource(BaseResource):
 
         name = args['name']
         room = args['room']
-        code = format_and_lower_str(args['code'])()
+        code = args['code']
 
         if not Laboratory.code_exists(code):
             try:
@@ -64,9 +64,8 @@ class LaboratoryResource(BaseResource):
     @jwt_required
     @has_required_request_params
     def put(self):
-        code = format_and_lower_str(request.headers['code'])()
+        code = format_and_lower_str(request.headers['code'])
         laboratory = LaboratoryResource.get_laboratory(code)
-        old_info = laboratory
 
         if laboratory is None:
             return BaseResource.send_json_message("Lab not found", 404)
@@ -79,24 +78,26 @@ class LaboratoryResource(BaseResource):
             code = args['code']
 
             if name != laboratory.name or room != laboratory.room or code != laboratory.code:
+                old_info = str(laboratory)
                 try:
                     laboratory.name = name
                     laboratory.room = room
                     laboratory.code = code
                     BaseModel.db.session.commit()
-                    log_update(old_info, laboratory)  # todo: check how to log old values and new values for a change
+                    log_update(old_info, laboratory)
                     return BaseResource.send_json_message("Lab updated successfully", 202)
 
                 except Exception as e:
                     current_app.logger.error(e)
                     BaseModel.db.session.rollback()
                     return BaseResource.send_json_message("Error while updating Laboratory", 500)
+            log_304(laboratory)
             return BaseResource.send_json_message("No changes were made", 304)
 
     @jwt_required
     @has_required_request_params
     def delete(self):
-        code = format_and_lower_str(request.headers['code'])()
+        code = format_and_lower_str(request.headers['code'])
         laboratory = LaboratoryResource.get_laboratory(code)
 
         if laboratory is None:
@@ -112,7 +113,7 @@ class LaboratoryResource(BaseResource):
         parser = reqparse.RequestParser()
         parser.add_argument('name', required=True)
         parser.add_argument('room', required=True)
-        parser.add_argument('code', required=True)
+        parser.add_argument('code', required=True, type=standard_non_empty_string)
 
         args = parser.parse_args()
         return args

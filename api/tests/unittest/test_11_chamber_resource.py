@@ -1,7 +1,7 @@
 from flask import json
 
 from api.tests.unittest.utils_for_tests import chamber_data, create_chamber, chamber_headers, prepare_chamber_test, \
-    access_token, freezer_updated_data, chamber_updated_data
+    access_token, freezer_updated_data, chamber_updated_data, chamber_resource_route
 
 """
 # ****************************
@@ -13,7 +13,7 @@ from api.tests.unittest.utils_for_tests import chamber_data, create_chamber, cha
 
 
 def test_create_chamber_by_non_logged_in_user(client):
-    response = client.post('/chamber', json=chamber_data)
+    response = client.post(chamber_resource_route, json=chamber_data)
     assert response.status_code == 401
 
 
@@ -26,7 +26,7 @@ def test_create_chamber(client):
 
 
 def test_create_chamber_with_missing_info(client):
-    response = client.post('/chamber', json={
+    response = client.post(chamber_resource_route, json={
         'freezer': '1',
         # 'type': 'Animal Species',  <-- missing required info
         'code': 'L1F1C1'
@@ -58,7 +58,7 @@ def test_create_duplicate_chamber(client):
 
 
 def test_get_non_existing_chamber(client):
-    response = client.get('/chamber', headers={'code': 'chamber_code'})
+    response = client.get(chamber_resource_route, headers={'code': 'chamber_code'})
     data = json.loads(response.data)
 
     assert response.status_code == 404
@@ -67,7 +67,7 @@ def test_get_non_existing_chamber(client):
 
 def test_get_chamber(client):
     prepare_chamber_test(client)
-    response = client.get('/chamber')
+    response = client.get(chamber_resource_route)
     data = json.loads(response.data)
 
     if response.status_code == 404:
@@ -87,7 +87,7 @@ def test_get_chamber(client):
 
 def test_get_chamber_by_param(client):
     prepare_chamber_test(client)
-    response = client.get('/chamber', headers=chamber_headers)
+    response = client.get(chamber_resource_route, headers=chamber_headers)
     data = json.loads(response.data)
 
     assert response.status_code == 200
@@ -107,13 +107,13 @@ def test_get_chamber_by_param(client):
 
 
 def test_update_chamber_by_non_logged_in_user(client):
-    response = client.put('/chamber', json=freezer_updated_data)
+    response = client.put(chamber_resource_route, json=freezer_updated_data)
     assert response.status_code == 401
 
 
 def test_update_chamber(client):
     prepare_chamber_test(client)
-    response = client.put('/chamber', json=chamber_updated_data, headers=chamber_headers)
+    response = client.put(chamber_resource_route, json=chamber_updated_data, headers=chamber_headers)
     data = json.loads(response.data)
 
     assert response.status_code == 202
@@ -122,7 +122,7 @@ def test_update_chamber(client):
 
 def test_update_non_existing_chamber(client):
     prepare_chamber_test(client)
-    response = client.put('/chamber', json=chamber_headers, headers={
+    response = client.put(chamber_resource_route, json=chamber_headers, headers={
         'Authorization': 'Bearer {}'.format(access_token),
         'code': 'chamber_code'  # <-- wrong/non-existing code
     })
@@ -134,7 +134,7 @@ def test_update_non_existing_chamber(client):
 
 def test_update_chamber_without_identity(client):
     prepare_chamber_test(client)
-    response = client.put('/chamber', json=freezer_updated_data, headers={
+    response = client.put(chamber_resource_route, json=freezer_updated_data, headers={
         'Authorization': 'Bearer {}'.format(access_token)  # <-- missing chamber code in header
     })
     assert response.status_code == 400
@@ -150,19 +150,19 @@ def test_update_chamber_without_identity(client):
 
 
 def test_deleting_chamber_by_non_logged_in_user(client):
-    response = client.delete('/chamber')
+    response = client.delete(chamber_resource_route)
     assert response.status_code == 401
 
 
 def test_deleting_chamber_without_identity(client):
-    response = client.delete('/chamber', headers={'Authorization': 'Bearer {}'.format(access_token)})
+    response = client.delete(chamber_resource_route, headers={'Authorization': 'Bearer {}'.format(access_token)})
     assert response.status_code == 400
 
 
 def test_deleting_non_existent_chamber(client):
     prepare_chamber_test(client)
-    response = client.delete('/chamber', headers={'Authorization': 'Bearer {}'.format(access_token),
-                                                  'code': '123'})
+    response = client.delete(chamber_resource_route, headers={'Authorization': 'Bearer {}'.format(access_token),
+                                                              'code': '123'})
     data = json.loads(response.data)
     assert response.status_code == 404
     assert data['message'] == 'Chamber not found'
@@ -170,7 +170,7 @@ def test_deleting_non_existent_chamber(client):
 
 def test_deleting_chamber(client):
     prepare_chamber_test(client)
-    response = client.delete('/chamber', headers=chamber_headers)
+    response = client.delete(chamber_resource_route, headers=chamber_headers)
 
     data = json.loads(response.data)
     assert response.status_code == 200

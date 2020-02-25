@@ -1,7 +1,7 @@
 from flask import json
 
 from api.tests.unittest.utils_for_tests import rack_data, create_rack, rack_headers, prepare_rack_test, \
-    access_token, freezer_updated_data, rack_updated_data
+    access_token, freezer_updated_data, rack_updated_data, rack_resource_route
 
 """
 # ****************************
@@ -13,7 +13,7 @@ from api.tests.unittest.utils_for_tests import rack_data, create_rack, rack_head
 
 
 def test_create_rack_by_non_logged_in_user(client):
-    response = client.post('/rack', json=rack_data)
+    response = client.post(rack_resource_route, json=rack_data)
     assert response.status_code == 401
 
 
@@ -26,7 +26,7 @@ def test_create_rack(client):
 
 
 def test_create_rack_with_missing_info(client):
-    response = client.post('/rack', json={
+    response = client.post(rack_resource_route, json={
         'chamber': '1',
         # 'number': '405',    <-- missing required info
         'code': 'L1F1C1R1'
@@ -58,7 +58,7 @@ def test_create_duplicate_rack(client):
 
 
 def test_get_non_existing_rack(client):
-    response = client.get('/rack', headers={'code': 'rack_code'})
+    response = client.get(rack_resource_route, headers={'code': 'rack_code'})
     data = json.loads(response.data)
 
     assert response.status_code == 404
@@ -67,7 +67,7 @@ def test_get_non_existing_rack(client):
 
 def test_get_rack(client):
     prepare_rack_test(client)
-    response = client.get('/rack')
+    response = client.get(rack_resource_route)
     data = json.loads(response.data)
 
     if response.status_code == 404:
@@ -86,7 +86,7 @@ def test_get_rack(client):
 
 def test_get_rack_by_param(client):
     prepare_rack_test(client)
-    response = client.get('/rack', headers=rack_headers)
+    response = client.get(rack_resource_route, headers=rack_headers)
     data = json.loads(response.data)
 
     assert response.status_code == 200
@@ -105,13 +105,13 @@ def test_get_rack_by_param(client):
 
 
 def test_update_rack_by_non_logged_in_user(client):
-    response = client.put('/rack', json=freezer_updated_data)
+    response = client.put(rack_resource_route, json=freezer_updated_data)
     assert response.status_code == 401
 
 
 def test_update_rack(client):
     prepare_rack_test(client)
-    response = client.put('/rack', json=rack_updated_data, headers=rack_headers)
+    response = client.put(rack_resource_route, json=rack_updated_data, headers=rack_headers)
     data = json.loads(response.data)
 
     assert response.status_code == 202
@@ -120,7 +120,7 @@ def test_update_rack(client):
 
 def test_update_non_existing_rack(client):
     prepare_rack_test(client)
-    response = client.put('/rack', json=rack_headers, headers={
+    response = client.put(rack_resource_route, json=rack_headers, headers={
         'Authorization': 'Bearer {}'.format(access_token),
         'code': 'rack_code'  # <-- wrong/non-existing code
     })
@@ -132,7 +132,7 @@ def test_update_non_existing_rack(client):
 
 def test_update_rack_without_identity(client):
     prepare_rack_test(client)
-    response = client.put('/rack', json=freezer_updated_data, headers={
+    response = client.put(rack_resource_route, json=freezer_updated_data, headers={
         'Authorization': 'Bearer {}'.format(access_token)  # <-- missing rack code in header
     })
     assert response.status_code == 400
@@ -148,19 +148,19 @@ def test_update_rack_without_identity(client):
 
 
 def test_deleting_rack_by_non_logged_in_user(client):
-    response = client.delete('/rack')
+    response = client.delete(rack_resource_route)
     assert response.status_code == 401
 
 
 def test_deleting_rack_without_identity(client):
-    response = client.delete('/rack', headers={'Authorization': 'Bearer {}'.format(access_token)})
+    response = client.delete(rack_resource_route, headers={'Authorization': 'Bearer {}'.format(access_token)})
     assert response.status_code == 400
 
 
 def test_deleting_non_existent_rack(client):
     prepare_rack_test(client)
-    response = client.delete('/rack', headers={'Authorization': 'Bearer {}'.format(access_token),
-                                               'code': '123'})
+    response = client.delete(rack_resource_route, headers={'Authorization': 'Bearer {}'.format(access_token),
+                                                           'code': '123'})
     data = json.loads(response.data)
     assert response.status_code == 404
     assert data['message'] == 'Rack not found'
@@ -168,7 +168,7 @@ def test_deleting_non_existent_rack(client):
 
 def test_deleting_rack(client):
     prepare_rack_test(client)
-    response = client.delete('/rack', headers=rack_headers)
+    response = client.delete(rack_resource_route, headers=rack_headers)
 
     data = json.loads(response.data)
     assert response.status_code == 200

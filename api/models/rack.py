@@ -5,8 +5,8 @@ class Rack(BaseModel.db.Model):
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
     chamber_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('chamber.id', ondelete='SET NULL'), nullable=True)
-    number = AppDb.Column(AppDb.Integer, unique=True, nullable=False)
-    code = AppDb.Column(AppDb.String(65), nullable=False)
+    number = AppDb.Column(AppDb.Integer, nullable=False)
+    code = AppDb.Column(AppDb.String(65), nullable=False, unique=True, index=True)
 
     # relationships
     chamber = AppDb.relationship('Chamber', backref='rack', lazy=True)

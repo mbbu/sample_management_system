@@ -6,7 +6,7 @@ from api.models.chamber import Chamber
 from api.models.database import BaseModel
 from api.resources.base_resource import BaseResource
 from api.utils import format_and_lower_str, non_empty_string, log_create, log_duplicate, log_update, log_delete, \
-    has_required_request_params
+    has_required_request_params, non_empty_int, standard_non_empty_string, log_304
 
 
 class ChamberResource(BaseResource):
@@ -19,7 +19,7 @@ class ChamberResource(BaseResource):
 
     def get(self):
         if request.headers.get('code') is not None:
-            code = format_and_lower_str(request.headers['code'])()
+            code = format_and_lower_str(request.headers['code'])
             chamber = ChamberResource.get_chamber(code)
             if chamber is None:
                 return BaseResource.send_json_message("Chamber not found", 404)
@@ -37,9 +37,9 @@ class ChamberResource(BaseResource):
     @jwt_required
     def post(self):
         args = ChamberResource.chamber_parser()
-        freezer = int(args['freezer'])
+        freezer = args['freezer']
         _type = args['type']
-        code = format_and_lower_str(args['code'])()
+        code = args['code']
 
         if not Chamber.chamber_exists(code):
             try:
@@ -60,39 +60,39 @@ class ChamberResource(BaseResource):
     @jwt_required
     @has_required_request_params
     def put(self):
-        code = format_and_lower_str(request.headers['code'])()
+        code = format_and_lower_str(request.headers['code'])
         chamber = ChamberResource.get_chamber(code)
-        print(chamber)
-        print(type(chamber))
 
         if chamber is None:
             return BaseResource.send_json_message("Chamber not found", 404)
 
         else:
             args = ChamberResource.chamber_parser()
-            freezer = int(args['freezer'])
+            freezer = args['freezer']
             _type = args['type']
-            code = format_and_lower_str(args['code'])()
+            code = args['code']
 
             if chamber.freezer_id != freezer or chamber.type != _type or chamber.code != code:
+                old_info = str(chamber)
                 try:
                     chamber.freezer_id = freezer
                     chamber.type = _type
-                    chamber.commit = code
+                    chamber.code = code
                     BaseModel.db.session.commit()
-                    log_update(chamber, chamber)  # todo: log old update
+                    log_update(old_info, chamber)
                     return BaseResource.send_json_message("Chamber successfully updated", 202)
                 except Exception as e:
                     current_app.logger.error(e)
                     BaseModel.db.session.rollback()
                     return BaseResource.send_json_message("Error while adding Chamber. Another chamber has that type",
                                                           500)
+            log_304(chamber)
             return BaseResource.send_json_message("No changes made", 304)
 
     @jwt_required
     @has_required_request_params
     def delete(self):
-        code = format_and_lower_str(request.headers['code'])()
+        code = format_and_lower_str(request.headers['code'])
         chamber = ChamberResource.get_chamber(code)
 
         if chamber is None:
@@ -106,9 +106,9 @@ class ChamberResource(BaseResource):
     @staticmethod
     def chamber_parser():
         parser = reqparse.RequestParser()
-        parser.add_argument('freezer', required=True)
-        parser.add_argument('type', required=True)
-        parser.add_argument('code', required=True, type=non_empty_string)
+        parser.add_argument('freezer', required=True, type=non_empty_int)
+        parser.add_argument('type', required=True, type=non_empty_string)
+        parser.add_argument('code', required=True, type=standard_non_empty_string)
 
         args = parser.parse_args()
         return args

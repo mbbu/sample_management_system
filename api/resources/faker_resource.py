@@ -8,7 +8,7 @@ from api.utils import format_and_lower_str, faker
 class FakeDataResource(BaseResource):
     def post(self):
         count = int(request.args.get('count'))
-        model = format_and_lower_str(request.args.get('model'))()
+        model = format_and_lower_str(request.args.get('model'))
 
         if model == 'box':
             db_model = Box

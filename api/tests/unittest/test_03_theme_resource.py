@@ -118,6 +118,12 @@ def test_update_theme(client):
     assert data['message'] == 'Theme successfully updated'
 
 
+def test_updating_theme_without_any_field_changes(client):
+    create_theme(client)
+    response = client.put(theme_resource_route, json=theme_data, headers=theme_headers)
+    assert response.status_code == 304
+
+
 def test_update_non_existing_theme(client):
     create_theme(client)
     response = client.put(theme_resource_route, json=theme_updated_data, headers={

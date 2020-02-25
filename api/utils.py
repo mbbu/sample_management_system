@@ -18,15 +18,34 @@ from api.models.database import BaseModel
 
 
 def non_empty_string(s: str):
+    if not s.strip():
+        raise ValueError("Expected a non empty string")
+    return s.strip()
+
+
+def standard_non_empty_string(s: str):
     if not s:
         raise ValueError("Expected a non empty string")
-    return s
+    return format_and_lower_str(s)
+
+
+def format_and_lower_str(string):
+    return str(string).strip().lower()
 
 
 def non_empty_int(i: int):
     if not i:
         raise ValueError("Expected an integer")
     return i
+
+
+"""
+    Date Formatter
+"""
+
+
+def format_str_to_date(date):
+    return datetime.strptime(date, '%Y-%m-%d %H:%M').date()
 
 
 """
@@ -67,26 +86,8 @@ def log_in_user_jwt(user):
     return {'access_token': access_token, 'refresh_token': refresh_token}
 
 
-def get_samples_by_code(code):
-    return BaseModel.db.session.query(Sample).filter(Sample.is_deleted == code).all()
-
-
-"""
-    String formatters
-"""
-
-
-def format_and_lower_str(string):
-    return lambda: str(string).lower()
-
-
-"""
-    Date Formatter
-"""
-
-
-def format_str_to_date(date):
-    return datetime.strptime(date, '%Y-%m-%d %H:%M').date()
+def get_sample_by_code(code):
+    return BaseModel.db.session.query(Sample).filter(Sample.code == code).first()
 
 
 """
@@ -94,8 +95,8 @@ def format_str_to_date(date):
 """
 
 
-def log_304():
-    return current_app.logger.info("No changes were made")
+def log_304(record):
+    return current_app.logger.info("No changes were made to {0}".format(record))
 
 
 def log_create(record):
@@ -103,7 +104,6 @@ def log_create(record):
         "New {0} created by {1} at {2}".format(record, get_jwt_identity(), datetime.now()))
 
 
-# todo: log old value and new value
 def log_update(old_record, new_record):
     return current_app.logger.info("{0} updated {1} to {2} at time={3}"
                                    .format(get_jwt_identity(), old_record, new_record,
@@ -120,7 +120,7 @@ def log_duplicate(record):
 
 def log_export_from_redcap(record):
     return current_app.logger.info(
-        "New {0} created from REDCap at {1}".format(record, datetime.now()))
+        "New sample {0} created from REDCap at {1} by {2}".format(record, datetime.now(), get_jwt_identity()))
 
 
 """
@@ -153,7 +153,10 @@ def export_all_records():
         'returnFormat': 'json'
     }
     response = requests.post(REDCAP_URI, data)
-    return response.json()
+
+    if response.status_code == 200:
+        return response.json()
+    return 404
 
 
 """

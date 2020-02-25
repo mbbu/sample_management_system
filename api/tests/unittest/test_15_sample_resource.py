@@ -110,7 +110,7 @@ def test_get_sample(client):
             assert data['message'][item]['amount'] == 100
             assert data['message'][item]['quantity.id'] == 'l'
             assert data['message'][item]['security_level'] == 1
-            assert data['message'][item]['code'] == format_and_lower_str(sample_code)()
+            assert data['message'][item]['code'] == format_and_lower_str(sample_code)
 
 
 def test_get_sample_by_param(client):
@@ -135,7 +135,7 @@ def test_get_sample_by_param(client):
     assert data['message']['amount'] == 100
     assert data['message']['quantity.id'] == 'l'
     assert data['message']['security_level'] == 1
-    assert data['message']['code'] == format_and_lower_str(sample_code)()
+    assert data['message']['code'] == format_and_lower_str(sample_code)
 
 
 """

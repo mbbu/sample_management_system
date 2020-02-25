@@ -6,7 +6,7 @@ from api.models.box import Box
 from api.models.database import BaseModel
 from api.resources.base_resource import BaseResource
 from api.utils import format_and_lower_str, log_create, log_duplicate, log_update, log_delete, \
-    has_required_request_params
+    has_required_request_params, non_empty_string, non_empty_int, standard_non_empty_string, log_304
 
 
 class BoxResource(BaseResource):
@@ -23,7 +23,7 @@ class BoxResource(BaseResource):
 
     def get(self):
         if request.headers.get('code') is not None:
-            code = format_and_lower_str(request.headers['code'])()
+            code = format_and_lower_str(request.headers['code'])
             box = BoxResource.get_box(code)
             if box is None:
                 return BaseResource.send_json_message("Box not found", 404)
@@ -39,11 +39,13 @@ class BoxResource(BaseResource):
     @jwt_required
     def post(self):
         args = BoxResource.box_args()
-        code = format_and_lower_str(args[2])()
+        tray = args['tray']
+        label = args['label']
+        code = args['code']
 
         if not Box.box_exists(code):
             try:
-                box = Box(tray_id=args[0], label=args[1], code=args[2])
+                box = Box(tray_id=tray, label=label, code=code)
 
                 BaseModel.db.session.add(box)
                 BaseModel.db.session.commit()
@@ -54,38 +56,44 @@ class BoxResource(BaseResource):
                 BaseModel.db.session.rollback()
                 return BaseResource.send_json_message("Error while adding box", 500)
         else:
-            log_duplicate(Box)
+            log_duplicate(Box.query.filter(Box.code == code).first())
             return BaseResource.send_json_message("Box already exists", 409)
 
     @jwt_required
     @has_required_request_params
     def put(self):
-        code = format_and_lower_str(request.headers['code'])()
+        code = format_and_lower_str(request.headers['code'])
         box = BoxResource.get_box(code)
 
         if box is None:
             return BaseResource.send_json_message("Box not found", 404)
 
         args = BoxResource.box_args()
-        if args[0] != box.tray_id or args[1] != box.label or args[2] != box.code:
+        tray = args['tray']
+        label = args['label']
+        code = args['code']
+
+        if tray != box.tray_id or label != box.label or code != box.code:
+            old_info = str(box)
             try:
-                box.tray_id = args[0]
-                box.label = args[1]
-                box.code = args[2]
+                box.tray_id = tray
+                box.label = label
+                box.code = code
                 BaseModel.db.session.commit()
-                log_update(box, box)
+                log_update(old_info, box)
                 return BaseResource.send_json_message("Box successfully updated", 202)
 
             except Exception as e:
                 current_app.logger.error(e)
                 BaseModel.db.session.rollback()
                 return BaseResource.send_json_message("Error while updating box.", 500)
+        log_304(box)
         return BaseResource.send_json_message("No changes made", 304)
 
     @jwt_required
     @has_required_request_params
     def delete(self):
-        code = format_and_lower_str(request.headers['code'])()
+        code = format_and_lower_str(request.headers['code'])
         box = BoxResource.get_box(code)
 
         if not box:
@@ -99,17 +107,12 @@ class BoxResource(BaseResource):
     @staticmethod
     def box_args():
         parser = reqparse.RequestParser()
-        parser.add_argument('tray', required=True)
-        parser.add_argument('label', required=True)
-        parser.add_argument('code', required=True)
+        parser.add_argument('tray', required=True, type=non_empty_int)
+        parser.add_argument('label', required=True, type=non_empty_string)
+        parser.add_argument('code', required=True, type=standard_non_empty_string)
 
         args = parser.parse_args()
-
-        tray = args['tray']
-        label = format_and_lower_str(args['label'])()
-        code = format_and_lower_str(args['code'])()
-
-        return [tray, label, code]
+        return args
 
     @staticmethod
     def get_box(code):

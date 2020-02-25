@@ -1,7 +1,7 @@
 from flask import json
 
 from api.tests.unittest.utils_for_tests import freezer_data, create_freezer, freezer_headers, prepare_freezer_test, \
-    access_token, freezer_updated_data
+    access_token, freezer_updated_data, freezer_resource_route
 
 """
 # ****************************
@@ -13,7 +13,7 @@ from api.tests.unittest.utils_for_tests import freezer_data, create_freezer, fre
 
 
 def test_create_freezer_by_non_logged_in_user(client):
-    response = client.post('/freezer', json=freezer_data)
+    response = client.post(freezer_resource_route, json=freezer_data)
     assert response.status_code == 401
 
 
@@ -21,13 +21,12 @@ def test_create_freezer(client):
     response = create_freezer(client)
     data = json.loads(response.data)
 
-    print(data)
     assert response.status_code == 201
     assert data['message'] == "Freezer Successfully Created"
 
 
 def test_create_freezer_with_missing_info(client):
-    response = client.post('/freezer', json={
+    response = client.post(freezer_resource_route, json={
         'laboratory': '1',
         'number': '1',
         # 'room': '303', <-- missing required field
@@ -60,7 +59,7 @@ def test_create_duplicate_freezer(client):
 
 
 def test_non_existing_freezer(client):
-    response = client.get('/freezer', headers={'code': 'freezer_code'})
+    response = client.get(freezer_resource_route, headers={'code': 'freezer_code'})
     data = json.loads(response.data)
 
     assert response.status_code == 404
@@ -69,7 +68,7 @@ def test_non_existing_freezer(client):
 
 def test_get_freezer(client):
     prepare_freezer_test(client)
-    response = client.get('/freezer')
+    response = client.get(freezer_resource_route)
     data = json.loads(response.data)
 
     if response.status_code == 404:
@@ -89,7 +88,7 @@ def test_get_freezer(client):
 
 def test_get_freezer_by_param(client):
     prepare_freezer_test(client)
-    response = client.get('/freezer', headers=freezer_headers)
+    response = client.get(freezer_resource_route, headers=freezer_headers)
     data = json.loads(response.data)
 
     assert response.status_code == 200
@@ -109,22 +108,30 @@ def test_get_freezer_by_param(client):
 
 
 def test_update_freezer_by_non_logged_in_user(client):
-    response = client.put('/freezer', json=freezer_updated_data)
+    response = client.put(freezer_resource_route, json=freezer_updated_data)
     assert response.status_code == 401
 
 
 def test_update_freezer(client):
     prepare_freezer_test(client)
-    response = client.put('/freezer', json=freezer_updated_data, headers=freezer_headers)
+    response = client.put(freezer_resource_route, json=freezer_updated_data, headers=freezer_headers)
     data = json.loads(response.data)
 
     assert response.status_code == 202
     assert data['message'] == 'Successfully updated freezer'
 
 
+def test_update_freezer_304(client):
+    prepare_freezer_test(client)
+    response = client.put(freezer_resource_route, json=freezer_data,  # same data used when creating is used for updated
+                          headers=freezer_headers)
+
+    assert response.status_code == 304
+
+
 def test_update_non_existing_freezer(client):
     prepare_freezer_test(client)
-    response = client.put('/freezer', json=freezer_headers, headers={
+    response = client.put(freezer_resource_route, json=freezer_headers, headers={
         'Authorization': 'Bearer {}'.format(access_token),
         'code': 'freezer_code'  # <-- wrong/non-existing code
     })
@@ -136,7 +143,7 @@ def test_update_non_existing_freezer(client):
 
 def test_update_freezer_without_identity(client):
     prepare_freezer_test(client)
-    response = client.put('/freezer', json=freezer_updated_data, headers={
+    response = client.put(freezer_resource_route, json=freezer_updated_data, headers={
         'Authorization': 'Bearer {}'.format(access_token)  # <-- missing freezer code in header
     })
     assert response.status_code == 400
@@ -152,19 +159,19 @@ def test_update_freezer_without_identity(client):
 
 
 def test_deleting_freezer_by_non_logged_in_user(client):
-    response = client.delete('/freezer')
+    response = client.delete(freezer_resource_route)
     assert response.status_code == 401
 
 
 def test_deleting_freezer_without_identity(client):
-    response = client.delete('/freezer', headers={'Authorization': 'Bearer {}'.format(access_token)})
+    response = client.delete(freezer_resource_route, headers={'Authorization': 'Bearer {}'.format(access_token)})
     assert response.status_code == 400
 
 
 def test_deleting_non_existent_freezer(client):
     prepare_freezer_test(client)
-    response = client.delete('/freezer', headers={'Authorization': 'Bearer {}'.format(access_token),
-                                                  'code': '123'})
+    response = client.delete(freezer_resource_route, headers={'Authorization': 'Bearer {}'.format(access_token),
+                                                              'code': '123'})
     data = json.loads(response.data)
     assert response.status_code == 404
     assert data['message'] == 'Freezer does not exist'
@@ -172,7 +179,7 @@ def test_deleting_non_existent_freezer(client):
 
 def test_deleting_freezer(client):
     prepare_freezer_test(client)
-    response = client.delete('/freezer', headers=freezer_headers)
+    response = client.delete(freezer_resource_route, headers=freezer_headers)
 
     data = json.loads(response.data)
     assert response.status_code == 200

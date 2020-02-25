@@ -1,3 +1,4 @@
+import decimal
 import os
 import sqlite3
 import tempfile
@@ -45,11 +46,23 @@ def runner(app):
     return app.test_cli_runner()
 
 
+D = decimal.Decimal
+
+
+def adapt_decimal(d): return str(d)  # converts decimal to text when inserting to db
+
+
+def convert_decimal(s): return D(s)  # converts text to decimal when fetching from db
+
+
+sqlite3.register_adapter(D, adapt_decimal)
+sqlite3.register_converter("decimal", convert_decimal)
+
+
 def create_database(db_file):
     conn = None
     try:
-        conn = sqlite3.connect(db_file)
-
+        conn = sqlite3.connect(db_file, detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
         with current_app.open_resource("./models/schema/schema.sql", 'rb') as f:
             conn.executescript(f.read().decode("utf8"))
     except Error as e:

@@ -1,7 +1,7 @@
 from flask import json, request
 
 from api import create_app as app
-from api.tests.unittest.utils_for_tests import role_data, headers, create_role
+from api.tests.unittest.utils_for_tests import role_data, headers, create_role, role_resource_route
 
 """
 # ****************************
@@ -10,6 +10,14 @@ from api.tests.unittest.utils_for_tests import role_data, headers, create_role
 # ***                      ***
 # ****************************
 """
+
+
+def test_create_role_by_non_logged_in_user(client):
+    response = client.post(role_resource_route, json=role_data)
+    data = json.loads(response.data)
+
+    assert response.status_code == 401
+    assert data['msg'] == 'Missing Authorization Header'
 
 
 def test_create_role(client):
@@ -22,7 +30,7 @@ def test_create_role(client):
 
 def test_create_duplicate_role(client):
     create_role(client)  # 1st role created
-    response = client.post('/role', json=role_data, headers=headers)  # duplicate of 1st role
+    response = client.post(role_resource_route, json=role_data, headers=headers)  # duplicate of 1st role
     data = json.loads(response.data)
 
     assert response.status_code == 409
@@ -30,7 +38,7 @@ def test_create_duplicate_role(client):
 
 
 def test_create_role_without_required_info(client):
-    response = client.post('/role', json={
+    response = client.post(role_resource_route, json={
         'code': '001',
         # 'name': 'Admin', <-- missing required info.
         'description': 'In Charge of the system'
@@ -68,11 +76,11 @@ def test_get_role(client):
 
 
 def test_get_role_by_params(client):
-    with app().test_request_context('/role'):
-        assert request.path == '/role'
+    with app().test_request_context(role_resource_route):
+        assert request.path == role_resource_route
 
     create_role(client)
-    response = client.get('/role', headers=headers)
+    response = client.get(role_resource_route, headers=headers)
     data = json.loads(response.data)
 
     if response.status_code == 200:
@@ -91,19 +99,19 @@ def test_get_role_by_params(client):
 
 
 def test_updating_role_without_jwt_token(client):
-    response = client.put('/role', json=role_data)
+    response = client.put(role_resource_route, json=role_data)
     assert response.status_code == 401
 
 
 def test_updating_non_existent_role(client):
-    response = client.put('/role', json=role_data, headers=headers)
+    response = client.put(role_resource_route, json=role_data, headers=headers)
     assert response.status_code == 404
 
 
-# def test_updating_role_without_any_field_changes(client):
-#     create_role(client)
-#     response = client.put('/role', json=role_data, headers=headers)
-#     assert response.status_code == 304
+def test_updating_role_without_any_field_changes(client):
+    create_role(client)
+    response = client.put(role_resource_route, json=role_data, headers=headers)
+    assert response.status_code == 304
 
 
 def test_updating_role_with_field_changes(client):
@@ -127,12 +135,12 @@ def test_updating_role_with_field_changes(client):
 
 
 def test_deleting_role_without_jwt_token(client):
-    response = client.delete('/role')
+    response = client.delete(role_resource_route)
     assert response.status_code == 401
 
 
 def test_deleting_role(client):
-    response = client.delete('/role', headers=headers)
+    response = client.delete(role_resource_route, headers=headers)
     data = json.loads(response.data)
 
     if response.status_code == 404:

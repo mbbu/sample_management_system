@@ -1,7 +1,7 @@
 from flask import json
 
 from api.tests.unittest.utils_for_tests import tray_data, create_tray, tray_headers, prepare_tray_test, \
-    access_token, freezer_updated_data, tray_updated_data, tray_code
+    access_token, freezer_updated_data, tray_updated_data, tray_code, tray_resource_route
 
 """
 # ****************************
@@ -13,7 +13,7 @@ from api.tests.unittest.utils_for_tests import tray_data, create_tray, tray_head
 
 
 def test_create_tray_by_non_logged_in_user(client):
-    response = client.post('/tray', json=tray_data)
+    response = client.post(tray_resource_route, json=tray_data)
     assert response.status_code == 401
 
 
@@ -26,7 +26,7 @@ def test_create_tray(client):
 
 
 def test_create_tray_with_missing_info(client):
-    response = client.post('/tray', json={
+    response = client.post(tray_resource_route, json={
         'rack': '1',
         # 'number': '405',    <-- missing required info
         'code': tray_code
@@ -58,7 +58,7 @@ def test_create_duplicate_tray(client):
 
 
 def test_get_non_existing_tray(client):
-    response = client.get('/tray', headers={'code': 'tray_code'})
+    response = client.get(tray_resource_route, headers={'code': 'tray_code'})
     data = json.loads(response.data)
 
     assert response.status_code == 404
@@ -67,7 +67,7 @@ def test_get_non_existing_tray(client):
 
 def test_get_tray(client):
     prepare_tray_test(client)
-    response = client.get('/tray')
+    response = client.get(tray_resource_route)
     data = json.loads(response.data)
 
     if response.status_code == 404:
@@ -86,7 +86,7 @@ def test_get_tray(client):
 
 def test_get_tray_by_param(client):
     prepare_tray_test(client)
-    response = client.get('/tray', headers=tray_headers)
+    response = client.get(tray_resource_route, headers=tray_headers)
     data = json.loads(response.data)
 
     assert response.status_code == 200
@@ -105,13 +105,13 @@ def test_get_tray_by_param(client):
 
 
 def test_update_tray_by_non_logged_in_user(client):
-    response = client.put('/tray', json=freezer_updated_data)
+    response = client.put(tray_resource_route, json=freezer_updated_data)
     assert response.status_code == 401
 
 
 def test_update_tray(client):
     prepare_tray_test(client)
-    response = client.put('/tray', json=tray_updated_data, headers=tray_headers)
+    response = client.put(tray_resource_route, json=tray_updated_data, headers=tray_headers)
     data = json.loads(response.data)
 
     assert response.status_code == 202
@@ -120,7 +120,7 @@ def test_update_tray(client):
 
 def test_update_non_existing_tray(client):
     prepare_tray_test(client)
-    response = client.put('/tray', json=tray_headers, headers={
+    response = client.put(tray_resource_route, json=tray_headers, headers={
         'Authorization': 'Bearer {}'.format(access_token),
         'code': 'tray_code'  # <-- wrong/non-existing code
     })
@@ -132,7 +132,7 @@ def test_update_non_existing_tray(client):
 
 def test_update_tray_without_identity(client):
     prepare_tray_test(client)
-    response = client.put('/tray', json=freezer_updated_data, headers={
+    response = client.put(tray_resource_route, json=freezer_updated_data, headers={
         'Authorization': 'Bearer {}'.format(access_token)  # <-- missing tray code in header
     })
     assert response.status_code == 400
@@ -148,19 +148,19 @@ def test_update_tray_without_identity(client):
 
 
 def test_deleting_tray_by_non_logged_in_user(client):
-    response = client.delete('/tray')
+    response = client.delete(tray_resource_route)
     assert response.status_code == 401
 
 
 def test_deleting_tray_without_identity(client):
-    response = client.delete('/tray', headers={'Authorization': 'Bearer {}'.format(access_token)})
+    response = client.delete(tray_resource_route, headers={'Authorization': 'Bearer {}'.format(access_token)})
     assert response.status_code == 400
 
 
 def test_deleting_non_existent_tray(client):
     prepare_tray_test(client)
-    response = client.delete('/tray', headers={'Authorization': 'Bearer {}'.format(access_token),
-                                               'code': '123'})
+    response = client.delete(tray_resource_route, headers={'Authorization': 'Bearer {}'.format(access_token),
+                                                           'code': '123'})
     data = json.loads(response.data)
     assert response.status_code == 404
     assert data['message'] == 'Tray not found'
@@ -168,7 +168,7 @@ def test_deleting_non_existent_tray(client):
 
 def test_deleting_tray(client):
     prepare_tray_test(client)
-    response = client.delete('/tray', headers=tray_headers)
+    response = client.delete(tray_resource_route, headers=tray_headers)
 
     data = json.loads(response.data)
     assert response.status_code == 200

@@ -1,7 +1,7 @@
 from flask import json
 
 from api.tests.unittest.utils_for_tests import box_data, create_box, box_headers, prepare_box_test, \
-    access_token, freezer_updated_data, box_updated_data, box_code
+    access_token, freezer_updated_data, box_updated_data, box_code, box_resource_route
 
 """
 # ****************************
@@ -13,7 +13,7 @@ from api.tests.unittest.utils_for_tests import box_data, create_box, box_headers
 
 
 def test_create_box_by_non_logged_in_user(client):
-    response = client.post('/box', json=box_data)
+    response = client.post(box_resource_route, json=box_data)
     assert response.status_code == 401
 
 
@@ -26,7 +26,7 @@ def test_create_box(client):
 
 
 def test_create_box_with_missing_info(client):
-    response = client.post('/box', json={
+    response = client.post(box_resource_route, json={
         'tray': '1',
         # 'label': 'animal tissue',    <-- missing required info
         'code': box_code
@@ -58,7 +58,7 @@ def test_create_duplicate_box(client):
 
 
 def test_get_non_existing_box(client):
-    response = client.get('/box', headers={'code': 'box_code'})
+    response = client.get(box_resource_route, headers={'code': 'box_code'})
     data = json.loads(response.data)
 
     assert response.status_code == 404
@@ -67,7 +67,7 @@ def test_get_non_existing_box(client):
 
 def test_get_box(client):
     prepare_box_test(client)
-    response = client.get('/box')
+    response = client.get(box_resource_route)
     data = json.loads(response.data)
 
     if response.status_code == 404:
@@ -91,7 +91,7 @@ def test_get_box(client):
 
 def test_get_box_by_param(client):
     prepare_box_test(client)
-    response = client.get('/box', headers=box_headers)
+    response = client.get(box_resource_route, headers=box_headers)
     data = json.loads(response.data)
 
     assert data['message']['code'] == 'l1f1c1r1t1b1'
@@ -114,13 +114,13 @@ def test_get_box_by_param(client):
 
 
 def test_update_box_by_non_logged_in_user(client):
-    response = client.put('/box', json=freezer_updated_data)
+    response = client.put(box_resource_route, json=freezer_updated_data)
     assert response.status_code == 401
 
 
 def test_update_box(client):
     prepare_box_test(client)
-    response = client.put('/box', json=box_updated_data, headers=box_headers)
+    response = client.put(box_resource_route, json=box_updated_data, headers=box_headers)
     data = json.loads(response.data)
 
     assert response.status_code == 202
@@ -129,7 +129,7 @@ def test_update_box(client):
 
 def test_update_non_existing_box(client):
     prepare_box_test(client)
-    response = client.put('/box', json=box_headers, headers={
+    response = client.put(box_resource_route, json=box_headers, headers={
         'Authorization': 'Bearer {}'.format(access_token),
         'code': 'box_code'  # <-- wrong/non-existing code
     })
@@ -141,7 +141,7 @@ def test_update_non_existing_box(client):
 
 def test_update_box_without_identity(client):
     prepare_box_test(client)
-    response = client.put('/box', json=freezer_updated_data, headers={
+    response = client.put(box_resource_route, json=freezer_updated_data, headers={
         'Authorization': 'Bearer {}'.format(access_token)  # <-- missing box code in header
     })
     assert response.status_code == 400
@@ -157,19 +157,19 @@ def test_update_box_without_identity(client):
 
 
 def test_deleting_box_by_non_logged_in_user(client):
-    response = client.delete('/box')
+    response = client.delete(box_resource_route)
     assert response.status_code == 401
 
 
 def test_deleting_box_without_identity(client):
-    response = client.delete('/box', headers={'Authorization': 'Bearer {}'.format(access_token)})
+    response = client.delete(box_resource_route, headers={'Authorization': 'Bearer {}'.format(access_token)})
     assert response.status_code == 400
 
 
 def test_deleting_non_existent_box(client):
     prepare_box_test(client)
-    response = client.delete('/box', headers={'Authorization': 'Bearer {}'.format(access_token),
-                                              'code': '123'})
+    response = client.delete(box_resource_route, headers={'Authorization': 'Bearer {}'.format(access_token),
+                                                          'code': '123'})
     data = json.loads(response.data)
     assert response.status_code == 404
     assert data['message'] == 'Box not found'
@@ -177,7 +177,7 @@ def test_deleting_non_existent_box(client):
 
 def test_deleting_box(client):
     prepare_box_test(client)
-    response = client.delete('/box', headers=box_headers)
+    response = client.delete(box_resource_route, headers=box_headers)
 
     data = json.loads(response.data)
     assert response.status_code == 200

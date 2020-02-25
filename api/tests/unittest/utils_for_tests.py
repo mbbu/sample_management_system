@@ -32,6 +32,7 @@ headers = {
 # ***                              ***
 # ************************************
 """
+role_resource_route = '/role'
 role_data = {
     'code': 'Admin1',
     'name': 'Admin',
@@ -40,7 +41,7 @@ role_data = {
 
 
 def create_role(client):
-    response = client.post('/role', json=role_data, headers=headers)
+    response = client.post(role_resource_route, json=role_data, headers=headers)
     return response
 
 
@@ -51,6 +52,7 @@ def create_role(client):
 # ***                              ***
 # ************************************
 """
+user_resource_route = '/user'
 USER_DATA = {
     'first_name': 'ICIPE',
     'last_name': 'ADMIN',
@@ -61,7 +63,7 @@ USER_DATA = {
 
 
 def create_user(client):
-    response = client.post('/user', json=USER_DATA, headers=headers)
+    response = client.post(user_resource_route, json=USER_DATA, headers=headers)
     return response
 
 
@@ -77,6 +79,7 @@ def prepare_user_test(client):
 # ***                              ***
 # ************************************
 """
+lab_resource_route = '/lab'
 lab_headers = {
     'Authorization': 'Bearer {}'.format(access_token),
     'code': lab_code
@@ -90,7 +93,7 @@ lab_data = {
 
 
 def create_lab(client):
-    response = client.post('/lab', json=lab_data, headers=lab_headers)
+    response = client.post(lab_resource_route, json=lab_data, headers=lab_headers)
     return response
 
 
@@ -101,17 +104,18 @@ def create_lab(client):
 # ***                              ***
 # ************************************
 """
+freezer_resource_route = '/freezer'
 freezer_data = {
-    'laboratory': '1',
+    'laboratory': 1,
     'room': '303',
-    'number': '1',
+    'number': 1,
     'code': freezer_code
 }
 
 freezer_updated_data = {
-    'laboratory': '1',
+    'laboratory': 1,
     'room': '304',  # <-- updated value
-    'number': '12',  # <-- updated value
+    'number': 12,  # <-- updated value
     'code': freezer_code
 }
 
@@ -122,7 +126,7 @@ freezer_headers = {
 
 
 def create_freezer(client):
-    response = client.post('/freezer', json=freezer_data, headers=freezer_headers)
+    response = client.post(freezer_resource_route, json=freezer_data, headers=freezer_headers)
     return response
 
 
@@ -138,6 +142,7 @@ def prepare_freezer_test(client):
 # ***                              ***
 # ************************************
 """
+chamber_resource_route = '/chamber'
 chamber_data = {
     'freezer': '1',
     'type': 'Animal Species',
@@ -157,7 +162,7 @@ chamber_headers = {
 
 
 def create_chamber(client):
-    response = client.post('/chamber', json=chamber_data, headers=chamber_headers)
+    response = client.post(chamber_resource_route, json=chamber_data, headers=chamber_headers)
     return response
 
 
@@ -174,6 +179,7 @@ def prepare_chamber_test(client):
 # ***                              ***
 # ************************************
 """
+rack_resource_route = '/rack'
 rack_data = {
     'chamber': '1',
     'number': '404',
@@ -193,7 +199,7 @@ rack_headers = {
 
 
 def create_rack(client):
-    response = client.post('/rack', json=rack_data, headers=rack_headers)
+    response = client.post(rack_resource_route, json=rack_data, headers=rack_headers)
     return response
 
 
@@ -211,6 +217,7 @@ def prepare_rack_test(client):
 # ***                              ***
 # ************************************
 """
+tray_resource_route = '/tray'
 tray_data = {
     'rack': '1',
     'number': '404',
@@ -230,7 +237,7 @@ tray_headers = {
 
 
 def create_tray(client):
-    response = client.post('/tray', json=tray_data, headers=tray_headers)
+    response = client.post(tray_resource_route, json=tray_data, headers=tray_headers)
     return response
 
 
@@ -249,6 +256,7 @@ def prepare_tray_test(client):
 # ***                              ***
 # ************************************
 """
+box_resource_route = '/box'
 box_data = {
     'tray': '1',
     'label': 'human skin',
@@ -268,7 +276,7 @@ box_headers = {
 
 
 def create_box(client):
-    response = client.post('/box', json=box_data, headers=box_headers)
+    response = client.post(box_resource_route, json=box_data, headers=box_headers)
     return response
 
 
@@ -317,6 +325,7 @@ def create_theme(client):
 # ***                                       ***
 # *********************************************
 """
+security_level_resource_route = '/security-level'
 security_level_data = {
     'name': 'Ebola',
     'code': security_level_code,
@@ -336,7 +345,7 @@ security_level_headers = {
 
 
 def create_security_level(client):
-    response = client.post('/security-level', json=security_level_data, headers=security_level_headers)
+    response = client.post(security_level_resource_route, json=security_level_data, headers=security_level_headers)
     return response
 
 
@@ -378,6 +387,21 @@ def create_quantity_type(client):
 # ***                                       ***
 # *********************************************
 """
+
+# class DecimalEncoder(json.JSONEncoder):
+#     def _iterencode(self, o, markers=None):
+#         if isinstance(o, decimal.Decimal):
+#             # wanted a simple yield str(o) in the next line,
+#             # but that would mean a yield on the line with super(...),
+#             # which wouldn't work (see my comment below), so...
+#             return (str(o) for o in [o])
+#         return super(DecimalEncoder, self)._iterencode(o, markers)
+
+# from api.tests.unittest.conftest import D
+# temp = D('35.00')
+# temp_val = adapt_decimal(temp)
+# temp_val = json.dumps({'temperature': decimal.Decimal('5.5')}, cls=DecimalEncoder)
+
 sample_resource_route = '/sample'
 sample_data = {
     'theme': 1,
@@ -392,11 +416,13 @@ sample_data = {
     'retention_period': 3,
     'barcode': '12254DS5774SDFS',
     'analysis': 'Incomplete',
-    'temperature': 35.0,
+    'temperature': '35.00',
+    # 'temp_str': temp_val,
     'amount': 100,
     'quantity_type': 'l',
     'security_level': 1,
-    'code': sample_code
+    'code': sample_code,
+
 }
 
 sample_updated_data = {
@@ -412,7 +438,7 @@ sample_updated_data = {
     'retention_period': 3,
     'barcode': '12254DS5774SDFS',
     'analysis': 'Complete',  # <-- updated value
-    'temperature': 35.0,
+    'temperature': '35.00',
     'amount': 100,
     'quantity_type': 'l',
     'security_level': 1,
@@ -437,6 +463,30 @@ def prepare_sample_test(client):
     create_quantity_type(client)
     create_security_level(client)
     create_sample(client)
+
+
+"""
+# *********************************************
+# ***                                       ***
+# ***  HELPER FUNCTIONS FOR REDCAP SAMPLES  ***
+# ***                                       ***
+# *********************************************
+"""
+redcap_sample_resource_route = '/redcap-samples'
+redcap_sample_data = {
+    'from': '2019-12-11',
+    'to': '2019-12-13',
+    'record_id': 1
+}
+
+redcap_sample_headers = {
+    'Authorization': 'Bearer {}'.format(access_token),
+}
+
+
+def create_sample_from_redcap(client):
+    response = client.post(redcap_sample_resource_route, headers=redcap_sample_headers)
+    return response
 
 
 """
@@ -488,6 +538,7 @@ def prepare_publication_test(client):
 # ***                                       ***
 # *********************************************
 """
+house_data_resource_route = '/house-data'
 house_data_data = {
     'code': house_data_code,
     'user': 1,
@@ -526,5 +577,5 @@ house_data_headers = {
 
 def create_house_data(client):
     create_user(client)
-    response = client.post('/house-data', json=house_data_data, headers=house_data_headers)
+    response = client.post(house_data_resource_route, json=house_data_data, headers=house_data_headers)
     return response
