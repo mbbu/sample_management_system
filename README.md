@@ -1,7 +1,11 @@
 # SAMPLE MANAGEMENT SYSTEM API #
-This is a web based application that interfaces samples available at ICIPE and acts as an intermediate tool for data management and laboratory information management system for ICIPE.
+This is a web based application that interfaces samples available at I.C.I.P.E 
+and acts as an intermediate tool for data management and laboratory information 
+management system for I.C.I.P.E.
 
-## HOW TO RUN THE API ##
+___
+*HOW TO RUN THE API*
+---
 ***1.Clone the repository and move into the project directory***
 
 > While here, locally checkout a new branch and pull from origin develop to update the code.
@@ -58,8 +62,46 @@ This is a web based application that interfaces samples available at ICIPE and a
 ```
  >> curl --url http://127.0.0.1:5000/welcome
 ```
-
+___
+*HOW TO RUN THE CLIENT*
 ---
+> From the root directory run ```cd client``` and run the following commands 
+>depending on the need i.e. development or production:
+
+>> Project setup run ```npm install```
+
+>> Compiles and hot-reloads for development ```npm run serve```
+
+>> Compiles and minifies for production ```npm run build```
+
+>> Run your tests ```npm run test```
+
+>> Lints and fixes files ```npm run lint```
+
+___
+*RUN THE API TESTS*
+---
+***1.Export required variables***
+
+> While in the root dir of the project, export the following required variables.
+```
+ >> export SAMPLE_MANAGEMENT_SYSTEM_SECRET_KEY='<<random key generated locally (os.urandom(32) )>>'
+ >> export REDCap_API_TOKEN = 'Token to access given data set i.e. project or survey (contact admin)'
+ >> export FLASK_APP=api/
+```
+> Change directory to api ```cd api/``` 
+
+> Run the tests with coverage ```coverage run -m --source=. pytest -v```
+
+> Generate coverage report after tests run ```coverage report -m```
+
+> Generate the html/web output of the test coverage ```coverage html```
+
+> In the same dir i.e. api a subdirectory titled **htmlcov** is created, expand it and open the *index.html* file in a browser.  
+
+
+___
+*EXTRAS*
 ---
 ***Adding new requirements to requirements.txt file***
 > The command below help fix bug by ubuntu which gives pip wrong metadata on pkg-resources.
@@ -75,13 +117,5 @@ This is a web based application that interfaces samples available at ICIPE and a
 ```
  >> pip list --outdated --format=freeze | grep -v '^\-e' | cut -d = -f 1  | xargs -n1 pip install -U
 ```
-
-
-## RUN THE TESTS ##
-***1.Export required variables***
-```
- >> export SAMPLE_MANAGEMENT_SYSTEM_DATABASE_URI='<<postgresql://username:password@host:port/database>>'
-```
-
 
 :+1:
