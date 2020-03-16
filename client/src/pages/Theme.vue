@@ -2,11 +2,10 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12">
-
-                <h1> Themes </h1>
-                <hr>
-                <br> <br>
-                <b-button v-b-modal.modal-theme variant="primary"> Add Theme</b-button>
+                <!--                <h1> {{page_title}} </h1>-->
+                <!--                <hr>-->
+                <!--                <br> <br>-->
+                <b-button class="float_btn" v-b-modal.modal-theme variant="primary"> Add Theme</b-button>
                 <br> <br>
                 <table class=" table table-hover">
                     <thead>
@@ -24,7 +23,11 @@
 
                         <td>
                             <button @click="formSubmit" class="btn btn-warning btn-sm" type="button"> Update</button>
-                        </td>
+                            <!--                            <p><span class="glyphicon glyphicon-pencil"></span></p>-->
+                            <!--                                        <button type="button" class="btn btn-default btn-sm">-->
+                            <!--          <span class="glyphicon glyphicon-pencil"></span> Pencil-->
+                            <!--        </button>-->
+                            <!--                        </td>-->
                         <td>
                             <button @click="deleteTheme(name)" class="btn btn-danger btn-sm" type="button"> Delete
                             </button>
@@ -35,11 +38,11 @@
                 </table>
             </div>
 
-            <!--            cancel-title="{:class }"-->
             <b-modal @ok="formSubmit"
                      @submit="showModal = false"
                      id="modal-theme"
                      ok-title="Save"
+                     cancel-variant="danger"
                      title="Add Theme"
                      v-if="showModal">
 
@@ -63,11 +66,6 @@
                                 type="text"
                                 v-model="code"></b-form-input>
                     </b-form-group>
-
-                    <!--                      <div class="btn-group" role="group">-->
-                    <!--                          <b-button type="reset" @click="clearForm" variant="danger"> Reset </b-button>-->
-                    <!--                          <b-button type="submit" @click="formSubmit" variant="primary"> Submit </b-button> <br>-->
-                    <!--                      </div>-->
                 </form>
             </b-modal>
         </div>
@@ -80,8 +78,10 @@
 
     export default {
         name: 'Theme',
+        page_title: "Themes",
         data() {
             return {
+                page_title: "Themes",
                 response: [],
                 name: null,
                 code: null,

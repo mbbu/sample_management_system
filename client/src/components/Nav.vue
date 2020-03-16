@@ -1,16 +1,17 @@
 <template>
     <div class="menu-container">
         <ul class="menu">
-            <li class="menu__top">
-                <router-link to="/index" class="menu__logo">
-                    <img :src="require('../assets/logo.png')" />
+            <li class="menu_top">
+                <router-link to="/index">
+                    <img :src="require('../assets/logo.png')" class="menu_logo"/>
                 </router-link>
             </li>
 
             <li>
-            <router-link to="/home" class="context-menu__link"> 
-            <i class="fa fa-home menu__icon" aria-hidden="true"> </i>  
-            Home </router-link> 
+                <router-link to="/home" class="context-menu__link">
+                    <i class="fa fa-home menu__icon" aria-hidden="true"> </i>
+                    Home
+                </router-link>
             </li>
 
             <li>

@@ -1,26 +1,46 @@
 <template>
 
 <div>
-  <b-navbar toggleable="lg" type="dark" variant="info">
+    <b-navbar toggleable="lg" type="dark" variant="dark">
 
-      <!-- Right aligned nav items -->
-      <b-navbar-nav class="ml-auto">
-        <b-nav-form>
-          <b-form-input size="sm" class="mr-sm-2"></b-form-input>
-          <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
-        </b-nav-form>
+        <b-navbar-nav class="item_title"><h1>{{page_title}}</h1></b-navbar-nav>
 
-        <b-nav-item-dropdown right>
-          <!-- Using 'button-content' slot -->
-          <template v-slot:button-content>
-            <em>User</em>
-          </template>
-          <b-dropdown-item > <router-link to="/updateprofile"> Profile </router-link></b-dropdown-item>
-          <b-dropdown-item > <router-link to="/home"> Sign Out </router-link></b-dropdown-item>
-        </b-nav-item-dropdown>
-      </b-navbar-nav>
-    
-  </b-navbar>
+        <!-- Right aligned nav items -->
+        <b-navbar-nav class="ml-auto">
+
+            <b-nav-form>
+                <b-form-input size="sm" class="mr-sm-2"></b-form-input>
+                <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
+            </b-nav-form>
+
+            <b-nav-item-dropdown right>
+                <!-- Using 'button-content' slot -->
+                <template v-slot:button-content>
+                    <em>User</em>
+                </template>
+                <b-dropdown-item>
+                    <router-link to="/updateprofile"> Profile</router-link>
+                </b-dropdown-item>
+                <b-dropdown-item>
+                    <router-link to="/home"> Sign Out</router-link>
+                </b-dropdown-item>
+            </b-nav-item-dropdown>
+        </b-navbar-nav>
+
+    </b-navbar>
 </div>
 
 </template>
+
+<script>
+    // import theme from '../../src/pages/Theme'
+    export default {
+        props: {
+            page_title: {
+                type: String,
+                // required: true,
+                // default: theme.page_title
+            }
+        }
+    }
+</script>

@@ -32,7 +32,7 @@ class ThemeResource(BaseResource):
                 data = marshal(themes, self.fields)
                 return BaseResource.send_json_message(data, 200)
 
-    @jwt_required
+    # @jwt_required
     def post(self):
         args = ThemeResource.theme_parser()
         code = args['code']

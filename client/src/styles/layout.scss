@@ -25,3 +25,12 @@ body {
 .main-content__body {
   margin-top: 80px;
 }
+
+.float_btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  border-radius: 5%;
+  text-align: center;
+  box-shadow: 2px 2px 3px #999;
+}
