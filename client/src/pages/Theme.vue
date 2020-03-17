@@ -2,9 +2,8 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12">
-                <!--                <h1> {{page_title}} </h1>-->
-                <!--                <hr>-->
-                <!--                <br> <br>-->
+                <top-nav :page_title="page_title"></top-nav>
+
                 <b-button class="float_btn" v-b-modal.modal-theme variant="primary"> Add Theme</b-button>
                 <br> <br>
                 <table class=" table table-hover">
@@ -75,6 +74,7 @@
 <script>
     import axios from 'axios';
     import theme_resource from '../../src/utils/api_paths'
+    import TopNav from "@/components/TopNav";
 
     export default {
         name: 'Theme',
@@ -139,5 +139,6 @@
     created() {
         this.getTheme();
       },
+        components: {TopNav}
 };
 </script>

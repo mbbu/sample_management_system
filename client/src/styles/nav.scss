@@ -9,10 +9,10 @@ ul {
   z-index: 1000;
   position: fixed;
   left: 277px;
-  width: 277px;
+  width: fit-content;
   height: 100%;
   margin-left: -277px;
-  overflow-y: auto;
+  //overflow-y: auto;
   background: #000;
   top: 0;
   overflow: hidden;
@@ -21,7 +21,7 @@ ul {
 
 .menu {
   position: fixed;
-  width: 21.5%;
+  width: 20%;
   height: 100%;
   background: #074880;
 }
@@ -92,6 +92,7 @@ ul {
 
 .navbar.navbar-dark.bg-dark {
   background-color: #074880 !important;
+  width: 100%;
 }
 
 .item_title {

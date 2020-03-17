@@ -1,7 +1,6 @@
 <template>
   <div id="wrapper" :class="wrapperClass">
-      <TopNav :page_title="page_title"></TopNav>
-      <Nav></Nav>
+      <side-menu></side-menu>
       <ContentOverlay></ContentOverlay>
       <router-view/>
   </div>
@@ -9,16 +8,13 @@
 
 <script>
 
-    import Nav from '@/components/Nav.vue';
     import ContentOverlay from '@/components/ContentOverlay.vue';
-    import TopNav from '@/components/TopNav.vue';
+    import SideMenu from "./components/Nav";
 
     export default {
-
         components: {
+            SideMenu,
             ContentOverlay,
-            Nav,
-            TopNav,
         },
     };
 </script>

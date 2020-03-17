@@ -39,22 +39,20 @@
 <script>
 
 export default {
-        contentSection: '',
-        name: 'Menu',
-        
+    name: 'side-menu',
+    contentSection: '',
 
-methods: {
-    openProjectLink() {
-        alert('You need to log in');
+    methods: {
+        openProjectLink() {
+            alert('You need to log in');
         },
 
-    highlightSection(section) {
-    return {
-        'menu__link': true,
-        'menu__link--active': section === this.contentSection,
-        };
-    },
-
+        highlightSection(section) {
+            return {
+                'menu__link': true,
+                'menu__link--active': section === this.contentSection,
+            };
+        },
     },
 };
 </script>

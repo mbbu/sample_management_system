@@ -1,9 +1,7 @@
 <template>
-
 <div>
     <b-navbar toggleable="lg" type="dark" variant="dark">
-
-        <b-navbar-nav class="item_title"><h1>{{page_title}}</h1></b-navbar-nav>
+        <b-navbar-nav class="item_title"><h1>{{ page_title }}</h1></b-navbar-nav>
 
         <!-- Right aligned nav items -->
         <b-navbar-nav class="ml-auto">
@@ -29,18 +27,16 @@
 
     </b-navbar>
 </div>
-
 </template>
 
 <script>
-    // import theme from '../../src/pages/Theme'
     export default {
+        name: 'top-nav',
         props: {
             page_title: {
                 type: String,
-                // required: true,
-                // default: theme.page_title
+                required: true,
             }
-        }
+        },
     }
 </script>
