@@ -25,14 +25,14 @@
                             <b-icon
                                     icon="pencil" font-scale="2.0"
                                     class="border border-info rounded" variant="info"
-                                    v-b-tooltip.hover title="Update Item"
+                                    v-b-tooltip.hover :title="`Update ${theme.name}`"
                                     @click="formSubmit"
                             ></b-icon>
                             &nbsp;
                             <b-icon
                                     icon="trash" font-scale="1.85"
                                     class="border rounded bg-danger p-1" variant="light"
-                                    v-b-tooltip.hover title="Delete Item!"
+                                    v-b-tooltip.hover :title="`Delete ${theme.name}!`"
                                     @click="deleteTheme(code)"
                             ></b-icon>
                         </td>

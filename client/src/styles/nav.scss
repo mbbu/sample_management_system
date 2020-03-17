@@ -58,7 +58,7 @@ ul {
   }
 }
 
-.menu__icon {
+.menu_icon {
   font-size: 16px;
   width: 16px;
   text-align: center;
@@ -146,24 +146,24 @@ ul {
   &:hover {
     color: #fff;
     text-decoration: none;
-    background: #3c444b;
+    background: #2F7B57;
     cursor: pointer;
     transition: all 500ms ease-out;
   }
 
   &:visited {
     color: #fff;
+    background: #FAAB2C;
+    //background: #2F7B57;
   }
 }
 
-.context-menu__link--active {
-  background: #57636d;
+// active links
+nav a.router-link-active {
+  font-weight: 700;
+  background: #FAAB2C;
 }
 
-// links
-.menu__link--active {
-  background: #000;
-}
 
 .slide-fade-enter-active {
   transition: all 0.2s ease;
