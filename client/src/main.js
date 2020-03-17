@@ -1,5 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.css';
-import {BootstrapVue, IconsPlugin} from 'bootstrap-vue';
+import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
+import 'bootstrap-vue/src/icons.scss'
 import Vue from 'vue';
 import App from './App.vue';
 import router from './router';
@@ -8,7 +9,7 @@ import axios from 'axios';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome'
 
 Vue.use(BootstrapVue);
-Vue.use(IconsPlugin);
+Vue.use(BootstrapVueIcons);
 Vue.use(axios);
 Vue.use(Vuelidate);
 Vue.component('font-awesome-icon', FontAwesomeIcon);

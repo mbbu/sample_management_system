@@ -1,20 +1,20 @@
 <template>
   <div id="wrapper" :class="wrapperClass">
       <side-menu></side-menu>
-      <ContentOverlay></ContentOverlay>
+<!--      <ContentOverlay></ContentOverlay>-->
       <router-view/>
   </div>
 </template>
 
 <script>
 
-    import ContentOverlay from '@/components/ContentOverlay.vue';
+    // import ContentOverlay from '@/components/ContentOverlay.vue';
     import SideMenu from "./components/Nav";
 
     export default {
         components: {
             SideMenu,
-            ContentOverlay,
+            // ContentOverlay,
         },
     };
 </script>

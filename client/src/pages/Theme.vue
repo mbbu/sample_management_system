@@ -4,36 +4,40 @@
             <div class="col-sm-12">
                 <top-nav :page_title="page_title"></top-nav>
 
-                <b-button class="float_btn" v-b-modal.modal-theme variant="primary"> Add Theme</b-button>
+                <b-button class="float_btn" v-b-modal.modal-theme variant="primary">Add Theme</b-button>
                 <br> <br>
                 <table class=" table table-hover">
                     <thead>
                     <tr>
+                        <th scope="col"> Id</th>
                         <th scope="col"> Name</th>
                         <th scope="col"> Code</th>
-                        <th scope="col"> Update</th>
-                        <th scope="col"> Delete</th>
+                        <th scope="col"> Actions</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="theme.id" v-for="theme in response.message">
+                    <tr :key="theme.id" v-for="(theme, index) in response.message">
+                        <td> {{ index + 1 }}</td>
                         <td> {{ theme.name }}</td>
                         <td> {{ theme.code }}</td>
 
                         <td>
-                            <button @click="formSubmit" class="btn btn-warning btn-sm" type="button"> Update</button>
-                            <!--                            <p><span class="glyphicon glyphicon-pencil"></span></p>-->
-                            <!--                                        <button type="button" class="btn btn-default btn-sm">-->
-                            <!--          <span class="glyphicon glyphicon-pencil"></span> Pencil-->
-                            <!--        </button>-->
-                            <!--                        </td>-->
-                        <td>
-                            <button @click="deleteTheme(name)" class="btn btn-danger btn-sm" type="button"> Delete
-                            </button>
+                            <b-icon
+                                    icon="pencil" font-scale="2.0"
+                                    class="border border-info rounded" variant="info"
+                                    v-b-tooltip.hover title="Update Item"
+                                    @click="formSubmit"
+                            ></b-icon>
+                            &nbsp;
+                            <b-icon
+                                    icon="trash" font-scale="1.85"
+                                    class="border rounded bg-danger p-1" variant="light"
+                                    v-b-tooltip.hover title="Delete Item!"
+                                    @click="deleteTheme(code)"
+                            ></b-icon>
                         </td>
                     </tr>
                     </tbody>
-
                 </table>
             </div>
 
@@ -103,42 +107,43 @@
                     })
                     .catch((error) => {
                         // eslint-disable-next-line
-          console.error(error);
-        });
-    },
+                        console.error(error);
+                    });
+            },
 
-    formSubmit(e) {
-        e.preventDefault();
-        let currentObj = this;
-        axios.post(theme_resource, {
-            name: this.name,
-            code: this.code,
-        })
-            .then(function (response) {
-                currentObj.output = response.data;
-            })
-            .catch(function (error) {
-                currentObj.output = error;
-            });
-        this.clearForm();
-        this.showModal = false;
-        this.getTheme();
-    },
+            formSubmit(e) {
+                e.preventDefault();
+                let currentObj = this;
+                axios.post(theme_resource, {
+                    name: this.name,
+                    code: this.code,
+                })
+                    .then(function (response) {
+                        currentObj.output = response.data;
+                    })
+                    .catch(function (error) {
+                        currentObj.output = error;
+                    });
+                this.clearForm();
+                this.showModal = false;
+                this.getTheme();
+            },
 
-            deleteTheme: function(name) {
-    axios.delete('localhost:5000/theme'/+name)
-    .then((response) => {
-      this.getTheme();
-        console.log(response)
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-},
-},
-    created() {
-        this.getTheme();
-      },
+            deleteTheme: function (code) {
+                axios.delete('localhost:5000/theme' / +code)
+                    .then((response) => {
+                        this.getTheme();
+                        console.log(response)
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
+            },
+        },
+        created() {
+            this.getTheme();
+        },
+
         components: {TopNav}
-};
+    };
 </script>
