@@ -4,7 +4,9 @@
             <div class="col-sm-12">
                 <top-nav :page_title="page_title"></top-nav>
 
+                <FlashMessage></FlashMessage>
                 <b-button class="float_btn" v-b-modal.modal-theme variant="primary">Add Theme</b-button>
+
                 <br> <br>
                 <table class=" table table-hover">
                     <thead>
@@ -26,14 +28,17 @@
                                     icon="pencil" font-scale="2.0"
                                     class="border border-info rounded" variant="info"
                                     v-b-tooltip.hover :title="`Update ${theme.name}`"
-                                    @click="formSubmit"
+                                    v-b-modal.modal-theme
+
                             ></b-icon>
+                            <!--                            @click="fillFormForUpdate(theme.name, theme.code)"-->
+                            <!--                            @click="updateTheme(theme.code)"-->
                             &nbsp;
                             <b-icon
                                     icon="trash" font-scale="1.85"
                                     class="border rounded bg-danger p-1" variant="light"
                                     v-b-tooltip.hover :title="`Delete ${theme.name}!`"
-                                    @click="deleteTheme(code)"
+                                    @click="deleteTheme(theme.code)"
                             ></b-icon>
                         </td>
                     </tr>
@@ -41,15 +46,16 @@
                 </table>
             </div>
 
-            <b-modal @ok="formSubmit"
+            <b-modal @ok="createTheme"
                      @submit="showModal = false"
                      id="modal-theme"
                      ok-title="Save"
                      cancel-variant="danger"
                      title="Add Theme"
-                     v-if="showModal">
+                     v-if="showModal"
+            >
 
-                <form @submit.prevent="formSubmit">
+                <form @submit.prevent="createTheme">
 
                     <b-form-group id="form-name-group" label="Name:" label-for="form-name-input">
                         <b-form-input
@@ -98,6 +104,12 @@
                 this.code = null
             },
 
+            fillFormForUpdate(name, code) {
+                this.name = name;
+                this.code = code;
+                this.showModal = true;
+            },
+
             getTheme() {
                 const path = theme_resource;
                 axios.get(path)
@@ -111,32 +123,72 @@
                     });
             },
 
-            formSubmit(e) {
-                e.preventDefault();
-                let currentObj = this;
+            createTheme: function () {
                 axios.post(theme_resource, {
                     name: this.name,
                     code: this.code,
                 })
-                    .then(function (response) {
-                        currentObj.output = response.data;
-                    })
-                    .catch(function (error) {
-                        currentObj.output = error;
-                    });
-                this.clearForm();
-                this.showModal = false;
-                this.getTheme();
-            },
-
-            deleteTheme: function (code) {
-                axios.delete('localhost:5000/theme' / +code)
                     .then((response) => {
                         this.getTheme();
-                        console.log(response)
+                        this.clearForm();
+                        this.flashMessage.show({
+                            status: 'success',
+                            title: response.data['message'], message: ""
+                        });
+                    })
+                    .catch((error, response) => {
+                        console.log(error);
+                        this.flashMessage.show({
+                            status: 'error',
+                            title: error, message: response.data['message']
+                        });
+                    });
+            },
+
+            updateTheme: function (code) {
+                this.fillFormForUpdate(this.name, this.code);
+                axios.put(theme_resource, {
+                    headers: {
+                        code: code
+                    },
+                    name: this.name,
+                    code: this.code,
+                })
+                    .then((response) => {
+                        this.getTheme();
+                        this.flashMessage.show({
+                            status: 'success',
+                            title: response.data['message'], message: ""
+                        });
                     })
                     .catch((error) => {
                         console.log(error);
+                        this.flashMessage.show({
+                            status: 'error',
+                            title: error, message: ""
+                        });
+                    });
+            },
+
+            deleteTheme: function (code) {
+                axios.delete(theme_resource, {
+                    headers: {
+                        code: code
+                    }
+                })
+                    .then((response) => {
+                        this.getTheme();
+                        this.flashMessage.show({
+                            status: 'success',
+                            title: response.data['message'], message: ""
+                        });
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                        this.flashMessage.show({
+                            status: 'error',
+                            title: error, message: ""
+                        });
                     });
             },
         },

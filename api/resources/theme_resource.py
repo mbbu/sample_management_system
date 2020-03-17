@@ -1,5 +1,4 @@
 from flask import current_app, request
-from flask_jwt_extended import jwt_required
 from flask_restful import reqparse, fields, marshal
 
 from api.models.database import BaseModel
@@ -53,7 +52,7 @@ class ThemeResource(BaseResource):
         log_duplicate(Theme.query.filter(Theme.code == code).first())
         return BaseResource.send_json_message("Theme already exists", 409)
 
-    @jwt_required
+    # @jwt_required
     @has_required_request_params
     def put(self):
         code = format_and_lower_str(request.headers.get('code'))
@@ -82,7 +81,7 @@ class ThemeResource(BaseResource):
             return BaseResource.send_json_message("No changes made", 304)
         return BaseResource.send_json_message("Theme not found", 404)
 
-    @jwt_required
+    # @jwt_required
     @has_required_request_params
     def delete(self):
         code = format_and_lower_str(request.headers.get('code'))
