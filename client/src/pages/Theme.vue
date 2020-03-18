@@ -27,10 +27,12 @@
                             <b-icon
                                     icon="pencil" font-scale="2.0"
                                     class="border border-info rounded" variant="info"
-                                    v-b-tooltip.hover :title="`Update ${theme.name}`"
-                                    v-b-modal.modal-theme
-
+                                    v-b-tooltip.hover :title="`Update ${ theme.code + isEditing}`"
+                                    v-b-modal.modal-theme-edit
+                                    @click="fillFormForUpdate(theme.name, theme.code)"
                             ></b-icon>
+                            <!--                            @click="isEditing=true && fillFormForUpdate(theme.name, theme.code)"-->
+                            <!--                            :isEditing="isEditing = true"-->
                             <!--                            @click="fillFormForUpdate(theme.name, theme.code)"-->
                             <!--                            @click="updateTheme(theme.code)"-->
                             &nbsp;
@@ -46,37 +48,71 @@
                 </table>
             </div>
 
-            <b-modal @ok="createTheme"
-                     @submit="showModal = false"
-                     id="modal-theme"
-                     ok-title="Save"
-                     cancel-variant="danger"
-                     title="Add Theme"
-                     v-if="showModal"
-            >
+            <div v-if="!isEditing">
+                <b-modal
+                        title="Add Theme"
+                        @ok="createTheme"
+                        @submit="showModal = false"
+                        id="modal-theme"
+                        ok-title="Save"
+                        cancel-variant="danger"
+                >
+                    <form @submit.prevent="createTheme">
 
-                <form @submit.prevent="createTheme">
+                        <b-form-group id="form-name-group" label="Name:" label-for="form-name-input">
+                            <b-form-input
+                                    id="form-name-input"
+                                    placeholder="Enter Name"
+                                    required="true"
+                                    type="text"
+                                    v-model="name"
+                            ></b-form-input>
+                        </b-form-group>
 
-                    <b-form-group id="form-name-group" label="Name:" label-for="form-name-input">
-                        <b-form-input
-                                id="form-name-input"
-                                placeholder="Enter Name"
-                                required="true"
-                                type="text"
-                                v-model="name"
-                        ></b-form-input>
-                    </b-form-group>
+                        <b-form-group id="form-code-group" label="Code:" label-for="form-code-input">
+                            <b-form-input
+                                    id="form-code-input"
+                                    placeholder="Enter Code"
+                                    required="true"
+                                    type="text"
+                                    v-model="code"></b-form-input>
+                        </b-form-group>
+                    </form>
+                </b-modal>
+            </div>
 
-                    <b-form-group id="form-code-group" label="Code:" label-for="form-code-input">
-                        <b-form-input
-                                id="form-code-input"
-                                placeholder="Enter Code"
-                                required="true"
-                                type="text"
-                                v-model="code"></b-form-input>
-                    </b-form-group>
-                </form>
-            </b-modal>
+            <div v-else>
+                <b-modal
+                        title="Edit Theme"
+                        @ok="updateTheme(old_code)"
+                        @submit="showModal = false"
+                        id="modal-theme-edit"
+                        ok-title="Update"
+                        cancel-variant="danger"
+                >
+                    <form>
+
+                        <b-form-group id="form-name-group-edit" label="Name:" label-for="form-name-input">
+                            <b-form-input
+                                    id="form-name-input"
+                                    placeholder="Enter Name"
+                                    required="true"
+                                    type="text"
+                                    v-model="name"
+                            ></b-form-input>
+                        </b-form-group>
+
+                        <b-form-group id="form-code-group-edit" label="Code:" label-for="form-code-input">
+                            <b-form-input
+                                    id="form-code-input"
+                                    placeholder="Enter Code"
+                                    required="true"
+                                    type="text"
+                                    v-model="code"></b-form-input>
+                        </b-form-group>
+                    </form>
+                </b-modal>
+            </div>
         </div>
     </div>
 </template>
@@ -88,25 +124,29 @@
 
     export default {
         name: 'Theme',
-        page_title: "Themes",
         data() {
             return {
                 page_title: "Themes",
                 response: [],
                 name: null,
                 code: null,
+                old_code: null,
                 showModal: true,
+                isEditing: false,
             };
         },
         methods: {
             clearForm() {
                 this.name = null;
-                this.code = null
+                this.code = null;
+                this.isEditing = false;
             },
 
             fillFormForUpdate(name, code) {
                 this.name = name;
                 this.code = code;
+                this.old_code = code;
+                this.isEditing = true;
                 this.showModal = true;
             },
 
@@ -146,14 +186,11 @@
             },
 
             updateTheme: function (code) {
-                this.fillFormForUpdate(this.name, this.code);
                 axios.put(theme_resource, {
-                    headers: {
-                        code: code
-                    },
-                    name: this.name,
-                    code: this.code,
-                })
+                        name: this.name,
+                        code: this.code,
+                    }, {headers: {code: code}}
+                )
                     .then((response) => {
                         this.getTheme();
                         this.flashMessage.show({
@@ -168,6 +205,7 @@
                             title: error, message: ""
                         });
                     });
+                this.clearForm();
             },
 
             deleteTheme: function (code) {
