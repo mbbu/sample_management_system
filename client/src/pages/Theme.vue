@@ -155,12 +155,12 @@
                 const path = theme_resource;
                 axios.get(path)
                     .then((res) => {
+                        this.$log.info("Response: " + res.status + " " + res.data['message']);
                         this.response = res.data;
-                        console.log(res.data);
                     })
                     .catch((error) => {
                         // eslint-disable-next-line
-                        console.error(error);
+                        this.$log.error(error);
                     });
             },
 
@@ -177,12 +177,24 @@
                             title: response.data['message'], message: ""
                         });
                     })
-                    .catch((error, response) => {
-                        console.log(error);
-                        this.flashMessage.show({
-                            status: 'error',
-                            title: error, message: response.data['message']
-                        });
+                    .catch((error) => {
+                        this.$log.error(error);
+                        if (error.response) {
+                            if (error.response.status === 409) {
+                                this.flashMessage.show({
+                                    status: 'error',
+                                    title: "Error",
+                                    message: error.response.data['message']
+                                });
+                            } else {
+                                this.flashMessage.show({
+                                    status: 'error',
+                                    title: "Error",
+                                    message: "Theme name already exists"
+                                });
+                            }
+                        }
+                        this.clearForm();
                     });
             },
 
@@ -233,6 +245,7 @@
         },
         created() {
             this.getTheme();
+            // this.$log.info('Test Logging')
         },
         components: {TopNav}
     };
