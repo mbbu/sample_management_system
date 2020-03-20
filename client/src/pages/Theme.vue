@@ -45,11 +45,12 @@
             <div v-if="!isEditing">
                 <b-modal
                         title="Add Theme"
-                        @ok="createTheme"
-                        @submit="showModal = false"
                         id="modal-theme"
                         ok-title="Save"
                         cancel-variant="danger"
+                        @ok="createTheme"
+                        @submit="showModal = false"
+                        @hidden="clearForm"
                 >
                     <form @submit.prevent="createTheme">
 
@@ -194,8 +195,8 @@
                                 });
                             }
                         }
-                        this.clearForm();
                     });
+                this.clearForm();
             },
 
             updateTheme: function (code) {
@@ -212,11 +213,22 @@
                         });
                     })
                     .catch((error) => {
-                        console.log(error);
-                        this.flashMessage.show({
-                            status: 'error',
-                            title: error, message: ""
-                        });
+                        this.$log.error(error);
+                        if (error.response) {
+                            if (error.response.status === 304) {
+                                this.flashMessage.show({
+                                    status: 'info',
+                                    title: "Info",
+                                    message: "Record not modified"
+                                });
+                            } else {
+                                this.flashMessage.show({
+                                    status: 'error',
+                                    title: "Error",
+                                    message: error.response.data['message']
+                                });
+                            }
+                        }
                     });
                 this.clearForm();
             },

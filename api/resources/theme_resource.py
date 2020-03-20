@@ -75,7 +75,7 @@ class ThemeResource(BaseResource):
                 except Exception as e:
                     current_app.logger.error(e)
                     BaseModel.db.session.rollback()
-                    return BaseResource.send_json_message("Error while adding theme. Another theme has that name or "
+                    return BaseResource.send_json_message("Error while updating theme. Another theme has that name or "
                                                           "code", 500)
             log_304(theme)
             return BaseResource.send_json_message("No changes made", 304)
