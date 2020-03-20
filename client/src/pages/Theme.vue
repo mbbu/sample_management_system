@@ -26,14 +26,9 @@
                                     icon="pencil" font-scale="2.0"
                                     class="border border-info rounded" variant="info"
                                     v-b-tooltip.hover :title="`Update ${ theme.name }`"
-                                    v-b-modal.modal-theme-edit :theme_name="theme_name = theme.name"
-                                    :theme_code="theme_code = theme.code"
-                                    @click="fillFormForUpdate(theme.name, theme.code)"
+                                    v-b-modal.modal-theme-edit
+                                    @mouseover="fillFormForUpdate(theme.name, theme.code)"
                             ></b-icon>
-                            <!--                            @click="isEditing=true && fillFormForUpdate(theme.name, theme.code)"-->
-                            <!--                            :isEditing="isEditing = true"-->
-                            <!--                            @click="fillFormForUpdate(theme.name, theme.code)"-->
-                            <!--                            @click="updateTheme(theme.code)"-->
                             &nbsp;
                             <b-icon
                                     icon="trash" font-scale="1.85"
@@ -81,8 +76,6 @@
             </div>
 
             <div v-else-if="isEditing">
-                <!--                @shown="fillFormForUpdate(theme_name, theme_code)"-->
-                <!--                a = fillFormForUpdate(theme_name, theme_code)-->
                 <b-modal
                         title="Edit Theme"
                         @ok="updateTheme(old_code)"
@@ -90,6 +83,7 @@
                         id="modal-theme-edit"
                         ok-title="Update"
                         cancel-variant="danger"
+                        @hidden="clearForm"
                 >
                     <form>
 
@@ -114,7 +108,10 @@
                     </form>
                 </b-modal>
             </div>
-            <b-button class="float_btn" v-b-modal.modal-theme variant="primary">Add Theme</b-button>
+            <b-button class="float_btn"
+                      v-b-modal.modal-theme variant="primary"
+            >Add Theme
+            </b-button>
         </div>
     </div>
 </template>
@@ -135,8 +132,6 @@
 
                 // values for data modification
                 old_code: null,
-                theme_name: null,
-                theme_code: null,
                 showModal: true,
                 isEditing: false,
             };
@@ -145,8 +140,6 @@
             clearForm() {
                 this.name = null;
                 this.code = null;
-                this.theme_name = null;
-                this.theme_code = null;
                 this.isEditing = false;
             },
 
@@ -241,7 +234,6 @@
         created() {
             this.getTheme();
         },
-
         components: {TopNav}
     };
 </script>
