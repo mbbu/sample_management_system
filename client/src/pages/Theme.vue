@@ -4,9 +4,7 @@
             <div class="col-sm-12">
                 <top-nav :page_title="page_title"></top-nav>
 
-                <FlashMessage></FlashMessage>
-                <b-button class="float_btn" v-b-modal.modal-theme variant="primary">Add Theme</b-button>
-
+                <FlashMessage :position="'center bottom'"></FlashMessage>
                 <br> <br>
                 <table class=" table table-hover">
                     <thead>
@@ -27,8 +25,9 @@
                             <b-icon
                                     icon="pencil" font-scale="2.0"
                                     class="border border-info rounded" variant="info"
-                                    v-b-tooltip.hover :title="`Update ${ theme.code + isEditing}`"
-                                    v-b-modal.modal-theme-edit
+                                    v-b-tooltip.hover :title="`Update ${ theme.name }`"
+                                    v-b-modal.modal-theme-edit :theme_name="theme_name = theme.name"
+                                    :theme_code="theme_code = theme.code"
                                     @click="fillFormForUpdate(theme.name, theme.code)"
                             ></b-icon>
                             <!--                            @click="isEditing=true && fillFormForUpdate(theme.name, theme.code)"-->
@@ -81,7 +80,9 @@
                 </b-modal>
             </div>
 
-            <div v-else>
+            <div v-else-if="isEditing">
+                <!--                @shown="fillFormForUpdate(theme_name, theme_code)"-->
+                <!--                a = fillFormForUpdate(theme_name, theme_code)-->
                 <b-modal
                         title="Edit Theme"
                         @ok="updateTheme(old_code)"
@@ -113,6 +114,7 @@
                     </form>
                 </b-modal>
             </div>
+            <b-button class="float_btn" v-b-modal.modal-theme variant="primary">Add Theme</b-button>
         </div>
     </div>
 </template>
@@ -130,7 +132,11 @@
                 response: [],
                 name: null,
                 code: null,
+
+                // values for data modification
                 old_code: null,
+                theme_name: null,
+                theme_code: null,
                 showModal: true,
                 isEditing: false,
             };
@@ -139,6 +145,8 @@
             clearForm() {
                 this.name = null;
                 this.code = null;
+                this.theme_name = null;
+                this.theme_code = null;
                 this.isEditing = false;
             },
 
