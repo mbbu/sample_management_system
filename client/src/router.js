@@ -10,6 +10,7 @@ import Map from './pages/Map.vue';
 import UpdateProfile from './pages/UpdateProfile.vue';
 import SecurityLevel from "./pages/SecurityLevel";
 import QuantityType from "./pages/QuantityType";
+import Lab from "./pages/Lab";
 
 
 Vue.use(Router);
@@ -85,6 +86,13 @@ export default new Router({
              name: 'QuantityType',
              alias: ['/qt'],
              component: QuantityType,
+         },
+
+         {
+             path: '/lab',
+             name: 'Lab',
+             alias: ['/laboratory'],
+             component: Lab,
          },
 
 

@@ -10,7 +10,7 @@
             <li>
                 <router-link to="/home" class="context-menu__link">
                     <i class="fa fa-home menu_icon" aria-hidden="true"> </i>
-                    <b-icon icon="house" font-scale="1.8"></b-icon>
+                    <b-icon icon="house-fill" font-scale="1.8"></b-icon>
                     Home
                 </router-link>
             </li>
@@ -62,6 +62,14 @@
                     <i class="fa fa-home menu__icon" aria-hidden="true"> </i>
                     <b-icon icon="bucket" font-scale="1.5"></b-icon>
                     Quantity Type
+                </router-link>
+            </li>
+
+            <li>
+                <router-link to="/lab" class="context-menu__link">
+                    <i class="fa fa-home menu__icon" aria-hidden="true"> </i>
+                    <b-icon icon="house-door" font-scale="1.5"></b-icon>
+                    Labs
                 </router-link>
             </li>
 
