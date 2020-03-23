@@ -9,6 +9,7 @@ import AddSample from './pages/AddSample.vue';
 import Map from './pages/Map.vue';
 import UpdateProfile from './pages/UpdateProfile.vue';
 import SecurityLevel from "./pages/SecurityLevel";
+import QuantityType from "./pages/QuantityType";
 
 
 Vue.use(Router);
@@ -77,6 +78,13 @@ export default new Router({
              name: 'SecurityLevel',
              alias: ['/securitylevel'],
              component: SecurityLevel,
+         },
+
+         {
+             path: '/quantity-type',
+             name: 'QuantityType',
+             alias: ['/qt'],
+             component: QuantityType,
          },
 
 

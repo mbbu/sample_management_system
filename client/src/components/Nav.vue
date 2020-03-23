@@ -57,6 +57,14 @@
                 </router-link>
             </li>
 
+            <li>
+                <router-link to="/quantity-type" class="context-menu__link">
+                    <i class="fa fa-home menu__icon" aria-hidden="true"> </i>
+                    <b-icon icon="bucket" font-scale="1.5"></b-icon>
+                    Quantity Type
+                </router-link>
+            </li>
+
 
         </ul>
     </nav>
