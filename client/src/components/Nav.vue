@@ -49,6 +49,14 @@
                 </router-link>
             </li>
 
+            <li>
+                <router-link to="/security-level" class="context-menu__link">
+                    <i class="fa fa-home menu__icon" aria-hidden="true"> </i>
+                    <b-icon icon="exclamation-triangle" font-scale="1.5"></b-icon>
+                    Security Level
+                </router-link>
+            </li>
+
 
         </ul>
     </nav>
