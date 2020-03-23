@@ -11,6 +11,7 @@ import UpdateProfile from './pages/UpdateProfile.vue';
 import SecurityLevel from "./pages/SecurityLevel";
 import QuantityType from "./pages/QuantityType";
 import Lab from "./pages/Lab";
+import Freezer from "./pages/Freezer";
 
 
 Vue.use(Router);
@@ -93,6 +94,13 @@ export default new Router({
              name: 'Lab',
              alias: ['/laboratory'],
              component: Lab,
+         },
+
+         {
+             path: '/freezer',
+             name: 'Freezer',
+             alias: ['/freezer'],
+             component: Freezer,
          },
 
 
