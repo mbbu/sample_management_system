@@ -119,7 +119,7 @@
 
 <script>
     import axios from 'axios';
-    import theme_resource from '../../src/utils/api_paths'
+    import {theme_resource} from '../../src/utils/api_paths'
     import TopNav from "@/components/TopNav";
 
     export default {
@@ -153,8 +153,7 @@
             },
 
             getTheme() {
-                const path = theme_resource;
-                axios.get(path)
+                axios.get(theme_resource)
                     .then((res) => {
                         this.$log.info("Response: " + res.status + " " + res.data['message']);
                         this.response = res.data;
@@ -186,6 +185,12 @@
                                     status: 'error',
                                     title: "Error",
                                     message: error.response.data['message']
+                                });
+                            } else if (error.response.status === 401) {
+                                this.flashMessage.show({
+                                    status: 'error',
+                                    title: "Session Expired",
+                                    message: "You need to log in to perform this operation"
                                 });
                             } else {
                                 this.flashMessage.show({
@@ -221,6 +226,12 @@
                                     title: "Info",
                                     message: "Record not modified"
                                 });
+                            } else if (error.response.status === 401) {
+                                this.flashMessage.show({
+                                    status: 'error',
+                                    title: "Session Expired",
+                                    message: "You need to log in to perform this operation"
+                                });
                             } else {
                                 this.flashMessage.show({
                                     status: 'error',
@@ -247,11 +258,21 @@
                         });
                     })
                     .catch((error) => {
-                        console.log(error);
-                        this.flashMessage.show({
-                            status: 'error',
-                            title: error, message: ""
-                        });
+                        this.$log.error(error);
+                        if (error.response) {
+                            if (error.response.status === 401) {
+                                this.flashMessage.show({
+                                    status: 'error',
+                                    title: "Session Expired",
+                                    message: "You need to log in to perform this operation"
+                                });
+                            } else {
+                                this.flashMessage.show({
+                                    status: 'error',
+                                    title: error, message: ""
+                                });
+                            }
+                        }
                     });
             },
         },
