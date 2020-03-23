@@ -164,6 +164,7 @@
             clearForm() {
                 this.name = null;
                 this.code = null;
+                this.desc = null;
                 this.isEditing = false;
             },
 
