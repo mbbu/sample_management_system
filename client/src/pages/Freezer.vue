@@ -61,16 +61,10 @@
                             <ejs-dropdownlist
                                     id='dropdownlist'
                                     :dataSource='labDataList'
+                                    :fields="fields"
                                     placeholder='Select a lab'
-                                    v-model="laboratory"
+                                    :v-model="laboratory = fields.value"
                             ></ejs-dropdownlist>
-                            <!--                            <b-form-input-->
-                            <!--                                    id="form-lab-input"-->
-                            <!--                                    placeholder="Enter Lab"-->
-                            <!--                                    required="true"-->
-                            <!--                                    type="text"-->
-                            <!--                                    v-model="laboratory"-->
-                            <!--                            ></b-form-input>-->
                         </b-form-group>
 
                         <b-form-group id="form-room-group" label="Room:" label-for="form-room-input">
@@ -186,6 +180,7 @@
                 room: null,
                 labData: [],
                 labDataList: [],
+                fields: {text: '', value: ''},
 
                 // values for data modification
                 old_code: null,
@@ -218,8 +213,21 @@
                         this.$log.info("Response: " + res.status + " " + res.data['message']);
                         this.labData = res.data;
                         for (var lab_item = 0; lab_item < this.labData.message.length; lab_item++) {
-                            this.labDataList.push(this.labData.message[lab_item].name);
-                            this.$log.info("LAB DATA LIST: " + this.labDataList)
+                            this.labDataList.push({
+                                'code': this.labData.message[lab_item].code,
+                                'name': this.labData.message[lab_item].name
+                            });
+
+                            this.fields.text = this.labDataList[lab_item].name;
+                            this.fields.value = this.labDataList[lab_item].code;
+
+                            // this.fields = {text: this.labDataList[lab_item].name, value: this.labDataList[lab_item].code};
+                            this.$log.info("LAB DATA LIST: " + JSON.stringify(this.labDataList));
+                            this.$log.info("LAB DATA LIST ITEM: " + this.labDataList[lab_item].name);
+                            this.$log.info("LAB DATA LIST ITEM: " + this.labDataList[lab_item].code);
+
+                            this.$log.info("LAB DATA LIST fields text: " + this.fields.text);
+                            this.$log.info("LAB DATA LIST fields value: " + this.fields.value)
                         }
                     })
                     .catch((error) => {
