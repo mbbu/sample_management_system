@@ -57,15 +57,20 @@
                         @hidden="clearForm"
                 >
                     <form @submit.prevent="createFreezer">
-
                         <b-form-group id="form-lab-group" label="Lab:" label-for="form-lab-input">
-                            <b-form-input
-                                    id="form-lab-input"
-                                    placeholder="Enter Lab"
-                                    required="true"
-                                    type="text"
+                            <ejs-dropdownlist
+                                    id='dropdownlist'
+                                    :dataSource='labDataList'
+                                    placeholder='Select a lab'
                                     v-model="laboratory"
-                            ></b-form-input>
+                            ></ejs-dropdownlist>
+                            <!--                            <b-form-input-->
+                            <!--                                    id="form-lab-input"-->
+                            <!--                                    placeholder="Enter Lab"-->
+                            <!--                                    required="true"-->
+                            <!--                                    type="text"-->
+                            <!--                                    v-model="laboratory"-->
+                            <!--                            ></b-form-input>-->
                         </b-form-group>
 
                         <b-form-group id="form-room-group" label="Room:" label-for="form-room-input">
@@ -166,7 +171,7 @@
 
 <script>
     import axios from 'axios';
-    import {freezer_resource} from '../../src/utils/api_paths'
+    import {freezer_resource, lab_resource} from '../../src/utils/api_paths'
     import TopNav from "@/components/TopNav";
 
     export default {
@@ -179,6 +184,8 @@
                 number: null,
                 code: null,
                 room: null,
+                labData: [],
+                labDataList: [],
 
                 // values for data modification
                 old_code: null,
@@ -205,6 +212,22 @@
                 this.showModal = true;
             },
 
+            getLabDataList() {
+                axios.get(lab_resource)
+                    .then((res) => {
+                        this.$log.info("Response: " + res.status + " " + res.data['message']);
+                        this.labData = res.data;
+                        for (var lab_item = 0; lab_item < this.labData.message.length; lab_item++) {
+                            this.labDataList.push(this.labData.message[lab_item].name);
+                            this.$log.info("LAB DATA LIST: " + this.labDataList)
+                        }
+                    })
+                    .catch((error) => {
+                        // eslint-disable-next-line
+                        this.$log.error(error);
+                    });
+            },
+
             getFreezer() {
                 axios.get(freezer_resource)
                     .then((res) => {
@@ -215,6 +238,7 @@
                         // eslint-disable-next-line
                         this.$log.error(error);
                     });
+                this.getLabDataList();
             },
 
             createFreezer: function () {

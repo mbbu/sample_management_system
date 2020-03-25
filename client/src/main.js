@@ -1,6 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.css';
 import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
 import 'bootstrap-vue/src/icons.scss'
+import {DropDownListPlugin} from "@syncfusion/ej2-vue-dropdowns";
 import Vue from 'vue';
 import App from './App.vue';
 import router from './router';
@@ -24,6 +25,7 @@ const options = {
 
 Vue.use(BootstrapVue);
 Vue.use(BootstrapVueIcons);
+Vue.use(DropDownListPlugin);
 Vue.use(axios);
 Vue.use(Vuelidate);
 Vue.use(VueLogger, options);

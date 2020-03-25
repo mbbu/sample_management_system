@@ -1,5 +1,4 @@
 from flask import current_app, request
-from flask_jwt_extended import jwt_required
 from flask_restful import fields, marshal, reqparse
 
 from api.models.database import BaseModel
@@ -35,7 +34,7 @@ class FreezerResource(BaseResource):
                 data = marshal(freezer, self.fields)
                 return BaseResource.send_json_message(data, 200)
 
-    @jwt_required
+    # @jwt_required
     def post(self):
         args = FreezerResource.freezer_args()
         laboratory = args['laboratory']
@@ -63,7 +62,7 @@ class FreezerResource(BaseResource):
         log_duplicate(Freezer.query.filter(Freezer.code == code).first())
         return BaseResource.send_json_message("Freezer already exists", 409)
 
-    @jwt_required
+    # @jwt_required
     @has_required_request_params
     def put(self):
         code = format_and_lower_str(request.headers['code'])
@@ -98,7 +97,7 @@ class FreezerResource(BaseResource):
             log_304(freezer)
             return BaseResource.send_json_message("No changes made", 304)
 
-    @jwt_required
+    # @jwt_required
     @has_required_request_params
     def delete(self):
         code = format_and_lower_str(request.headers['code'])
