@@ -11,6 +11,7 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.26",
     "@fortawesome/vue-fontawesome": "^0.1.9",
     "@google/markerclusterer": "^2.0.6",
+    "@syncfusion/ej2-vue-dropdowns": "^17.4.51",
     "@syncfusion/ej2-vue-maps": "^17.4.43",
     "axios": "^0.18.1",
     "bootstrap": "^4.3.1",
