@@ -44,8 +44,6 @@
                     </tr>
                     </tbody>
                 </table>
-                {{isEditing}}
-                {{labDataList}}
             </div>
 
             <div v-if="!isEditing">
@@ -180,7 +178,6 @@
                 number: null,
                 code: null,
                 room: null,
-                labData: [],
                 labDataList: [],
                 fields: {text: '', value: ''},
 
@@ -191,13 +188,13 @@
             };
         },
         methods: {
+            // Util Functions
             clearForm() {
                 this.laboratory = null;
                 this.number = null;
                 this.code = null;
                 this.room = null;
                 this.isEditing = false;
-                this.labData = [];
                 this.labDataList = [];
                 this.getLabDataList();
             },
@@ -216,11 +213,10 @@
                 axios.get(lab_resource)
                     .then((res) => {
                         this.$log.info("Response: " + res.status + " " + res.data['message']);
-                        this.labData = res.data;
-                        for (var lab_item = 0; lab_item < this.labData.message.length; lab_item++) {
+                        for (var lab_item = 0; lab_item < res.data.message.length; lab_item++) {
                             this.labDataList.push({
-                                'Code': this.labData.message[lab_item].code,
-                                'Name': this.labData.message[lab_item].name
+                                'Code': res.data.message[lab_item].code,
+                                'Name': res.data.message[lab_item].name
                             });
                             this.fields = {text: 'Name', value: 'Code'};
                         }
@@ -232,16 +228,12 @@
             },
 
             getSelectedLabItem() {
-                var item = document.getElementById("dropdownlist").value;
-                this.$log.info("*****> SELECTED ITEM VALUE: " + item);
+                let item = document.getElementById("dropdownlist").value;
 
                 for (var i = 0; i < this.labDataList.length; i++) {
                     this.$log.info("ITEM: " + item + " labDataList Item: " + this.labDataList[i].Name);
-
                     if (item === this.labDataList[i].Name) {
                         this.laboratory = this.labDataList[i].Code;
-                        this.$log.info("Item Value: " + item + " LabDataList Item Value: " + this.labDataList[i].Name +
-                            " Lab Code is: " + this.laboratory)
                     } else {
                         this.$log.info("** ITEM NOT FOUND ***")
                     }
@@ -252,9 +244,16 @@
                 // set dropdownitem to the selected item
                 var element = document.getElementById("dropdownlist");
                 element.value = laboratory;
-                this.$log.info("Element is " + element + " ~~~~~~~~> LAB PASSED: " + laboratory + " and this.laboratory = " + this.laboratory);
             },
 
+            showFlashMessage(status, title, message) {
+                this.flashMessage.show({
+                    status: status,
+                    title: title, message: message
+                });
+            },
+
+            // Functions to interact with api
             getFreezer() {
                 this.clearForm();
                 axios.get(freezer_resource)
@@ -279,10 +278,7 @@
                 })
                     .then((response) => {
                         this.getFreezer();
-                        this.flashMessage.show({
-                            status: 'success',
-                            title: "", message: response.data['message']
-                        });
+                        this.showFlashMessage('success', response.data['message'], '');
                         this.clearForm();
                     })
                     .catch((error) => {
@@ -290,29 +286,13 @@
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 409) {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Error",
-                                    message: error.response.data['message']
-                                });
+                                this.showFlashMessage('error', error.response.data['message'], '');
                             } else if (error.response.status === 400) {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Form Error",
-                                    message: "Kindly refill the form"
-                                });
+                                this.showFlashMessage('error', error.response.data['message'], 'Kindly refill the form');
                             } else if (error.response.status === 401) {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Session Expired",
-                                    message: "You need to log in to perform this operation"
-                                });
+                                this.showFlashMessage('error', "Session Expired", 'You need to log in to perform this operation');
                             } else {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Error",
-                                    message: "Freezer already exists"
-                                });
+                                this.showFlashMessage('error', error.response.data['message'], '');
                             }
                         }
                     });
@@ -330,10 +310,7 @@
                 )
                     .then((response) => {
                         this.getFreezer();
-                        this.flashMessage.show({
-                            status: 'success',
-                            title: response.data['message'], message: ""
-                        });
+                        this.showFlashMessage('success', response.data['message'], '');
                         this.clearForm();
                     })
                     .catch((error) => {
@@ -341,23 +318,11 @@
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 304) {
-                                this.flashMessage.show({
-                                    status: 'info',
-                                    title: "Info",
-                                    message: "Record not modified"
-                                });
+                                this.showFlashMessage('info', 'Record not modified!', '');
                             } else if (error.response.status === 401) {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Session Expired",
-                                    message: "You need to log in to perform this operation"
-                                });
+                                this.showFlashMessage('error', "Session Expired", 'You need to log in to perform this operation');
                             } else {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Error",
-                                    message: error.response.data['message']
-                                });
+                                this.showFlashMessage('error', error.response.data['message'], '');
                             }
                         }
                     });
@@ -371,25 +336,15 @@
                 })
                     .then((response) => {
                         this.getFreezer();
-                        this.flashMessage.show({
-                            status: 'success',
-                            title: response.data['message'], message: ""
-                        });
+                        this.showFlashMessage('success', response.data['message'], '');
                     })
                     .catch((error) => {
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 401) {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Session Expired",
-                                    message: "You need to log in to perform this operation"
-                                });
+                                this.showFlashMessage('error', "Session Expired", 'You need to log in to perform this operation');
                             } else {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: error, message: ""
-                                });
+                                this.showFlashMessage('error', error.response.data['message'], '');
                             }
                         }
                     });
