@@ -29,7 +29,7 @@
                             <b-icon
                                     icon="pencil" font-scale="2.0"
                                     class="border border-info rounded" variant="info"
-                                    v-b-tooltip.hover :title="`Update ${ freezer.name }`"
+                                    v-b-tooltip.hover :title="`Update freezer ${ freezer.number }`"
                                     v-b-modal.modal-freezer-edit
                                     @mouseover="fillFormForUpdate(freezer.number, freezer.code, freezer.room, freezer.lab)"
                             ></b-icon>
@@ -37,7 +37,7 @@
                             <b-icon
                                     icon="trash" font-scale="1.85"
                                     class="border rounded bg-danger p-1" variant="light"
-                                    v-b-tooltip.hover :title="`Delete ${freezer.name}!`"
+                                    v-b-tooltip.hover :title="`Delete freezer ${freezer.number}!`"
                                     @click="deleteFreezer(freezer.code)"
                             ></b-icon>
                         </td>
@@ -63,7 +63,7 @@
                                     :dataSource='labDataList'
                                     :fields="fields"
                                     placeholder='Select a lab'
-                                    :v-model="laboratory = fields.value"
+                                    :v-model="laboratory"
                             ></ejs-dropdownlist>
                         </b-form-group>
 
@@ -195,6 +195,9 @@
                 this.code = null;
                 this.room = null;
                 this.isEditing = false;
+                this.labData = [];
+                this.labDataList = [];
+                this.getLabDataList();
             },
 
             fillFormForUpdate(number, code, room, laboratory) {
@@ -214,26 +217,34 @@
                         this.labData = res.data;
                         for (var lab_item = 0; lab_item < this.labData.message.length; lab_item++) {
                             this.labDataList.push({
-                                'code': this.labData.message[lab_item].code,
-                                'name': this.labData.message[lab_item].name
+                                'Code': this.labData.message[lab_item].code,
+                                'Name': this.labData.message[lab_item].name
                             });
 
-                            this.fields.text = this.labDataList[lab_item].name;
-                            this.fields.value = this.labDataList[lab_item].code;
-
-                            // this.fields = {text: this.labDataList[lab_item].name, value: this.labDataList[lab_item].code};
-                            this.$log.info("LAB DATA LIST: " + JSON.stringify(this.labDataList));
-                            this.$log.info("LAB DATA LIST ITEM: " + this.labDataList[lab_item].name);
-                            this.$log.info("LAB DATA LIST ITEM: " + this.labDataList[lab_item].code);
-
-                            this.$log.info("LAB DATA LIST fields text: " + this.fields.text);
-                            this.$log.info("LAB DATA LIST fields value: " + this.fields.value)
+                            this.fields = {text: 'Name', value: 'Code'};
                         }
                     })
                     .catch((error) => {
                         // eslint-disable-next-line
                         this.$log.error(error);
                     });
+            },
+
+            getSelectedLabItem() {
+                var item = document.getElementById("dropdownlist").value;
+                this.$log.info("*****> SELECTED ITEM VALUE: " + item);
+
+                for (var i = 0; i < this.labDataList.length; i++) {
+                    this.$log.info("ITEM: " + item + " labDataList Item: " + this.labDataList[i].Name);
+
+                    if (item === this.labDataList[i].Name) {
+                        this.laboratory = this.labDataList[i].Code;
+                        this.$log.info("Item Value: " + item + " LabDataList Item Value: " + this.labDataList[i].Name +
+                            " Lab Code is: " + this.laboratory)
+                    } else {
+                        this.$log.info("** ITEM NOT FOUND ***")
+                    }
+                }
             },
 
             getFreezer() {
@@ -250,6 +261,8 @@
             },
 
             createFreezer: function () {
+                this.getSelectedLabItem();
+
                 axios.post(freezer_resource, {
                     laboratory: this.laboratory,
                     number: this.number,
@@ -260,10 +273,12 @@
                         this.getFreezer();
                         this.flashMessage.show({
                             status: 'success',
-                            title: response.data['message'], message: ""
+                            title: "", message: response.data['message']
                         });
+                        this.clearForm();
                     })
                     .catch((error) => {
+                        this.clearForm();
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 409) {
@@ -271,6 +286,12 @@
                                     status: 'error',
                                     title: "Error",
                                     message: error.response.data['message']
+                                });
+                            } else if (error.response.status === 400) {
+                                this.flashMessage.show({
+                                    status: 'error',
+                                    title: "Form Error",
+                                    message: "Kindly refill the form"
                                 });
                             } else if (error.response.status === 401) {
                                 this.flashMessage.show({
@@ -287,7 +308,6 @@
                             }
                         }
                     });
-                this.clearForm();
             },
 
             updateFreezer: function (code) {
