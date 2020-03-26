@@ -31,7 +31,7 @@
                                     class="border border-info rounded" variant="info"
                                     v-b-tooltip.hover :title="`Update freezer ${ freezer.number }`"
                                     v-b-modal.modal-freezer-edit
-                                    @mouseover="fillFormForUpdate(freezer.number, freezer.code, freezer.room, freezer.lab)"
+                                    @mouseover="fillFormForUpdate(freezer.number, freezer.code, freezer.room, freezer['lab.name'])"
                             ></b-icon>
                             &nbsp;
                             <b-icon
@@ -44,6 +44,8 @@
                     </tr>
                     </tbody>
                 </table>
+                {{isEditing}}
+                {{labDataList}}
             </div>
 
             <div v-if="!isEditing">
@@ -53,7 +55,7 @@
                         ok-title="Save"
                         cancel-variant="danger"
                         @ok="createFreezer"
-                        @submit="showModal = false"
+                        @submit="clearForm"
                         @hidden="clearForm"
                 >
                     <form @submit.prevent="createFreezer">
@@ -109,18 +111,18 @@
                         id="modal-freezer-edit"
                         ok-title="Update"
                         cancel-variant="danger"
+                        @shown="selectLabItemForUpdate(laboratory)"
                         @hidden="clearForm"
                 >
                     <form>
-
                         <b-form-group id="form-lab-group-edit" label="Lab:" label-for="form-lab-input">
-                            <b-form-input
-                                    id="form-lab-input"
-                                    placeholder="Enter Lab"
-                                    required="true"
-                                    type="text"
-                                    v-model="laboratory"
-                            ></b-form-input>
+                            <ejs-dropdownlist
+                                    id='dropdownlist'
+                                    :dataSource='labDataList'
+                                    :fields="fields"
+                                    placeholder='Select a lab'
+                                    :v-model="laboratory"
+                            ></ejs-dropdownlist>
                         </b-form-group>
 
                         <b-form-group id="form-room-group-edit" label="Room:" label-for="form-room-input">
@@ -220,7 +222,6 @@
                                 'Code': this.labData.message[lab_item].code,
                                 'Name': this.labData.message[lab_item].name
                             });
-
                             this.fields = {text: 'Name', value: 'Code'};
                         }
                     })
@@ -247,7 +248,15 @@
                 }
             },
 
+            selectLabItemForUpdate(laboratory) {
+                // set dropdownitem to the selected item
+                var element = document.getElementById("dropdownlist");
+                element.value = laboratory;
+                this.$log.info("Element is " + element + " ~~~~~~~~> LAB PASSED: " + laboratory + " and this.laboratory = " + this.laboratory);
+            },
+
             getFreezer() {
+                this.clearForm();
                 axios.get(freezer_resource)
                     .then((res) => {
                         this.$log.info("Response: " + res.status + " " + res.data['message']);
@@ -257,7 +266,6 @@
                         // eslint-disable-next-line
                         this.$log.error(error);
                     });
-                this.getLabDataList();
             },
 
             createFreezer: function () {
@@ -311,6 +319,8 @@
             },
 
             updateFreezer: function (code) {
+                this.getSelectedLabItem();
+
                 axios.put(freezer_resource, {
                         laboratory: this.laboratory,
                         number: this.number,
@@ -324,8 +334,10 @@
                             status: 'success',
                             title: response.data['message'], message: ""
                         });
+                        this.clearForm();
                     })
                     .catch((error) => {
+                        this.clearForm();
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 304) {
@@ -349,7 +361,6 @@
                             }
                         }
                     });
-                this.clearForm();
             },
 
             deleteFreezer: function (code) {

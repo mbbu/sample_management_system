@@ -79,7 +79,12 @@ class FreezerResource(BaseResource):
 
         else:
             args = FreezerResource.freezer_args()
-            laboratory = args['laboratory']
+            if type(args['laboratory']) is str:
+                lab = LaboratoryResource.get_laboratory(args['laboratory'])
+                laboratory = lab.id
+            else:
+                laboratory = args['laboratory']
+
             number = args['number']
             room = args['room']
             code = args['code']
