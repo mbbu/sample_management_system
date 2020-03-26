@@ -23,13 +23,18 @@ const options = {
     showConsoleColors: true
 };
 
+const flash_config = {
+    time: 5000,
+    icon: true
+};
+
 Vue.use(BootstrapVue);
 Vue.use(BootstrapVueIcons);
 Vue.use(DropDownListPlugin);
 Vue.use(axios);
 Vue.use(Vuelidate);
 Vue.use(VueLogger, options);
-Vue.use(FlashMessage);
+Vue.use(FlashMessage, flash_config);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.config.productionTip = false;
 
