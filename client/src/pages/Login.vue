@@ -1,51 +1,68 @@
 <template>
-  <div class="container">
-    <h2> Login </h2>
-    <b-form @submit="onSubmit" @reset="onReset" v-if="show">
-      <b-form-group
-        id="input-group-1"
-        label="Email address:"
-        label-for="input-1"
-      >
-        <b-form-input
-          id="input-1"
-          v-model="form.email"
-          type="email"
-        ></b-form-input>
-      </b-form-group>
+  <!-- Material form login -->
+  <!-- Default form login -->
+  <form class="text-center border border-light p-5" action="#!">
 
-      <b-form-group id="input-group-2" label="Your Password:" label-for="input-2">
-        <b-form-input
-          id="input-2"
-          type="password"
-          v-model="form.password"
-        ></b-form-input>
-      </b-form-group>
+    <!--Header-->
+    <div class="form-header  purple darken-4">
+      <h3><i class="fa fa-lock"></i> Login:</h3>
+    </div>
 
-      <div class="wrapper">
+    <!--    <p class="h4 mb-4">Sign in</p>-->
 
-        <b-form-group id="input-group-4">
-        <b-form-checkbox-group v-model="form.checked" id="checkboxes-4">
-          <b-form-checkbox value="me">Remember Me</b-form-checkbox>
-        </b-form-checkbox-group>
-      </b-form-group>
+    <!-- Email -->
+    <input type="email" id="defaultLoginFormEmail" class="form-control mb-4" placeholder="E-mail">
 
-          <b-button type="submit" variant="primary">Submit</b-button>
+    <!-- Password -->
+    <input type="password" id="defaultLoginFormPassword" class="form-control mb-4" placeholder="Password">
 
-          <p> Don't have an account yet?</p>
-
-          <b-button type="register" variant="danger">Register</b-button> 
+    <div class="d-flex justify-content-around">
+      <div>
+        <!-- Remember me -->
+        <div class="custom-control custom-checkbox">
+          <input type="checkbox" class="custom-control-input" id="defaultLoginFormRemember">
+          <label class="custom-control-label" for="defaultLoginFormRemember">Remember me</label>
+        </div>
       </div>
-    
- 
-      
-    </b-form>
-   
-  </div>
+      <div>
+        <!-- Forgot password -->
+        <a href="">Forgot password?</a>
+      </div>
+    </div>
+
+    <!-- Sign in button -->
+    <button class="btn btn-info btn-block my-4" type="submit">Sign in</button>
+
+    <!-- Register -->
+    <p>Not a member?
+      <a href="">Register</a>
+    </p>
+
+    <!-- Social login -->
+    <p>or sign in with:</p>
+
+    <a href="#" class="mx-2" role="button"><i class="fab fa-facebook-f light-blue-text"></i></a>
+    <a href="#" class="mx-2" role="button"><i class="fab fa-twitter light-blue-text"></i></a>
+    <a href="#" class="mx-2" role="button"><i class="fab fa-linkedin-in light-blue-text"></i></a>
+    <a href="#" class="mx-2" role="button"><i class="fab fa-github light-blue-text"></i></a>
+
+  </form>
+  <!-- Default form login -->
+  <!-- Material form login -->
+
+  <!-- Material form register -->
+
+  <!-- Material form register -->
 </template>
 
 <script>
+  // import {  mdbBtn, mdbInput } from "mdbvue";
   export default {
+    components: {
+      // mdbInput,
+      // mdbBtn,
+
+    },
     data() {
       return {
         form: {
@@ -57,16 +74,16 @@
     },
     methods: {
       onSubmit(evt) {
-        evt.preventDefault()
+        evt.preventDefault();
         alert(JSON.stringify(this.form))
       },
       onReset(evt) {
-        evt.preventDefault()
+        evt.preventDefault();
         // Reset our form values
-        this.form.email = ''
-        this.form.checked = []
+        this.form.email = '';
+        this.form.checked = [];
         // Trick to reset/clear native browser form validation state
-        this.show = false
+        this.show = false;
         this.$nextTick(() => {
           this.show = true
         })

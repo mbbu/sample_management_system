@@ -12,30 +12,46 @@ import SecurityLevel from "./pages/SecurityLevel";
 import QuantityType from "./pages/QuantityType";
 import Lab from "./pages/Lab";
 import Freezer from "./pages/Freezer";
+import SignUp from "./pages/SignUp";
+import ContactUs from "./pages/ContactUs";
 
 
 Vue.use(Router);
 
 export default new Router({
-     mode: 'history',
-     base: process.env.BASE_URL,
-     routes: [
-         {
-             path: '/login',
-             name: 'login',
-             alias: ['/signin'],
-             component: Login,
-         },
+    mode: 'history',
+    base: process.env.BASE_URL,
+    routes: [
+        {
+            path: '/login',
+            name: 'login',
+            alias: ['/signin'],
+            component: Login,
+        },
 
-         {
-             path: '/updateprofile',
-             name: 'updateprofile',
-             component: UpdateProfile,
-         },
+        {
+            path: '/register',
+            name: 'register',
+            alias: ['/signup'],
+            component: SignUp,
+        },
 
-         {
-             path: '/home',
-             name: 'Map',
+        {
+            path: '/contact-us',
+            name: 'contact',
+            alias: ['/contact'],
+            component: ContactUs,
+        },
+
+        {
+            path: '/updateprofile',
+            name: 'updateprofile',
+            component: UpdateProfile,
+        },
+
+        {
+            path: '/home',
+            name: 'Map',
              alias: ['/welcome'],
              component: Map,
          },
