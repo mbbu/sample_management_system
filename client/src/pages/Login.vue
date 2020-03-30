@@ -1,88 +1,107 @@
 <template>
-  <!-- Material form login -->
-  <!-- Default form login -->
-  <form class="text-center border border-light p-5" action="#!">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <top-nav :page_title="page_title"></top-nav>
 
-    <!--Header-->
-    <div class="form-header  purple darken-4">
-      <h3><i class="fa fa-lock"></i> Login:</h3>
-    </div>
+                <section class="form-gradient" style="margin-top: 2%">
+                    <mdb-row>
+                        <mdb-col md="12">
+                            <mdb-card>
+                                <div class="header pt-3 blue-gradient">
+                                    <mdb-row class="d-flex justify-content-center">
+                                        <h3 class="white-text mb-3 pt-3"><i class="fa fa-lock"></i> Log In:</h3>
+                                    </mdb-row>
+                                </div>
 
-    <!--    <p class="h4 mb-4">Sign in</p>-->
+                                <mdb-card-body class="mx-4 mt-4">
+                                    <div class="md-form row">
+                                        <i class="fa fa-envelope prefix"></i>
+                                        <mdb-input class="form_input_margin" label="Your email" type="text"/>
+                                    </div>
 
-    <!-- Email -->
-    <input type="email" id="defaultLoginFormEmail" class="form-control mb-4" placeholder="E-mail">
+                                    <div class="md-form row">
+                                        <i class="fa fa-lock prefix"></i>
+                                        <mdb-input id="password-field" class="form_input_margin" label="Your password"
+                                                   type="password" containerClass="mb-0"/>
+                                        <span id="view-pwd" class="fa fa-fw fa-eye" aria-hidden="true"
+                                              @click="viewPassword()"/>
+                                    </div>
 
-    <!-- Password -->
-    <input type="password" id="defaultLoginFormPassword" class="form-control mb-4" placeholder="Password">
+                                    <br>
+                                    <p class="font-small grey-text d-flex justify-content-end">Forgot <a href="#"
+                                                                                                         class="dark-grey-text ml-1 font-weight-bold">
+                                        Password?</a></p>
+                                    <mdb-row class="d-flex align-items-center mb-4 mt-5">
+                                        <mdb-col md="5" class="d-flex align-items-start">
+                                            <div class="text-center">
+                                                <mdb-btn rounded type="button" class="z-depth-1a">Login</mdb-btn>
+                                            </div>
+                                        </mdb-col>
+                                        <mdb-col md="7" class="d-flex justify-content-end">
+                                            <p class="font-small grey-text mt-3">Don't have an account? <a href="#"
+                                                                                                           class="dark-grey-text ml-1 font-weight-bold">
+                                                Sign up</a></p>
+                                        </mdb-col>
+                                    </mdb-row>
+                                </mdb-card-body>
+                            </mdb-card>
+                        </mdb-col>
+                    </mdb-row>
+                </section>
 
-    <div class="d-flex justify-content-around">
-      <div>
-        <!-- Remember me -->
-        <div class="custom-control custom-checkbox">
-          <input type="checkbox" class="custom-control-input" id="defaultLoginFormRemember">
-          <label class="custom-control-label" for="defaultLoginFormRemember">Remember me</label>
+            </div>
         </div>
-      </div>
-      <div>
-        <!-- Forgot password -->
-        <a href="">Forgot password?</a>
-      </div>
     </div>
-
-    <!-- Sign in button -->
-    <button class="btn btn-info btn-block my-4" type="submit">Sign in</button>
-
-    <!-- Register -->
-    <p>Not a member?
-      <a href="">Register</a>
-    </p>
-
-    <!-- Social login -->
-    <p>or sign in with:</p>
-
-    <a href="#" class="mx-2" role="button"><i class="fab fa-facebook-f light-blue-text"></i></a>
-    <a href="#" class="mx-2" role="button"><i class="fab fa-twitter light-blue-text"></i></a>
-    <a href="#" class="mx-2" role="button"><i class="fab fa-linkedin-in light-blue-text"></i></a>
-    <a href="#" class="mx-2" role="button"><i class="fab fa-github light-blue-text"></i></a>
-
-  </form>
-  <!-- Default form login -->
-  <!-- Material form login -->
-
-  <!-- Material form register -->
-
-  <!-- Material form register -->
 </template>
 
 <script>
-  // import {  mdbBtn, mdbInput } from "mdbvue";
-  export default {
-    components: {
-      // mdbInput,
-      // mdbBtn,
+    import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
+    import TopNav from "../components/TopNav";
 
-    },
-    data() {
-      return {
-        form: {
-          email: '',
-          checked: []
+    export default {
+        components: {
+            mdbInput,
+            mdbBtn,
+            mdbCard,
+            mdbCardBody,
+            mdbCol,
+            mdbRow,
+            TopNav
         },
-        show: true
+        data() {
+      return {
+          page_title: 'LogIn',
+          form: {
+              email: '',
+              checked: []
+          },
+          show: true
       }
     },
     methods: {
-      onSubmit(evt) {
-        evt.preventDefault();
-        alert(JSON.stringify(this.form))
-      },
-      onReset(evt) {
-        evt.preventDefault();
-        // Reset our form values
-        this.form.email = '';
-        this.form.checked = [];
-        // Trick to reset/clear native browser form validation state
+        viewPassword() {
+            let passwordInput = document.getElementById('password-field');
+            let pwdEyeIcon = document.getElementById('view-pwd');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                pwdEyeIcon.className = 'fa fa-eye-slash';
+            } else {
+                passwordInput.type = 'password';
+                pwdEyeIcon.className = 'fa fa-eye';
+            }
+        },
+        onSubmit(evt) {
+            evt.preventDefault();
+            alert(JSON.stringify(this.form))
+        },
+        onReset(evt) {
+            evt.preventDefault();
+            // Reset our form values
+            this.form.email = '';
+            this.form.checked = [];
+            // Trick to reset/clear native browser form validation state
         this.show = false;
         this.$nextTick(() => {
           this.show = true
@@ -91,13 +110,3 @@
     }
   }
 </script>
-
-<style>
-.wrapper {
-  text-align: center;
-  display: inline-block;
-
-}
-
-
-</style>

@@ -30,5 +30,7 @@
     @import "../node_modules/@syncfusion/ej2-inputs/styles/material.css";
     @import "../node_modules/@syncfusion/ej2-vue-dropdowns/styles/material.css";
     @import "../node_modules/@fortawesome/fontawesome-free/css/all.min.css";
+    @import "../node_modules/mdbootstrap/css/bootstrap.min.css";
+    @import "../node_modules/mdbvue/lib/css/mdb.min.css";
 </style>
 
