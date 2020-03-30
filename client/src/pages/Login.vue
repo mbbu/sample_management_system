@@ -15,18 +15,19 @@
                                 </div>
 
                                 <mdb-card-body class="mx-4 mt-4">
-                                    <div class="md-form row">
-                                        <i class="fa fa-envelope prefix"></i>
-                                        <mdb-input class="form_input_margin" label="Your email" type="text"/>
-                                    </div>
-
-                                    <div class="md-form row">
-                                        <i class="fa fa-lock prefix"></i>
-                                        <mdb-input id="password-field" class="form_input_margin" label="Your password"
-                                                   type="password" containerClass="mb-0"/>
-                                        <span id="view-pwd" class="fa fa-fw fa-eye" aria-hidden="true"
-                                              @click="viewPassword()"/>
-                                    </div>
+                                    <form>
+                                        <div class="grey-text">
+                                            <mdb-input label="Your email" icon="envelope" type="email"/>
+                                            <div class="md-form row">
+                                                <mdb-input id="password-field" label="Your password"
+                                                           icon="lock" class="form_input_margin"
+                                                           type="password"/>
+                                                <span id="view-pwd" class="fa fa-fw fa-eye" aria-hidden="true"
+                                                      v-b-tooltip.hover :title="'see raw password'"
+                                                      @click="viewPassword()"/>
+                                            </div>
+                                        </div>
+                                    </form>
 
                                     <br>
                                     <p class="font-small grey-text d-flex justify-content-end">Forgot <a href="#"
@@ -39,8 +40,9 @@
                                             </div>
                                         </mdb-col>
                                         <mdb-col md="7" class="d-flex justify-content-end">
-                                            <p class="font-small grey-text mt-3">Don't have an account? <a href="#"
-                                                                                                           class="dark-grey-text ml-1 font-weight-bold">
+                                            <p class="font-small grey-text mt-3">Don't have an account? <a
+                                                    href="/register"
+                                                    class="dark-grey-text ml-1 font-weight-bold">
                                                 Sign up</a></p>
                                         </mdb-col>
                                     </mdb-row>
@@ -71,7 +73,7 @@
         },
         data() {
       return {
-          page_title: 'LogIn',
+          page_title: 'Log In',
           form: {
               email: '',
               checked: []
