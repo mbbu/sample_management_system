@@ -1,114 +1,74 @@
 <template>
-    <div class="card">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <top-nav :page_title="page_title"></top-nav>
+                <section class="form-gradient" style="margin-top: 2%">
+                    <mdb-row>
+                        <mdb-col md="12">
+                            <mdb-card>
+                                <div class="header pt-3 blue-gradient">
+                                    <mdb-row class="d-flex justify-content-center">
+                                        <h3 class="white-text mb-3 pt-3"><i class="fa fa-user"></i> {{ page_title }} :
+                                        </h3>
+                                    </mdb-row>
+                                </div>
 
-        <h5 class="card-header info-color white-text text-center py-4">
-            <strong>Sign up</strong>
-        </h5>
+                                <mdb-card-body class="mx-4 mt-4">
+                                    <form>
+                                        <div class="grey-text">
+                                            <mdb-input label="First name" icon="user" type="text"/>
+                                            <mdb-input label="Last name" icon="user" type="text"/>
+                                            <mdb-input label="Your email" icon="envelope" type="email"/>
+                                            <mdb-input label="Your password" icon="lock" type="password"/>
+                                            <mdb-input label="Confirm your password" icon="exclamation-triangle"
+                                                       type="password"/>
+                                        </div>
+                                    </form>
 
-        <!--Header-->
-        <div class="form-header blue-gradient">
-            <h3><i class="fa fa-user"></i> Register:</h3>
+                                    <mdb-row class="d-flex align-items-center mb-4 mt-5">
+                                        <mdb-col md="5" class="d-flex align-items-start">
+                                            <div class="text-center">
+                                                <mdb-btn rounded type="button" class="z-depth-1a">Register</mdb-btn>
+                                            </div>
+                                        </mdb-col>
+                                        <mdb-col md="7" class="d-flex justify-content-end">
+                                            <p class="font-small grey-text mt-3">Have an account already? <a
+                                                    href="/login"
+                                                    class="dark-grey-text ml-1 font-weight-bold">
+                                                Log In</a></p>
+                                        </mdb-col>
+                                    </mdb-row>
+                                </mdb-card-body>
+                            </mdb-card>
+                        </mdb-col>
+                    </mdb-row>
+                </section>
+            </div>
         </div>
-
-        <!--Card content-->
-        <div class="card-body px-lg-5 pt-0">
-
-            <!-- Form -->
-            <form class="text-center" style="color: #757575;" action="#!">
-
-                <div class="form-row">
-                    <div class="col">
-                        <!-- First name -->
-                        <div class="md-form">
-                            <input type="text" id="materialRegisterFormFirstName" class="form-control">
-                            <label for="materialRegisterFormFirstName">First name</label>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <!-- Last name -->
-                        <div class="md-form">
-                            <input type="email" id="materialRegisterFormLastName" class="form-control">
-                            <label for="materialRegisterFormLastName">Last name</label>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- E-mail -->
-                <div class="md-form mt-0">
-                    <input type="email" id="materialRegisterFormEmail" class="form-control">
-                    <label for="materialRegisterFormEmail">E-mail</label>
-                </div>
-
-                <!-- Password -->
-                <div class="md-form">
-                    <input type="password" id="materialRegisterFormPassword" class="form-control"
-                           aria-describedby="materialRegisterFormPasswordHelpBlock">
-                    <label for="materialRegisterFormPassword">Password</label>
-                    <small id="materialRegisterFormPasswordHelpBlock" class="form-text text-muted mb-4">
-                        At least 8 characters and 1 digit
-                    </small>
-                </div>
-
-                <!-- Phone number -->
-                <div class="md-form">
-                    <input type="password" id="materialRegisterFormPhone" class="form-control"
-                           aria-describedby="materialRegisterFormPhoneHelpBlock">
-                    <label for="materialRegisterFormPhone">Phone number</label>
-                    <small id="materialRegisterFormPhoneHelpBlock" class="form-text text-muted mb-4">
-                        Optional - for two step authentication
-                    </small>
-                </div>
-
-                <!-- Newsletter -->
-                <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="materialRegisterFormNewsletter">
-                    <label class="form-check-label" for="materialRegisterFormNewsletter">Subscribe to our
-                        newsletter</label>
-                </div>
-
-                <!-- Sign up button -->
-                <button class="btn btn-outline-info btn-rounded btn-block my-4 waves-effect z-depth-0" type="submit">
-                    Sign in
-                </button>
-
-                <!-- Social register -->
-                <p>or sign up with:</p>
-
-                <a type="button" class="btn-floating btn-fb btn-sm">
-                    <i class="fab fa-facebook-f"></i>
-                </a>
-                <a type="button" class="btn-floating btn-tw btn-sm">
-                    <i class="fab fa-twitter"></i>
-                </a>
-                <a type="button" class="btn-floating btn-li btn-sm">
-                    <i class="fab fa-linkedin-in"></i>
-                </a>
-                <a type="button" class="btn-floating btn-git btn-sm">
-                    <i class="fab fa-github"></i>
-                </a>
-
-                <hr>
-
-                <!-- Terms of service -->
-                <p>By clicking
-                    <em>Sign up</em> you agree to our
-                    <a href="" target="_blank">terms of service</a>
-                </p>
-
-            </form>
-            <!-- Form -->
-
-        </div>
-
     </div>
 </template>
 
 <script>
+    import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
+    import TopNav from "../components/TopNav";
+
     export default {
-        name: "SignUp"
+        name: "SignUp",
+        components: {
+            mdbInput,
+            mdbBtn,
+            mdbCard,
+            mdbCardBody,
+            mdbCol,
+            mdbRow,
+            TopNav
+        },
+        data() {
+            return {
+                page_title: 'Sign Up',
+            }
+        }
+
     }
 </script>
-
-<style scoped>
-
-</style>
