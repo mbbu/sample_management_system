@@ -73,7 +73,7 @@
 
                                             <b-form-group
                                                     :class="{ 'form-group--error': $v.user.confirmPassword.$error }">
-                                                <mdb-input id="pwd-confirm"
+                                                <mdb-input id="confirmPassword"
                                                            v-model.trim="$v.user.confirmPassword.$model"
                                                            label="Confirm your confirmPassword"
                                                            icon="exclamation-triangle"
@@ -84,7 +84,7 @@
                                                     </div>
                                                     <div class="error" v-if="!$v.user.confirmPassword.sameAsPassword">
                                                         Passwords must be
-                                                        identical!{{$v.user.confirmPassword.$params.minLength.min}}.
+                                                        identical!
                                                     </div>
                                                 </div>
                                             </b-form-group>
