@@ -16,8 +16,8 @@
 
                                 <mdb-card-body class="mx-4 mt-4">
                                     <form @submit.prevent="submit">
-                                        <div class="grey-text">
-
+                                        <div>
+                                            <!--FIRST NAME-->
                                             <b-form-group :class="{ 'form-group--error': $v.user.firstName.$error }">
                                                 <mdb-input id="fName" v-model.trim="$v.user.firstName.$model"
                                                            label="First name" icon="user" type="text"/>
@@ -32,6 +32,7 @@
                                                 </div>
                                             </b-form-group>
 
+                                            <!--LAST NAME-->
                                             <b-form-group :class="{ 'form-group--error': $v.user.lastName.$error }">
                                                 <mdb-input id="lName" v-model.trim="$v.user.lastName.$model"
                                                            label="Last name" icon="user" type="text"/>
@@ -45,6 +46,7 @@
                                                 </div>
                                             </b-form-group>
 
+                                            <!--EMAIL-->
                                             <b-form-group :class="{ 'form-group--error': $v.user.email.$error }">
                                                 <mdb-input id="email" v-model.trim="$v.user.email.$model"
                                                            label="Your email" icon="envelope" type="email"/>
@@ -58,24 +60,33 @@
                                                 </div>
                                             </b-form-group>
 
+                                            <!--PASSWORD-->
                                             <b-form-group :class="{ 'form-group--error': $v.user.password.$error }">
-                                                <mdb-input id="password" v-model.trim="$v.user.password.$model"
-                                                           label="Your password" icon="lock" type="password"/>
+                                                <div class="row">
+                                                    <mdb-input id="password" v-model.trim="$v.user.password.$model"
+                                                               class="form_input_margin" label="Your password"
+                                                               icon="lock" type="password"/>
+                                                    <span id="view-pwd" class="fa fa-fw fa-eye" aria-hidden="true"
+                                                          v-b-tooltip.hover :title="'see raw password'"
+                                                          @click="viewPassword()"/>
+                                                </div>
                                                 <div v-if="$v.user.password.$dirty">
                                                     <div class="error" v-if="!$v.user.password.required">Field is
                                                         required
                                                     </div>
-                                                    <div class="error" v-if="!$v.user.password.minLength">Password must
-                                                        have at least {{$v.user.password.$params.minLength.min}}.
+                                                    <div class="error" v-if="!$v.user.password.strongPassword">
+                                                        Strong passwords need to have a letter, a number, a special
+                                                        character, and be more than 8 characters long..
                                                     </div>
                                                 </div>
                                             </b-form-group>
 
+                                            <!--REPEAT PASSWORD-->
                                             <b-form-group
                                                     :class="{ 'form-group--error': $v.user.confirmPassword.$error }">
                                                 <mdb-input id="confirmPassword"
                                                            v-model.trim="$v.user.confirmPassword.$model"
-                                                           label="Confirm your confirmPassword"
+                                                           label="Confirm your password"
                                                            icon="exclamation-triangle"
                                                            type="password"/>
                                                 <div v-if="$v.user.confirmPassword.$dirty">
@@ -152,26 +163,46 @@
                 firstName: {required, minLength: minLength(3)},
                 lastName: {required, minLength: minLength(3)},
                 email: {required, email},
-                password: {required, minLength: minLength(6)},
+                password: {
+                    required,
+                    strongPassword(password1) {
+                        return (
+                            /[a-z]/.test(password1) && //checks for a-z
+                            /[0-9]/.test(password1) && //checks for 0-9
+                            /\W|_/.test(password1) && //checks for special char
+                            password1.length >= 6
+                        );
+                    }
+                },
                 confirmPassword: {required, sameAsPassword: sameAs('password')}
             }
         },
 
         methods: {
             submit() {
+                this.$log.info("FORM SUBMIT METHOD CALLED!");
                 // stop here if form is invalid
                 this.$v.$touch();
                 if (this.$v.$invalid) {
+                    this.$log.info("FORM INVALID!");
                     return;
                 }
-
+                this.$log.info("FORM VALID!");
                 alert("SUCCESS!! :-)\n\n" + JSON.stringify(this.user));
+                // api call to create user.
+            },
 
-                // this.$v.form.$touch();
-                // // if its still pending or an error is returned do not submit
-                // if (this.$v.form.$pending || this.$v.form.$error) return;
-                // // to form submit after this
-                // alert("Form submitted");
+            viewPassword() {
+                let passwordInput = document.getElementById('password');
+                let pwdEyeIcon = document.getElementById('view-pwd');
+
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    pwdEyeIcon.className = 'fa fa-eye-slash';
+                } else {
+                    passwordInput.type = 'password';
+                    pwdEyeIcon.className = 'fa fa-eye';
+                }
             }
         }
 
