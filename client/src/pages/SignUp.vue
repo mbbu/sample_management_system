@@ -15,7 +15,7 @@
                                 </div>
 
                                 <mdb-card-body class="mx-4 mt-4">
-                                    <form @submit.prevent="submit">
+                                    <form @submit.prevent="onSubmit">
                                         <div>
                                             <!--FIRST NAME-->
                                             <b-form-group :class="{ 'form-group--error': $v.user.firstName.$error }">
@@ -99,23 +99,21 @@
                                                     </div>
                                                 </div>
                                             </b-form-group>
-
                                         </div>
-                                        <!--                                    </form>-->
 
-                                    <mdb-row class="d-flex align-items-center mb-4 mt-5">
-                                        <mdb-col md="5" class="d-flex align-items-start">
-                                            <div class="text-center">
-                                                <mdb-btn rounded type="submit" class="z-depth-1a">Register</mdb-btn>
-                                            </div>
-                                        </mdb-col>
-                                        <mdb-col md="7" class="d-flex justify-content-end">
-                                            <p class="font-small grey-text mt-3">Have an account already? <a
-                                                    href="/login"
-                                                    class="dark-grey-text ml-1 font-weight-bold">
-                                                Log In</a></p>
-                                        </mdb-col>
-                                    </mdb-row>
+                                        <mdb-row class="d-flex align-items-center mb-4 mt-5">
+                                            <mdb-col md="5" class="d-flex align-items-start">
+                                                <div class="text-center">
+                                                    <mdb-btn rounded type="submit" class="z-depth-1a">Register</mdb-btn>
+                                                </div>
+                                            </mdb-col>
+                                            <mdb-col md="7" class="d-flex justify-content-end">
+                                                <p class="font-small grey-text mt-3">Have an account already? <a
+                                                        href="/login"
+                                                        class="dark-grey-text ml-1 font-weight-bold">
+                                                    Log In</a></p>
+                                            </mdb-col>
+                                        </mdb-row>
                                     </form>
                                 </mdb-card-body>
                             </mdb-card>
@@ -179,7 +177,7 @@
         },
 
         methods: {
-            submit() {
+            onSubmit() {
                 this.$log.info("FORM SUBMIT METHOD CALLED!");
                 // stop here if form is invalid
                 this.$v.$touch();
