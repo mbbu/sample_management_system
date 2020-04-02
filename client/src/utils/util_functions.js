@@ -10,22 +10,64 @@ export function showFlashMessage(status, title, message) {
 }
 
 // DropDownList Functions
-export function getItemDataList(resource, itemDataList) {
-    axios.get(resource)
+// eslint-disable-next-line no-unused-vars
+export function getItemDataList(resource) {
+    return axios.get(resource)
         .then((res) => {
-            this.$log.info("Response: " + res.status + " " + res.data['message']);
-            for (var lab_item = 0; lab_item < res.data.message.length; lab_item++) {
-                itemDataList.push({
-                    'Code': res.data.message[lab_item].code,
-                    'Name': res.data.message[lab_item].name
-                });
-                this.fields = {text: 'Name', value: 'Code'};
-            }
+            console.log("Response: " + res.status + " " + res.data['message']);
+            // extractApiData(res.data.message);
+            return res.data.message
+            // for (var item = 0; item < res.data.message.length; item++) {
+            //     itemList.push({
+            //         'Code': res.data.message[item].code,
+            //         'Name': res.data.message[item].name
+            //     });
+            //     // fields = {text: 'Name', value: 'Code'};
+            //     fields.text='Name';
+            //     fields.value='Code';
+            // }
+            // console.log("Item list: " , itemList);
+            // console.log("Item fields: " , fields);
+            // console.log("resultObject before: " , resultObject);
+            // console.log("resultObject before fields: " , resultObject.fields);
+            // console.log("resultObject before items: " , resultObject.items);
+
+            // resultObject['items'] = itemList;
+            // // resultObject['fields'] = fields;
+            // console.log("resultObject after: " , resultObject);
+            // console.log("resultObject after fields: " , resultObject.fields);
+            // console.log("resultObject after items: " , resultObject.items);
+            // return resultObject;
+
         })
         .catch((error) => {
             // eslint-disable-next-line
-            this.$log.error(error);
+            console.log(error);
         });
+    // console.log("resultObject before: " , resultObject);
+    // console.log(resultObject.items);
+    // console.log(resultObject.fields);
+    // return resultObject;
+}
+
+export function extractApiData(data) {
+    console.log("extract api data function: ", data);
+    let itemList = [];
+    let fields = {text: '', value: ''};
+    let resultObject = {items: itemList, fields: fields};
+
+    for (var item = 0; item < data.length; item++) {
+        itemList.push({
+            'Code': data[item].code,
+            'Name': data[item].name
+        });
+        fields.text = 'Name';
+        fields.value = 'Code';
+    }
+    console.log("resultObject: ", resultObject);
+    console.log("resultObject items: ", resultObject.items);
+    console.log("resultObject fields: ", resultObject.fields);
+    return resultObject;
 }
 
 // eslint-disable-next-line no-unused-vars
