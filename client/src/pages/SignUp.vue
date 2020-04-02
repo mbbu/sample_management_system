@@ -46,6 +46,19 @@
                                                 </div>
                                             </b-form-group>
 
+                                            <!-- ROLE -->
+                                            <!-- LIST POPULATED FROM ROLE RESOURCE -->
+                                            <b-form-group class="form_input_margin">
+                                                <i class="fas fa-user-cog"></i> Role: <br/>
+                                                <ejs-dropdownlist
+                                                        id='dropdownlist'
+                                                        :dataSource='roleDataList'
+                                                        :fields="fields"
+                                                        placeholder='Select a role'
+                                                        :v-model="$v.user.role"
+                                                ></ejs-dropdownlist>
+                                            </b-form-group>
+
                                             <!--EMAIL-->
                                             <b-form-group :class="{ 'form-group--error': $v.user.email.$error }">
                                                 <mdb-input id="email" v-model.trim="$v.user.email.$model"
@@ -126,9 +139,12 @@
 </template>
 
 <script>
+    // import axios from 'axios';
     import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
     import TopNav from "../components/TopNav";
     import {email, minLength, required, sameAs} from "vuelidate/lib/validators"
+    import {role_resource} from "../utils/api_paths";
+    import {extractApiData, getItemDataList} from "../utils/util_functions"
 
     export default {
         name: "SignUp",
@@ -145,21 +161,24 @@
         data() {
             return {
                 page_title: 'Sign Up',
-                errors: [],
+                roleDataList: [],
+                fields: {text: '', value: ''},
                 user: {
                     firstName: '',
                     lastName: '',
+                    role: '',
                     email: '',
                     password: '',
                     confirmPassword: ''
                 }
-            }
+            };
         },
 
         validations: {
             user: {
                 firstName: {required, minLength: minLength(3)},
                 lastName: {required, minLength: minLength(3)},
+                role: {required},
                 email: {required, email},
                 password: {
                     required,
@@ -201,7 +220,64 @@
                     passwordInput.type = 'password';
                     pwdEyeIcon.className = 'fa fa-eye';
                 }
+            },
+
+            onLoadPage() {
+                getItemDataList(role_resource).then(data => {
+                    this.$log.info("Returned Data: " + data);
+                    let roleList = extractApiData(data);
+                    this.$log.info("Extracted Data: " + roleList);
+                    this.$log.info("Role list json: ", JSON.stringify(roleList));
+                })
+
+                // let roleList = getItemDataList(role_resource);
+                // this.roleDataList = roleList['items'];
+                // this.fields = roleList['fields'];
+
+
+                // this.$log.info("Role list: ", roleList);
+                // this.$log.info("Role list items: ", roleList.items);
+                // this.$log.info("Role list items: ", roleList['items']);
+                // this.$log.info("Role list fields: ", roleList['fields']);
+                // this.$log.info("Role list fields text: " + roleList['fields'].text);
+                // this.$log.info("Role list fields value: " + roleList['fields'].value);
+                //
+                //
+                // for (let i=0; i < roleList.items.length; i ++){
+                //     this.$log.info("FOR LOOP");
+                //     this.$log.info(i)
+                // }
+
+
+                // this.$log.info("Role list: ", roleList.toString());
+                // this.$log.info("Role list type: ", typeof(roleList));
+                // this.$log.info("Role list json: ", JSON.stringify(roleList));
+                // this.$log.info("Role Data List: " , this.roleDataList);
+                // this.$log.info("Fields: " + this.fields);
+                // return getItemDataList(role_resource, this.roleDataList, this.fields);
             }
+
+
+            // getRoleDataList() {
+            //     axios.get(role_resource)
+            //         .then((res) => {
+            //             this.$log.info("Response: " + res.status + " " + res.data['message']);
+            //             for (var lab_item = 0; lab_item < res.data.message.length; lab_item++) {
+            //                 this.roleDataList.push({
+            //                     'Code': res.data.message[lab_item].code,
+            //                     'Name': res.data.message[lab_item].name
+            //                 });
+            //                 this.fields = {text: 'Name', value: 'Code'};
+            //             }
+            //         })
+            //         .catch((error) => {
+            //             // eslint-disable-next-line
+            //             this.$log.error(error);
+            //         });
+            // },
+        },
+        created() {
+            this.onLoadPage();
         }
 
     }
