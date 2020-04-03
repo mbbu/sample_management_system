@@ -25,3 +25,23 @@ body {
 .main-content__body {
   margin-top: 80px;
 }
+
+.float_btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  border-radius: 5%;
+  text-align: center;
+  box-shadow: 2px 2px 3px #999;
+}
+
+.form_input_margin {
+  margin-left: 2%;
+  width: 95%;
+}
+
+.error {
+  color: red;
+  font-style: italic;
+}
+

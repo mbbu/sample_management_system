@@ -1,35 +1,36 @@
 <template>
   <div id="wrapper" :class="wrapperClass">
-      <TopNav> </TopNav>
-      <Nav></Nav>
-      <ContentOverlay></ContentOverlay>
+      <side-menu></side-menu>
+<!--      <ContentOverlay></ContentOverlay>-->
       <router-view/>
   </div>
 </template>
 
 <script>
 
-import Nav from '@/components/Nav.vue';
-import ContentOverlay from '@/components/ContentOverlay.vue';
-import TopNav from '@/components/TopNav.vue';
+    // import ContentOverlay from '@/components/ContentOverlay.vue';
+    import SideMenu from "./components/Nav";
 
-export default {
-
-    components: {
-    ContentOverlay,
-    Nav,
-    TopNav,
-},
-};
+    export default {
+        components: {
+            SideMenu,
+            // ContentOverlay,
+        },
+    };
 </script>
 
 <style lang="scss" >
-@import 'styles/layout.scss';
-@import 'styles/nav.scss';
-@import 'styles/media-queries.scss';
-@import 'styles/nav-toggle-btn.scss';
-
+    @import 'styles/layout.scss';
+    @import 'styles/nav.scss';
+    @import 'styles/media-queries.scss';
+    @import 'styles/nav-toggle-btn.scss';
+    @import 'node_modules/bootstrap/scss/bootstrap';
+    @import 'node_modules/bootstrap-vue/src/index.scss';
+    @import "../node_modules/@syncfusion/ej2-base/styles/material.css";
+    @import "../node_modules/@syncfusion/ej2-inputs/styles/material.css";
+    @import "../node_modules/@syncfusion/ej2-vue-dropdowns/styles/material.css";
+    @import "../node_modules/@fortawesome/fontawesome-free/css/all.min.css";
+    @import "../node_modules/mdbootstrap/css/bootstrap.min.css";
+    @import "../node_modules/mdbvue/lib/css/mdb.min.css";
 </style>
-
-
 

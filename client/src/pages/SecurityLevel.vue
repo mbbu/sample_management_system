@@ -12,29 +12,31 @@
                         <th scope="col"> Id</th>
                         <th scope="col"> Name</th>
                         <th scope="col"> Code</th>
+                        <th scope="col"> Description</th>
                         <th scope="col"> Actions</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="theme.id" v-for="(theme, index) in response.message">
+                    <tr :key="sec_level.id" v-for="(sec_level, index) in response.message">
                         <td> {{ index + 1 }}</td>
-                        <td> {{ theme.name }}</td>
-                        <td> {{ theme.code }}</td>
+                        <td> {{ sec_level.name }}</td>
+                        <td> {{ sec_level.code }}</td>
+                        <td> {{ sec_level.description }}</td>
 
                         <td>
                             <b-icon
                                     icon="pencil" font-scale="2.0"
                                     class="border border-info rounded" variant="info"
-                                    v-b-tooltip.hover :title="`Update ${ theme.name }`"
-                                    v-b-modal.modal-theme-edit
-                                    @mouseover="fillFormForUpdate(theme.name, theme.code)"
+                                    v-b-tooltip.hover :title="`Update ${ sec_level.name }`"
+                                    v-b-modal.modal-security-level-edit
+                                    @mouseover="fillFormForUpdate(sec_level.name, sec_level.code, sec_level.description)"
                             ></b-icon>
                             &nbsp;
                             <b-icon
                                     icon="trash" font-scale="1.85"
                                     class="border rounded bg-danger p-1" variant="light"
-                                    v-b-tooltip.hover :title="`Delete ${theme.name}!`"
-                                    @click="deleteTheme(theme.code)"
+                                    v-b-tooltip.hover :title="`Delete ${sec_level.name}!`"
+                                    @click="deleteSecurityLevel(sec_level.code)"
                             ></b-icon>
                         </td>
                     </tr>
@@ -44,15 +46,15 @@
 
             <div v-if="!isEditing">
                 <b-modal
-                        title="Add Theme"
-                        id="modal-theme"
+                        title="Add Security Level"
+                        id="modal-security-level"
                         ok-title="Save"
                         cancel-variant="danger"
-                        @ok="createTheme"
+                        @ok="createSecurityLevel"
                         @submit="showModal = false"
                         @hidden="clearForm"
                 >
-                    <form @submit.prevent="createTheme">
+                    <form @submit.prevent="createSecurityLevel">
 
                         <b-form-group id="form-name-group" label="Name:" label-for="form-name-input">
                             <b-form-input
@@ -72,16 +74,26 @@
                                     type="text"
                                     v-model="code"></b-form-input>
                         </b-form-group>
+
+                        <b-form-group id="form-desc-group" label="Description:" label-for="form-desc-input">
+                            <b-form-textarea
+                                    id="form-desc-input"
+                                    placeholder="Enter Description"
+                                    required="true"
+                                    type="text"
+                                    v-model="desc"
+                            ></b-form-textarea>
+                        </b-form-group>
                     </form>
                 </b-modal>
             </div>
 
             <div v-else-if="isEditing">
                 <b-modal
-                        title="Edit Theme"
-                        @ok="updateTheme(old_code)"
+                        title="Edit Security Level"
+                        @ok="updateSecurityLevel(old_code)"
                         @submit="showModal = false"
-                        id="modal-theme-edit"
+                        id="modal-security-level-edit"
                         ok-title="Update"
                         cancel-variant="danger"
                         @hidden="clearForm"
@@ -106,12 +118,22 @@
                                     type="text"
                                     v-model="code"></b-form-input>
                         </b-form-group>
+
+                        <b-form-group id="form-desc-group-edit" label="Description:" label-for="form-desc-input">
+                            <b-form-textarea
+                                    id="form-desc-input"
+                                    placeholder="Enter Description"
+                                    required="true"
+                                    type="text"
+                                    v-model="desc"
+                            ></b-form-textarea>
+                        </b-form-group>
                     </form>
                 </b-modal>
             </div>
             <b-button class="float_btn"
-                      v-b-modal.modal-theme variant="primary"
-            >Add Theme
+                      v-b-modal.modal-security-level variant="primary"
+            >Add Security Level
             </b-button>
         </div>
     </div>
@@ -119,17 +141,18 @@
 
 <script>
     import axios from 'axios';
-    import {theme_resource} from '../../src/utils/api_paths'
+    import {security_level_resource} from '../../src/utils/api_paths'
     import TopNav from "@/components/TopNav";
 
     export default {
-        name: 'Theme',
+        name: 'SecurityLevel',
         data() {
             return {
-                page_title: "Themes",
+                page_title: "Security Level",
                 response: [],
                 name: null,
                 code: null,
+                desc: null,
 
                 // values for data modification
                 old_code: null,
@@ -141,19 +164,21 @@
             clearForm() {
                 this.name = null;
                 this.code = null;
+                this.desc = null;
                 this.isEditing = false;
             },
 
-            fillFormForUpdate(name, code) {
+            fillFormForUpdate(name, code, desc) {
                 this.name = name;
                 this.code = code;
+                this.desc = desc;
                 this.old_code = code;
                 this.isEditing = true;
                 this.showModal = true;
             },
 
-            getTheme() {
-                axios.get(theme_resource)
+            getSecurityLevel() {
+                axios.get(security_level_resource)
                     .then((res) => {
                         this.$log.info("Response: " + res.status + " " + res.data['message']);
                         this.response = res.data;
@@ -164,13 +189,14 @@
                     });
             },
 
-            createTheme: function () {
-                axios.post(theme_resource, {
+            createSecurityLevel: function () {
+                axios.post(security_level_resource, {
                     name: this.name,
                     code: this.code,
+                    description: this.desc,
                 })
                     .then((response) => {
-                        this.getTheme();
+                        this.getSecurityLevel();
                         this.clearForm();
                         this.flashMessage.show({
                             status: 'success',
@@ -196,7 +222,7 @@
                                 this.flashMessage.show({
                                     status: 'error',
                                     title: "Error",
-                                    message: "Theme name already exists"
+                                    message: "Security Level already exists"
                                 });
                             }
                         }
@@ -204,14 +230,15 @@
                 this.clearForm();
             },
 
-            updateTheme: function (code) {
-                axios.put(theme_resource, {
+            updateSecurityLevel: function (code) {
+                axios.put(security_level_resource, {
                         name: this.name,
                         code: this.code,
+                        description: this.desc,
                     }, {headers: {code: code}}
                 )
                     .then((response) => {
-                        this.getTheme();
+                        this.getSecurityLevel();
                         this.flashMessage.show({
                             status: 'success',
                             title: response.data['message'], message: ""
@@ -244,14 +271,14 @@
                 this.clearForm();
             },
 
-            deleteTheme: function (code) {
-                axios.delete(theme_resource, {
+            deleteSecurityLevel: function (code) {
+                axios.delete(security_level_resource, {
                     headers: {
                         code: code
                     }
                 })
                     .then((response) => {
-                        this.getTheme();
+                        this.getSecurityLevel();
                         this.flashMessage.show({
                             status: 'success',
                             title: response.data['message'], message: ""
@@ -277,8 +304,7 @@
             },
         },
         created() {
-            this.getTheme();
-            // this.$log.info('Test Logging')
+            this.getSecurityLevel();
         },
         components: {TopNav}
     };

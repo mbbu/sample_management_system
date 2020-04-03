@@ -5,6 +5,7 @@ from flask_restful import fields, marshal, reqparse
 from api.models.database import BaseModel
 from api.models.freezer import Freezer
 from api.resources.base_resource import BaseResource
+from api.resources.lab_resource import LaboratoryResource
 from api.utils import format_and_lower_str, non_empty_int, log_create, has_required_request_params, \
     log_update, log_delete, log_duplicate, standard_non_empty_string, non_empty_string, log_304
 
@@ -38,7 +39,12 @@ class FreezerResource(BaseResource):
     @jwt_required
     def post(self):
         args = FreezerResource.freezer_args()
-        laboratory = args['laboratory']
+        if type(args['laboratory']) is str:
+            lab = LaboratoryResource.get_laboratory(args['laboratory'])
+            laboratory = lab.id
+        else:
+            laboratory = args['laboratory']
+
         number = args['number']
         room = args['room']
         code = args['code']
@@ -74,7 +80,12 @@ class FreezerResource(BaseResource):
 
         else:
             args = FreezerResource.freezer_args()
-            laboratory = args['laboratory']
+            if type(args['laboratory']) is str:
+                lab = LaboratoryResource.get_laboratory(args['laboratory'])
+                laboratory = lab.id
+            else:
+                laboratory = args['laboratory']
+
             number = args['number']
             room = args['room']
             code = args['code']

@@ -8,7 +8,7 @@
         </h1>
     </div>
 
-    <div class="main-content__body">
+    <div class="main-content_body">
 
       <p>
         Lorem Ipsum is simply dummy text of the printing and typesetting industry.
