@@ -9,6 +9,19 @@ export function showFlashMessage(status, title, message) {
     });
 }
 
+// export function countDownTimer(countDown) {
+//     if(countDown > 0) {
+//         console.log("CountDown: ", countDown);
+//         setTimeout(() => {
+//             countDown -= 1;
+//             this.countDownTimer()
+//         }, 1000)
+//     }else if (this.countDown === 0) {
+//         this.$log.info("**** Timer out ... ****");
+//         this.$router.push({ path : '/home' });
+//     }
+// }
+
 // DropDownList Functions
 // eslint-disable-next-line no-unused-vars
 export function getItemDataList(resource) {
@@ -37,7 +50,6 @@ export function extractApiData(data) {
         fields.text = 'Name';
         fields.value = 'Code';
     }
-    console.log("data received: " + data + "\nresultObject: ", resultObject);
     return resultObject;
 }
 
@@ -46,7 +58,6 @@ export function getSelectedItem(itemDataList, itemVar) {
     let item = document.getElementById("dropdownlist").value;
 
     for (var i = 0; i < itemDataList.length; i++) {
-        console.log("ITEM: " + item + " itemDataList Item: " + itemDataList[i].Name);
         if (item === itemDataList[i].Name) {
             itemVar = itemDataList[i].Code;
             return itemVar

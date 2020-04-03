@@ -7,6 +7,7 @@
                     <mdb-row>
                         <mdb-col md="12">
                             <mdb-card>
+                                <FlashMessage :position="'right bottom'"></FlashMessage>
                                 <div class="header pt-3 blue-gradient">
                                     <mdb-row class="d-flex justify-content-center">
                                         <h3 class="white-text mb-3 pt-3"><i class="fa fa-user"></i> {{ page_title }} :
@@ -139,12 +140,12 @@
 </template>
 
 <script>
-    // import axios from 'axios';
+    import axios from 'axios';
     import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
     import TopNav from "../components/TopNav";
     import {email, minLength, required, sameAs} from "vuelidate/lib/validators"
-    import {role_resource} from "../utils/api_paths";
-    import {extractApiData, getItemDataList, getSelectedItem} from "../utils/util_functions"
+    import {role_resource, user_resource} from "../utils/api_paths";
+    import {extractApiData, getItemDataList, getSelectedItem, showFlashMessage} from "../utils/util_functions"
 
     export default {
         name: "SignUp",
@@ -171,6 +172,7 @@
                     password: '',
                     confirmPassword: ''
                 },
+                countDown: 5,
             };
         },
 
@@ -196,6 +198,17 @@
         },
 
         methods: {
+            clearForm(user) {
+                this.$log.info("Clear form called");
+                user.firstName = null;
+                user.lastName = null;
+                user.email = null;
+                user.role = null;
+                user.password = null;
+                user.confirmPassword = null;
+                this.roleDataList = [];
+            },
+
             onSubmit() {
                 this.$log.info("FORM SUBMIT METHOD CALLED!");
                 // stop here if form is invalid
@@ -205,8 +218,6 @@
                     return;
                 }
                 this.$log.info("FORM VALID!");
-                alert("SUCCESS!! :-)\n\n" + JSON.stringify(this.user));
-
                 // api call to create user.
                 this.createUser(this.user);
             },
@@ -243,12 +254,53 @@
             },
 
 
-            createUser(user) {
+            createUser: function (user) {
                 this.user.role = getSelectedItem(this.roleDataList, this.user.role);
-                this.$log.info(user, " User role selected and updated: " + this.user.role)
+                axios.post(user_resource, {
+                    first_name: user.firstName,
+                    last_name: user.lastName,
+                    email: user.email,
+                    role: user.role,
+                    password: user.password
+                })
+                    .then((response) => {
+                        // redirect after successful signUp
+                        if (response.status === 201) {
+                            this.flashMessage.show({
+                                status: "success", title: "Success",
+                                message: 'User Created. Redirecting you to home page in ' + this.countDown + " seconds"
+                            });
+                            // todo: store jwt tokens to be used for transactions
+                            this.countDownTimer();
+                        }
+                    })
+                    .catch((error) => {
+                        this.$log.error(error);
+                        if (error.response) {
+                            if (error.response.status === 409) {
+                                showFlashMessage('error', error.response.data['message'], '');
+                            } else if (error.response.status === 400) {
+                                showFlashMessage('error', error.response.data['message'], 'Kindly refill the form');
+                            } else if (error.response.status === 500) {
+                                showFlashMessage('error', "Fatal Error", 'Admin has been contacted.');
+                            } else {
+                                showFlashMessage('error', error.response.data['message'], '');
+                            }
+                        }
+                    })
 
+            },
+
+            countDownTimer() {
+                if (this.countDown > 0) {
+                    setTimeout(() => {
+                        this.countDown -= 1;
+                        this.countDownTimer()
+                    }, 1000)
+                } else if (this.countDown === 0) {
+                    this.$router.push({path: '/home'});
+                }
             }
-
         },
         created() {
             this.onLoadPage();
