@@ -55,7 +55,7 @@
                                                         :dataSource='roleDataList'
                                                         :fields="fields"
                                                         placeholder='Select a role'
-                                                        :v-model="$v.user.role"
+                                                        :v-model="user.role"
                                                 ></ejs-dropdownlist>
                                             </b-form-group>
 
@@ -144,7 +144,7 @@
     import TopNav from "../components/TopNav";
     import {email, minLength, required, sameAs} from "vuelidate/lib/validators"
     import {role_resource} from "../utils/api_paths";
-    import {extractApiData, getItemDataList} from "../utils/util_functions"
+    import {extractApiData, getItemDataList, getSelectedItem} from "../utils/util_functions"
 
     export default {
         name: "SignUp",
@@ -170,7 +170,7 @@
                     email: '',
                     password: '',
                     confirmPassword: ''
-                }
+                },
             };
         },
 
@@ -178,7 +178,7 @@
             user: {
                 firstName: {required, minLength: minLength(3)},
                 lastName: {required, minLength: minLength(3)},
-                role: {required},
+                // role: {required},
                 email: {required, email},
                 password: {
                     required,
@@ -206,7 +206,9 @@
                 }
                 this.$log.info("FORM VALID!");
                 alert("SUCCESS!! :-)\n\n" + JSON.stringify(this.user));
+
                 // api call to create user.
+                this.createUser(this.user);
             },
 
             viewPassword() {
@@ -224,57 +226,29 @@
 
             onLoadPage() {
                 getItemDataList(role_resource).then(data => {
-                    this.$log.info("Returned Data: " + data);
                     let roleList = extractApiData(data);
-                    this.$log.info("Extracted Data: " + roleList);
                     this.$log.info("Role list json: ", JSON.stringify(roleList));
+
+                    // update local variables with data from API
+                    this.fields = roleList['fields'];
+                    for (let i = 0; i < roleList.items.length; i++) {
+                        this.roleDataList.push({
+                            'Code': roleList.items[i].Code,
+                            'Name': roleList.items[i].Name,
+                        });
+                    }
+                    this.$log.info("Extracted data as json fields: ", this.fields);
+                    this.$log.info("Extracted roleDataList items: ", this.roleDataList)
                 })
-
-                // let roleList = getItemDataList(role_resource);
-                // this.roleDataList = roleList['items'];
-                // this.fields = roleList['fields'];
+            },
 
 
-                // this.$log.info("Role list: ", roleList);
-                // this.$log.info("Role list items: ", roleList.items);
-                // this.$log.info("Role list items: ", roleList['items']);
-                // this.$log.info("Role list fields: ", roleList['fields']);
-                // this.$log.info("Role list fields text: " + roleList['fields'].text);
-                // this.$log.info("Role list fields value: " + roleList['fields'].value);
-                //
-                //
-                // for (let i=0; i < roleList.items.length; i ++){
-                //     this.$log.info("FOR LOOP");
-                //     this.$log.info(i)
-                // }
+            createUser(user) {
+                this.user.role = getSelectedItem(this.roleDataList, this.user.role);
+                this.$log.info(user, " User role selected and updated: " + this.user.role)
 
-
-                // this.$log.info("Role list: ", roleList.toString());
-                // this.$log.info("Role list type: ", typeof(roleList));
-                // this.$log.info("Role list json: ", JSON.stringify(roleList));
-                // this.$log.info("Role Data List: " , this.roleDataList);
-                // this.$log.info("Fields: " + this.fields);
-                // return getItemDataList(role_resource, this.roleDataList, this.fields);
             }
 
-
-            // getRoleDataList() {
-            //     axios.get(role_resource)
-            //         .then((res) => {
-            //             this.$log.info("Response: " + res.status + " " + res.data['message']);
-            //             for (var lab_item = 0; lab_item < res.data.message.length; lab_item++) {
-            //                 this.roleDataList.push({
-            //                     'Code': res.data.message[lab_item].code,
-            //                     'Name': res.data.message[lab_item].name
-            //                 });
-            //                 this.fields = {text: 'Name', value: 'Code'};
-            //             }
-            //         })
-            //         .catch((error) => {
-            //             // eslint-disable-next-line
-            //             this.$log.error(error);
-            //         });
-            // },
         },
         created() {
             this.onLoadPage();

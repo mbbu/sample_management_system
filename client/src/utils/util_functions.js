@@ -14,44 +14,17 @@ export function showFlashMessage(status, title, message) {
 export function getItemDataList(resource) {
     return axios.get(resource)
         .then((res) => {
-            console.log("Response: " + res.status + " " + res.data['message']);
-            // extractApiData(res.data.message);
+            console.log("Response: " + res.status);
+            // return a promise to be evaluated ...
             return res.data.message
-            // for (var item = 0; item < res.data.message.length; item++) {
-            //     itemList.push({
-            //         'Code': res.data.message[item].code,
-            //         'Name': res.data.message[item].name
-            //     });
-            //     // fields = {text: 'Name', value: 'Code'};
-            //     fields.text='Name';
-            //     fields.value='Code';
-            // }
-            // console.log("Item list: " , itemList);
-            // console.log("Item fields: " , fields);
-            // console.log("resultObject before: " , resultObject);
-            // console.log("resultObject before fields: " , resultObject.fields);
-            // console.log("resultObject before items: " , resultObject.items);
-
-            // resultObject['items'] = itemList;
-            // // resultObject['fields'] = fields;
-            // console.log("resultObject after: " , resultObject);
-            // console.log("resultObject after fields: " , resultObject.fields);
-            // console.log("resultObject after items: " , resultObject.items);
-            // return resultObject;
-
         })
         .catch((error) => {
             // eslint-disable-next-line
             console.log(error);
         });
-    // console.log("resultObject before: " , resultObject);
-    // console.log(resultObject.items);
-    // console.log(resultObject.fields);
-    // return resultObject;
 }
 
 export function extractApiData(data) {
-    console.log("extract api data function: ", data);
     let itemList = [];
     let fields = {text: '', value: ''};
     let resultObject = {items: itemList, fields: fields};
@@ -64,22 +37,21 @@ export function extractApiData(data) {
         fields.text = 'Name';
         fields.value = 'Code';
     }
-    console.log("resultObject: ", resultObject);
-    console.log("resultObject items: ", resultObject.items);
-    console.log("resultObject fields: ", resultObject.fields);
+    console.log("data received: " + data + "\nresultObject: ", resultObject);
     return resultObject;
 }
 
 // eslint-disable-next-line no-unused-vars
-export function getSelectedItem(elementId, itemDataList, itemVar) {
-    let item = document.getElementById(elementId).value;
+export function getSelectedItem(itemDataList, itemVar) {
+    let item = document.getElementById("dropdownlist").value;
 
     for (var i = 0; i < itemDataList.length; i++) {
-        this.$log.info("ITEM: " + item + " itemDataList Item: " + itemDataList[i].Name);
+        console.log("ITEM: " + item + " itemDataList Item: " + itemDataList[i].Name);
         if (item === itemDataList[i].Name) {
             itemVar = itemDataList[i].Code;
+            return itemVar
         } else {
-            this.$log.info("** ITEM NOT FOUND ***")
+            console.log("** ITEM NOT FOUND ***")
         }
     }
 }
