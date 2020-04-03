@@ -7,6 +7,7 @@ from flask_restful import fields, marshal, reqparse
 from api.models.database import BaseModel
 from api.models.user import User
 from api.resources.base_resource import BaseResource
+from api.resources.role_resource import RoleResource
 from api.utils import get_active_users, get_user_by_email, get_users_by_role, get_users_by_status, get_deactivated_user, \
     log_in_user_jwt, format_and_lower_str, standard_non_empty_string, log_update
 
@@ -45,8 +46,11 @@ class UserResource(BaseResource):
         first_name = args['first_name']
         last_name = args['last_name']
         email = args['email']
-        role = args['role']
         password = args['password']
+
+        # FK
+        db_role = RoleResource.get_role(args['role'])
+        role = db_role.id
 
         deactivated_user = get_deactivated_user(email)
 
