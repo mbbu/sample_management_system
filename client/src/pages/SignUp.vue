@@ -151,7 +151,8 @@
         getItemDataList,
         getSelectedItem,
         secureStoreSetString,
-        showFlashMessage
+        showFlashMessage,
+        viewPassword
     } from "../utils/util_functions"
 
     export default {
@@ -205,6 +206,7 @@
         },
 
         methods: {
+            viewPassword,
             clearForm(user) {
                 user.firstName = null;
                 user.lastName = null;
@@ -226,19 +228,6 @@
                 this.$log.info("FORM VALID!");
                 // api call to create user.
                 this.createUser(this.user);
-            },
-
-            viewPassword() {
-                let passwordInput = document.getElementById('password');
-                let pwdEyeIcon = document.getElementById('view-pwd');
-
-                if (passwordInput.type === 'password') {
-                    passwordInput.type = 'text';
-                    pwdEyeIcon.className = 'fa fa-eye-slash';
-                } else {
-                    passwordInput.type = 'password';
-                    pwdEyeIcon.className = 'fa fa-eye';
-                }
             },
 
             onLoadPage() {

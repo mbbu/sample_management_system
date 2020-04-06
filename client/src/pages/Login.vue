@@ -93,7 +93,7 @@
     import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
     import TopNav from "../components/TopNav";
     import {email, required} from "vuelidate/lib/validators";
-    import {countDownTimer, secureStoreSetString, showFlashMessage} from "../utils/util_functions";
+    import {countDownTimer, secureStoreSetString, showFlashMessage, viewPassword} from "../utils/util_functions";
     import {auth_resource} from "../utils/api_paths";
 
     export default {
@@ -128,18 +128,7 @@
         },
 
         methods: {
-            viewPassword() {
-                let passwordInput = document.getElementById('password');
-                let pwdEyeIcon = document.getElementById('view-pwd');
-
-                if (passwordInput.type === 'password') {
-                    passwordInput.type = 'text';
-                    pwdEyeIcon.className = 'fa fa-eye-slash';
-                } else {
-                    passwordInput.type = 'password';
-                    pwdEyeIcon.className = 'fa fa-eye';
-                }
-            },
+            viewPassword,
             onSubmit() {
                 // stop here if form is invalid
                 this.$v.$touch();

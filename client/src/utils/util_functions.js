@@ -28,6 +28,19 @@ export function countDownTimer(self, countDown) {
     return countDown;
 }
 
+export function viewPassword() {
+    let passwordInput = document.getElementById('password');
+    let pwdEyeIcon = document.getElementById('view-pwd');
+
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        pwdEyeIcon.className = 'fa fa-eye-slash';
+    } else {
+        passwordInput.type = 'password';
+        pwdEyeIcon.className = 'fa fa-eye';
+    }
+}
+
 // DropDownList Functions
 // eslint-disable-next-line no-unused-vars
 export function getItemDataList(resource) {
