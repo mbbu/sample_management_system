@@ -1,12 +1,12 @@
 // flash messages
 
-import axios from "axios";
 /*
 * Set secure storage for jwt tokens */
 import Vuex from 'vuex'
 import createPersistedState from "vuex-persistedstate";
 import SecureLS from "secure-ls";
 import Vue from "vue";
+import axios from "axios";
 
 export function showFlashMessage(self, status, title, message) {
     self.flashMessage.show({
