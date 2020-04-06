@@ -104,7 +104,10 @@ const store = new Vuex.Store({
 });
 
 export function secureStoreGetString() {
-    return store.state.string;
+    let jwtString = store.state.string;
+
+    let tokenPrefix = 'Bearer ';
+    return tokenPrefix + jwtString;
 }
 
 export function secureStoreSetString(string) {
@@ -114,4 +117,3 @@ export function secureStoreSetString(string) {
 export function secureStoreDeleteString() {
     store.commit("jwtToken");
 }
-
