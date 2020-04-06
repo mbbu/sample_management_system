@@ -2,8 +2,8 @@
 
 import axios from "axios";
 
-export function showFlashMessage(status, title, message) {
-    this.flashMessage.show({
+export function showFlashMessage(self, status, title, message) {
+    self.flashMessage.show({
         status: status,
         title: title, message: message
     });

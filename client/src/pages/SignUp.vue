@@ -199,7 +199,6 @@
 
         methods: {
             clearForm(user) {
-                this.$log.info("Clear form called");
                 user.firstName = null;
                 user.lastName = null;
                 user.email = null;
@@ -255,6 +254,8 @@
 
 
             createUser: function (user) {
+                let self = this;
+
                 this.user.role = getSelectedItem(this.roleDataList, this.user.role);
                 axios.post(user_resource, {
                     first_name: user.firstName,
@@ -278,13 +279,13 @@
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 409) {
-                                showFlashMessage('error', error.response.data['message'], '');
+                                showFlashMessage(self, 'error', error.response.data['message'], '');
                             } else if (error.response.status === 400) {
-                                showFlashMessage('error', error.response.data['message'], 'Kindly refill the form');
+                                showFlashMessage(self, 'error', error.response.data['message'], 'Kindly refill the form');
                             } else if (error.response.status === 500) {
-                                showFlashMessage('error', "Fatal Error", 'Admin has been contacted.');
+                                showFlashMessage(self, 'error', "Fatal Error", 'Admin has been contacted.');
                             } else {
-                                showFlashMessage('error', error.response.data['message'], '');
+                                showFlashMessage(self, 'error', error.response.data['message'], '');
                             }
                         }
                     })
