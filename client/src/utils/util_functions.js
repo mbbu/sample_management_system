@@ -9,18 +9,21 @@ export function showFlashMessage(self, status, title, message) {
     });
 }
 
-// export function countDownTimer(countDown) {
-//     if(countDown > 0) {
-//         console.log("CountDown: ", countDown);
-//         setTimeout(() => {
-//             countDown -= 1;
-//             this.countDownTimer()
-//         }, 1000)
-//     }else if (this.countDown === 0) {
-//         this.$log.info("**** Timer out ... ****");
-//         this.$router.push({ path : '/home' });
-//     }
-// }
+export function countDownTimer(self, countDown) {
+    if (countDown > 0) {
+        console.log("CountDown: ", countDown);
+        setTimeout(() => {
+            self.$log.info("**** Timer in setTimeout function ... **** --> ", countDown);
+            countDown -= 1;
+            countDownTimer(self, countDown);
+            self.$log.info("**** Timer almost out of setTimeout function ... **** --> ", countDown);
+        }, 1000)
+    } else if (countDown === 0) {
+        self.$log.info("**** Timer out ... ****");
+        self.$router.push({path: '/home'});
+    }
+    return countDown;
+}
 
 // DropDownList Functions
 // eslint-disable-next-line no-unused-vars

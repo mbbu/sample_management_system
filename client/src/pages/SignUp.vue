@@ -145,7 +145,13 @@
     import TopNav from "../components/TopNav";
     import {email, minLength, required, sameAs} from "vuelidate/lib/validators"
     import {role_resource, user_resource} from "../utils/api_paths";
-    import {extractApiData, getItemDataList, getSelectedItem, showFlashMessage} from "../utils/util_functions"
+    import {
+        countDownTimer,
+        extractApiData,
+        getItemDataList,
+        getSelectedItem,
+        showFlashMessage
+    } from "../utils/util_functions"
 
     export default {
         name: "SignUp",
@@ -267,7 +273,7 @@
                     .then((response) => {
                         // redirect after successful signUp
                         if (response.status === 201) {
-                            showFlashMessage(self, 'success', 'User Created', 'Redirecting you to home page in ' + this.countDownTimer() + " seconds");
+                            showFlashMessage(self, 'success', 'User Created', 'Redirecting you to home page in ' + countDownTimer(self, this.countDown) + " seconds");
                             // todo: store jwt tokens to be used for transactions
                             // this.countDownTimer();
                         }
@@ -288,18 +294,6 @@
                     })
 
             },
-
-            countDownTimer() {
-                if (this.countDown > 0) {
-                    setTimeout(() => {
-                        this.countDown -= 1;
-                        this.countDownTimer()
-                    }, 1000)
-                } else if (this.countDown === 0) {
-                    this.$router.push({path: '/home'});
-                }
-                return this.countDown;
-            }
         },
         created() {
             this.onLoadPage();
