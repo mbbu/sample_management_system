@@ -52,9 +52,9 @@ export default new Router({
         {
             path: '/home',
             name: 'Map',
-             alias: ['/welcome'],
-             component: Map,
-         },
+            alias: ['/', '/index', '/welcome'],
+            component: Map,
+        },
 
          {
              path: '/box',
