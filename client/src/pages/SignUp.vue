@@ -150,6 +150,7 @@
         extractApiData,
         getItemDataList,
         getSelectedItem,
+        secureStoreSetString,
         showFlashMessage
     } from "../utils/util_functions"
 
@@ -274,8 +275,7 @@
                         // redirect after successful signUp
                         if (response.status === 201) {
                             showFlashMessage(self, 'success', 'User Created', 'Redirecting you to home page in ' + countDownTimer(self, this.countDown) + " seconds");
-                            // todo: store jwt tokens to be used for transactions
-                            // this.countDownTimer();
+                            secureStoreSetString(response.data.message.token);
                         }
                     })
                     .catch((error) => {
