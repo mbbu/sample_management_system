@@ -167,6 +167,7 @@
     import axios from 'axios';
     import {freezer_resource, lab_resource} from '../../src/utils/api_paths'
     import TopNav from "@/components/TopNav";
+    import {secureStoreGetString} from "../utils/util_functions";
 
     export default {
         name: 'Freezer',
@@ -275,6 +276,11 @@
                     number: this.number,
                     code: this.code,
                     room: this.room,
+                }, {
+                    headers:
+                        {
+                            Authorization: secureStoreGetString()
+                        }
                 })
                     .then((response) => {
                         this.getFreezer();
@@ -302,12 +308,17 @@
                 this.getSelectedLabItem();
 
                 axios.put(freezer_resource, {
-                        laboratory: this.laboratory,
-                        number: this.number,
-                        code: this.code,
-                        room: this.room,
-                    }, {headers: {code: code}}
-                )
+                    laboratory: this.laboratory,
+                    number: this.number,
+                    code: this.code,
+                    room: this.room,
+                }, {
+                    headers:
+                        {
+                            code: code,
+                            Authorization: secureStoreGetString()
+                        }
+                })
                     .then((response) => {
                         this.getFreezer();
                         this.showFlashMessage('success', response.data['message'], '');
@@ -330,9 +341,11 @@
 
             deleteFreezer: function (code) {
                 axios.delete(freezer_resource, {
-                    headers: {
-                        code: code
-                    }
+                    headers:
+                        {
+                            code: code,
+                            Authorization: secureStoreGetString()
+                        }
                 })
                     .then((response) => {
                         this.getFreezer();

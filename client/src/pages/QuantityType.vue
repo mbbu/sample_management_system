@@ -143,6 +143,7 @@
     import axios from 'axios';
     import {quantity_type_resource} from '../../src/utils/api_paths'
     import TopNav from "@/components/TopNav";
+    import {secureStoreGetString} from "../utils/util_functions";
 
     export default {
         name: 'QuantityType',
@@ -194,6 +195,10 @@
                     name: this.name,
                     code: this.code,
                     description: this.desc,
+                }, {
+                    headers: {
+                        Authorization: secureStoreGetString()
+                    }
                 })
                     .then((response) => {
                         this.getQuantityType();
@@ -232,11 +237,16 @@
 
             updateQuantityType: function (code) {
                 axios.put(quantity_type_resource, {
-                        name: this.name,
-                        code: this.code,
-                        description: this.desc,
-                    }, {headers: {code: code}}
-                )
+                    name: this.name,
+                    code: this.code,
+                    description: this.desc,
+                }, {
+                    headers:
+                        {
+                            code: code,
+                            Authorization: secureStoreGetString()
+                        }
+                })
                     .then((response) => {
                         this.getQuantityType();
                         this.flashMessage.show({
@@ -273,9 +283,11 @@
 
             deleteQuantityType: function (code) {
                 axios.delete(quantity_type_resource, {
-                    headers: {
-                        code: code
-                    }
+                    headers:
+                        {
+                            code: code,
+                            Authorization: secureStoreGetString()
+                        }
                 })
                     .then((response) => {
                         this.getQuantityType();
