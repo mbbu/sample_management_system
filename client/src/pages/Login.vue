@@ -89,10 +89,16 @@
 
 <script>
     import axios from 'axios';
+    import 'es6-promise/auto';
     import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
     import TopNav from "../components/TopNav";
     import {email, required} from "vuelidate/lib/validators";
-    import {countDownTimer, showFlashMessage} from "../utils/util_functions";
+    import {
+        countDownTimer,
+        secureStoreGetString,
+        secureStoreSetString,
+        showFlashMessage
+    } from "../utils/util_functions";
     import {auth_resource} from "../utils/api_paths";
 
     export default {
@@ -116,6 +122,7 @@
                 },
                 show: true,
                 countDown: 3,
+                auth_token: '',
             }
         },
 
@@ -162,6 +169,11 @@
                         // redirect after successful login
                         if (response.status === 200) {
                             showFlashMessage(self, 'success', 'Logged In', 'Redirecting you to home page in ' + countDownTimer(self, this.countDown) + " seconds");
+                            secureStoreSetString(response.data.message.token);
+
+                            this.auth_token = secureStoreGetString();
+
+
                             // todo: store jwt tokens to be used for transactions
                         }
                     })

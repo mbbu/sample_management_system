@@ -1,6 +1,12 @@
 // flash messages
 
 import axios from "axios";
+/*
+* Set secure storage for jwt tokens */
+import Vuex from 'vuex'
+import createPersistedState from "vuex-persistedstate";
+import SecureLS from "secure-ls";
+import Vue from "vue";
 
 export function showFlashMessage(self, status, title, message) {
     self.flashMessage.show({
@@ -11,12 +17,9 @@ export function showFlashMessage(self, status, title, message) {
 
 export function countDownTimer(self, countDown) {
     if (countDown > 0) {
-        console.log("CountDown: ", countDown);
         setTimeout(() => {
-            self.$log.info("**** Timer in setTimeout function ... **** --> ", countDown);
             countDown -= 1;
             countDownTimer(self, countDown);
-            self.$log.info("**** Timer almost out of setTimeout function ... **** --> ", countDown);
         }, 1000)
     } else if (countDown === 0) {
         self.$log.info("**** Timer out ... ****");
@@ -75,3 +78,40 @@ export function selectItemForUpdate(elementId, item) {
     var element = document.getElementById(elementId);
     element.value = item;
 }
+
+
+const ls = new SecureLS({isCompression: false});
+
+Vue.use(Vuex);
+
+const store = new Vuex.Store({
+    state: {
+        string: ""
+    },
+    plugins: [
+        createPersistedState({
+            storage: {
+                getItem: key => ls.get(key),
+                setItem: (key, value) => ls.set(key, value),
+                removeItem: key => ls.remove(key)
+            }
+        })
+    ],
+    mutations: {
+        jwtToken: (state, value) =>
+            value ? (state.string = value) : (state.string = "")
+    }
+});
+
+export function secureStoreGetString() {
+    return store.state.string;
+}
+
+export function secureStoreSetString(string) {
+    store.commit("jwtToken", string);
+}
+
+export function secureStoreDeleteString() {
+    store.commit("jwtToken");
+}
+
