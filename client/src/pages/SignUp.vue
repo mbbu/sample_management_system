@@ -267,10 +267,7 @@
                     .then((response) => {
                         // redirect after successful signUp
                         if (response.status === 201) {
-                            this.flashMessage.show({
-                                status: "success", title: "Success",
-                                message: 'User Created. Redirecting you to home page in ' + this.countDownTimer() + " seconds"
-                            });
+                            showFlashMessage(self, 'success', 'User Created', 'Redirecting you to home page in ' + this.countDownTimer() + " seconds");
                             // todo: store jwt tokens to be used for transactions
                             // this.countDownTimer();
                         }
