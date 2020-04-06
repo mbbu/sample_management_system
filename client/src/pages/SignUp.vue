@@ -268,10 +268,10 @@
                         if (response.status === 201) {
                             this.flashMessage.show({
                                 status: "success", title: "Success",
-                                message: 'User Created. Redirecting you to home page in ' + this.countDown + " seconds"
+                                message: 'User Created. Redirecting you to home page in ' + this.countDownTimer() + " seconds"
                             });
                             // todo: store jwt tokens to be used for transactions
-                            this.countDownTimer();
+                            // this.countDownTimer();
                         }
                     })
                     .catch((error) => {
@@ -300,6 +300,7 @@
                 } else if (this.countDown === 0) {
                     this.$router.push({path: '/home'});
                 }
+                return this.countDown;
             }
         },
         created() {
