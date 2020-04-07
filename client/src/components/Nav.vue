@@ -73,6 +73,14 @@
             </li>
 
 
+            <li>
+                <router-link to="/chamber" class="context-menu__link">
+                    <i class="fas fa-bars menu_icon"></i>
+                    Chamber
+                </router-link>
+            </li>
+
+
         </ul>
     </nav>
 </template>
