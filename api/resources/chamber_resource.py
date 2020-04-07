@@ -5,6 +5,7 @@ from flask_restful import fields, marshal, reqparse
 from api.models.chamber import Chamber
 from api.models.database import BaseModel
 from api.resources.base_resource import BaseResource
+from api.resources.freezer_resource import FreezerResource
 from api.utils import format_and_lower_str, non_empty_string, log_create, log_duplicate, log_update, log_delete, \
     has_required_request_params, non_empty_int, standard_non_empty_string, log_304
 
@@ -37,7 +38,12 @@ class ChamberResource(BaseResource):
     @jwt_required
     def post(self):
         args = ChamberResource.chamber_parser()
-        freezer = args['freezer']
+        if type(args['freezer']) is str:
+            freezer_db = FreezerResource.get_freezer(args['freezer'])
+            freezer = freezer_db.id
+        else:
+            freezer = args['freezer']
+
         _type = args['type']
         code = args['code']
 
@@ -68,7 +74,11 @@ class ChamberResource(BaseResource):
 
         else:
             args = ChamberResource.chamber_parser()
-            freezer = args['freezer']
+            if type(args['freezer']) is str:
+                freezer_db = FreezerResource.get_freezer(args['freezer'])
+                freezer = freezer_db.id
+            else:
+                freezer = args['freezer']
             _type = args['type']
             code = args['code']
 
