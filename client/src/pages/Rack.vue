@@ -36,7 +36,7 @@
                                     icon="trash" font-scale="1.85"
                                     class="border rounded bg-danger p-1" variant="light"
                                     v-b-tooltip.hover :title="`Delete rack ${rack.code}!`"
-                                    @click="deleteChamber(rack.code)"
+                                    @click="deleteRack(rack.code)"
                             ></b-icon>
                         </td>
                     </tr>
@@ -50,11 +50,11 @@
                         id="modal-freezer"
                         ok-title="Save"
                         cancel-variant="danger"
-                        @ok="createChamber"
+                        @ok="createRack"
                         @submit="clearForm"
                         @hidden="clearForm"
                 >
-                    <form @submit.prevent="createChamber">
+                    <form @submit.prevent="createRack">
                         <b-form-group id="form-lab-group" label="Chamber Type:" label-for="form-lab-input">
                             <ejs-dropdownlist
                                     id='dropdownlist'
@@ -92,7 +92,7 @@
             <div v-else-if="isEditing">
                 <b-modal
                         :title="`Edit ${page_title}`"
-                        @ok="updateChamber(old_code)"
+                        @ok="updateRack(old_code)"
                         @submit="showModal = false"
                         id="modal-freezer-edit"
                         ok-title="Update"
@@ -224,7 +224,7 @@
                     });
             },
 
-            createChamber: function () {
+            createRack: function () {
                 let self = this;
                 this.chamber = getSelectedItem(this.chamberDataList, this.chamber);
 
@@ -260,7 +260,7 @@
                     });
             },
 
-            updateChamber: function (code) {
+            updateRack: function (code) {
                 let self = this;
                 this.chamber = getSelectedItem(this.chamberDataList, this.chamber);
 
@@ -295,7 +295,7 @@
                     });
             },
 
-            deleteChamber: function (code) {
+            deleteRack: function (code) {
                 let self = this;
                 axios.delete(rack_resource, {
                     headers:
