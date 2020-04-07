@@ -15,6 +15,7 @@ import Freezer from "./pages/Freezer";
 import SignUp from "./pages/SignUp";
 import ContactUs from "./pages/ContactUs";
 import Rack from "./pages/Rack";
+import Tray from "./pages/Tray";
 
 
 Vue.use(Router);
@@ -125,6 +126,13 @@ export default new Router({
             name: 'Rack',
             alias: ['/racks'],
             component: Rack,
+        },
+
+        {
+            path: '/tray',
+            name: 'Tray',
+            alias: ['/trays'],
+            component: Tray,
         },
 
 

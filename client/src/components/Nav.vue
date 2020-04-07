@@ -88,6 +88,12 @@
                 </router-link>
             </li>
 
+            <li>
+                <router-link to="/tray" class="context-menu__link">
+                    <i class="fas fa-th menu_icon"></i>
+                    Tray
+                </router-link>
+            </li>
 
         </ul>
     </nav>

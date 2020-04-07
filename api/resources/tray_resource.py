@@ -5,6 +5,7 @@ from flask_restful import fields, marshal, reqparse
 from api.models.database import BaseModel
 from api.models.tray import Tray
 from api.resources.base_resource import BaseResource
+from api.resources.rack_resource import RackResource
 from api.utils import format_and_lower_str, log_create, log_duplicate, log_update, log_delete, \
     has_required_request_params, standard_non_empty_string, log_304
 
@@ -35,7 +36,7 @@ class TrayResource(BaseResource):
     @jwt_required
     def post(self):
         args = TrayResource.tray_parser()
-        rack = int(args['rack'])
+        rack = RackResource.get_rack(args['rack']).id
         number = int(args['number'])
         code = args['code']
 
@@ -62,7 +63,7 @@ class TrayResource(BaseResource):
 
         if tray is not None:
             args = TrayResource.tray_parser()
-            rack = int(args['rack'])
+            rack = RackResource.get_rack(args['rack']).id
             number = int(args['number'])
             code = args['code']
 
