@@ -14,6 +14,8 @@ import Lab from "./pages/Lab";
 import Freezer from "./pages/Freezer";
 import SignUp from "./pages/SignUp";
 import ContactUs from "./pages/ContactUs";
+import Rack from "./pages/Rack";
+import Tray from "./pages/Tray";
 
 
 Vue.use(Router);
@@ -25,7 +27,7 @@ export default new Router({
         {
             path: '/login',
             name: 'login',
-            alias: ['/signin'],
+            alias: ['/auth', '/auth/login'],
             component: Login,
         },
 
@@ -52,9 +54,9 @@ export default new Router({
         {
             path: '/home',
             name: 'Map',
-             alias: ['/welcome'],
-             component: Map,
-         },
+            alias: ['/', '/index', '/welcome'],
+            component: Map,
+        },
 
          {
              path: '/box',
@@ -112,13 +114,27 @@ export default new Router({
              component: Lab,
          },
 
-         {
-             path: '/freezer',
-             name: 'Freezer',
-             alias: ['/freezer'],
-             component: Freezer,
-         },
+        {
+            path: '/freezer',
+            name: 'Freezer',
+            alias: ['/freezer'],
+            component: Freezer,
+        },
+
+        {
+            path: '/rack',
+            name: 'Rack',
+            alias: ['/racks'],
+            component: Rack,
+        },
+
+        {
+            path: '/tray',
+            name: 'Tray',
+            alias: ['/trays'],
+            component: Tray,
+        },
 
 
-     ],
+    ],
 });

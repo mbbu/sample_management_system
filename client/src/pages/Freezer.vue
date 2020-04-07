@@ -167,6 +167,13 @@
     import axios from 'axios';
     import {freezer_resource, lab_resource} from '../../src/utils/api_paths'
     import TopNav from "@/components/TopNav";
+    import {
+        extractApiData,
+        getItemDataList,
+        getSelectedItem,
+        secureStoreGetString,
+        showFlashMessage
+    } from "../utils/util_functions";
 
     export default {
         name: 'Freezer',
@@ -196,7 +203,7 @@
                 this.room = null;
                 this.isEditing = false;
                 this.labDataList = [];
-                this.getLabDataList();
+                this.onLoadPage();
             },
 
             fillFormForUpdate(number, code, room, laboratory) {
@@ -209,48 +216,28 @@
                 this.showModal = true;
             },
 
-            getLabDataList() {
-                axios.get(lab_resource)
-                    .then((res) => {
-                        this.$log.info("Response: " + res.status + " " + res.data['message']);
-                        for (var lab_item = 0; lab_item < res.data.message.length; lab_item++) {
-                            this.labDataList.push({
-                                'Code': res.data.message[lab_item].code,
-                                'Name': res.data.message[lab_item].name
-                            });
-                            this.fields = {text: 'Name', value: 'Code'};
-                        }
-                    })
-                    .catch((error) => {
-                        // eslint-disable-next-line
-                        this.$log.error(error);
-                    });
-            },
+            onLoadPage() {
+                getItemDataList(lab_resource).then(data => {
+                    let labList = extractApiData(data);
+                    this.$log.info("Role list json: ", JSON.stringify(labList));
 
-            getSelectedLabItem() {
-                let item = document.getElementById("dropdownlist").value;
-
-                for (var i = 0; i < this.labDataList.length; i++) {
-                    this.$log.info("ITEM: " + item + " labDataList Item: " + this.labDataList[i].Name);
-                    if (item === this.labDataList[i].Name) {
-                        this.laboratory = this.labDataList[i].Code;
-                    } else {
-                        this.$log.info("** ITEM NOT FOUND ***")
+                    // update local variables with data from API
+                    this.fields = labList['fields'];
+                    for (let i = 0; i < labList.items.length; i++) {
+                        this.labDataList.push({
+                            'Code': labList.items[i].Code,
+                            'Name': labList.items[i].Name,
+                        });
                     }
-                }
+                    this.$log.info("Extracted data as json fields: ", this.fields);
+                    this.$log.info("Extracted labDataList items: ", this.labDataList)
+                })
             },
 
             selectLabItemForUpdate(laboratory) {
                 // set dropdownitem to the selected item
                 var element = document.getElementById("dropdownlist");
                 element.value = laboratory;
-            },
-
-            showFlashMessage(status, title, message) {
-                this.flashMessage.show({
-                    status: status,
-                    title: title, message: message
-                });
             },
 
             // Functions to interact with api
@@ -268,17 +255,23 @@
             },
 
             createFreezer: function () {
-                this.getSelectedLabItem();
+                let self = this;
+                this.laboratory = getSelectedItem(this.labDataList, this.laboratory);
 
                 axios.post(freezer_resource, {
                     laboratory: this.laboratory,
                     number: this.number,
                     code: this.code,
                     room: this.room,
+                }, {
+                    headers:
+                        {
+                            Authorization: secureStoreGetString()
+                        }
                 })
                     .then((response) => {
                         this.getFreezer();
-                        this.showFlashMessage('success', response.data['message'], '');
+                        showFlashMessage(self, 'success', response.data['message'], '');
                         this.clearForm();
                     })
                     .catch((error) => {
@@ -286,31 +279,37 @@
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 409) {
-                                this.showFlashMessage('error', error.response.data['message'], '');
+                                showFlashMessage(self, 'error', error.response.data['message'], '');
                             } else if (error.response.status === 400) {
-                                this.showFlashMessage('error', error.response.data['message'], 'Kindly refill the form');
+                                showFlashMessage(self, 'error', error.response.data['message'], 'Kindly refill the form');
                             } else if (error.response.status === 401) {
-                                this.showFlashMessage('error', "Session Expired", 'You need to log in to perform this operation');
+                                showFlashMessage(self, 'error', "Session Expired", 'You need to log in to perform this operation');
                             } else {
-                                this.showFlashMessage('error', error.response.data['message'], '');
+                                showFlashMessage(self, 'error', error.response.data['message'], '');
                             }
                         }
                     });
             },
 
             updateFreezer: function (code) {
-                this.getSelectedLabItem();
+                let self = this;
+                this.laboratory = getSelectedItem(this.labDataList, this.laboratory);
 
                 axios.put(freezer_resource, {
-                        laboratory: this.laboratory,
-                        number: this.number,
-                        code: this.code,
-                        room: this.room,
-                    }, {headers: {code: code}}
-                )
+                    laboratory: this.laboratory,
+                    number: this.number,
+                    code: this.code,
+                    room: this.room,
+                }, {
+                    headers:
+                        {
+                            code: code,
+                            Authorization: secureStoreGetString()
+                        }
+                })
                     .then((response) => {
                         this.getFreezer();
-                        this.showFlashMessage('success', response.data['message'], '');
+                        showFlashMessage(self, 'success', response.data['message'], '');
                         this.clearForm();
                     })
                     .catch((error) => {
@@ -318,33 +317,36 @@
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 304) {
-                                this.showFlashMessage('info', 'Record not modified!', '');
+                                showFlashMessage(self, 'info', 'Record not modified!', '');
                             } else if (error.response.status === 401) {
-                                this.showFlashMessage('error', "Session Expired", 'You need to log in to perform this operation');
+                                showFlashMessage(self, 'error', "Session Expired", 'You need to log in to perform this operation');
                             } else {
-                                this.showFlashMessage('error', error.response.data['message'], '');
+                                showFlashMessage(self, 'error', error.response.data['message'], '');
                             }
                         }
                     });
             },
 
             deleteFreezer: function (code) {
+                let self = this;
                 axios.delete(freezer_resource, {
-                    headers: {
-                        code: code
-                    }
+                    headers:
+                        {
+                            code: code,
+                            Authorization: secureStoreGetString()
+                        }
                 })
                     .then((response) => {
                         this.getFreezer();
-                        this.showFlashMessage('success', response.data['message'], '');
+                        showFlashMessage(self, 'success', response.data['message'], '');
                     })
                     .catch((error) => {
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 401) {
-                                this.showFlashMessage('error', "Session Expired", 'You need to log in to perform this operation');
+                                showFlashMessage(self, 'error', "Session Expired", 'You need to log in to perform this operation');
                             } else {
-                                this.showFlashMessage('error', error.response.data['message'], '');
+                                showFlashMessage(self, 'error', error.response.data['message'], '');
                             }
                         }
                     });

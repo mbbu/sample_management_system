@@ -10,30 +10,26 @@
             <li>
                 <router-link to="/home" class="context-menu__link">
                     <i class="fa fa-home menu_icon" aria-hidden="true"> </i>
-                    <b-icon icon="house-fill" font-scale="1.8"></b-icon>
                     Home
                 </router-link>
             </li>
 
             <li>
                 <router-link to="/sample" class="context-menu__link">
-                    <i class="fa fa-home menu__icon" aria-hidden="true"> </i>
-                    <b-icon icon="search" font-scale="1.5"></b-icon>
+                    <i class="fa fa-search menu_icon" aria-hidden="true"> </i>
                     Search Samples
                 </router-link>
             </li>
 
             <li>
                 <a href="https://redcap.icipe.org/surveys/?s=W7A7TFJ89J" class="context-menu__link">
-                    <i class="fa fa-home menu__icon" aria-hidden="true"> </i>
-                    <b-icon icon="inbox" font-scale="1.5"></b-icon>
+                    <i class="fa fa-inbox menu_icon" aria-hidden="true"> </i>
                     Request Sample </a>
             </li>
 
             <li>
                 <router-link to="/addsample" class="context-menu__link">
-                    <i class="fa fa-home menu__icon" aria-hidden="true"> </i>
-                    <b-icon icon="plus" font-scale="1.5"></b-icon>
+                    <i class="fa fa-plus menu_icon" aria-hidden="true"> </i>
                     Add New Sample
                 </router-link>
             </li>
@@ -43,44 +39,61 @@
 
             <li>
                 <router-link to="/themes" class="context-menu__link">
-                    <i class="fa fa-home menu__icon" aria-hidden="true"> </i>
-                    <b-icon icon="trophy" font-scale="1.5"></b-icon>
+                    <i class="fa fa-trophy menu_icon" aria-hidden="true"> </i>
                     Themes
                 </router-link>
             </li>
 
             <li>
                 <router-link to="/security-level" class="context-menu__link">
-                    <i class="fa fa-home menu__icon" aria-hidden="true"> </i>
-                    <b-icon icon="exclamation-triangle" font-scale="1.5"></b-icon>
+                    <i class="fa fa-exclamation-triangle menu_icon" aria-hidden="true"> </i>
                     Security Level
                 </router-link>
             </li>
 
             <li>
                 <router-link to="/quantity-type" class="context-menu__link">
-                    <i class="fa fa-home menu__icon" aria-hidden="true"> </i>
-                    <b-icon icon="bucket" font-scale="1.5"></b-icon>
+                    <i class="fas fa-balance-scale menu_icon" aria-hidden="true"></i>
                     Quantity Type
                 </router-link>
             </li>
 
             <li>
                 <router-link to="/lab" class="context-menu__link">
-                    <i class="fa fa-home menu__icon" aria-hidden="true"> </i>
-                    <b-icon icon="house-door" font-scale="1.5"></b-icon>
+                    <i class="fa fa-building menu_icon" aria-hidden="true"></i>
                     Labs
                 </router-link>
             </li>
 
             <li>
                 <router-link to="/freezer" class="context-menu__link">
-                    <i class="fa fa-home menu__icon" aria-hidden="true"> </i>
-                    <b-icon icon="house-door" font-scale="1.5"></b-icon>
+                    <i class="fas fa-snowflake menu_icon"></i>
                     Freezer
                 </router-link>
             </li>
 
+
+            <li>
+                <router-link to="/chamber" class="context-menu__link">
+                    <i class="fas fa-bars menu_icon"></i>
+                    Chamber
+                </router-link>
+            </li>
+
+
+            <li>
+                <router-link to="/rack" class="context-menu__link">
+                    <i class="fas fa-box menu_icon"></i>
+                    Rack
+                </router-link>
+            </li>
+
+            <li>
+                <router-link to="/tray" class="context-menu__link">
+                    <i class="fas fa-th menu_icon"></i>
+                    Tray
+                </router-link>
+            </li>
 
         </ul>
     </nav>

@@ -145,7 +145,15 @@
     import TopNav from "../components/TopNav";
     import {email, minLength, required, sameAs} from "vuelidate/lib/validators"
     import {role_resource, user_resource} from "../utils/api_paths";
-    import {extractApiData, getItemDataList, getSelectedItem, showFlashMessage} from "../utils/util_functions"
+    import {
+        countDownTimer,
+        extractApiData,
+        getItemDataList,
+        getSelectedItem,
+        secureStoreSetString,
+        showFlashMessage,
+        viewPassword
+    } from "../utils/util_functions"
 
     export default {
         name: "SignUp",
@@ -198,8 +206,8 @@
         },
 
         methods: {
+            viewPassword,
             clearForm(user) {
-                this.$log.info("Clear form called");
                 user.firstName = null;
                 user.lastName = null;
                 user.email = null;
@@ -222,19 +230,6 @@
                 this.createUser(this.user);
             },
 
-            viewPassword() {
-                let passwordInput = document.getElementById('password');
-                let pwdEyeIcon = document.getElementById('view-pwd');
-
-                if (passwordInput.type === 'password') {
-                    passwordInput.type = 'text';
-                    pwdEyeIcon.className = 'fa fa-eye-slash';
-                } else {
-                    passwordInput.type = 'password';
-                    pwdEyeIcon.className = 'fa fa-eye';
-                }
-            },
-
             onLoadPage() {
                 getItemDataList(role_resource).then(data => {
                     let roleList = extractApiData(data);
@@ -255,6 +250,8 @@
 
 
             createUser: function (user) {
+                let self = this;
+
                 this.user.role = getSelectedItem(this.roleDataList, this.user.role);
                 axios.post(user_resource, {
                     first_name: user.firstName,
@@ -266,41 +263,26 @@
                     .then((response) => {
                         // redirect after successful signUp
                         if (response.status === 201) {
-                            this.flashMessage.show({
-                                status: "success", title: "Success",
-                                message: 'User Created. Redirecting you to home page in ' + this.countDown + " seconds"
-                            });
-                            // todo: store jwt tokens to be used for transactions
-                            this.countDownTimer();
+                            showFlashMessage(self, 'success', 'User Created', 'Redirecting you to home page in ' + countDownTimer(self, this.countDown) + " seconds");
+                            secureStoreSetString(response.data.message.token);
                         }
                     })
                     .catch((error) => {
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 409) {
-                                showFlashMessage('error', error.response.data['message'], '');
+                                showFlashMessage(self, 'error', error.response.data['message'], '');
                             } else if (error.response.status === 400) {
-                                showFlashMessage('error', error.response.data['message'], 'Kindly refill the form');
+                                showFlashMessage(self, 'error', error.response.data['message'], 'Kindly refill the form');
                             } else if (error.response.status === 500) {
-                                showFlashMessage('error', "Fatal Error", 'Admin has been contacted.');
+                                showFlashMessage(self, 'error', "Fatal Error", 'Admin has been contacted.');
                             } else {
-                                showFlashMessage('error', error.response.data['message'], '');
+                                showFlashMessage(self, 'error', error.response.data['message'], '');
                             }
                         }
                     })
 
             },
-
-            countDownTimer() {
-                if (this.countDown > 0) {
-                    setTimeout(() => {
-                        this.countDown -= 1;
-                        this.countDownTimer()
-                    }, 1000)
-                } else if (this.countDown === 0) {
-                    this.$router.push({path: '/home'});
-                }
-            }
         },
         created() {
             this.onLoadPage();

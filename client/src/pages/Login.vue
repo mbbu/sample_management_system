@@ -8,6 +8,7 @@
                     <mdb-row>
                         <mdb-col md="12">
                             <mdb-card>
+                                <FlashMessage :position="'right bottom'"></FlashMessage>
                                 <div class="header pt-3 blue-gradient">
                                     <mdb-row class="d-flex justify-content-center">
                                         <h3 class="white-text mb-3 pt-3"><i class="fa fa-lock"></i> Log In:</h3>
@@ -87,9 +88,13 @@
 </template>
 
 <script>
+    import axios from 'axios';
+    import 'es6-promise/auto';
     import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
     import TopNav from "../components/TopNav";
     import {email, required} from "vuelidate/lib/validators";
+    import {countDownTimer, secureStoreSetString, showFlashMessage, viewPassword} from "../utils/util_functions";
+    import {auth_resource} from "../utils/api_paths";
 
     export default {
         components: {
@@ -110,7 +115,8 @@
                     password: '',
                     checked: []
                 },
-                show: true
+                show: true,
+                countDown: 3,
             }
         },
 
@@ -122,20 +128,8 @@
         },
 
         methods: {
-            viewPassword() {
-                let passwordInput = document.getElementById('password');
-                let pwdEyeIcon = document.getElementById('view-pwd');
-
-                if (passwordInput.type === 'password') {
-                    passwordInput.type = 'text';
-                    pwdEyeIcon.className = 'fa fa-eye-slash';
-                } else {
-                    passwordInput.type = 'password';
-                    pwdEyeIcon.className = 'fa fa-eye';
-                }
-            },
+            viewPassword,
             onSubmit() {
-                this.$log.info("FORM SUBMIT METHOD CALLED!");
                 // stop here if form is invalid
                 this.$v.$touch();
                 if (this.$v.$invalid) {
@@ -143,20 +137,40 @@
                     return;
                 }
                 this.$log.info("FORM VALID!");
-                alert("SUCCESS!! :-)\n\n" + JSON.stringify(this.user));
                 // api call to authentication user.
+                this.logInUser(this.user);
             },
-            onReset(evt) {
-                evt.preventDefault();
-                // Reset our form values
-                this.form.email = '';
-                this.form.checked = [];
-                // Trick to reset/clear native browser form validation state
-                this.show = false;
-                this.$nextTick(() => {
-                    this.show = true
-        })
-      }
-    }
+
+            logInUser: function (user) {
+                let self = this;
+
+                axios.post(auth_resource, {
+                    email: user.email,
+                    password: user.password
+                })
+                    .then((response) => {
+                        // redirect after successful login
+                        if (response.status === 200) {
+                            showFlashMessage(self, 'success', 'Logged In', 'Redirecting you to home page in ' + countDownTimer(self, this.countDown) + " seconds");
+                            secureStoreSetString(response.data.message.token); // set jwt token required across requests
+                        }
+                    })
+                    .catch((error) => {
+                        this.$log.error(error);
+                        this.$log.error("error: ", error.response.status);
+                        if (error.response) {
+                            if (error.response.status === 403) {
+                                showFlashMessage(self, 'error', error.response.data['message'], '');
+                            } else if (error.response.status === 404) {
+                                showFlashMessage(self, 'error', error.response.data['message'], 'Try to SignUp instead');
+                            } else if (error.response.status === 500) {
+                                showFlashMessage(self, 'error', "Fatal Error", 'Admin has been contacted.');
+                            } else {
+                                showFlashMessage(self, 'error', error.response.data['message'], '');
+                            }
+                        }
+                    })
+            },
+        }
   }
 </script>

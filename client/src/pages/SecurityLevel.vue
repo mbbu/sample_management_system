@@ -143,6 +143,7 @@
     import axios from 'axios';
     import {security_level_resource} from '../../src/utils/api_paths'
     import TopNav from "@/components/TopNav";
+    import {secureStoreGetString} from "../utils/util_functions";
 
     export default {
         name: 'SecurityLevel',
@@ -194,6 +195,10 @@
                     name: this.name,
                     code: this.code,
                     description: this.desc,
+                }, {
+                    headers: {
+                        Authorization: secureStoreGetString()
+                    }
                 })
                     .then((response) => {
                         this.getSecurityLevel();
@@ -232,11 +237,16 @@
 
             updateSecurityLevel: function (code) {
                 axios.put(security_level_resource, {
-                        name: this.name,
-                        code: this.code,
-                        description: this.desc,
-                    }, {headers: {code: code}}
-                )
+                    name: this.name,
+                    code: this.code,
+                    description: this.desc,
+                }, {
+                    headers:
+                        {
+                            code: code,
+                            Authorization: secureStoreGetString()
+                        }
+                })
                     .then((response) => {
                         this.getSecurityLevel();
                         this.flashMessage.show({
@@ -273,9 +283,11 @@
 
             deleteSecurityLevel: function (code) {
                 axios.delete(security_level_resource, {
-                    headers: {
-                        code: code
-                    }
+                    headers:
+                        {
+                            code: code,
+                            Authorization: secureStoreGetString()
+                        }
                 })
                     .then((response) => {
                         this.getSecurityLevel();

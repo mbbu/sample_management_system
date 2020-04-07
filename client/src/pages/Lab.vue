@@ -143,12 +143,13 @@
     import axios from 'axios';
     import {lab_resource} from '../../src/utils/api_paths'
     import TopNav from "@/components/TopNav";
+    import {secureStoreGetString} from "../utils/util_functions";
 
     export default {
         name: 'Lab',
         data() {
             return {
-                page_title: "Lab",
+                page_title: "Labs",
                 response: [],
                 name: null,
                 code: null,
@@ -194,6 +195,10 @@
                     name: this.name,
                     code: this.code,
                     room: this.room,
+                }, {
+                    headers: {
+                        Authorization: secureStoreGetString()
+                    }
                 })
                     .then((response) => {
                         this.getLab();
@@ -232,11 +237,16 @@
 
             updateLab: function (code) {
                 axios.put(lab_resource, {
-                        name: this.name,
-                        code: this.code,
-                        room: this.room,
-                    }, {headers: {code: code}}
-                )
+                    name: this.name,
+                    code: this.code,
+                    room: this.room,
+                }, {
+                    headers:
+                        {
+                            code: code,
+                            Authorization: secureStoreGetString()
+                        }
+                })
                     .then((response) => {
                         this.getLab();
                         this.flashMessage.show({
@@ -273,9 +283,11 @@
 
             deleteLab: function (code) {
                 axios.delete(lab_resource, {
-                    headers: {
-                        code: code
-                    }
+                    headers:
+                        {
+                            code: code,
+                            Authorization: secureStoreGetString()
+                        }
                 })
                     .then((response) => {
                         this.getLab();

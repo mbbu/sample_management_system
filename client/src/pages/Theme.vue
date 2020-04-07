@@ -121,6 +121,7 @@
     import axios from 'axios';
     import {theme_resource} from '../../src/utils/api_paths'
     import TopNav from "@/components/TopNav";
+    import {secureStoreGetString} from '../utils/util_functions'
 
     export default {
         name: 'Theme',
@@ -168,6 +169,10 @@
                 axios.post(theme_resource, {
                     name: this.name,
                     code: this.code,
+                }, {
+                    headers: {
+                        Authorization: secureStoreGetString()
+                    }
                 })
                     .then((response) => {
                         this.getTheme();
@@ -206,10 +211,15 @@
 
             updateTheme: function (code) {
                 axios.put(theme_resource, {
-                        name: this.name,
-                        code: this.code,
-                    }, {headers: {code: code}}
-                )
+                    name: this.name,
+                    code: this.code,
+                }, {
+                    headers:
+                        {
+                            code: code,
+                            Authorization: secureStoreGetString()
+                        }
+                })
                     .then((response) => {
                         this.getTheme();
                         this.flashMessage.show({
@@ -247,7 +257,8 @@
             deleteTheme: function (code) {
                 axios.delete(theme_resource, {
                     headers: {
-                        code: code
+                        code: code,
+                        Authorization: secureStoreGetString()
                     }
                 })
                     .then((response) => {

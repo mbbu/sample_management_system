@@ -5,6 +5,7 @@ from flask_restful import fields, marshal, reqparse
 from api.models.database import BaseModel
 from api.models.rack import Rack
 from api.resources.base_resource import BaseResource
+from api.resources.chamber_resource import ChamberResource
 from api.utils import format_and_lower_str, log_create, log_duplicate, log_update, log_delete, \
     has_required_request_params, standard_non_empty_string, log_304, non_empty_int
 
@@ -36,7 +37,12 @@ class RackResource(BaseResource):
     @jwt_required
     def post(self):
         args = RackResource.rack_parser()
-        chamber = args['chamber']
+        if type(args['chamber']) is str:
+            chamber_db = ChamberResource.get_chamber(args['chamber'])
+            chamber = chamber_db.id
+        else:
+            chamber = args['chamber']
+
         number = args['number']
         code = args['code']
 
@@ -63,7 +69,12 @@ class RackResource(BaseResource):
 
         if rack is not None:
             args = RackResource.rack_parser()
-            chamber = args['chamber']
+            if type(args['chamber']) is str:
+                chamber_db = ChamberResource.get_chamber(args['chamber'])
+                chamber = chamber_db.id
+            else:
+                chamber = args['chamber']
+
             number = args['number']
             code = args['code']
 

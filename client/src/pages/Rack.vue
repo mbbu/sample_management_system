@@ -10,35 +10,33 @@
                     <thead>
                     <tr>
                         <th scope="col"> Id</th>
-                        <th scope="col"> Type</th>
+                        <th scope="col"> Number</th>
                         <th scope="col"> Code</th>
-                        <th scope="col"> Freezer Room</th>
-                        <th scope="col"> Freezer Number</th>
+                        <th scope="col"> Chamber Type</th>
                         <th scope="col"> Actions</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="chamber.id" v-for="(chamber, index) in response.message">
+                    <tr :key="rack.id" v-for="(rack, index) in response.message">
                         <td> {{ index + 1 }}</td>
-                        <td> {{chamber.type}}</td>
-                        <td> {{chamber.code}}</td>
-                        <td> {{chamber['freezer.room']}}</td>
-                        <td> {{chamber['freezer.number']}}</td>
+                        <td> {{rack.number}}</td>
+                        <td> {{rack.code}}</td>
+                        <td> {{rack['chamber.type']}}</td>
 
                         <td>
                             <b-icon
                                     icon="pencil" font-scale="2.0"
                                     class="border border-info rounded" variant="info"
-                                    v-b-tooltip.hover :title="`Update chamber ${ chamber.code }`"
+                                    v-b-tooltip.hover :title="`Update rack ${ rack.code }`"
                                     v-b-modal.modal-freezer-edit
-                                    @mouseover="fillFormForUpdate(chamber['freezer.number'], chamber.type, chamber.code)"
+                                    @mouseover="fillFormForUpdate(rack['chamber.type'], rack.number, rack.code)"
                             ></b-icon>
                             &nbsp;
                             <b-icon
                                     icon="trash" font-scale="1.85"
                                     class="border rounded bg-danger p-1" variant="light"
-                                    v-b-tooltip.hover :title="`Delete chamber ${chamber.code}!`"
-                                    @click="deleteChamber(chamber.code)"
+                                    v-b-tooltip.hover :title="`Delete rack ${rack.code}!`"
+                                    @click="deleteRack(rack.code)"
                             ></b-icon>
                         </td>
                     </tr>
@@ -52,28 +50,28 @@
                         id="modal-freezer"
                         ok-title="Save"
                         cancel-variant="danger"
-                        @ok="createChamber"
+                        @ok="createRack"
                         @submit="clearForm"
                         @hidden="clearForm"
                 >
-                    <form @submit.prevent="createChamber">
-                        <b-form-group id="form-lab-group" label="Freezer Number:" label-for="form-lab-input">
+                    <form @submit.prevent="createRack">
+                        <b-form-group id="form-lab-group" label="Chamber Type:" label-for="form-lab-input">
                             <ejs-dropdownlist
                                     id='dropdownlist'
-                                    :dataSource='freezerDataList'
+                                    :dataSource='chamberDataList'
                                     :fields="fields"
-                                    placeholder='Select a freezer'
+                                    placeholder='Select a chamber'
                                     :v-model="freezer"
                             ></ejs-dropdownlist>
                         </b-form-group>
 
-                        <b-form-group id="form-room-group" label="Type:" label-for="form-room-input">
+                        <b-form-group id="form-number-group" label="Number:" label-for="form-number-input">
                             <b-form-input
-                                    id="form-room-input"
-                                    placeholder="Enter Freezer Type"
+                                    id="form-number-input"
+                                    placeholder="Enter Rack Number"
                                     required="true"
                                     type="text"
-                                    v-model="type"
+                                    v-model="number"
                             ></b-form-input>
                         </b-form-group>
 
@@ -94,12 +92,12 @@
             <div v-else-if="isEditing">
                 <b-modal
                         :title="`Edit ${page_title}`"
-                        @ok="updateChamber(old_code)"
+                        @ok="updateRack(old_code)"
                         @submit="showModal = false"
                         id="modal-freezer-edit"
                         ok-title="Update"
                         cancel-variant="danger"
-                        @shown="selectItemForUpdate(freezer)"
+                        @shown="selectItemForUpdate(chamber)"
                         @hidden="clearForm"
                 >
                     <form>
@@ -107,20 +105,20 @@
                                       label-for="form-freezer-input">
                             <ejs-dropdownlist
                                     id='dropdownlist'
-                                    :dataSource='freezerDataList'
+                                    :dataSource='chamberDataList'
                                     :fields="fields"
-                                    placeholder='Select a freezer'
+                                    placeholder='Select a chamber'
                                     :v-model="freezer"
                             ></ejs-dropdownlist>
                         </b-form-group>
 
-                        <b-form-group id="form-type-group-edit" label="Type:" label-for="form-type-input">
+                        <b-form-group id="form-type-group-edit" label="Number:" label-for="form-type-input">
                             <b-form-input
                                     id="form-type-input"
-                                    placeholder="Enter chamber type"
+                                    placeholder="Enter Rack Number"
                                     required="true"
                                     type="text"
-                                    v-model="type"
+                                    v-model="number"
                             ></b-form-input>
                         </b-form-group>
 
@@ -138,7 +136,7 @@
             </div>
             <b-button class="float_btn"
                       v-b-modal.modal-freezer variant="primary"
-            >Add Chamber
+            >Add Rack
             </b-button>
         </div>
     </div>
@@ -146,10 +144,10 @@
 
 <script>
     import axios from 'axios';
-    import {chamber_resource, freezer_resource} from '../../src/utils/api_paths'
+    import {chamber_resource, rack_resource} from '../../src/utils/api_paths'
     import TopNav from "@/components/TopNav";
     import {
-        extractApiData2,
+        extractApiData3,
         getItemDataList,
         getSelectedItem,
         secureStoreGetString,
@@ -158,15 +156,15 @@
     } from "../utils/util_functions";
 
     export default {
-        name: 'Chamber',
+        name: 'Rack',
         data() {
             return {
-                page_title: "Chambers",
+                page_title: "Rack",
                 response: [],
-                freezer: null,
+                chamber: null,
                 code: null,
-                type: null,
-                freezerDataList: [],
+                number: null,
+                chamberDataList: [],
                 fields: {text: '', value: ''},
 
                 // values for data modification
@@ -179,45 +177,43 @@
             selectItemForUpdate,
             // Util Functions
             clearForm() {
-                this.freezer = null;
+                this.chamber = null;
                 this.code = null;
-                this.type = null;
+                this.number = null;
                 this.isEditing = false;
-                this.freezerDataList = [];
+                this.chamberDataList = [];
                 this.onLoadPage();
             },
 
-            fillFormForUpdate(freezer, type, code) {
-                this.freezer = freezer;
+            fillFormForUpdate(chamber, number, code) {
+                this.chamber = chamber;
                 this.code = code;
-                this.type = type;
+                this.number = number;
                 this.old_code = code;
                 this.isEditing = true;
                 this.showModal = true;
             },
 
             onLoadPage() {
-                getItemDataList(freezer_resource).then(data => {
-                    let freezerList = extractApiData2(data);
-                    this.$log.info("Freezer list json: ", JSON.stringify(freezerList));
+                getItemDataList(chamber_resource).then(data => {
+                    let chamberList = extractApiData3(data);
+                    this.$log.info("Chamber list json: ", JSON.stringify(chamberList));
 
                     // update local variables with data from API
-                    this.fields = freezerList['fields'];
-                    for (let i = 0; i < freezerList.items.length; i++) {
-                        this.freezerDataList.push({
-                            'Code': freezerList.items[i].Code,
-                            'Name': freezerList.items[i].Name,
+                    this.fields = chamberList['fields'];
+                    for (let i = 0; i < chamberList.items.length; i++) {
+                        this.chamberDataList.push({
+                            'Code': chamberList.items[i].Code,
+                            'Name': chamberList.items[i].Name,
                         });
                     }
-                    this.$log.info("Extracted data as json fields: ", this.fields);
-                    this.$log.info("Extracted freezerDataList items: ", this.freezerDataList)
                 })
             },
 
             // Functions to interact with api
-            getChamber() {
+            getRack() {
                 this.clearForm();
-                axios.get(chamber_resource)
+                axios.get(rack_resource)
                     .then((res) => {
                         this.$log.info("Response: " + res.status + " " + res.data['message']);
                         this.response = res.data;
@@ -228,13 +224,13 @@
                     });
             },
 
-            createChamber: function () {
+            createRack: function () {
                 let self = this;
-                this.freezer = getSelectedItem(this.freezerDataList, this.freezer);
+                this.chamber = getSelectedItem(this.chamberDataList, this.chamber);
 
-                axios.post(chamber_resource, {
-                    freezer: this.freezer,
-                    type: this.type,
+                axios.post(rack_resource, {
+                    chamber: this.chamber,
+                    number: this.number,
                     code: this.code,
                 }, {
                     headers:
@@ -243,7 +239,7 @@
                         }
                 })
                     .then((response) => {
-                        this.getChamber();
+                        this.getRack();
                         showFlashMessage(self, 'success', response.data['message'], '');
                         this.clearForm();
                     })
@@ -264,13 +260,13 @@
                     });
             },
 
-            updateChamber: function (code) {
+            updateRack: function (code) {
                 let self = this;
-                this.freezer = getSelectedItem(this.freezerDataList, this.freezer);
+                this.chamber = getSelectedItem(this.chamberDataList, this.chamber);
 
-                axios.put(chamber_resource, {
-                    freezer: this.freezer,
-                    type: this.type,
+                axios.put(rack_resource, {
+                    chamber: this.chamber,
+                    number: this.number,
                     code: this.code,
                 }, {
                     headers:
@@ -280,7 +276,7 @@
                         }
                 })
                     .then((response) => {
-                        this.getChamber();
+                        this.getRack();
                         showFlashMessage(self, 'success', response.data['message'], '');
                         this.clearForm();
                     })
@@ -299,9 +295,9 @@
                     });
             },
 
-            deleteChamber: function (code) {
+            deleteRack: function (code) {
                 let self = this;
-                axios.delete(chamber_resource, {
+                axios.delete(rack_resource, {
                     headers:
                         {
                             code: code,
@@ -309,7 +305,7 @@
                         }
                 })
                     .then((response) => {
-                        this.getChamber();
+                        this.getRack();
                         showFlashMessage(self, 'success', response.data['message'], '');
                     })
                     .catch((error) => {
@@ -325,7 +321,7 @@
             },
         },
         created() {
-            this.getChamber();
+            this.getRack();
         },
         components: {TopNav}
     };

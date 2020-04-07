@@ -1,26 +1,45 @@
 // flash messages
 
+/*
+* Set secure storage for jwt tokens */
+import Vuex from 'vuex'
+import createPersistedState from "vuex-persistedstate";
+import SecureLS from "secure-ls";
+import Vue from "vue";
 import axios from "axios";
 
-export function showFlashMessage(status, title, message) {
-    this.flashMessage.show({
+export function showFlashMessage(self, status, title, message) {
+    self.flashMessage.show({
         status: status,
         title: title, message: message
     });
 }
 
-// export function countDownTimer(countDown) {
-//     if(countDown > 0) {
-//         console.log("CountDown: ", countDown);
-//         setTimeout(() => {
-//             countDown -= 1;
-//             this.countDownTimer()
-//         }, 1000)
-//     }else if (this.countDown === 0) {
-//         this.$log.info("**** Timer out ... ****");
-//         this.$router.push({ path : '/home' });
-//     }
-// }
+export function countDownTimer(self, countDown) {
+    if (countDown > 0) {
+        setTimeout(() => {
+            countDown -= 1;
+            countDownTimer(self, countDown);
+        }, 1000)
+    } else if (countDown === 0) {
+        self.$log.info("**** Timer out ... ****");
+        self.$router.push({path: '/home'});
+    }
+    return countDown;
+}
+
+export function viewPassword() {
+    let passwordInput = document.getElementById('password');
+    let pwdEyeIcon = document.getElementById('view-pwd');
+
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        pwdEyeIcon.className = 'fa fa-eye-slash';
+    } else {
+        passwordInput.type = 'password';
+        pwdEyeIcon.className = 'fa fa-eye';
+    }
+}
 
 // DropDownList Functions
 // eslint-disable-next-line no-unused-vars
@@ -53,6 +72,54 @@ export function extractApiData(data) {
     return resultObject;
 }
 
+export function extractApiData2(data) {
+    let itemList = [];
+    let fields = {text: '', value: ''};
+    let resultObject = {items: itemList, fields: fields};
+
+    for (var item = 0; item < data.length; item++) {
+        itemList.push({
+            'Code': data[item].code,
+            'Name': "Freezer number(" + data[item].number + ") in room " + data[item].room
+        });
+        fields.text = 'Name';
+        fields.value = 'Code';
+    }
+    return resultObject;
+}
+
+export function extractApiData3(data) {
+    let itemList = [];
+    let fields = {text: '', value: ''};
+    let resultObject = {items: itemList, fields: fields};
+
+    for (var item = 0; item < data.length; item++) {
+        itemList.push({
+            'Code': data[item].code,
+            'Name': data[item].type
+        });
+        fields.text = 'Name';
+        fields.value = 'Code';
+    }
+    return resultObject;
+}
+
+export function extractApiData4(data) {
+    let itemList = [];
+    let fields = {text: '', value: ''};
+    let resultObject = {items: itemList, fields: fields};
+
+    for (var item = 0; item < data.length; item++) {
+        itemList.push({
+            'Code': data[item].code,
+            'Name': "Rack number(" + data[item].number + ") in chamber " + data[item]['chamber.type']
+        });
+        fields.text = 'Name';
+        fields.value = 'Code';
+    }
+    return resultObject;
+}
+
 // eslint-disable-next-line no-unused-vars
 export function getSelectedItem(itemDataList, itemVar) {
     let item = document.getElementById("dropdownlist").value;
@@ -67,8 +134,47 @@ export function getSelectedItem(itemDataList, itemVar) {
     }
 }
 
-export function selectItemForUpdate(elementId, item) {
+export function selectItemForUpdate(item) {
     // set dropdownItem to the selected item
-    var element = document.getElementById(elementId);
+    var element = document.getElementById("dropdownlist");
     element.value = item;
+}
+
+
+const ls = new SecureLS({isCompression: false});
+
+Vue.use(Vuex);
+
+const store = new Vuex.Store({
+    state: {
+        string: ""
+    },
+    plugins: [
+        createPersistedState({
+            storage: {
+                getItem: key => ls.get(key),
+                setItem: (key, value) => ls.set(key, value),
+                removeItem: key => ls.remove(key)
+            }
+        })
+    ],
+    mutations: {
+        jwtToken: (state, value) =>
+            value ? (state.string = value) : (state.string = "")
+    }
+});
+
+export function secureStoreGetString() {
+    let jwtString = store.state.string;
+
+    let tokenPrefix = 'Bearer ';
+    return tokenPrefix + jwtString;
+}
+
+export function secureStoreSetString(string) {
+    store.commit("jwtToken", string);
+}
+
+export function secureStoreDeleteString() {
+    store.commit("jwtToken");
 }
