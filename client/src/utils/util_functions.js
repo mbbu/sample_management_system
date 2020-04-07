@@ -72,6 +72,22 @@ export function extractApiData(data) {
     return resultObject;
 }
 
+export function extractApiData2(data) {
+    let itemList = [];
+    let fields = {text: '', value: ''};
+    let resultObject = {items: itemList, fields: fields};
+
+    for (var item = 0; item < data.length; item++) {
+        itemList.push({
+            'Code': data[item].code,
+            'Name': "Freezer number(" + data[item].number + ") in room " + data[item].room
+        });
+        fields.text = 'Name';
+        fields.value = 'Code';
+    }
+    return resultObject;
+}
+
 // eslint-disable-next-line no-unused-vars
 export function getSelectedItem(itemDataList, itemVar) {
     let item = document.getElementById("dropdownlist").value;
@@ -86,9 +102,9 @@ export function getSelectedItem(itemDataList, itemVar) {
     }
 }
 
-export function selectItemForUpdate(elementId, item) {
+export function selectItemForUpdate(item) {
     // set dropdownItem to the selected item
-    var element = document.getElementById(elementId);
+    var element = document.getElementById("dropdownlist");
     element.value = item;
 }
 
