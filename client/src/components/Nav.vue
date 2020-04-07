@@ -81,6 +81,14 @@
             </li>
 
 
+            <li>
+                <router-link to="/rack" class="context-menu__link">
+                    <i class="fas fa-box menu_icon"></i>
+                    Rack
+                </router-link>
+            </li>
+
+
         </ul>
     </nav>
 </template>

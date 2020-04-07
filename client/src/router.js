@@ -14,6 +14,7 @@ import Lab from "./pages/Lab";
 import Freezer from "./pages/Freezer";
 import SignUp from "./pages/SignUp";
 import ContactUs from "./pages/ContactUs";
+import Rack from "./pages/Rack";
 
 
 Vue.use(Router);
@@ -112,13 +113,20 @@ export default new Router({
              component: Lab,
          },
 
-         {
-             path: '/freezer',
-             name: 'Freezer',
-             alias: ['/freezer'],
-             component: Freezer,
-         },
+        {
+            path: '/freezer',
+            name: 'Freezer',
+            alias: ['/freezer'],
+            component: Freezer,
+        },
+
+        {
+            path: '/rack',
+            name: 'Rack',
+            alias: ['/racks'],
+            component: Rack,
+        },
 
 
-     ],
+    ],
 });
