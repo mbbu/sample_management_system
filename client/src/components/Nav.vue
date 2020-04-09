@@ -16,8 +16,8 @@
 
             <li>
                 <router-link to="/sample" class="context-menu__link">
-                    <i class="fa fa-search menu_icon" aria-hidden="true"> </i>
-                    Search Samples
+                    <i class="fas fa-vial menu_icon"></i>
+                    Samples
                 </router-link>
             </li>
 
@@ -27,14 +27,6 @@
                     Request Sample </a>
             </li>
 
-            <li>
-                <router-link to="/addsample" class="context-menu__link">
-                    <i class="fa fa-plus menu_icon" aria-hidden="true"> </i>
-                    Add New Sample
-                </router-link>
-            </li>
-
-            <hr>
             <hr>
 
             <li>
@@ -92,6 +84,20 @@
                 <router-link to="/tray" class="context-menu__link">
                     <i class="fas fa-th menu_icon"></i>
                     Tray
+                </router-link>
+            </li>
+
+            <li>
+                <router-link to="/box" class="context-menu__link">
+                    <i class="fas fa-briefcase menu_icon"></i>
+                    Box
+                </router-link>
+            </li>
+
+            <li>
+                <router-link to="/publication" class="context-menu__link">
+                    <i class="fas fa-brain menu_icon"></i>
+                    Publication
                 </router-link>
             </li>
 
