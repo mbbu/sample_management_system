@@ -16,6 +16,7 @@ import SignUp from "./pages/SignUp";
 import ContactUs from "./pages/ContactUs";
 import Rack from "./pages/Rack";
 import Tray from "./pages/Tray";
+import Publication from "./pages/Publication";
 
 
 Vue.use(Router);
@@ -58,61 +59,61 @@ export default new Router({
             component: Map,
         },
 
-         {
-             path: '/box',
-             name: 'Box',
-             alias: ['/boxes'],
-             component: Box,
-         },
+        {
+            path: '/box',
+            name: 'Box',
+            alias: ['/boxes'],
+            component: Box,
+        },
 
-         {
-             path: '/sample',
-             name: 'Sample',
-             alias: ['/samples'],
-             component: Sample,
-         },
+        {
+            path: '/sample',
+            name: 'Sample',
+            alias: ['/samples'],
+            component: Sample,
+        },
 
-         {
-             path: '/addsample',
-             name: 'AddSample',
-             alias: ['/addsamples'],
-             component: AddSample,
-         },
+        {
+            path: '/addsample',
+            name: 'AddSample',
+            alias: ['/addsamples'],
+            component: AddSample,
+        },
 
-         {
-             path: '/chamber',
-             name: 'chamber',
-             alias: ['/chambers'],
-             component: Chamber,
-         },
+        {
+            path: '/chamber',
+            name: 'chamber',
+            alias: ['/chambers'],
+            component: Chamber,
+        },
 
-         {
-             path: '/theme',
-             name: 'theme',
-             alias: ['/themes'],
-             component: Theme,
-         },
+        {
+            path: '/theme',
+            name: 'theme',
+            alias: ['/themes'],
+            component: Theme,
+        },
 
-         {
-             path: '/security-level',
-             name: 'SecurityLevel',
-             alias: ['/securitylevel'],
-             component: SecurityLevel,
-         },
+        {
+            path: '/security-level',
+            name: 'SecurityLevel',
+            alias: ['/securitylevel'],
+            component: SecurityLevel,
+        },
 
-         {
-             path: '/quantity-type',
-             name: 'QuantityType',
-             alias: ['/qt'],
-             component: QuantityType,
-         },
+        {
+            path: '/quantity-type',
+            name: 'QuantityType',
+            alias: ['/qt'],
+            component: QuantityType,
+        },
 
-         {
-             path: '/lab',
-             name: 'Lab',
-             alias: ['/laboratory'],
-             component: Lab,
-         },
+        {
+            path: '/lab',
+            name: 'Lab',
+            alias: ['/laboratory'],
+            component: Lab,
+        },
 
         {
             path: '/freezer',
@@ -133,6 +134,13 @@ export default new Router({
             name: 'Tray',
             alias: ['/trays'],
             component: Tray,
+        },
+
+        {
+            path: '/publication',
+            name: 'Publication',
+            alias: ['/publications'],
+            component: Publication,
         },
 
 

@@ -14,6 +14,8 @@ class PublicationResource(BaseResource):
         'sample.project': fields.String,
         'sample.theme.name': fields.String,
         'sample.code': fields.String,
+        'user.first_name': fields.String,
+        'user.last_name': fields.String,
         'user.email': fields.String,
         'sample_results': fields.String,
         'publication_title': fields.String,
