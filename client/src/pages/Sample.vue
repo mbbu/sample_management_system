@@ -33,25 +33,29 @@
          </tbody>
      </table>
      </div>
-
+            <a href="/addsample">
+                <b-button class="float_btn" variant="primary">Add Sample</b-button>
+            </a>
      </div>
     </div>
 </template>
 
 <script>
-import axios from 'axios';
-export default {
-    data() {
-        return {
-            response: [],
+    import axios from 'axios';
+
+    export default {
+        data() {
+            return {
+                response: [],
             };
-    },
-    methods: {
-        getSamples() {
-         const path= 'http://localhost:5000/sample'  ;
-         axios.get(path)
-            .then((res) => {
-                this.response = res.data;
+        },
+        methods: {
+            getSamples() {
+                const path = 'http://localhost:5000/sample';
+                axios.get(path)
+                    .then((res) => {
+                        this.response = res.data;
+                        console.info("Response: ", this.response)
             })
              .catch((error) => {
                  console.error(error);
