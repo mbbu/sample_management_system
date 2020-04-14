@@ -212,7 +212,7 @@
     import axios from "axios";
     import {publication_resource, sample_resource} from "../utils/api_paths";
     import {
-        countDownTimer1,
+        countDownTimer,
         extractApiDataForPub,
         getItemDataList,
         getSelectedItemSetTextFieldValue,
@@ -341,7 +341,7 @@
                                 showFlashMessage(self, 'error', error.response.data['message'], 'Kindly refill the form');
                             } else if (error.response.status === 401) {
                                 showFlashMessage(self, 'error', "Session Expired", 'You need to log in to perform this operation');
-                                countDownTimer1(self, 3, '/login');
+                                countDownTimer(self, 3, '/login');
                             } else {
                                 showFlashMessage(self, 'error', error.response.data['message'], '');
                             }
