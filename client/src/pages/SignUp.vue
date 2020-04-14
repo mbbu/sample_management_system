@@ -263,7 +263,8 @@
                     .then((response) => {
                         // redirect after successful signUp
                         if (response.status === 201) {
-                            showFlashMessage(self, 'success', 'User Created', 'Redirecting you to home page in ' + countDownTimer(self, this.countDown) + " seconds");
+                            showFlashMessage(self, 'success', 'User Created', 'Redirecting you to home page in ' +
+                                countDownTimer(self, this.countDown, '/home') + " seconds");
                             secureStoreSetString(response.data.message.token);
                         }
                     })

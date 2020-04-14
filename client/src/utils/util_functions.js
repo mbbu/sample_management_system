@@ -11,25 +11,11 @@ export function showFlashMessage(self, status, title, message) {
     });
 }
 
-// TODO: Delete use lower function
-export function countDownTimer(self, countDown) {
+export function countDownTimer(self, countDown, route) {
     if (countDown > 0) {
         setTimeout(() => {
             countDown -= 1;
-            countDownTimer(self, countDown);
-        }, 1000)
-    } else if (countDown === 0) {
-        self.$log.info("**** Timer out ... ****");
-        self.$router.push({path: '/home'});
-    }
-    return countDown;
-}
-
-export function countDownTimer1(self, countDown, route) {
-    if (countDown > 0) {
-        setTimeout(() => {
-            countDown -= 1;
-            countDownTimer1(self, countDown, route);
+            countDownTimer(self, countDown, route);
         }, 1000)
     } else if (countDown === 0) {
         self.$log.info("**** Timer out ... ****");
