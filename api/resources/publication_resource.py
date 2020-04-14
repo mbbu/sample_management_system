@@ -5,8 +5,9 @@ from flask_restful import fields, marshal, reqparse
 from api.models.database import BaseModel
 from api.models.publication import Publication
 from api.resources.base_resource import BaseResource
+from api.resources.sample_resource import SampleResource
 from api.utils import log_create, log_duplicate, log_update, log_delete, format_and_lower_str, \
-    has_required_request_params, non_empty_int, log_304
+    has_required_request_params, non_empty_int, log_304, get_user_by_email
 
 
 class PublicationResource(BaseResource):
@@ -41,8 +42,8 @@ class PublicationResource(BaseResource):
     @jwt_required
     def post(self):
         args = PublicationResource.publication_parser()
-        sample_id = args['sample']
-        user_id = args['user']
+        sample_id = SampleResource.get_sample(args['sample']).id
+        user_id = get_user_by_email(args['user']).id
         sample_results = args['sample_results']
         publication_title = format_and_lower_str(args['publication_title'])
         co_authors = args['co_authors']
@@ -77,9 +78,8 @@ class PublicationResource(BaseResource):
 
         if publication is not None:
             args = PublicationResource.publication_parser()
-
-            sample = args['sample']
-            user = args['user']
+            sample = SampleResource.get_sample(args['sample']).id
+            user = get_user_by_email(args['user']).id
             sample_results = args['sample_results']
             publication_title = format_and_lower_str(args['publication_title'])
             co_authors = args['co_authors']
