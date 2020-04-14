@@ -18,6 +18,8 @@ class SampleResource(BaseResource):
     fields = {
         'theme.name': fields.String,
         'user.email': fields.String,
+        'user.first_name': fields.String,
+        'user.last_name': fields.String,
         'box.label': fields.String,
         'animal_species': fields.String,
         'sample_type': fields.String,
