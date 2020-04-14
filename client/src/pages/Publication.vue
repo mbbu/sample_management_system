@@ -72,14 +72,25 @@
                         @hidden="clearForm"
                 >
                     <form @submit.prevent="createPublication">
-                        <b-form-group id="form-user-group" label="Author:" label-for="form-user-input">
+                        <b-form-group id="form-sample-group" label="Sample:" label-for="form-sample-input">
                             <ejs-dropdownlist
                                     id='dropdownlist'
-                                    :dataSource='authorDataList'
+                                    :dataSource='sampleDataList'
                                     :fields="fields"
-                                    placeholder='Select an author'
-                                    :v-model="publication.user"
+                                    placeholder='Select a sample'
+                                    :v-model="publication.sample"
+                                    @change="prepareCreate"
                             ></ejs-dropdownlist>
+                        </b-form-group>
+
+                        <b-form-group id="form-user-group" label="Authors:" label-for="form-user-input">
+                            <b-form-input
+                                    id="form-user-input"
+                                    placeholder="Enter author's name"
+                                    required="true"
+                                    type="text"
+                                    disabled="disabled"
+                            ></b-form-input>
                         </b-form-group>
 
                         <b-form-group id="form-coauthors-group" label="Add CoAuthors:" label-for="form-coauthors-input">
@@ -90,16 +101,6 @@
                                     type="text"
                                     v-model="publication.co_authors"
                             ></b-form-input>
-                        </b-form-group>
-
-                        <b-form-group id="form-sample-group" label="Sample:" label-for="form-sample-input">
-                            <ejs-dropdownlist
-                                    id='dropdownlist'
-                                    :dataSource='sampleDataList'
-                                    :fields="fields"
-                                    placeholder='Select a sample'
-                                    :v-model="publication.sample"
-                            ></ejs-dropdownlist>
                         </b-form-group>
 
                         <b-form-group id="form-pub-title-group" label="Publication Title:"
@@ -205,8 +206,16 @@
 <script>
     import TopNav from "../components/TopNav";
     import axios from "axios";
-    import {publication_resource} from "../utils/api_paths";
-    import {secureStoreGetString, showFlashMessage} from "../utils/util_functions";
+    import {publication_resource, sample_resource} from "../utils/api_paths";
+    import {
+        clearForm,
+        countDownTimer1,
+        extractApiDataForPub,
+        getItemDataList,
+        getSelectedItemSetTextFieldValue,
+        secureStoreGetString,
+        showFlashMessage
+    } from "../utils/util_functions";
 
     export default {
         name: "Publication",
@@ -235,10 +244,29 @@
         },
 
         methods: {
+            //UTIL Fn
+            onLoadPage() {
+                getItemDataList(sample_resource).then(data => {
+                    let sampleList = extractApiDataForPub(data);
+                    this.$log.info("Sample list json: ", JSON.stringify(sampleList));
+
+                    // update local variables with data from API
+                    this.fields = sampleList['fields'];
+                    for (let i = 0; i < sampleList.items.length; i++) {
+                        this.sampleDataList.push({
+                            'Code': sampleList.items[i].sampleCode,
+                            'Name': sampleList.items[i].sampleName,
+                            'authorCode': sampleList.items[i].authorCode,
+                            'authorName': sampleList.items[i].authorName
+                        });
+                    }
+                })
+            },
+
 
             // methods to interact with api
             getPublication() {
-                // this.clearForm();
+                this.onLoadPage();
                 axios.get(publication_resource)
                     .then((res) => {
                         this.$log.info("Response: " + res.status + " " + res.data['message']);
@@ -247,6 +275,51 @@
                     .catch((error) => {
                         // eslint-disable-next-line
                         this.$log.error(error);
+                    });
+            },
+
+            prepareCreate() {
+                let dropdownSelection = getSelectedItemSetTextFieldValue(this.sampleDataList, this.publication.sample);
+                this.publication.user = dropdownSelection.authorCode
+                this.publication.sample = dropdownSelection.sampleCode
+                document.getElementById("form-user-input").value = dropdownSelection.authorText;
+            },
+
+
+            createPublication() {
+                let self = this;
+
+                axios.post(publication_resource, {
+                    publication_title: this.publication.title,
+                    sample: this.publication.sample,
+                    user: this.publication.user,
+                    sample_results: this.publication.sample_results,
+                    co_authors: this.publication.co_authors
+                }, {
+                    headers: {
+                        Authorization: secureStoreGetString()
+                    }
+                })
+                    .then((response) => {
+                        this.getPublication();
+                        showFlashMessage(self, 'success', response.data['message'], '');
+                        clearForm(this.publication);
+                    })
+                    .catch((error) => {
+                        clearForm(this.publication);
+                        this.$log.error(error);
+                        if (error.response) {
+                            if (error.response.status === 409) {
+                                showFlashMessage(self, 'error', error.response.data['message'], '');
+                            } else if (error.response.status === 400) {
+                                showFlashMessage(self, 'error', error.response.data['message'], 'Kindly refill the form');
+                            } else if (error.response.status === 401) {
+                                showFlashMessage(self, 'error', "Session Expired", 'You need to log in to perform this operation');
+                                countDownTimer1(self, 3, '/login');
+                            } else {
+                                showFlashMessage(self, 'error', error.response.data['message'], '');
+                            }
+                        }
                     });
             },
 
@@ -262,6 +335,7 @@
                     .then((response) => {
                         this.getPublication();
                         showFlashMessage(self, 'success', response.data['message'], '');
+                        clearForm(this.publication);
                     })
                     .catch((error) => {
                         this.$log.error(error);
