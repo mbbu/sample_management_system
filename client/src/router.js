@@ -118,7 +118,7 @@ export default new Router({
         {
             path: '/freezer',
             name: 'Freezer',
-            alias: ['/freezer'],
+            alias: ['/freezers'],
             component: Freezer,
         },
 
