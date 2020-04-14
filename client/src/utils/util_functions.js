@@ -1,7 +1,3 @@
-// flash messages
-
-/*
-* Set secure storage for jwt tokens */
 import Vuex from 'vuex'
 import createPersistedState from "vuex-persistedstate";
 import SecureLS from "secure-ls";
@@ -15,6 +11,7 @@ export function showFlashMessage(self, status, title, message) {
     });
 }
 
+// TODO: Delete use lower function
 export function countDownTimer(self, countDown) {
     if (countDown > 0) {
         setTimeout(() => {
@@ -26,6 +23,27 @@ export function countDownTimer(self, countDown) {
         self.$router.push({path: '/home'});
     }
     return countDown;
+}
+
+export function countDownTimer1(self, countDown, route) {
+    if (countDown > 0) {
+        setTimeout(() => {
+            countDown -= 1;
+            countDownTimer1(self, countDown, route);
+        }, 1000)
+    } else if (countDown === 0) {
+        self.$log.info("**** Timer out ... ****");
+        self.$log.info("ROUTE PASSED" + route)
+        self.$router.push({path: route});
+    }
+    return countDown;
+}
+
+/*
+* Form Util Functions */
+export function clearForm(form) {
+    form = {}
+    return form
 }
 
 export function viewPassword() {
@@ -136,6 +154,24 @@ export function extractApiData5(data) {
     return resultObject;
 }
 
+export function extractApiDataForPub(data) {
+    let itemList = [];
+    let fields = {text: '', value: ''};
+    let resultObject = {items: itemList, fields: fields};
+
+    for (var item = 0; item < data.length; item++) {
+        itemList.push({
+            'sampleCode': data[item].code,
+            'sampleName': "Sample under theme: " + data[item]['theme.name'] + " by " + data[item]['user.first_name'],
+            'authorCode': data[item]['user.email'],
+            'authorName': data[item]['user.first_name'] + " " + data[item]['user.last_name']
+        });
+        fields.text = 'Name';
+        fields.value = 'Code';
+    }
+    return resultObject;
+}
+
 // eslint-disable-next-line no-unused-vars
 export function getSelectedItem(itemDataList, itemVar) {
     let item = document.getElementById("dropdownlist").value;
@@ -150,12 +186,30 @@ export function getSelectedItem(itemDataList, itemVar) {
     }
 }
 
+export function getSelectedItemSetTextFieldValue(itemDataList, itemVar) {
+    let item = document.getElementById("dropdownlist").value;
+    console.log("Item passed", itemDataList)
+
+    for (var i = 0; i < itemDataList.length; i++) {
+        if (item === itemDataList[i].Name) {
+            itemVar = itemDataList[i].Code;
+            let textValue = itemDataList[i].authorName;
+            let textCode = itemDataList[i].authorCode
+            return {'sampleCode': itemVar, 'authorText': textValue, 'authorCode': textCode}
+        } else {
+            console.log("** ITEM NOT FOUND ***")
+        }
+    }
+}
+
 export function selectItemForUpdate(item) {
     // set dropdownItem to the selected item
     var element = document.getElementById("dropdownlist");
     element.value = item;
 }
 
+/*
+* Set secure storage for jwt tokens */
 
 const ls = new SecureLS({isCompression: false});
 
