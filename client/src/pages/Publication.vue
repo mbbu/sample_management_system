@@ -27,33 +27,37 @@
                         <td>
                             {{publication['user.first_name']}} &nbsp; {{publication['user.last_name']}} &nbsp;
                             <b-icon
-                                    icon="envelope" font-scale="1.5"
-                                    class="border border-info rounded" variant="info"
-                                    v-b-tooltip.hover :title="`Contact author(${ publication['user.email'] })`"
+                                    :title="`Contact author(${ publication['user.email'] })`"
+                                    class="border border-info rounded"
+                                    font-scale="1.5" icon="envelope"
+                                    v-b-tooltip.hover variant="info"
                             ></b-icon>
                         </td>
                         <td> {{publication['co_authors']}}</td>
 
                         <td>
                             <b-icon
-                                    icon="pencil" font-scale="2.0"
-                                    class="border border-info rounded" variant="info"
-                                    v-b-tooltip.hover :title="`Update ${ publication.publication_title }`"
-                                    v-b-modal.modal-publication-edit
-                                    @mouseover="fillFormForUpdate(tray['rack.number'], tray.number, tray.code)"
+                                    :title="`Update ${ publication.publication_title }`" @mouseover="fillFormForUpdate(publication.publication_title, publication['sample.theme.name'],
+                                     publication['user.first_name'], publication['user.last_name'], publication['co_authors'], publication.sample_results)"
+                                    class="border border-info rounded" font-scale="2.0"
+                                    icon="pencil" v-b-modal.modal-publication-edit
+                                    v-b-tooltip.hover
+                                    variant="info"
                             ></b-icon>
                             &nbsp;
                             <b-icon
-                                    icon="trash" font-scale="1.85"
-                                    class="border rounded bg-danger p-1" variant="light"
-                                    v-b-tooltip.hover :title="`Delete ${ publication.publication_title }!`"
+                                    :title="`Delete ${ publication.publication_title }!`"
                                     @click="deletePublication(publication.publication_title)"
+                                    class="border rounded bg-danger p-1" font-scale="1.85"
+                                    icon="trash" v-b-tooltip.hover
+                                    variant="light"
                             ></b-icon>
                             &nbsp;
                             <b-icon
-                                    icon="download" font-scale="2.0" title="Download"
-                                    class="border border-info rounded" variant="info"
-                                    v-b-tooltip.hover @click="downloadPublication(publication.publication_title)"
+                                    @click="downloadPublication(publication.publication_title)"
+                                    class="border border-info rounded" font-scale="2.0"
+                                    icon="download" title="Download"
+                                    v-b-tooltip.hover variant="info"
                             ></b-icon>
                         </td>
                     </tr>
@@ -64,32 +68,32 @@
             <div v-if="!isEditing">
                 <b-modal
                         :title="`Add ${page_title}`"
-                        id="modal-publication"
-                        ok-title="Save"
-                        cancel-variant="danger"
+                        @hidden="clearForm"
                         @ok="createPublication"
                         @submit="clearForm"
-                        @hidden="clearForm"
+                        cancel-variant="danger"
+                        id="modal-publication"
+                        ok-title="Save"
                 >
                     <form @submit.prevent="createPublication">
                         <b-form-group id="form-sample-group" label="Sample:" label-for="form-sample-input">
                             <ejs-dropdownlist
-                                    id='dropdownlist'
                                     :dataSource='sampleDataList'
                                     :fields="fields"
-                                    placeholder='Select a sample'
                                     :v-model="publication.sample"
                                     @change="prepareCreate"
+                                    id='dropdownlist'
+                                    placeholder='Select a sample'
                             ></ejs-dropdownlist>
                         </b-form-group>
 
                         <b-form-group id="form-user-group" label="Authors:" label-for="form-user-input">
                             <b-form-input
+                                    disabled="disabled"
                                     id="form-user-input"
                                     placeholder="Enter author's name"
                                     required="true"
                                     type="text"
-                                    disabled="disabled"
                             ></b-form-input>
                         </b-form-group>
 
@@ -127,27 +131,36 @@
                     </form>
                 </b-modal>
             </div>
-            {{isEditing}}
             <div v-if="isEditing">
                 <b-modal
                         :title="`Edit ${page_title}`"
+                        @hidden="clearForm"
+                        @ok="updatePublication(old_title)"
+                        @submit="showModal = false"
+                        cancel-variant="danger"
                         id="modal-publication-edit"
                         ok-title="Update"
-                        cancel-variant="danger"
-                        @ok="UpdatePublication(old_title)"
-                        @submit="showModal = false"
-                        @hidden="clearForm"
-                        @shown="selectItemForUpdate(publication.user, publication.sample)"
                 >
                     <form @submit.prevent="updatePublication">
-                        <b-form-group id="form-user-group-edit" label="Author:" label-for="form-user-input">
+                        <b-form-group id="form-sample-group-edit" label="Sample:" label-for="form-sample-input">
                             <ejs-dropdownlist
-                                    id='dropdownlist'
-                                    :dataSource='authorDataList'
+                                    :dataSource='sampleDataList'
                                     :fields="fields"
-                                    placeholder='Select an author'
-                                    :v-model="publication.user"
+                                    :v-model="publication.sample"
+                                    @change="prepareCreate"
+                                    id='dropdownlist'
+                                    placeholder='Select a sample'
                             ></ejs-dropdownlist>
+                        </b-form-group>
+
+                        <b-form-group id="form-user-group-edit" label="Authors:" label-for="form-user-input">
+                            <b-form-input
+                                    disabled="disabled"
+                                    id="form-user-input"
+                                    placeholder="Enter author's name"
+                                    required="true"
+                                    type="text"
+                            ></b-form-input>
                         </b-form-group>
 
                         <b-form-group id="form-coauthors-group-edit" label="Add CoAuthors:"
@@ -161,16 +174,6 @@
                             ></b-form-input>
                         </b-form-group>
 
-                        <b-form-group id="form-sample-group-edit" label="Sample:" label-for="form-sample-input">
-                            <ejs-dropdownlist
-                                    id='dropdownlist'
-                                    :dataSource='sampleDataList'
-                                    :fields="fields"
-                                    placeholder='Select a sample'
-                                    :v-model="publication.sample"
-                            ></ejs-dropdownlist>
-                        </b-form-group>
-
                         <b-form-group id="form-pub-title-group-edit" label="Publication Title:"
                                       label-for="form-pub-title-input">
                             <b-form-input
@@ -181,6 +184,7 @@
                                     v-model="publication.title"
                             ></b-form-input>
                         </b-form-group>
+
                         <!-- todo: sample_results? can be changed to publication summary-->
                         <b-form-group id="form-sample-results-group-edit" label="Sample Results:"
                                       label-for="form-sample-results-input">
@@ -208,7 +212,6 @@
     import axios from "axios";
     import {publication_resource, sample_resource} from "../utils/api_paths";
     import {
-        clearForm,
         countDownTimer1,
         extractApiDataForPub,
         getItemDataList,
@@ -245,6 +248,29 @@
 
         methods: {
             //UTIL Fn
+            clearForm() {
+                this.isEditing = false;
+                this.old_title = null;
+                this.publication.title = null;
+                this.publication.sample = null;
+                this.publication.user = null;
+                this.publication.co_authors = null;
+                this.publication.sample_results = null;
+                this.sampleDataList = [];
+                this.authorDataList = [];
+                this.onLoadPage();
+            },
+
+            fillFormForUpdate(title, theme, first_name, last_name, co_authors, sample_results) {
+                this.isEditing = true;
+                this.old_title = title;
+                this.publication.title = title;
+                this.publication.sample = theme;
+                this.publication.user = first_name + " " + last_name;
+                this.publication.co_authors = co_authors;
+                this.publication.sample_results = sample_results;
+            },
+
             onLoadPage() {
                 getItemDataList(sample_resource).then(data => {
                     let sampleList = extractApiDataForPub(data);
@@ -266,7 +292,7 @@
 
             // methods to interact with api
             getPublication() {
-                this.onLoadPage();
+                this.clearForm();
                 axios.get(publication_resource)
                     .then((res) => {
                         this.$log.info("Response: " + res.status + " " + res.data['message']);
@@ -303,10 +329,10 @@
                     .then((response) => {
                         this.getPublication();
                         showFlashMessage(self, 'success', response.data['message'], '');
-                        clearForm(this.publication);
+                        this.clearForm();
                     })
                     .catch((error) => {
-                        clearForm(this.publication);
+                        this.clearForm();
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 409) {
@@ -323,6 +349,41 @@
                     });
             },
 
+            updatePublication: function (title) {
+                let self = this;
+                axios.put(publication_resource, {
+                    publication_title: this.publication.title,
+                    sample: this.publication.sample,
+                    user: this.publication.user,
+                    sample_results: this.publication.sample_results,
+                    co_authors: this.publication.co_authors
+                }, {
+                    headers: {
+                        title: title,
+                        Authorization: secureStoreGetString()
+                    }
+                })
+                    .then((response) => {
+                        this.getPublication();
+                        showFlashMessage(self, 'success', response.data['message'], '');
+                        this.clearForm();
+                    })
+                    .catch((error) => {
+                        this.clearForm();
+                        this.$log.error(error);
+                        if (error.response) {
+                            if (error.response.status === 304) {
+                                showFlashMessage(self, 'info', 'Record not modified!', '');
+                            } else if (error.response.status === 401) {
+                                showFlashMessage(self, 'error', "Session Expired", 'You need to log in to perform this operation');
+                            } else {
+                                showFlashMessage(self, 'error', error.response.data['message'], '');
+                            }
+                        }
+                    });
+
+            },
+
             deletePublication: function (title) {
                 let self = this;
                 axios.delete(publication_resource, {
@@ -335,7 +396,7 @@
                     .then((response) => {
                         this.getPublication();
                         showFlashMessage(self, 'success', response.data['message'], '');
-                        clearForm(this.publication);
+                        this.clearForm();
                     })
                     .catch((error) => {
                         this.$log.error(error);
