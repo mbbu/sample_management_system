@@ -137,9 +137,7 @@ class SampleResource(BaseResource):
             return BaseResource.send_json_message("Sample not found", 404)
 
         else:
-            sample.is_deleted = True
-            sample.deleted_at = datetime.now()
-            sample.deleted_by = get_jwt_identity()
+            BaseModel.db.session.delete(sample)
             BaseModel.db.session.commit()
             current_app.logger.info("{0} deleted {1}".format(get_jwt_identity(), sample.user_id))
             return BaseResource.send_json_message("Sample deleted", 200)
