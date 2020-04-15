@@ -8,8 +8,13 @@ from api.constants import DATE_TIME_NONE
 from api.models.database import BaseModel
 from api.models.sample import Sample
 from api.resources.base_resource import BaseResource
+from api.resources.box_resource import BoxResource
+from api.resources.quantity_type_resource import QuantityTypeResource
+from api.resources.security_level_resource import SecurityLevelResource
+from api.resources.theme_resource import ThemeResource
 from api.utils import format_and_lower_str, log_create, log_update, log_duplicate, \
-    has_required_request_params, export_all_records, log_export_from_redcap, format_str_to_date, non_empty_int, log_304
+    has_required_request_params, export_all_records, log_export_from_redcap, format_str_to_date, non_empty_int, log_304, \
+    get_user_by_email
 
 samples_page = Blueprint('samples_bp', __name__, template_folder='templates')
 
@@ -57,14 +62,19 @@ class SampleResource(BaseResource):
     def post(self):
         args = SampleResource.sample_args()
         code = format_and_lower_str(args[16])
+        theme = ThemeResource.get_theme(args[0]).id
+        user = get_user_by_email(args[1]).id
+        box = BoxResource.get_box(args[2]).id
+        qt = QuantityTypeResource.get_quantity_type(args[14]).id
+        sl = SecurityLevelResource.get_security_level(args[15]).id
 
         if not Sample.sample_exists(code):
             try:
-                sample = Sample(theme_id=args[0], user_id=args[1], box_id=args[2], animal_species=args[3],
+                sample = Sample(theme_id=theme, user_id=user, box_id=box, animal_species=args[3],
                                 sample_type=args[4], sample_description=args[5], location_collected=args[6],
                                 project=args[7], project_owner=args[8], retention_period=args[9], barcode=args[10],
-                                analysis=args[11], temperature=args[12], amount=args[13], quantity_type=args[14],
-                                security_level=args[15], code=code)
+                                analysis=args[11], temperature=args[12], amount=args[13], quantity_type=qt,
+                                security_level=sl, code=code)
 
                 BaseModel.db.session.add(sample)
                 BaseModel.db.session.commit()
@@ -165,8 +175,8 @@ class SampleResource(BaseResource):
 
         args = parser.parse_args()
 
-        theme_id = int(args['theme'])
-        user_id = int(args['user'])
+        theme_id = args['theme']
+        user_id = args['user']
         box_id = args['box']
         animal_species = args['animal_species']
         sample_type = args['sample_type']
