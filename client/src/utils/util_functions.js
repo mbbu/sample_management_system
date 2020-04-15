@@ -76,6 +76,59 @@ export function extractApiData(data) {
     return resultObject;
 }
 
+export function extractQTData(data) {
+    let itemList = [];
+    let fields = {text: '', value: ''};
+    let resultObject = {items: itemList, fields: fields};
+
+    for (var item = 0; item < data.length; item++) {
+        itemList.push({
+            'Code': data[item].id,
+            'Name': data[item].name
+        });
+        fields.text = 'Name';
+        fields.value = 'Code';
+    }
+    return resultObject;
+}
+
+export function extractUserData(data) {
+    let itemList = [];
+    let fields = {text: '', value: ''};
+    let resultObject = {items: itemList, fields: fields};
+
+    for (var item = 0; item < data.length; item++) {
+        itemList.push({
+            'Code': data[item].email,
+            'Name': data[item].first_name + " " + data[item].last_name
+        });
+        fields.text = 'Name';
+        fields.value = 'Code';
+    }
+    return resultObject;
+}
+
+export function extractBoxData(data) {
+    let itemList = [];
+    let fields = {text: '', value: ''};
+    let resultObject = {items: itemList, fields: fields};
+
+    for (var item = 0; item < data.length; item++) {
+        itemList.push({
+            'Code': data[item].code,
+            'Name': data[item].label,
+            'Tray': data[item]['tray.number'],
+            'Rack': data[item]['tray.rack.number'],
+            'Chamber': data[item]['tray.rack.chamber.type'],
+            'Freezer': data[item]['tray.rack.chamber.freezer.number'],
+            'Lab': data[item]['tray.rack.chamber.freezer.lab.name'] + " room " + data[item]['tray.rack.chamber.freezer.lab.room'],
+        });
+        fields.text = 'Name';
+        fields.value = 'Code';
+    }
+    return resultObject;
+}
+
 export function extractFreezerData(data) {
     let itemList = [];
     let fields = {text: '', value: ''};
@@ -172,6 +225,18 @@ export function getSelectedItem(itemDataList, itemVar) {
     }
 }
 
+export function getSelectedItemCode(elementId, itemDataList) {
+    let item = document.getElementById(elementId).value;
+
+    for (var i = 0; i < itemDataList.length; i++) {
+        if (item === itemDataList[i].Name) {
+            return itemDataList[i].Code
+        } else {
+            console.log("** ITEM NOT FOUND ***")
+        }
+    }
+}
+
 export function getSelectedItemSetTextFieldValue(itemDataList, itemVar) {
     let item = document.getElementById("dropdownlist").value;
     console.log("Item passed", itemDataList)
@@ -182,6 +247,31 @@ export function getSelectedItemSetTextFieldValue(itemDataList, itemVar) {
             let textValue = itemDataList[i].authorName;
             let textCode = itemDataList[i].authorCode
             return {'sampleCode': itemVar, 'authorText': textValue, 'authorCode': textCode}
+        } else {
+            console.log("** ITEM NOT FOUND ***")
+        }
+    }
+}
+
+export function getSelectedBoxSetTextFieldValue(elementId, itemDataList) {
+    let item = document.getElementById(elementId).value;
+
+    for (var i = 0; i < itemDataList.length; i++) {
+        if (item === itemDataList[i].Name) {
+            let boxCode = itemDataList[i].Code;
+            let trayNum = itemDataList[i].Tray;
+            let rackNum = itemDataList[i].Rack;
+            let chamberType = itemDataList[i].Chamber;
+            let freezerNum = itemDataList[i].Freezer;
+            let lab = itemDataList[i].Lab;
+            return {
+                'boxCode': boxCode,
+                'tray': trayNum,
+                'rack': rackNum,
+                'chamber': chamberType,
+                'freezer': freezerNum,
+                'lab': lab
+            }
         } else {
             console.log("** ITEM NOT FOUND ***")
         }

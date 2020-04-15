@@ -1,354 +1,563 @@
 <template>
-  <div id="jumbotron">
-  <div class="container">
-    <form-wizard title="Sample Data Form" subtitle="Kindly input the correct information" @submit.prevent="handleSubmit" >
-        <tab-content title="Sample Details" @click.native="handleSubmit" >
+    <div id="jumbotron">
+        <div class="container">
+            <form-wizard @submit.prevent="handleSubmit" subtitle="Kindly input the correct information"
+                         title="Sample Data Form">
+                <tab-content @click.native="handleSubmit" title="Sample Details">
 
-                   <label for="theme"> Please select a Theme </label>
-                   <div class="form-group">
-                     <select v-model="sample.theme" id="theme" name="theme" class="form-control" :class="{ 'is-invlaid' : submitted && $v.sample.theme.$error }" >
-                    <option value="1"> Plant Health</option>
-                    <option value="2" > Animal Health </option>
-                    <option value="3" > Environmental Health </option>
-                    <option value="4" > Human Health </option>
-                     </select>
-                    <div v-if="submitted && $v.sample.theme.$error" class="invaid-feedback">
-                     <span v-if="!$v.sample.theme.required"> Theme is required </span>
-                     <span v-if="!$v.sample.theme.theme"> Select one </span>
-                   </div> </div>
-                    
+                    <div class="form-group">
+                        <b-form-group id="form-theme" label="Select a Theme:" label-for="form-theme-input">
+                            <ejs-dropdownlist
+                                    :dataSource='themeDataList'
+                                    :fields="fields"
+                                    :v-model="sample.theme"
+                                    id="theme-dropdownlist"
+                                    placeholder='Select a theme'
+                            ></ejs-dropdownlist>
+                        </b-form-group>
+                        <div class="invaid-feedback" v-if="submitted && $v.sample.theme.$error">
+                            <span v-if="!$v.sample.theme.required"> Theme is required </span>
+                            <span v-if="!$v.sample.theme.theme"> Select one </span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="project"> Project</label>
+                        <input :class="{ 'is-invalid': submitted && $sample.project.$error}" class="form-control"
+                               id="project" type="text"
+                               v-model="sample.project"/>
+                    </div>
+
                     <div class="form-group">
                         <label for="projectOwner"> Project Owner</label>
-                        <input type="text" v-model="sample.projectOwner" id="projectOwner" class="form-control" :class="{ 'is-invalid': submitted && $sample.projectOwner.$error}" />
-                        <div v-if="submitted && !$v.sample.projectOwner.required" class="invalid-feedback"> Project owner is required </div> 
-                      </div>
+                        <input :class="{ 'is-invalid': submitted && $sample.projectOwner.$error}" class="form-control"
+                               id="projectOwner" type="text"
+                               v-model="sample.projectOwner"/>
+                        <div class="invalid-feedback" v-if="submitted && !$v.sample.projectOwner.required"> Project
+                            owner is required
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <b-form-group id="form-user" label="Select the Sample Owner:" label-for="form-user-input">
+                            <ejs-dropdownlist
+                                    :dataSource='userDataList'
+                                    :fields="fields"
+                                    :v-model="sample.user"
+                                    id="user-dropdownlist"
+                                    placeholder='Select the sample owner(i.e. One in-charge of handling the sample)'
+                            ></ejs-dropdownlist>
+                        </b-form-group>
+                        <div class="invaid-feedback" v-if="submitted && $v.sample.user.$error">
+                            <span v-if="!$v.sample.user.required"> Sample owner is required </span>
+                            <span v-if="!$v.sample.user.user"> Select one </span>
+                        </div>
+                    </div>
 
                     <div class="form-group">
                         <label for="sampleType"> Sample Type</label>
-                        <input type="text" v-model="sample.sampleType" id="sampleType" class="form-control" :class="{ 'is-invalid': submitted && $sample.sampleType.$error}" />
-                        <div v-if="submitted && !$v.sample.sampleType.required" class="invalid-feedback"> Sample Type is required </div> 
-                      </div>
+                        <input :class="{ 'is-invalid': submitted && $sample.sampleType.$error}" class="form-control"
+                               id="sampleType" type="text"
+                               v-model="sample.sampleType"/>
+                        <div class="invalid-feedback" v-if="submitted && !$v.sample.sampleType.required"> Sample Type is
+                            required
+                        </div>
+                    </div>
 
                     <div class="form-group">
                         <label for="species"> Species</label>
-                        <input type="text" v-model="sample.species" id="species" class="form-control" :class="{ 'is-invalid': submitted && $sample.species.$error}" />
-                        <div v-if="submitted && !$v.sample.species.required" class="invalid-feedback"> Species is required </div> 
-                      </div>
+                        <input :class="{ 'is-invalid': submitted && $sample.species.$error}" class="form-control"
+                               id="species" type="text"
+                               v-model="sample.species"/>
+                        <div class="invalid-feedback" v-if="submitted && !$v.sample.species.required"> Species is
+                            required
+                        </div>
+                    </div>
 
                     <div class="form-group">
-                          <label for="description"> Description</label>
-                        <input type="text" v-model="sample.description" id="description" name="description" class="form-control" :class="{ 'is-invalid': submitted && $sample.description.$error}" />
-                        <div v-if="submitted && $v.sample.description.$error" class="invalid-feedback"> 
-                        <span v-if="!$v.sample.description.required"> Description is required </span>
-                        <span v-if="!$v.sample.description.minLength"> Description must be at least 25 words </span>
-                    </div> </div> 
-                      
-        </tab-content>
+                        <label for="description"> Description</label>
+                        <textarea :class="{ 'is-invalid': submitted && $sample.description.$error}" class="form-control"
+                                  id="description" name="description"
+                                  type="text" v-model="sample.description"/>
+                        <div class="invalid-feedback" v-if="submitted && $v.sample.description.$error">
+                            <span v-if="!$v.sample.description.required"> Description is required </span>
+                            <span v-if="!$v.sample.description.minLength"> Description must be at least 25 words </span>
+                        </div>
+                    </div>
 
-         <tab-content title="Sample Location in Institution" @click.native="handleSubmit"  >
+                </tab-content>
 
-                  <div class="form-group">
+                <tab-content @click.native="handleSubmit" title="Sample Location in Institution">
+
+                    <div class="form-group">
                         <label for="locationCollected">Location Collected</label>
-                        <input type="text" v-model="sample.locationCollected" id="locationCollected" class="form-control" :class="{ 'is-invalid': submitted && $sample.locationCollected.$error}" />
-                        <div v-if="submitted && !$v.sample.locationCollected" class="invalid-feedback"> 
-                        <span v-if="!$v.sample.locationCollected.required"> Location Collected is required </span>
-                        <span v-if="!$v.sample.locationCollected.minLength"> Location Collected must be at least 25 words </span>
-                      </div> </div>
-
-                  <div class="form-group">
-                        <label for="lab">Lab</label>
-                        <input type="number" v-model="sample.lab" id="lab" class="form-control" :class="{ 'is-invalid': submitted && $sample.lab.$error}" />
-                        <div v-if="submitted && !$v.sample.lab" class="invalid-feedback">  
-                        <span v-if="!$v.sample.lab.required"> Lab is required </span>
-                        <span v-if="!$v.sample.lab.minValue"> Lab Should be more than zero </span>
-                      </div> </div>
-
-                <!-- Start row -->
-                  <div class="row">
-                    <div class="col">
-                  <div class="form-group">
-                        <label for="freezer"> Freezer</label>
-                        <input type="number" v-model="sample.freezer" id="freezer" class="form-control" :class="{ 'is-invalid': submitted && $sample.freezer.$error}" />
-                        <div v-if="submitted && !$v.sample.freezer" class="invalid-feedback"> 
-                        <span v-if="!$v.sample.freezer.required"> Freezer is required </span>
-                        <span v-if="!$v.sample.freezer.minValue"> Freezer Should be more than zero </span>
-                      </div> </div>
+                        <input :class="{ 'is-invalid': submitted && $sample.locationCollected.$error}"
+                               class="form-control" id="locationCollected"
+                               type="text"
+                               v-model="sample.locationCollected"/>
+                        <div class="invalid-feedback" v-if="submitted && !$v.sample.locationCollected">
+                            <span v-if="!$v.sample.locationCollected.required"> Location Collected is required </span>
+                            <span v-if="!$v.sample.locationCollected.minLength"> Location Collected must be at least 25 words </span>
+                        </div>
                     </div>
 
-                  <div class="col">
-                    <label for="chamber"> Please select a Chamber </label>
-                   <div class="form">
-                     <select v-model="sample.chamber" id="chamber" name="chamber" class="form-control" :class="{ 'is-invlaid' : submitted && $v.sample.chamber.$error }" >
-                    <option value="1"> Top</option>
-                    <option value="2" > Middle </option>
-                    <option value="3" > Bottom </option>
-                     </select>
-                  <div v-if="submitted && $v.sample.chamber.$error" class="invaid-feedback">
-                     <span v-if="!$v.sample.chamber.required"> Chamber is required </span>
-                     <span v-if="!$v.sample.chamber.chamber"> Select one </span>
-                   </div> </div>
+                    <div class="form-group">
+                        <b-form-group ::class="{ 'is-invalid': submitted && $sample.box.$error}"
+                                      id="box" label="Select a Box for the sample:"
+                                      label-for="form-box-input">
+                            <ejs-dropdownlist
+                                    :dataSource='boxDataList'
+                                    :fields="fields"
+                                    :v-model="sample.box"
+                                    @change="fillFormFieldsDependentOnBox"
+                                    id="box-dropdownlist"
+                                    placeholder='Select a box and its location will be shown'
+                            ></ejs-dropdownlist>
+                        </b-form-group>
 
-                  </div>
-                  
-                  </div>
-                  
-                  <!-- End row -->
-
-
-                  <!-- Start Row -->
-                  <div class="row">
-                    <div class="col">
-                       <div class="form-group">
-                        <label for="freezer"> Rack</label>
-                        <input type="number" v-model="sample.rack" id="rack" class="form-control" :class="{ 'is-invalid': submitted && $sample.rack.$error}" />
-                        <div v-if="submitted && !$v.sample.rack" class="invalid-feedback">
-                        <span v-if="!$v.sample.rack.required"> Rack Collected is required </span>
-                        <span v-if="!$v.sample.rack.minValue"> Rack Should be more than zero </span>
-                      </div> </div>
+                        <div class="invalid-feedback" v-if="submitted && !$v.sample.box">
+                            <span v-if="!$v.sample.box.required"> Box Collected is required </span>
+                            <span v-if="!$v.sample.box.minValue"> Box Should be more than zero </span>
+                        </div>
                     </div>
 
-                    <div class="col">
-                       <div class="form-group">
-                        <label for="tray"> Tray</label>
-                        <input type="number" v-model="sample.tray" id="tray" class="form-control" :class="{ 'is-invalid': submitted && $sample.tray.$error}" />
-                        <div v-if="submitted && !$v.sample.tray" class="invalid-feedback"> 
-                        <span v-if="!$v.sample.tray.required"> Tray Collected is required </span>
-                        <span v-if="!$v.sample.tray.minValue"> Tray Should be more than zero </span>
-                      </div> </div>
-                    </div>
 
-                    <div class="col">
-                       <div class="form-group">
-                        <label for="box"> Box</label>
-                        <input type="number" v-model="sample.box" id="box" class="form-control" :class="{ 'is-invalid': submitted && $sample.box.$error}" />
-                        <div v-if="submitted && !$v.sample.box" class="invalid-feedback">  
-                        <span v-if="!$v.sample.box.required"> Box Collected is required </span>
-                        <span v-if="!$v.sample.box.minValue"> Box Should be more than zero </span>
-                      </div> </div> 
-                    </div>
-                  </div>
+                    <!-- Start row -->
+                    <div class="row">
 
-                  <!-- Start Row -->
-
-
-                  <!-- Start row -->
-                  <div class="row">
-                    <div class="col">
-                      <div class="form-group">
-                        <label for="temperature">Temperature</label>
-                        <input type="number" v-model="sample.temperature" id="temperature" class="form-control" :class="{ 'is-invalid': submitted && $sample.temperature.$error}" />
-                        <div v-if="submitted && !$v.sample.temperature" class="invalid-feedback"> Temperature Collected is required </div> 
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="tray">Tray Number</label>
+                                <input class="form-control" disabled="disabled" id="tray" placeholder="Tray having box"
+                                       type="text"/>
+                            </div>
                         </div>
 
-                  </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="rack">Rack Number</label>
+                                <input class="form-control" disabled="disabled" id="rack"
+                                       placeholder="Rack holding tray"
+                                       type="text"/>
+                            </div>
+                        </div>
 
-                    <div class="col">
-                         <div class="form-group">
-                        <label for="amount"> amount</label>
-                        <input type="number" v-model="sample.amount" id="amount" class="form-control" :class="{ 'is-invalid': submitted && $sample.amount.$error}" />
-                        <div v-if="submitted && !$v.sample.amount" class="invalid-feedback"> 
-                        <span v-if="!$v.sample.amount.required"> Amount is required </span>
-                        <span v-if="!$v.sample.amount.minValue"> Amount Should be more than zero </span>
-                      </div> </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="chamber"> Chamber Type </label>
+                                <input class="form-control" disabled="disabled" id="chamber"
+                                       placeholder="Chamber where rack is" type="text"/>
+                            </div>
 
-                  </div>
-                    <div class="col">
-                      <label for="theme"> Please select a Quantity Type </label>
-                   <div class="form-group">
-                     <select v-model="sample.quantity_type" id="quantity_type" name="quantity_type" class="form-control" :class="{ 'is-invlaid' : submitted && $v.sample.quantity_type.$error }" >
-                    <option value="1"> MILLILITRES</option>
-                    <option value="2" > LITRES </option>
-                    <option value="3" > CENTIMETRES </option>
-                    <option value="4" > MILIMETER MERCURY </option>
-                     </select>
-                     <div v-if="submitted && $v.sample.quantity_type.$error" class="invaid-feedback">
-                     <span v-if="!$v.sample.quantity_type.required"> Quantity Type is required </span>
-                     <span v-if="!$v.sample.quantity_type.quantity_type"> Select one </span>
-                   </div> </div>
-
-                  </div>
-                  </div>
-
-                  <!-- End Row -->
-
-         </tab-content>
+                        </div>
+                    </div>
+                    <!-- End row -->
 
 
-          <tab-content title="Finishing Up" @click.native="handleSubmit" >
+                    <!-- Start Row -->
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="freezer">Freezer Number</label>
+                                <input class="form-control" disabled="disabled" id="freezer"
+                                       placeholder="Freezer where box is stored" type="text"/>
+                            </div>
+                        </div>
 
-                <label for="securityLevel"> Security Level Needed </label>
-                  <div class="form-group">
-                     <select v-model="sample.securityLevel" id="securityLevel" name="securityLevel" class="form-control" :class="{ 'is-invlaid' : submitted && $v.sample.securityLevel.$error }" >
-                    <option value="1"> Low</option>
-                    <option value="2" > Meduim </option>
-                    <option value="3" > High </option>
-                     </select>
-                    <div v-if="submitted && $v.sample.securityLevel.$error" class="invaid-feedback">
-                     <span v-if="!$v.sample.securityLevel.required"> Security Level is required </span>
-                     <span v-if="!$v.sample.securityLevel.securityLevel"> Select one </span>
-                   </div> </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="lab">Lab</label>
+                                <input class="form-control" disabled="disabled" id="lab"
+                                       placeholder="Lab where freezer is"
+                                       type="text"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Start Row -->
+
+
+                    <!-- Start row -->
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="temperature">Temperature (Default in Celsius)</label>
+                                <input :class="{ 'is-invalid': submitted && $sample.temperature.$error}"
+                                       class="form-control" id="temperature" type="number"
+                                       v-model="sample.temperature"/>
+                                <div class="invalid-feedback" v-if="submitted && !$v.sample.temperature"> Temperature
+                                    Collected is required
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="amount">Amount</label>
+                                <input :class="{ 'is-invalid': submitted && $sample.amount.$error}" class="form-control"
+                                       id="amount" type="number"
+                                       v-model="sample.amount"/>
+                                <div class="invalid-feedback" v-if="submitted && !$v.sample.amount">
+                                    <span v-if="!$v.sample.amount.required"> Amount is required </span>
+                                    <span v-if="!$v.sample.amount.minValue"> Amount Should be more than zero </span>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <b-form-group :class="{ 'is-invalid' : submitted && $v.sample.quantity_type.$error }"
+                                              id="form-QT"
+                                              label="Select a Quantity Type:"
+                                              label-for="form-user-input">
+                                    <ejs-dropdownlist
+                                            :dataSource='QTDataList'
+                                            :fields="fields"
+                                            :v-model="sample.quantity_type"
+                                            id="QT-dropdownlist"
+                                            placeholder='Select a quantity type(e.g. ML, L, G ...)'
+                                    ></ejs-dropdownlist>
+                                </b-form-group>
+                                <div class="invalid-feedback" v-if="submitted && $v.sample.quantity_type.$error">
+                                    <span v-if="!$v.sample.quantity_type.required"> Quantity Type is required </span>
+                                    <span v-if="!$v.sample.quantity_type.quantity_type"> Select one </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- End Row -->
+
+                </tab-content>
+
+
+                <tab-content @click.native="handleSubmit" title="Finishing Up">
 
                     <div class="form-group">
-                      <label for="code"> Code</label>
-                      <input type="text" v-model="sample.code" id="code" class="form-control" :class="{ 'is-invalid': submitted && $sample.code.$error}" />
-                      <div v-if="submitted && !$v.sample.code" class="invalid-feedback"> Code is required </div> 
+                        <b-form-group id="form-securityLevel" label="Security Level Needed:"
+                                      label-for="form-securityLevel-input">
+                            <ejs-dropdownlist
+                                    :dataSource='secLevelDataList'
+                                    :fields="fields"
+                                    :v-model="sample.securityLevel"
+                                    id="securityLevel-dropdownlist"
+                                    placeholder='Select Security Level Needed'
+                            ></ejs-dropdownlist>
+                        </b-form-group>
+                        <div class="invaid-feedback" v-if="submitted && $v.sample.securityLevel.$error">
+                            <span v-if="!$v.sample.securityLevel.required"> Security Level is required </span>
+                            <span v-if="!$v.sample.securityLevel.securityLevel"> Select one </span>
+                        </div>
                     </div>
 
                     <div class="form-group">
-                      <label for="barcode"> Barcode</label>
-                      <input type="text" v-model="sample.barcode" id="barcode" class="form-control" :class="{ 'is-invalid': submitted && $sample.barcode.$error}" />
-                      <div v-if="submitted && !$v.sample.barcode" class="invalid-feedback"> Barcode is required </div> 
+                        <label for="code"> Code</label>
+                        <input :class="{ 'is-invalid': submitted && $sample.code.$error}" class="form-control" id="code"
+                               type="text"
+                               v-model="sample.code"/>
+                        <div class="invalid-feedback" v-if="submitted && !$v.sample.code"> Code is required</div>
                     </div>
 
                     <div class="form-group">
-                      <label for="analysis"> Analysis</label>
-                      <input type="text" v-model="sample.analysis" id="analysis" class="form-control" :class="{ 'is-invalid': submitted && $sample.analysis.$error}" />
-                      <div v-if="submitted && !v.sample.analysis" class="invalid-feedback"> Analysis is required </div> 
+                        <label for="barcode"> Barcode</label>
+                        <input :class="{ 'is-invalid': submitted && $sample.barcode.$error}" class="form-control"
+                               id="barcode" type="text"
+                               v-model="sample.barcode"/>
+                        <div class="invalid-feedback" v-if="submitted && !$v.sample.barcode"> Barcode is required</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="analysis"> Analysis</label>
+                        <input :class="{ 'is-invalid': submitted && $sample.analysis.$error}" class="form-control"
+                               id="analysis" type="text"
+                               v-model="sample.analysis"/>
+                        <div class="invalid-feedback" v-if="submitted && !v.sample.analysis"> Analysis is required</div>
                     </div>
 
                     <div class="form-group">
                         <label for="retention"> Retention</label>
-                        <input type="number" v-model="sample.retention" id="retention" class="form-control" :class="{ 'is-invalid': submitted && $sample.retention.$error}" />
-                        <div v-if="submitted && !$v.sample.retention" class="invalid-feedback">
-                        <span v-if="!$v.sample.retention.required"> Retention is required </span>
-                        <span v-if="!$v.sample.retention.minValue"> Retention Should be more than zero </span>
-                      </div> </div>
+                        <input :class="{ 'is-invalid': submitted && $sample.retention.$error}" class="form-control"
+                               id="retention" type="number"
+                               v-model="sample.retention"/>
+                        <div class="invalid-feedback" v-if="submitted && !$v.sample.retention">
+                            <span v-if="!$v.sample.retention.required"> Retention is required </span>
+                            <span v-if="!$v.sample.retention.minValue"> Retention Should be more than zero </span>
+                        </div>
+                    </div>
 
-          </tab-content>
+                </tab-content>
 
-           <template slot="footer" scope="props">
-            <div class=wizard-footer-left>
-                <wizard-button  v-if="props.activeTabIndex > 0 && !props.isLastStep" :style="props.fillButtonStyle">Previous</wizard-button>
-            </div>
-            
-              <div class="wizard-footer-right">
-                <wizard-button v-if="!props.isLastStep"  @click.native="props.nextTab()" class="wizard-footer-right" :style="props.fillButtonStyle">Next</wizard-button>
-                
-                <wizard-button v-else @click.native="formSubmit" class="wizard-footer-right finish-button" :style="props.fillButtonStyle">{{props.isLastStep ? 'Done' : 'Next'}}</wizard-button>
-              </div>
-          </template> 
-          </form-wizard>
-  </div>
-  </div>
+                <template scope="props" slot="footer">
+                    <div class=wizard-footer-left>
+                        <wizard-button :style="props.fillButtonStyle"
+                                       v-if="props.activeTabIndex > 0 && !props.isLastStep">Previous
+                        </wizard-button>
+                    </div>
+
+                    <div class="wizard-footer-right">
+                        <wizard-button :style="props.fillButtonStyle" @click.native="props.nextTab()"
+                                       class="wizard-footer-right" v-if="!props.isLastStep">Next
+                        </wizard-button>
+
+                        <wizard-button :style="props.fillButtonStyle" @click.native="formSubmit"
+                                       class="wizard-footer-right finish-button"
+                                       v-else>{{props.isLastStep ? 'Done' : 'Next'}}
+                        </wizard-button>
+                    </div>
+                </template>
+            </form-wizard>
+        </div>
+    </div>
 </template>
 
 <script>
-import Vue from 'vue';
-import VueFormWizard, { TabContent } from 'vue-form-wizard';
-import 'vue-form-wizard/dist/vue-form-wizard.min.css';
-import { required, minLength, minValue } from "vuelidate/lib/validators";
-import axios from 'axios';
+    import Vue from 'vue';
+    import VueFormWizard, {TabContent} from 'vue-form-wizard';
+    import 'vue-form-wizard/dist/vue-form-wizard.min.css';
+    import {minLength, minValue, required} from "vuelidate/lib/validators";
+    import axios from 'axios';
+    import {
+        extractApiData,
+        extractBoxData,
+        extractQTData,
+        extractUserData,
+        getItemDataList,
+        getSelectedBoxSetTextFieldValue,
+        getSelectedItemCode,
+        secureStoreGetString
+    } from "../utils/util_functions";
+    import {
+        box_resource,
+        quantity_type_resource,
+        sample_resource,
+        security_level_resource,
+        theme_resource,
+        user_resource
+    } from "../utils/api_paths";
 
-Vue.use(VueFormWizard)
-Vue.use(TabContent)
+    Vue.use(VueFormWizard)
+    Vue.use(TabContent)
 
-export default {
-  name: "jumbotron",
-     
-  data() {
-    return {
-        response: [],
-        sample: {
-            theme: "",
-            project: "",
-            projectOwner: "",
-            sampleType: "",
-            species: "",
-            description: "",
-            lab: "",
-            freezer: "",
-            chamber: "",
-            rack: "",
-            tray: "",
-            box: "",   
-            locationCollected: "",
-            retention: "",
-            barcode: "",
-            analysis: "",
-            temperature: "",
-            amount: "",
-            quantity_type: "",
-            securityLevel: "",
-            code: "",
-            
-      },
-      submitted: false     
-     };
-    },
+    export default {
+        name: "jumbotron",
 
-    validations: {
-      sample: {
-        theme: { required } ,
-        projectOwner: { required } ,
-        project: { required } ,
-        sampleType: { required } ,
-        species: { required } ,
-        description: { required, minLength: minLength(25) } ,
-        lab: { required, minValue: minValue(0) } ,
-        freezer: { required, minValue: minValue(0) } ,
-        chamber: {required, minValue: minValue(0)},
-        rack: { required, minValue: minValue(0)},
-        tray: { required, minValue: minValue(0)},
-        box: { required, minValue: minValue(0)},
-        locationCollected: {required},
-        retention: {required},
-        barcode: { required},
-        analysis: { required},
-        temperature: {required},
-        amount: {required, minValue: minValue(0)},
-        quantity_type: { required},
-        securityLevel: {required},
-        code: {required},
-      },
-    },
+        data() {
+            return {
+                response: [],
+                sample: {
+                    theme: "",
+                    user: "",
+                    project: "",
+                    projectOwner: "",
+                    sampleType: "",
+                    species: "",
+                    description: "",
+                    box: "",
+                    locationCollected: "",
+                    retention: "",
+                    barcode: "",
+                    analysis: "",
+                    temperature: "",
+                    amount: "",
+                    quantity_type: "",
+                    securityLevel: "",
+                    code: "",
 
-  methods : {
+                },
+                submitted: false,
 
-        handleSubmit(e) {
-          this.submitted = true;
-
-          this.$v.$touch(e);
-          if (this.$v.$invalid) {
-            return;
-          }
-        alert ("Sucsess! :-)\n\n" + JSON.stringify(this.sample));
-
-          }
-    }, 
-
-         formSubmit(e) {
-            e.preventDefault();
-            let currentObj = this;
-            axios.post('http://localhost:5000/sample' || 'http://localhost:5000/samples', {
-            theme: this.sample.theme,
-            lab: this.sample.lab,
-            freezer: this.sample.freezer,
-            chamber: this.sample.chamber,
-            rack: this.sample.rack,
-            tray: this.sample.tray,
-            box: this.sample.box,
-            animal_species: this.sample.species,
-            sample_type: this.sample.sampleType,
-            sample_description: this.sample.description,
-            project: this.sample.project,
-            project_owner: this.sample.projectOwner,
-            retention_period: this.sample.retention,
-            barcode: this.sample.barcode,
-            analysis: this.sample.analysis,
-            temperature: this.sample.temperature,
-            amount: this.sample.amount,
-            quantity_type: this.sample.quantity_type,
-            security_level: this.sample.securityLevel,
-            code: this.sample.code,
-            })
-            .then(function (response) {
-            currentObj.output = response.data;
-            })
-            .catch(function (error) {
-            currentObj.output = error;
-            });
+                QTDataList: [],
+                boxDataList: [],
+                userDataList: [],
+                themeDataList: [],
+                secLevelDataList: [],
+                fields: {text: '', value: ''},
+            };
         },
-};
+
+        validations: {
+            sample: {
+                theme: {required},
+                projectOwner: {required},
+                user: {required},
+                project: {required},
+                sampleType: {required},
+                species: {required},
+                description: {required, minLength: minLength(25)},
+                box: {required, minValue: minValue(0)},
+                locationCollected: {required},
+                retention: {required},
+                barcode: {required},
+                analysis: {required},
+                temperature: {required},
+                amount: {required, minValue: minValue(0)},
+                quantity_type: {required},
+                securityLevel: {required},
+                code: {required},
+            },
+        },
+
+        methods: {
+            onLoadPage() {
+
+                // GET THEME LIST
+                getItemDataList(theme_resource).then(data => {
+                    let themeList = extractApiData(data);
+
+                    // update local variables with data from API
+                    this.fields = themeList['fields'];
+                    for (let i = 0; i < themeList.items.length; i++) {
+                        this.themeDataList.push({
+                            'Code': themeList.items[i].Code,
+                            'Name': themeList.items[i].Name,
+                        });
+                    }
+                })
+
+                // GET USER LIST
+                getItemDataList(user_resource).then(data => {
+                    let userList = extractUserData(data);
+
+                    // update local variables with data from API
+                    this.fields = userList['fields'];
+                    for (let i = 0; i < userList.items.length; i++) {
+                        this.userDataList.push({
+                            'Code': userList.items[i].Code,
+                            'Name': userList.items[i].Name,
+                        });
+                    }
+                })
+
+                // GET QUANTITY TYPE LIST
+                getItemDataList(quantity_type_resource).then(data => {
+                    let QTList = extractQTData(data);
+
+                    // update local variables with data from API
+                    this.fields = QTList['fields'];
+                    for (let i = 0; i < QTList.items.length; i++) {
+                        this.QTDataList.push({
+                            'Code': QTList.items[i].Code,
+                            'Name': QTList.items[i].Name,
+                        });
+                    }
+                })
+
+                // GET BOX LIST
+                getItemDataList(box_resource).then(data => {
+                    let boxList = extractBoxData(data);
+
+                    // update local variables with data from API
+                    this.fields = boxList['fields'];
+                    for (let i = 0; i < boxList.items.length; i++) {
+                        this.boxDataList.push({
+                            'Code': boxList.items[i].Code,
+                            'Name': boxList.items[i].Name,
+                            'Tray': boxList.items[i].Tray,
+                            'Rack': boxList.items[i].Rack,
+                            'Chamber': boxList.items[i].Chamber,
+                            'Freezer': boxList.items[i].Freezer,
+                            'Lab': boxList.items[i].Lab
+                        });
+                    }
+                    this.$log.info("Box list has: ", this.boxDataList)
+                })
+
+                // GET SECURITY LEVEL LIST
+                getItemDataList(security_level_resource).then(data => {
+                    let secLevelList = extractApiData(data);
+
+                    // update local variables with data from API
+                    this.fields = secLevelList['fields'];
+                    for (let i = 0; i < secLevelList.items.length; i++) {
+                        this.secLevelDataList.push({
+                            'Code': secLevelList.items[i].Code,
+                            'Name': secLevelList.items[i].Name,
+                        });
+                    }
+                })
+            },
+
+            fillFormFieldsDependentOnBox() {
+                let dropdownSelection = getSelectedBoxSetTextFieldValue("box-dropdownlist", this.boxDataList);
+                this.sample.box = dropdownSelection.boxCode;
+
+                // SET FIELDS TEXT
+                document.getElementById("tray").value = dropdownSelection.tray;
+                document.getElementById("rack").value = dropdownSelection.rack;
+                document.getElementById("chamber").value = dropdownSelection.chamber;
+                document.getElementById("freezer").value = dropdownSelection.freezer;
+                document.getElementById("lab").value = dropdownSelection.lab;
+            },
+
+            handleSubmit() {
+                this.$log.info("HANDLE SUBMIT CALLED");
+                this.submitted = true;
+
+                this.$v.$touch();
+                if (this.$v.$invalid) {
+                    this.$log.info("HANDLE SUBMIT FAILED");
+                    return;
+                }
+
+                this.$log.info("HANDLE SUBMIT PASSED");
+                // this.sample.theme = getSelectedItemCode("theme-dropdownlist", this.themeDataList)
+                // this.sample.user = getSelectedItemCode("user-dropdownlist", this.userDataList)
+                // this.sample.securityLevel = getSelectedItemCode("secLevel-dropdownlist", this.secLevelDataList)
+                // this.sample.quantity_type = getSelectedItemCode("QT-dropdownlist", this.QTDataList)
+
+                alert("Sucsess! :-)\n\n" + JSON.stringify(this.sample));
+
+            },
+
+            formSubmit(e) {
+                e.preventDefault();
+                let currentObj = this;
+                this.sample.theme = getSelectedItemCode("theme-dropdownlist", this.themeDataList)
+                this.sample.user = getSelectedItemCode("user-dropdownlist", this.userDataList)
+                this.sample.securityLevel = getSelectedItemCode("securityLevel-dropdownlist", this.secLevelDataList)
+                this.sample.quantity_type = getSelectedItemCode("QT-dropdownlist", this.QTDataList)
+
+                this.$log.info("DATA FROM DROPDOWN SELECTION: \n1. Theme " + this.sample.theme)
+                this.$log.info("DATA FROM DROPDOWN SELECTION: \n1. User " + this.sample.user)
+                this.$log.info("DATA FROM DROPDOWN SELECTION: \n1. secLevel " + this.sample.securityLevel)
+                this.$log.info("DATA FROM DROPDOWN SELECTION: \n1. quantityType " + this.sample.quantity_type)
+
+                axios.post(sample_resource, {
+                    theme: this.sample.theme,
+                    user: this.sample.user,
+                    box: this.sample.box,
+                    animal_species: this.sample.species,
+                    sample_type: this.sample.sampleType,
+                    sample_description: this.sample.description,
+                    project: this.sample.project,
+                    project_owner: this.sample.projectOwner,
+                    retention_period: this.sample.retention,
+                    barcode: this.sample.barcode,
+                    analysis: this.sample.analysis,
+                    temperature: this.sample.temperature,
+                    amount: this.sample.amount,
+                    quantity_type: this.sample.quantity_type,
+                    security_level: this.sample.securityLevel,
+                    code: this.sample.code,
+                }, {
+                    headers:
+                        {
+                            Authorization: secureStoreGetString()
+                        }
+                })
+                    .then(function (response) {
+                        currentObj.output = response.data;
+                    })
+                    .catch(function (error) {
+                        currentObj.output = error;
+                    });
+            },
+        },
+        created() {
+            this.onLoadPage();
+        }
+    };
 
 
 </script>
