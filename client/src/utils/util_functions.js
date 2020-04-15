@@ -76,7 +76,7 @@ export function extractApiData(data) {
     return resultObject;
 }
 
-export function extractApiData2(data) {
+export function extractFreezerData(data) {
     let itemList = [];
     let fields = {text: '', value: ''};
     let resultObject = {items: itemList, fields: fields};
@@ -92,7 +92,7 @@ export function extractApiData2(data) {
     return resultObject;
 }
 
-export function extractApiData3(data) {
+export function extractChamberData(data) {
     let itemList = [];
     let fields = {text: '', value: ''};
     let resultObject = {items: itemList, fields: fields};
@@ -108,7 +108,7 @@ export function extractApiData3(data) {
     return resultObject;
 }
 
-export function extractApiData4(data) {
+export function extractRackData(data) {
     let itemList = [];
     let fields = {text: '', value: ''};
     let resultObject = {items: itemList, fields: fields};
@@ -124,7 +124,7 @@ export function extractApiData4(data) {
     return resultObject;
 }
 
-export function extractApiData5(data) {
+export function extractTrayData(data) {
     let itemList = [];
     let fields = {text: '', value: ''};
     let resultObject = {items: itemList, fields: fields};

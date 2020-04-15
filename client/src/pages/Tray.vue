@@ -147,7 +147,7 @@
     import {rack_resource, tray_resource} from '../../src/utils/api_paths'
     import TopNav from "@/components/TopNav";
     import {
-        extractApiData4,
+        extractRackData,
         getItemDataList,
         getSelectedItem,
         secureStoreGetString,
@@ -196,8 +196,8 @@
 
             onLoadPage() {
                 getItemDataList(rack_resource).then(data => {
-                    let rackList = extractApiData4(data);
-                    this.$log.info("Tray list json: ", JSON.stringify(rackList));
+                    let rackList = extractRackData(data);
+                    this.$log.info("Rack list json: ", JSON.stringify(rackList));
 
                     // update local variables with data from API
                     this.fields = rackList['fields'];

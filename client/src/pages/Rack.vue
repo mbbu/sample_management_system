@@ -147,7 +147,7 @@
     import {chamber_resource, rack_resource} from '../../src/utils/api_paths'
     import TopNav from "@/components/TopNav";
     import {
-        extractApiData3,
+        extractChamberData,
         getItemDataList,
         getSelectedItem,
         secureStoreGetString,
@@ -196,7 +196,7 @@
 
             onLoadPage() {
                 getItemDataList(chamber_resource).then(data => {
-                    let chamberList = extractApiData3(data);
+                    let chamberList = extractChamberData(data);
                     this.$log.info("Chamber list json: ", JSON.stringify(chamberList));
 
                     // update local variables with data from API

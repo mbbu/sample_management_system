@@ -157,7 +157,7 @@
     import axios from 'axios';
     import TopNav from "../components/TopNav";
     import {
-        extractApiData5,
+        extractTrayData,
         getItemDataList,
         getSelectedItem,
         secureStoreGetString,
@@ -213,7 +213,7 @@
 
             onLoadPage() {
                 getItemDataList(tray_resource).then(data => {
-                    let trayList = extractApiData5(data);
+                    let trayList = extractTrayData(data);
                     this.$log.info("Tray list json: ", JSON.stringify(trayList));
 
                     // update local variables with data from API

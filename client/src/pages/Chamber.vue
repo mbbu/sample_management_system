@@ -149,7 +149,7 @@
     import {chamber_resource, freezer_resource} from '../../src/utils/api_paths'
     import TopNav from "@/components/TopNav";
     import {
-        extractApiData2,
+        extractFreezerData,
         getItemDataList,
         getSelectedItem,
         secureStoreGetString,
@@ -198,7 +198,7 @@
 
             onLoadPage() {
                 getItemDataList(freezer_resource).then(data => {
-                    let freezerList = extractApiData2(data);
+                    let freezerList = extractFreezerData(data);
                     this.$log.info("Freezer list json: ", JSON.stringify(freezerList));
 
                     // update local variables with data from API
