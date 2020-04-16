@@ -10,6 +10,8 @@ import VueLogger from 'vuejs-logger';
 import FlashMessage from "@smartweb/vue-flash-message";
 import axios from 'axios';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome'
+import Loading from 'vue-loading-overlay';
+
 
 // logging options
 const isProduction = process.env.NODE_ENV === 'production';
@@ -36,6 +38,7 @@ Vue.use(Vuelidate);
 Vue.use(VueLogger, options);
 Vue.use(FlashMessage, flash_config);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
+Vue.use(Loading);
 Vue.config.productionTip = false;
 
 new Vue({

@@ -4,8 +4,9 @@
             <top-nav :page_title="page_title"></top-nav>
             <FlashMessage :position="'right bottom'"></FlashMessage>
 
-            <form-wizard @submit.prevent="formSubmit" subtitle="Kindly input the correct information"
-                         title="Sample Data Form">
+            <form-wizard @submit.prevent="formSubmit" ref="formContainer"
+                         subtitle="Kindly input the correct information" title="Sample Data Form">
+
                 <tab-content :before-change="handleSubmit" title="Sample Details">
                     <!--THEME-->
                     <div class="form-group">
@@ -536,6 +537,22 @@
             formSubmit() {
                 let self = this;
 
+                let loader = this.$loading.show({
+                    isFullPage: true,
+                    canCancel: false,
+                    color: '#074880',
+                    loader: 'dots',
+                    width: 255,
+                    height: 255,
+                    backgroundColor: '#FAAB2C',
+                    opacity: 0.7,
+                    zIndex: 999,
+                });
+                // simulate AJAX
+                // setTimeout(() => {
+                //     loader.hide()
+                // }, 5000)
+
                 axios.post(sample_resource, {
                     theme: this.sample.theme,
                     user: this.sample.user,
@@ -561,11 +578,15 @@
                         }
                 })
                     .then((response) => {
-                        showFlashMessage(self, 'success', response.data['message'], 'Redirecting you to sample page');
-                        // todo: redirect to sample view page
-                        countDownTimer(self, 5, '/sample')
+                        setTimeout(() => {
+                            loader.hide()
+                            showFlashMessage(self, 'success', response.data['message'], '');
+                            // todo: redirect to sample view page
+                            countDownTimer(self, 2, '/sample')
+                        }, 4000)
                     })
                     .catch((error) => {
+                        loader.hide()
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 409) {
