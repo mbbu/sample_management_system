@@ -2,12 +2,16 @@
     <p v-if="errors.length">
         <b>Please correct the following error(s):</b>
     <ul>
-        <li :key="index" v-for="(error, index) in errors">{{ error }}</li>
+        <em>
+            <li class="text-danger" :key="index" v-for="(error, index) in errors">* {{ error }}</li>
+        </em>
     </ul>
     </p>
 </template>
 
 <script>
+    // import {showFlashMessage} from "../utils/util_functions";
+
     export default {
         name: "ErrorsDisplay",
         props: {
@@ -15,6 +19,6 @@
                 type: Array,
                 required: false,
             }
-        }
+        },
     }
 </script>

@@ -1,110 +1,84 @@
 <template>
     <div id="jumbotron">
         <div class="container">
-            <form-wizard @submit.prevent="handleSubmit" subtitle="Kindly input the correct information"
-                         title="Sample Data Form">
-                <tab-content @click.native="handleSubmit" title="Sample Details">
+            <top-nav :page_title="page_title"></top-nav>
+            <FlashMessage :position="'right bottom'"></FlashMessage>
 
+            <form-wizard @submit.prevent="formSubmit" subtitle="Kindly input the correct information"
+                         title="Sample Data Form">
+                <tab-content :before-change="handleSubmit" title="Sample Details">
+                    <!--THEME-->
                     <div class="form-group">
                         <b-form-group id="form-theme" label="Select a Theme:" label-for="form-theme-input">
                             <ejs-dropdownlist
                                     :dataSource='themeDataList'
                                     :fields="fields"
                                     :v-model="sample.theme"
+                                    @change="setTheme"
                                     id="theme-dropdownlist"
                                     placeholder='Select a theme'
                             ></ejs-dropdownlist>
                         </b-form-group>
-                        <div class="invaid-feedback" v-if="submitted && $v.sample.theme.$error">
-                            <span v-if="!$v.sample.theme.required"> Theme is required </span>
-                            <span v-if="!$v.sample.theme.theme"> Select one </span>
-                        </div>
                     </div>
 
+                    <!-- PROJECT -->
                     <div class="form-group">
                         <label for="project"> Project</label>
-                        <input :class="{ 'is-invalid': submitted && $sample.project.$error}" class="form-control"
-                               id="project" type="text"
-                               v-model="sample.project"/>
+                        <input class="form-control" id="project" required type="text" v-model="sample.project"/>
                     </div>
 
+                    <!--PROJECT OWNER-->
                     <div class="form-group">
                         <label for="projectOwner"> Project Owner</label>
-                        <input :class="{ 'is-invalid': submitted && $sample.projectOwner.$error}" class="form-control"
-                               id="projectOwner" type="text"
+                        <input class="form-control" id="projectOwner" required type="text"
                                v-model="sample.projectOwner"/>
-                        <div class="invalid-feedback" v-if="submitted && !$v.sample.projectOwner.required"> Project
-                            owner is required
-                        </div>
                     </div>
 
+                    <!--SAMPLE OWNER-->
                     <div class="form-group">
                         <b-form-group id="form-user" label="Select the Sample Owner:" label-for="form-user-input">
                             <ejs-dropdownlist
                                     :dataSource='userDataList'
                                     :fields="fields"
                                     :v-model="sample.user"
+                                    @change="setUser"
                                     id="user-dropdownlist"
                                     placeholder='Select the sample owner(i.e. One in-charge of handling the sample)'
                             ></ejs-dropdownlist>
                         </b-form-group>
-                        <div class="invaid-feedback" v-if="submitted && $v.sample.user.$error">
-                            <span v-if="!$v.sample.user.required"> Sample owner is required </span>
-                            <span v-if="!$v.sample.user.user"> Select one </span>
-                        </div>
                     </div>
 
+                    <!--SAMPLE TYPE-->
                     <div class="form-group">
                         <label for="sampleType"> Sample Type</label>
-                        <input :class="{ 'is-invalid': submitted && $sample.sampleType.$error}" class="form-control"
-                               id="sampleType" type="text"
-                               v-model="sample.sampleType"/>
-                        <div class="invalid-feedback" v-if="submitted && !$v.sample.sampleType.required"> Sample Type is
-                            required
-                        </div>
+                        <input class="form-control" id="sampleType" required type="text" v-model="sample.sampleType"/>
                     </div>
 
+                    <!--SPECIES-->
                     <div class="form-group">
                         <label for="species"> Species</label>
-                        <input :class="{ 'is-invalid': submitted && $sample.species.$error}" class="form-control"
-                               id="species" type="text"
-                               v-model="sample.species"/>
-                        <div class="invalid-feedback" v-if="submitted && !$v.sample.species.required"> Species is
-                            required
-                        </div>
+                        <input class="form-control" id="species" required type="text" v-model="sample.species"/>
                     </div>
 
+                    <!--DESC-->
                     <div class="form-group">
                         <label for="description"> Description</label>
-                        <textarea :class="{ 'is-invalid': submitted && $sample.description.$error}" class="form-control"
-                                  id="description" name="description"
-                                  type="text" v-model="sample.description"/>
-                        <div class="invalid-feedback" v-if="submitted && $v.sample.description.$error">
-                            <span v-if="!$v.sample.description.required"> Description is required </span>
-                            <span v-if="!$v.sample.description.minLength"> Description must be at least 25 words </span>
-                        </div>
+                        <textarea class="form-control" id="description" name="description" type="text"
+                                  v-model="sample.description"/>
                     </div>
-
+                    <errors-display :errors="errors"></errors-display>
                 </tab-content>
 
-                <tab-content @click.native="handleSubmit" title="Sample Location in Institution">
-
+                <!-- TAB 2 -->
+                <tab-content :before-change="handleSubmit" title="Sample Location in Institution">
                     <div class="form-group">
                         <label for="locationCollected">Location Collected</label>
-                        <input :class="{ 'is-invalid': submitted && $sample.locationCollected.$error}"
-                               class="form-control" id="locationCollected"
-                               type="text"
+                        <input class="form-control" id="locationCollected" required type="text"
                                v-model="sample.locationCollected"/>
-                        <div class="invalid-feedback" v-if="submitted && !$v.sample.locationCollected">
-                            <span v-if="!$v.sample.locationCollected.required"> Location Collected is required </span>
-                            <span v-if="!$v.sample.locationCollected.minLength"> Location Collected must be at least 25 words </span>
-                        </div>
                     </div>
 
                     <div class="form-group">
-                        <b-form-group ::class="{ 'is-invalid': submitted && $sample.box.$error}"
-                                      id="box" label="Select a Box for the sample:"
-                                      label-for="form-box-input">
+                        <b-form-group id="box" label="Select a Box for the sample:" label-for="form-box-input">
                             <ejs-dropdownlist
                                     :dataSource='boxDataList'
                                     :fields="fields"
@@ -114,21 +88,15 @@
                                     placeholder='Select a box and its location will be shown'
                             ></ejs-dropdownlist>
                         </b-form-group>
-
-                        <div class="invalid-feedback" v-if="submitted && !$v.sample.box">
-                            <span v-if="!$v.sample.box.required"> Box Collected is required </span>
-                            <span v-if="!$v.sample.box.minValue"> Box Should be more than zero </span>
-                        </div>
                     </div>
-
 
                     <!-- Start row -->
                     <div class="row">
-
                         <div class="col">
                             <div class="form-group">
                                 <label for="tray">Tray Number</label>
                                 <input class="form-control" disabled="disabled" id="tray" placeholder="Tray having box"
+                                       required
                                        type="text"/>
                             </div>
                         </div>
@@ -138,7 +106,7 @@
                                 <label for="rack">Rack Number</label>
                                 <input class="form-control" disabled="disabled" id="rack"
                                        placeholder="Rack holding tray"
-                                       type="text"/>
+                                       required type="text"/>
                             </div>
                         </div>
 
@@ -146,9 +114,9 @@
                             <div class="form-group">
                                 <label for="chamber"> Chamber Type </label>
                                 <input class="form-control" disabled="disabled" id="chamber"
-                                       placeholder="Chamber where rack is" type="text"/>
+                                       placeholder="Chamber where rack is"
+                                       required type="text"/>
                             </div>
-
                         </div>
                     </div>
                     <!-- End row -->
@@ -160,7 +128,8 @@
                             <div class="form-group">
                                 <label for="freezer">Freezer Number</label>
                                 <input class="form-control" disabled="disabled" id="freezer"
-                                       placeholder="Freezer where box is stored" type="text"/>
+                                       placeholder="Freezer where box is stored"
+                                       required type="text"/>
                             </div>
                         </div>
 
@@ -169,25 +138,19 @@
                                 <label for="lab">Lab</label>
                                 <input class="form-control" disabled="disabled" id="lab"
                                        placeholder="Lab where freezer is"
-                                       type="text"/>
+                                       required type="text"/>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Start Row -->
-
+                    <!-- End Row -->
 
                     <!-- Start row -->
                     <div class="row">
                         <div class="col">
                             <div class="form-group">
                                 <label for="temperature">Temperature (Default in Celsius)</label>
-                                <input :class="{ 'is-invalid': submitted && $sample.temperature.$error}"
-                                       class="form-control" id="temperature" type="number"
+                                <input class="form-control" id="temperature" required type="number"
                                        v-model="sample.temperature"/>
-                                <div class="invalid-feedback" v-if="submitted && !$v.sample.temperature"> Temperature
-                                    Collected is required
-                                </div>
                             </div>
 
                         </div>
@@ -195,45 +158,32 @@
                         <div class="col">
                             <div class="form-group">
                                 <label for="amount">Amount</label>
-                                <input :class="{ 'is-invalid': submitted && $sample.amount.$error}" class="form-control"
-                                       id="amount" type="number"
-                                       v-model="sample.amount"/>
-                                <div class="invalid-feedback" v-if="submitted && !$v.sample.amount">
-                                    <span v-if="!$v.sample.amount.required"> Amount is required </span>
-                                    <span v-if="!$v.sample.amount.minValue"> Amount Should be more than zero </span>
-                                </div>
+                                <input class="form-control" id="amount" required type="number" v-model="sample.amount"/>
                             </div>
 
                         </div>
                         <div class="col">
                             <div class="form-group">
-                                <b-form-group :class="{ 'is-invalid' : submitted && $v.sample.quantity_type.$error }"
-                                              id="form-QT"
-                                              label="Select a Quantity Type:"
+                                <b-form-group id="form-QT" label="Select a Quantity Type:"
                                               label-for="form-user-input">
                                     <ejs-dropdownlist
                                             :dataSource='QTDataList'
                                             :fields="fields"
                                             :v-model="sample.quantity_type"
+                                            @change="setQuantityType"
                                             id="QT-dropdownlist"
                                             placeholder='Select a quantity type(e.g. ML, L, G ...)'
                                     ></ejs-dropdownlist>
                                 </b-form-group>
-                                <div class="invalid-feedback" v-if="submitted && $v.sample.quantity_type.$error">
-                                    <span v-if="!$v.sample.quantity_type.required"> Quantity Type is required </span>
-                                    <span v-if="!$v.sample.quantity_type.quantity_type"> Select one </span>
-                                </div>
                             </div>
                         </div>
                     </div>
-
                     <!-- End Row -->
-
+                    <errors-display :errors="errors"></errors-display>
                 </tab-content>
 
 
-                <tab-content @click.native="handleSubmit" title="Finishing Up">
-
+                <tab-content :before-change="handleSubmit" title="Finishing Up">
                     <div class="form-group">
                         <b-form-group id="form-securityLevel" label="Security Level Needed:"
                                       label-for="form-securityLevel-input">
@@ -241,51 +191,38 @@
                                     :dataSource='secLevelDataList'
                                     :fields="fields"
                                     :v-model="sample.securityLevel"
+                                    @change="setSecurityLevel"
                                     id="securityLevel-dropdownlist"
                                     placeholder='Select Security Level Needed'
                             ></ejs-dropdownlist>
                         </b-form-group>
-                        <div class="invaid-feedback" v-if="submitted && $v.sample.securityLevel.$error">
-                            <span v-if="!$v.sample.securityLevel.required"> Security Level is required </span>
-                            <span v-if="!$v.sample.securityLevel.securityLevel"> Select one </span>
-                        </div>
                     </div>
 
                     <div class="form-group">
                         <label for="code"> Code</label>
-                        <input :class="{ 'is-invalid': submitted && $sample.code.$error}" class="form-control" id="code"
+                        <input class="form-control" id="code" required
                                type="text"
                                v-model="sample.code"/>
-                        <div class="invalid-feedback" v-if="submitted && !$v.sample.code"> Code is required</div>
+                        <div class="invalid-feedback" v-if="submitted && error in errors">
+                            <span> Code is required + {{ error }} </span>
+                        </div>
                     </div>
 
                     <div class="form-group">
                         <label for="barcode"> Barcode</label>
-                        <input :class="{ 'is-invalid': submitted && $sample.barcode.$error}" class="form-control"
-                               id="barcode" type="text"
-                               v-model="sample.barcode"/>
-                        <div class="invalid-feedback" v-if="submitted && !$v.sample.barcode"> Barcode is required</div>
+                        <input class="form-control" id="barcode" required type="text" v-model="sample.barcode"/>
                     </div>
 
                     <div class="form-group">
                         <label for="analysis"> Analysis</label>
-                        <input :class="{ 'is-invalid': submitted && $sample.analysis.$error}" class="form-control"
-                               id="analysis" type="text"
-                               v-model="sample.analysis"/>
-                        <div class="invalid-feedback" v-if="submitted && !v.sample.analysis"> Analysis is required</div>
+                        <input class="form-control" id="analysis" required type="text" v-model="sample.analysis"/>
                     </div>
 
                     <div class="form-group">
                         <label for="retention"> Retention</label>
-                        <input :class="{ 'is-invalid': submitted && $sample.retention.$error}" class="form-control"
-                               id="retention" type="number"
-                               v-model="sample.retention"/>
-                        <div class="invalid-feedback" v-if="submitted && !$v.sample.retention">
-                            <span v-if="!$v.sample.retention.required"> Retention is required </span>
-                            <span v-if="!$v.sample.retention.minValue"> Retention Should be more than zero </span>
-                        </div>
+                        <input class="form-control" id="retention" required type="number" v-model="sample.retention"/>
                     </div>
-
+                    <errors-display :errors="errors"></errors-display>
                 </tab-content>
 
                 <template scope="props" slot="footer">
@@ -315,9 +252,9 @@
     import Vue from 'vue';
     import VueFormWizard, {TabContent} from 'vue-form-wizard';
     import 'vue-form-wizard/dist/vue-form-wizard.min.css';
-    import {minLength, minValue, required} from "vuelidate/lib/validators";
     import axios from 'axios';
     import {
+        countDownTimer,
         extractApiData,
         extractBoxData,
         extractQTData,
@@ -325,7 +262,8 @@
         getItemDataList,
         getSelectedBoxSetTextFieldValue,
         getSelectedItemCode,
-        secureStoreGetString
+        secureStoreGetString,
+        showFlashMessage
     } from "../utils/util_functions";
     import {
         box_resource,
@@ -335,6 +273,8 @@
         theme_resource,
         user_resource
     } from "../utils/api_paths";
+    import TopNav from "../components/TopNav";
+    import ErrorsDisplay from "../components/ErrorsDisplay";
 
     Vue.use(VueFormWizard)
     Vue.use(TabContent)
@@ -367,35 +307,19 @@
                 },
                 submitted: false,
 
+                errors: [],
+                tabNum: 0,
+                tabOne: 0,
+                tabTwo: 1,
+                tabThree: 2,
                 QTDataList: [],
                 boxDataList: [],
                 userDataList: [],
                 themeDataList: [],
                 secLevelDataList: [],
                 fields: {text: '', value: ''},
+                page_title: "Add Sample"
             };
-        },
-
-        validations: {
-            sample: {
-                theme: {required},
-                projectOwner: {required},
-                user: {required},
-                project: {required},
-                sampleType: {required},
-                species: {required},
-                description: {required, minLength: minLength(25)},
-                box: {required, minValue: minValue(0)},
-                locationCollected: {required},
-                retention: {required},
-                barcode: {required},
-                analysis: {required},
-                temperature: {required},
-                amount: {required, minValue: minValue(0)},
-                quantity_type: {required},
-                securityLevel: {required},
-                code: {required},
-            },
         },
 
         methods: {
@@ -460,7 +384,6 @@
                             'Lab': boxList.items[i].Lab
                         });
                     }
-                    this.$log.info("Box list has: ", this.boxDataList)
                 })
 
                 // GET SECURITY LEVEL LIST
@@ -491,37 +414,127 @@
             },
 
             handleSubmit() {
-                this.$log.info("HANDLE SUBMIT CALLED");
-                this.submitted = true;
-
-                this.$v.$touch();
-                if (this.$v.$invalid) {
-                    this.$log.info("HANDLE SUBMIT FAILED");
-                    return;
+                if (this.tabNum === 0) {
+                    this.errors = []
+                    return this.validateForm(this.tabOne)
+                } else if (this.tabNum === 1) {
+                    this.errors = []
+                    return this.validateForm(this.tabTwo)
+                } else if (this.tabNum === 2) {
+                    this.errors = []
+                    return this.validateForm(this.tabThree)
                 }
-
-                this.$log.info("HANDLE SUBMIT PASSED");
-                // this.sample.theme = getSelectedItemCode("theme-dropdownlist", this.themeDataList)
-                // this.sample.user = getSelectedItemCode("user-dropdownlist", this.userDataList)
-                // this.sample.securityLevel = getSelectedItemCode("secLevel-dropdownlist", this.secLevelDataList)
-                // this.sample.quantity_type = getSelectedItemCode("QT-dropdownlist", this.QTDataList)
-
-                alert("Sucsess! :-)\n\n" + JSON.stringify(this.sample));
-
             },
 
-            formSubmit(e) {
-                e.preventDefault();
-                let currentObj = this;
-                this.sample.theme = getSelectedItemCode("theme-dropdownlist", this.themeDataList)
-                this.sample.user = getSelectedItemCode("user-dropdownlist", this.userDataList)
-                this.sample.securityLevel = getSelectedItemCode("securityLevel-dropdownlist", this.secLevelDataList)
-                this.sample.quantity_type = getSelectedItemCode("QT-dropdownlist", this.QTDataList)
+            validateForm(tabs) {
+                let self = this;
 
-                this.$log.info("DATA FROM DROPDOWN SELECTION: \n1. Theme " + this.sample.theme)
-                this.$log.info("DATA FROM DROPDOWN SELECTION: \n1. User " + this.sample.user)
-                this.$log.info("DATA FROM DROPDOWN SELECTION: \n1. secLevel " + this.sample.securityLevel)
-                this.$log.info("DATA FROM DROPDOWN SELECTION: \n1. quantityType " + this.sample.quantity_type)
+                switch (tabs) {
+                    case 0:
+                        if (!this.sample.theme) {
+                            this.errors.push("Theme is required");
+                        }
+                        if (!this.sample.project) {
+                            this.errors.push("Project is required");
+                        }
+                        if (!this.sample.projectOwner) {
+                            this.errors.push("Project Owner is required");
+                        }
+                        if (!this.sample.user) {
+                            this.errors.push("Sample Owner is required");
+                        }
+                        if (!this.sample.sampleType) {
+                            this.errors.push("Sample Type is required");
+                        }
+                        if (!this.sample.species) {
+                            this.errors.push("Animal species is required");
+                        }
+                        if (!this.sample.description || this.sample.description.length < 25) {
+                            this.errors.push("Description is required and should be at least 2 sentences.");
+                        }
+                        if (this.errors.length) {
+                            showFlashMessage(self, "error", "Check Form for Errors", "Correct errors to proceed!")
+                        }
+                        if (!this.errors.length) {
+                            this.tabNum++
+                            return true;
+                        }
+                        break;
+
+                    case 1:
+                        if (!this.sample.locationCollected) {
+                            this.errors.push("Location is required");
+                        }
+                        if (!this.sample.box) {
+                            this.errors.push("Box is required");
+                        }
+                        if (!this.sample.temperature) {
+                            this.errors.push("Temperature is required");
+                        }
+                        if (!this.sample.amount) {
+                            this.errors.push("Amount is required");
+                        }
+                        if (!this.sample.quantity_type) {
+                            this.errors.push("Quantity Type is required");
+                        }
+                        if (this.errors.length) {
+                            showFlashMessage(self, "error", "Check Form for Errors", "Correct errors to proceed!")
+                        }
+                        if (!this.errors.length) {
+                            this.tabNum++
+                            return true;
+                        }
+                        break;
+
+                    case 2:
+                        if (!this.sample.securityLevel) {
+                            this.errors.push("Security level is required");
+                        }
+                        if (!this.sample.code) {
+                            this.errors.push("Code is required");
+                        }
+                        if (!this.sample.barcode) {
+                            this.errors.push("Barcode Owner is required");
+                        }
+                        if (!this.sample.analysis) {
+                            this.errors.push("Analysis is required");
+                        }
+                        if (!this.sample.retention) {
+                            this.errors.push("Retention period is required");
+                        }
+                        if (this.errors.length) {
+                            showFlashMessage(self, "error", "Check Form for Errors", "Correct errors to proceed!")
+                        }
+                        if (!this.errors.length) {
+                            this.tabNum = 0
+                            return true;
+                        }
+                        break;
+
+                    default:
+                        this.errors = [];
+                        if (!this.errors.length) {
+                            return true;
+                        }
+                        break;
+                }
+            },
+
+            setTheme() {
+                this.sample.theme = getSelectedItemCode("theme-dropdownlist", this.themeDataList)
+            },
+            setUser() {
+                this.sample.user = getSelectedItemCode("user-dropdownlist", this.userDataList)
+            },
+            setSecurityLevel() {
+                this.sample.securityLevel = getSelectedItemCode("securityLevel-dropdownlist", this.secLevelDataList)
+            },
+            setQuantityType() {
+                this.sample.quantity_type = getSelectedItemCode("QT-dropdownlist", this.QTDataList)
+            },
+
+            formSubmit() {
+                let self = this;
 
                 axios.post(sample_resource, {
                     theme: this.sample.theme,
@@ -539,6 +552,7 @@
                     amount: this.sample.amount,
                     quantity_type: this.sample.quantity_type,
                     security_level: this.sample.securityLevel,
+                    location_collected: this.location_collected,
                     code: this.sample.code,
                 }, {
                     headers:
@@ -546,17 +560,32 @@
                             Authorization: secureStoreGetString()
                         }
                 })
-                    .then(function (response) {
-                        currentObj.output = response.data;
+                    .then((response) => {
+                        showFlashMessage(self, 'success', response.data['message'], 'Redirecting you to sample page');
+                        // todo: redirect to sample view page
+                        countDownTimer(self, 5, '/sample')
                     })
-                    .catch(function (error) {
-                        currentObj.output = error;
+                    .catch((error) => {
+                        this.$log.error(error);
+                        if (error.response) {
+                            if (error.response.status === 409) {
+                                showFlashMessage(self, 'error', error.response.data['message'], '');
+                            } else if (error.response.status === 400) {
+                                showFlashMessage(self, 'error', 'Kindly refill the form', error.response.data['message']);
+                            } else if (error.response.status === 401) {
+                                showFlashMessage(self, 'error', "Session Expired", 'You need to log in to perform this operation');
+                                countDownTimer(self, 3, '/login');
+                            } else {
+                                showFlashMessage(self, 'error', error.response.data['message'], '');
+                            }
+                        }
                     });
             },
         },
         created() {
             this.onLoadPage();
-        }
+        },
+        components: {TopNav, ErrorsDisplay}
     };
 
 
