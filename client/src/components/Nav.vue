@@ -21,12 +21,7 @@
                 </router-link>
             </li>
 
-            <li>
-                <a href="https://redcap.icipe.org/surveys/?s=W7A7TFJ89J" class="context-menu__link">
-                    <i class="fa fa-inbox menu_icon" aria-hidden="true"> </i>
-                    Request Sample </a>
-            </li>
-
+            <hr>
             <hr>
 
             <li>
