@@ -25,7 +25,6 @@ class SampleResource(BaseResource):
         'user.email': fields.String,
         'user.first_name': fields.String,
         'user.last_name': fields.String,
-        'box.label': fields.String,
         'animal_species': fields.String,
         'sample_type': fields.String,
         'sample_description': fields.String,
@@ -39,7 +38,15 @@ class SampleResource(BaseResource):
         'amount': fields.Integer,
         'quantity.id': fields.String,
         'security_level': fields.Integer,
-        'code': fields.String
+        'code': fields.String,
+        'box.label': fields.String,
+        'box.tray.number': fields.Integer,
+        'box.tray.rack.number': fields.Integer,
+        'box.tray.rack.chamber.type': fields.String,
+        'box.tray.rack.chamber.freezer.number': fields.Integer,
+        'box.tray.rack.chamber.freezer.lab.name': fields.String,
+        'box.tray.rack.chamber.freezer.lab.room': fields.Integer
+
     }
 
     def get(self):
