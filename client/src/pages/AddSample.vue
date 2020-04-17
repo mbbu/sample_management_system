@@ -219,9 +219,27 @@
                         <input class="form-control" id="analysis" required type="text" v-model="sample.analysis"/>
                     </div>
 
-                    <div class="form-group">
-                        <label for="retention"> Retention</label>
-                        <input class="form-control" id="retention" required type="number" v-model="sample.retention"/>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="retention"> Retention</label>
+                                <input class="form-control" id="retention" required type="number"
+                                       v-model="sample.retention"/>
+                            </div>
+                        </div>
+
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="period">Select period(Days, Weeks ...):</label>
+                                <select class="custom-select" id="period" @change="setRetentionPeriod" required>
+                                    <option value="" disabled selected>Choose a period</option>
+                                    <option value="1">Days</option>
+                                    <option value="2">Weeks</option>
+                                    <option value="3">Months</option>
+                                    <option value="4">Years</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     <errors-display :errors="errors"></errors-display>
                 </tab-content>
@@ -297,6 +315,7 @@
                     box: "",
                     locationCollected: "",
                     retention: "",
+                    convertedRetentionPeriod: "",
                     barcode: "",
                     analysis: "",
                     temperature: "",
@@ -534,6 +553,24 @@
                 this.sample.quantity_type = getSelectedItemCode("QT-dropdownlist", this.QTDataList)
             },
 
+            setRetentionPeriod() {
+                let periodSelect = document.getElementById("period")
+                let periodValue = parseInt(periodSelect.options[periodSelect.selectedIndex].value);
+
+                if (periodValue === 1) {
+                    this.sample.convertedRetentionPeriod = this.sample.retention
+                } else if (periodValue === 2) {
+                    // convert week to days
+                    this.sample.convertedRetentionPeriod = this.sample.retention * 7
+                } else if (periodValue === 3) {
+                    // convert months to days
+                    this.sample.convertedRetentionPeriod = this.sample.retention * 30
+                } else if (periodValue === 4) {
+                    //  convert years to days
+                    this.sample.convertedRetentionPeriod = this.sample.retention * 365
+                }
+            },
+
             formSubmit() {
                 let self = this;
 
@@ -562,7 +599,7 @@
                     sample_description: this.sample.description,
                     project: this.sample.project,
                     project_owner: this.sample.projectOwner,
-                    retention_period: this.sample.retention,
+                    retention_period: this.sample.convertedRetentionPeriod,
                     barcode: this.sample.barcode,
                     analysis: this.sample.analysis,
                     temperature: this.sample.temperature,
