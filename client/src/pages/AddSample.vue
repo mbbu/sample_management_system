@@ -585,10 +585,6 @@
                     opacity: 0.7,
                     zIndex: 999,
                 });
-                // simulate AJAX
-                // setTimeout(() => {
-                //     loader.hide()
-                // }, 5000)
 
                 axios.post(sample_resource, {
                     theme: this.sample.theme,
@@ -606,7 +602,7 @@
                     amount: this.sample.amount,
                     quantity_type: this.sample.quantity_type,
                     security_level: this.sample.securityLevel,
-                    location_collected: this.location_collected,
+                    location_collected: this.sample.locationCollected,
                     code: this.sample.code,
                 }, {
                     headers:
