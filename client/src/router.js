@@ -1,11 +1,11 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import Box from './pages/Box.vue';
-import Sample from './pages/Sample.vue';
+import Sample from './pages/Sample/ListSampleView.vue';
 import Chamber from './pages/Chamber.vue';
 import Theme from './pages/Theme.vue';
 import Login from './pages/Login.vue';
-import AddSample from './pages/AddSample.vue';
+import AddSample from './pages/Sample/AddSample.vue';
 import Map from './pages/Map.vue';
 import UpdateProfile from './pages/UpdateProfile.vue';
 import SecurityLevel from "./pages/SecurityLevel";
@@ -17,6 +17,8 @@ import ContactUs from "./pages/ContactUs";
 import Rack from "./pages/Rack";
 import Tray from "./pages/Tray";
 import Publication from "./pages/Publication";
+import DetailedSampleView from "./pages/Sample/DetailedSampleView";
+import UpdateSample from "./pages/Sample/UpdateSample";
 
 
 Vue.use(Router);
@@ -74,10 +76,24 @@ export default new Router({
         },
 
         {
-            path: '/addsample',
+            path: '/add-sample',
             name: 'AddSample',
-            alias: ['/addsamples'],
+            alias: ['/addsample'],
             component: AddSample,
+        },
+
+        {
+            path: '/view-sample',
+            name: 'DetailedSampleView',
+            alias: ['/viewsample'],
+            component: DetailedSampleView,
+        },
+
+        {
+            path: '/update-sample',
+            name: 'UpdateSample',
+            alias: ['/updatesample'],
+            component: UpdateSample,
         },
 
         {

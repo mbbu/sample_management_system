@@ -46,8 +46,7 @@
                                     v-b-tooltip.hover
                                     variant="info"
                             ></b-icon>
-                            <!--                            @mouseover="fillFormForUpdate(publication.publication_title, publication['sample.theme.name'],
-                                                                 publication['user.first_name'], publication['user.last_name'], publication['co_authors'], publication.sample_results)"-->
+
                             &nbsp;
                             <b-icon
                                     :title="`Delete ${ sample.code }!`"
@@ -70,9 +69,9 @@
 
 <script>
     import axios from 'axios';
-    import {sample_resource} from "../utils/api_paths";
-    import TopNav from "../components/TopNav";
-    import {countDownTimer, secureStoreGetString, showFlashMessage} from "../utils/util_functions";
+    import {sample_resource} from "../../utils/api_paths";
+    import TopNav from "../../components/TopNav";
+    import {countDownTimer, secureStoreGetString, showFlashMessage} from "../../utils/util_functions";
 
     export default {
         name: "Sample",

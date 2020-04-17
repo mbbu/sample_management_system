@@ -283,7 +283,7 @@
         getSelectedItemCode,
         secureStoreGetString,
         showFlashMessage
-    } from "../utils/util_functions";
+    } from "../../utils/util_functions";
     import {
         box_resource,
         quantity_type_resource,
@@ -291,9 +291,9 @@
         security_level_resource,
         theme_resource,
         user_resource
-    } from "../utils/api_paths";
-    import TopNav from "../components/TopNav";
-    import ErrorsDisplay from "../components/ErrorsDisplay";
+    } from "../../utils/api_paths";
+    import TopNav from "../../components/TopNav";
+    import ErrorsDisplay from "../../components/ErrorsDisplay";
 
     Vue.use(VueFormWizard)
     Vue.use(TabContent)
