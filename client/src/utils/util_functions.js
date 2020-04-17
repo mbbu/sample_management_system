@@ -319,3 +319,26 @@ export function secureStoreSetString(string) {
 export function secureStoreDeleteString() {
     store.commit("jwtToken");
 }
+
+// accessor for sample code; used when requesting to view detailed sample page
+let sampleCode = ""
+
+export function setSampleCode(code) {
+    sampleCode = code
+}
+
+export function getSampleCode() {
+    return sampleCode
+}
+
+// DATE FUNCTIONS
+export function convertDaysAndFormat(numberOfDays) {
+    let years = Math.floor(numberOfDays / 365);
+    let months = Math.floor(numberOfDays % 365 / 30);
+    let days = Math.floor(numberOfDays % 365 % 30);
+
+    let yearsDisplay = years > 0 ? years + (years === 1 ? " year " : " years ") : "";
+    let monthsDisplay = months > 0 ? months + (months === 1 ? " month " : " months ") : "";
+    let daysDisplay = days > 0 ? days + (days === 1 ? " day" : " days") : "";
+    return yearsDisplay + monthsDisplay + daysDisplay;
+}
