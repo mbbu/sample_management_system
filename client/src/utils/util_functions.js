@@ -27,11 +27,6 @@ export function countDownTimer(self, countDown, route) {
 
 /*
 * Form Util Functions */
-export function clearForm(form) {
-    form = {}
-    return form
-}
-
 export function viewPassword() {
     let passwordInput = document.getElementById('password');
     let pwdEyeIcon = document.getElementById('view-pwd');
@@ -220,7 +215,7 @@ export function getSelectedItem(itemDataList, itemVar) {
             itemVar = itemDataList[i].Code;
             return itemVar
         } else {
-            console.log("** ITEM NOT FOUND ***")
+            console.log("NOT FOUND")
         }
     }
 }
@@ -232,7 +227,7 @@ export function getSelectedItemCode(elementId, itemDataList) {
         if (item === itemDataList[i].Name) {
             return itemDataList[i].Code
         } else {
-            console.log("** ITEM NOT FOUND ***")
+            console.log("NOT FOUND")
         }
     }
 }
@@ -248,7 +243,7 @@ export function getSelectedItemSetTextFieldValue(itemDataList, itemVar) {
             let textCode = itemDataList[i].authorCode
             return {'sampleCode': itemVar, 'authorText': textValue, 'authorCode': textCode}
         } else {
-            console.log("** ITEM NOT FOUND ***")
+            console.log("NOT FOUND")
         }
     }
 }
@@ -273,7 +268,7 @@ export function getSelectedBoxSetTextFieldValue(elementId, itemDataList) {
                 'lab': lab
             }
         } else {
-            console.log("** ITEM NOT FOUND ***")
+            console.log("NOT FOUND")
         }
     }
 }
