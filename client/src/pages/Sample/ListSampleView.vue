@@ -38,23 +38,6 @@
                                     icon="eye-fill" title="View Sample"
                                     v-b-tooltip.hover variant="info"
                             ></b-icon>
-                            &nbsp;
-                            <b-icon
-                                    :title="`Update ${ sample.code }`"
-                                    class="border border-info rounded" font-scale="1.90"
-                                    icon="pencil" v-b-modal.modal-publication-edit
-                                    v-b-tooltip.hover
-                                    variant="info"
-                            ></b-icon>
-
-                            &nbsp;
-                            <b-icon
-                                    :title="`Delete ${ sample.code }!`"
-                                    @click="deleteSample(sample.code)"
-                                    class="border rounded bg-danger p-1" font-scale="1.85"
-                                    icon="trash" v-b-tooltip.hover
-                                    variant="light"
-                            ></b-icon>
                         </td>
                     </tr>
                     </tbody>
@@ -71,7 +54,7 @@
     import axios from 'axios';
     import {sample_resource} from "../../utils/api_paths";
     import TopNav from "../../components/TopNav";
-    import {countDownTimer, secureStoreGetString, showFlashMessage} from "../../utils/util_functions";
+    import {countDownTimer, setSampleCode} from "../../utils/util_functions";
 
     export default {
         name: "Sample",
@@ -96,30 +79,12 @@
                     });
             },
 
-            deleteSample: function (code) {
+            viewSample(code) {
                 let self = this;
-                axios.delete(sample_resource, {
-                    headers:
-                        {
-                            code: code,
-                            Authorization: secureStoreGetString()
-                        }
-                })
-                    .then((response) => {
-                        this.getSamples();
-                        showFlashMessage(self, 'success', response.data['message'], '');
-                    })
-                    .catch((error) => {
-                        this.$log.error(error);
-                        if (error.response) {
-                            if (error.response.status === 401) {
-                                showFlashMessage(self, 'error', "Session Expired", 'You need to log in to perform this operation');
-                                countDownTimer(self, 3, '/login')
-                            } else {
-                                showFlashMessage(self, 'error', error.response.data['message'], '');
-                            }
-                        }
-                    });
+                // 1st call the setter function to set the code
+                setSampleCode(code)
+                // redirect to sample view page
+                countDownTimer(self, 1, '/view-sample')
             },
         },
         components: {TopNav},
