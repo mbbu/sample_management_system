@@ -170,13 +170,13 @@
                             </a>
                         </div>
                         <div class="text-center">
-                            <button class="btn btn-outline-info btn-rounded" type="button">Update
+                            <button @click="requestUpdateSample" class="btn btn-outline-info btn-rounded"
+                                    type="button"> Update Sample
                                 <i class="fas fa-pencil-alt"></i></button>
                         </div>
                         <div class="text-center">
                             <button @click="deleteSample(sample.code)" class="btn btn-outline-danger btn-rounded"
-                                    type="button">
-                                Delete
+                                    type="button"> Delete Sample
                                 <i class="far fa-trash-alt"></i></button>
                         </div>
                     </mdb-col>
@@ -196,6 +196,8 @@
         countDownTimer,
         getSampleCode,
         secureStoreGetString,
+        setSampleDetailsForEditing,
+        setUpdateSample,
         showFlashMessage
     } from "../../utils/util_functions";
 
@@ -314,6 +316,18 @@
                         // eslint-disable-next-line
                         this.$log.error(error);
                     });
+            },
+
+            requestUpdateSample() {
+                let self = this;
+                let loader = this.showLoader()
+
+                setTimeout(() => {
+                    loader.hide()
+                    setSampleDetailsForEditing(this.response)
+                    setUpdateSample(true)
+                    countDownTimer(self, 1, '/addsample')
+                }, 1000)
             },
 
             deleteSample: function (code) {

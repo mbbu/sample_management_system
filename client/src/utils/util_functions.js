@@ -322,6 +322,8 @@ export function secureStoreDeleteString() {
 
 // accessor for sample code; used when requesting to view detailed sample page
 let sampleCode = ""
+let sample = []
+let updateSample = false;
 
 export function setSampleCode(code) {
     sampleCode = code
@@ -329,6 +331,33 @@ export function setSampleCode(code) {
 
 export function getSampleCode() {
     return sampleCode
+}
+
+export function setSampleDetailsForEditing(sampleRes) {
+    sample = sampleRes
+}
+
+export function getSampleDetailsForEditing() {
+    return sample;
+}
+
+export function setUpdateSample(updateVal) {
+    updateSample = updateVal;
+}
+
+export function isUpdate() {
+    return updateSample;
+}
+
+export function resetUpdateSample() {
+    updateSample = false;
+}
+
+export function selectDropDownItemForUpdate(elementId, item) {
+    // set dropdownItem to the selected item
+    let element = document.getElementById(elementId);
+    element.value = item;
+    console.log("Selecting from dd: " + item)
 }
 
 // DATE FUNCTIONS

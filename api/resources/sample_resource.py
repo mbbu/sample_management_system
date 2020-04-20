@@ -39,6 +39,8 @@ class SampleResource(BaseResource):
         'quantity.id': fields.String,
         'security_level': fields.Integer,
         'code': fields.String,
+        'created_at': fields.String,
+        'updated_at': fields.String,
         'box.label': fields.String,
         'box.tray.number': fields.Integer,
         'box.tray.rack.number': fields.Integer,
