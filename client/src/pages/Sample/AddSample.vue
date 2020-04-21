@@ -164,7 +164,8 @@
                         <div class="col">
                             <div class="form-group">
                                 <label for="amount">Amount</label>
-                                <input class="form-control" id="amount" required type="number" v-model="sample.amount"/>
+                                <input class="form-control" id="amount" required type="number" min="1"
+                                       v-model="sample.amount"/>
                             </div>
 
                         </div>
@@ -230,16 +231,17 @@
                         <div class="col">
                             <div class="form-group">
                                 <label for="retention"> Retention</label>
-                                <input class="form-control" id="retention" required type="number"
+                                <input class="form-control" id="retention" required type="number" min="1"
                                        v-model="sample.retention"/>
                             </div>
                         </div>
 
                         <div class="col">
                             <div class="form-group">
-                                <label for="period">Select period(Days, Weeks ...):</label>
+                                <label for="period">Select Retention Length:</label>
                                 <select @change="setRetentionPeriod" class="custom-select" id="period" required>
-                                    <option selected value="1">Days</option>
+                                    <option selected>Select period(Days, Weeks ...)</option>
+                                    <option value="1">Days</option>
                                     <option value="2">Weeks</option>
                                     <option value="3">Months</option>
                                     <option value="4">Years</option>
@@ -448,10 +450,6 @@
                         });
                     }
                 })
-
-                this.$log.info(this.userDataList)
-                this.$log.info(this.boxDataList)
-                this.$log.info(this.secLevelDataList)
             },
 
             fillFormFieldsDependentOnBox() {
@@ -459,11 +457,11 @@
                 this.sample.box = dropdownSelection.boxCode;
 
                 // SET FIELDS TEXT
-                document.getElementById("tray").value = dropdownSelection.tray;
-                document.getElementById("rack").value = dropdownSelection.rack;
-                document.getElementById("chamber").value = dropdownSelection.chamber;
-                document.getElementById("freezer").value = dropdownSelection.freezer;
-                document.getElementById("lab").value = dropdownSelection.lab;
+                this.sample.tray = dropdownSelection.tray;
+                this.sample.rack = dropdownSelection.rack;
+                this.sample.chamber = dropdownSelection.chamber;
+                this.sample.freezer = dropdownSelection.freezer;
+                this.sample.lab = dropdownSelection.lab;
             },
 
             handleSubmit() {
@@ -591,7 +589,7 @@
                 let periodValue = parseInt(periodSelect.options[periodSelect.selectedIndex].value);
 
                 if (periodValue === 1) {
-                    this.sample.convertedRetentionPeriod = this.sample.retention
+                    this.sample.convertedRetentionPeriod = this.sample.retention * 1
                 } else if (periodValue === 2) {
                     // convert week to days
                     this.sample.convertedRetentionPeriod = this.sample.retention * 7
@@ -709,13 +707,6 @@
                 this.sample.box = sampleForUpdate['box.label'];
                 this.sample.quantity_type = sampleForUpdate['quantity.id'];
                 this.sample.securityLevel = sampleForUpdate['security_level'];
-
-                this.$log.info("Theme: " + this.sample.theme)
-                this.$log.info("User: " + this.sample.user)
-                this.$log.info("Box: " + this.sample.box)
-                this.$log.info("QT: " + this.sample.quantity_type)
-                this.$log.info("SL: " + this.sample.securityLevel)
-
                 this.sample.convertedRetentionPeriod = this.sample.retention; // special
 
             },
@@ -733,8 +724,6 @@
                     opacity: 0.7,
                     zIndex: 999,
                 })
-
-                this.$log.info("Sample", this.sample)
 
                 axios.put(sample_resource, {
                     theme: this.sample.theme,
