@@ -2,10 +2,10 @@
     <div id="jumbotron">
         <div class="container">
             <top-nav :page_title="page_title"></top-nav>
-            <FlashMessage :position="'right bottom'"></FlashMessage>
 
             <form-wizard @submit.prevent="formSubmit" ref="formContainer"
                          subtitle="Kindly input the correct information" title="Sample Data Form">
+                <FlashMessage :position="'center bottom'"></FlashMessage>
 
                 <tab-content :before-change="handleSubmit"
                              title="Sample Details">
@@ -16,8 +16,8 @@
                                     :dataSource='themeDataList'
                                     :fields="fields"
                                     :v-model="sample.theme"
-                                    @change="setTheme"
                                     :value="selectDropDownItemForUpdate('theme-dropdownlist', sample.theme, themeDataList)"
+                                    @change="setTheme"
                                     id="theme-dropdownlist"
                                     placeholder='Select a theme'
                             ></ejs-dropdownlist>
@@ -44,8 +44,8 @@
                                     :dataSource='userDataList'
                                     :fields="fields"
                                     :v-model="sample.user"
-                                    @change="setUser"
                                     :value="selectDropDownItemForUpdate('user-dropdownlist', sample.user, userDataList)"
+                                    @change="setUser"
                                     id="user-dropdownlist"
                                     placeholder='Select the sample owner(i.e. One in-charge of handling the sample)'
                             ></ejs-dropdownlist>
@@ -87,8 +87,8 @@
                                     :dataSource='boxDataList'
                                     :fields="fields"
                                     :v-model="sample.box"
-                                    @change="fillFormFieldsDependentOnBox"
                                     :value="selectDropDownItemForUpdate('box-dropdownlist', sample.box, boxDataList)"
+                                    @change="fillFormFieldsDependentOnBox"
                                     id="box-dropdownlist"
                                     placeholder='Select a box and its location will be shown'
                             ></ejs-dropdownlist>
@@ -176,8 +176,8 @@
                                             :dataSource='QTDataList'
                                             :fields="fields"
                                             :v-model="sample.quantity_type"
-                                            @change="setQuantityType"
                                             :value="selectDropDownItemForUpdate('QT-dropdownlist', sample.quantity_type, QTDataList)"
+                                            @change="setQuantityType"
                                             id="QT-dropdownlist"
                                             placeholder='Select a quantity type(e.g. ML, L, G ...)'
                                     ></ejs-dropdownlist>
@@ -198,8 +198,8 @@
                                     :dataSource='secLevelDataList'
                                     :fields="fields"
                                     :v-model="sample.securityLevel"
-                                    @change="setSecurityLevel"
                                     :value="selectDropDownItemForUpdate('securityLevel-dropdownlist', sample.securityLevel, secLevelDataList)"
+                                    @change="setSecurityLevel"
                                     id="securityLevel-dropdownlist"
                                     placeholder='Select Security Level Needed'
                             ></ejs-dropdownlist>
@@ -354,11 +354,12 @@
                 themeDataList: [],
                 secLevelDataList: [],
                 fields: {text: '', value: ''},
-                page_title: "Add Sample"
+                page_title: "Add Sample",
             };
         },
 
         methods: {
+            // util functions
             selectDropDownItemForUpdate,
             onLoadPage() {
                 this.$log.info("Is Update True? ", isUpdate())
@@ -720,6 +721,21 @@
             },
 
             updateSample() {
+                let self = this;
+                let loader = self.$loading.show({
+                    isFullPage: true,
+                    canCancel: false,
+                    color: '#074880',
+                    loader: 'dots',
+                    width: 255,
+                    height: 255,
+                    backgroundColor: '#FAAB2C',
+                    opacity: 0.7,
+                    zIndex: 999,
+                })
+
+                this.$log.info("Sample", this.sample)
+
                 axios.put(sample_resource, {
                     theme: this.sample.theme,
                     user: this.sample.user,
@@ -745,6 +761,32 @@
                             Authorization: secureStoreGetString()
                         }
                 })
+                    .then((response) => {
+                        setTimeout(() => {
+                            // stopLoader(self)
+                            loader.hide()
+                            showFlashMessage(self, 'success', response.data['message'], '');
+                            // todo: redirect to sample view page
+                            countDownTimer(self, 2, '/sample')
+                        }, 4000)
+                    })
+                    .catch((error) => {
+                        // stopLoader(self)
+                        loader.hide()
+                        this.$log.error(error);
+                        if (error.response) {
+                            if (error.response.status === 409) {
+                                showFlashMessage(self, 'error', error.response.data['message'], '');
+                            } else if (error.response.status === 400) {
+                                showFlashMessage(self, 'error', 'Kindly refill the form', error.response.data['message']);
+                            } else if (error.response.status === 401) {
+                                showFlashMessage(self, 'error', "Session Expired", 'You need to log in to perform this operation');
+                                countDownTimer(self, 3, '/login');
+                            } else {
+                                showFlashMessage(self, 'error', error.response.data['message'], '');
+                            }
+                        }
+                    });
 
             },
         },
