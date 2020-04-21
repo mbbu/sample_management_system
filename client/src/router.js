@@ -18,7 +18,7 @@ import Rack from "./pages/Rack";
 import Tray from "./pages/Tray";
 import Publication from "./pages/Publication";
 import DetailedSampleView from "./pages/Sample/DetailedSampleView";
-import UpdateSample from "./pages/Sample/UpdateSample";
+import {isUpdate} from "./utils/util_functions";
 
 
 Vue.use(Router);
@@ -93,7 +93,8 @@ export default new Router({
             path: '/update-sample',
             name: 'UpdateSample',
             alias: ['/updatesample'],
-            component: UpdateSample,
+            component: AddSample,
+            condition: isUpdate()
         },
 
         {
