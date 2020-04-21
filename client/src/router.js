@@ -5,7 +5,7 @@ import Sample from './pages/Sample/ListSampleView.vue';
 import Chamber from './pages/Chamber.vue';
 import Theme from './pages/Theme.vue';
 import Login from './pages/Login.vue';
-import AddSample from './pages/Sample/AddSample.vue';
+import AddSample from './pages/Sample/Add_and_Update_Sample.vue';
 import Map from './pages/Map.vue';
 import UpdateProfile from './pages/UpdateProfile.vue';
 import SecurityLevel from "./pages/SecurityLevel";
