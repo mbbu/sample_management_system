@@ -113,10 +113,17 @@ class SampleResource(BaseResource):
                     or args[13] != sample.amount or args[14] != sample.quantity_type or args[
                 15] != sample.security_level or args[16] != sample.code:
                 try:
+                    code = format_and_lower_str(args[16])
+                    theme = ThemeResource.get_theme(args[0]).id
+                    user = get_user_by_email(args[1]).id
+                    box = BoxResource.get_box(args[2]).id
+                    qt = QuantityTypeResource.get_quantity_type(args[14]).id
+                    # sl = SecurityLevelResource.get_security_level(args[15]).id
+
                     old_info = str(sample)
-                    sample.theme_id = args[0]
-                    sample.user_id = args[1]
-                    sample.box_id = args[2]
+                    sample.theme_id = theme
+                    sample.user_id = user
+                    sample.box_id = box
                     sample.animal_species = args[3]
                     sample.sample_type = args[4]
                     sample.sample_description = args[5]
@@ -128,9 +135,9 @@ class SampleResource(BaseResource):
                     sample.analysis = args[11]
                     sample.temperature = args[12]
                     sample.amount = args[13]
-                    sample.quantity_type = args[14]
+                    sample.quantity_type = qt
                     sample.security_level = args[15]
-                    sample.code = args[16]
+                    sample.code = code
 
                     sample.updated_at = datetime.now()
                     BaseModel.db.session.commit()
