@@ -293,7 +293,8 @@
             },
 
             getSampleByCode(code) {
-                this.$log.info("Code received: " + code)
+                let self = this;
+
                 // show loader while request is being made
                 let loader = this.showLoader()
 
@@ -314,7 +315,16 @@
                     })
                     .catch((error) => {
                         // eslint-disable-next-line
+                        loader.hide()
                         this.$log.error(error);
+                        if (error.response) {
+                            if (error.response.status === 401) {
+                                showFlashMessage(self, 'error', "Session Expired", 'You need to log in to perform this operation');
+                            } else if (error.response.status === 404) {
+                                showFlashMessage(self, 'error', 'Connection Error', 'Request was timed out');
+                                countDownTimer(self, 3, '/sample')
+                            }
+                        }
                     });
             },
 
