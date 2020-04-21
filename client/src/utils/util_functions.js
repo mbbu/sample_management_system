@@ -354,22 +354,17 @@ export function resetUpdateSample() {
 }
 
 export function selectDropDownItemForUpdate(elementId, item, itemDataList) {
-    console.log("selectDropDownItemForUpdate called! Data passed\n1 elementId: " + elementId + " item " + item + " itemDataList: ", itemDataList)
-    console.log(" The data list length is: " + itemDataList.length)
     // set dropdownItem to the selected item
     let element = document.getElementById(elementId);
 
     // look up the datalist for a similar name as the value the holder has;
     for (var i = 0; i < itemDataList.length; i++) {
-        console.log("Item passed is: " + item + " list has items: " + itemDataList[i].Name + " code: " + itemDataList[i].Code)
         if (item === itemDataList[i].Name || item === itemDataList[i].Code) {
             // -> assign the code to the itemCode
             item = itemDataList[i].Code
 
             // -> Update the dropdown element value to have the itemName
             element.value = itemDataList[i].Name
-
-            console.log("Selecting from dd item of code: " + item + " and element value set to: " + element.value)
             return item
         } else {
             console.log("NOT FOUND")
@@ -387,4 +382,23 @@ export function convertDaysAndFormat(numberOfDays) {
     let monthsDisplay = months > 0 ? months + (months === 1 ? " month " : " months ") : "";
     let daysDisplay = days > 0 ? days + (days === 1 ? " day" : " days") : "";
     return yearsDisplay + monthsDisplay + daysDisplay;
+}
+
+// loader function
+export function startLoader(self) {
+    self.$loading.show({
+        isFullPage: true,
+        canCancel: false,
+        color: '#074880',
+        loader: 'dots',
+        width: 255,
+        height: 255,
+        backgroundColor: '#FAAB2C',
+        opacity: 0.7,
+        zIndex: 999,
+    })
+}
+
+export function stopLoader(self) {
+    self.$loading.hide()
 }
