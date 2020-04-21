@@ -7,7 +7,8 @@
             <form-wizard @submit.prevent="formSubmit" ref="formContainer"
                          subtitle="Kindly input the correct information" title="Sample Data Form">
 
-                <tab-content :before-change="handleSubmit" title="Sample Details">
+                <tab-content :before-change="handleSubmit"
+                             title="Sample Details">
                     <!--THEME-->
                     <div class="form-group">
                         <b-form-group id="form-theme" label="Select a Theme:" label-for="form-theme-input">
@@ -16,6 +17,7 @@
                                     :fields="fields"
                                     :v-model="sample.theme"
                                     @change="setTheme"
+                                    :value="selectDropDownItemForUpdate('theme-dropdownlist', sample.theme, themeDataList)"
                                     id="theme-dropdownlist"
                                     placeholder='Select a theme'
                             ></ejs-dropdownlist>
@@ -43,6 +45,7 @@
                                     :fields="fields"
                                     :v-model="sample.user"
                                     @change="setUser"
+                                    :value="selectDropDownItemForUpdate('user-dropdownlist', sample.user, userDataList)"
                                     id="user-dropdownlist"
                                     placeholder='Select the sample owner(i.e. One in-charge of handling the sample)'
                             ></ejs-dropdownlist>
@@ -85,6 +88,7 @@
                                     :fields="fields"
                                     :v-model="sample.box"
                                     @change="fillFormFieldsDependentOnBox"
+                                    :value="selectDropDownItemForUpdate('box-dropdownlist', sample.box, boxDataList)"
                                     id="box-dropdownlist"
                                     placeholder='Select a box and its location will be shown'
                             ></ejs-dropdownlist>
@@ -98,7 +102,8 @@
                                 <label for="tray">Tray Number</label>
                                 <input class="form-control" disabled="disabled" id="tray" placeholder="Tray having box"
                                        required
-                                       type="text"/>
+                                       type="text"
+                                       v-model="sample.tray"/>
                             </div>
                         </div>
 
@@ -106,8 +111,8 @@
                             <div class="form-group">
                                 <label for="rack">Rack Number</label>
                                 <input class="form-control" disabled="disabled" id="rack"
-                                       placeholder="Rack holding tray"
-                                       required type="text"/>
+                                       placeholder="Rack holding tray" required
+                                       type="text" v-model="sample.rack"/>
                             </div>
                         </div>
 
@@ -115,8 +120,8 @@
                             <div class="form-group">
                                 <label for="chamber"> Chamber Type </label>
                                 <input class="form-control" disabled="disabled" id="chamber"
-                                       placeholder="Chamber where rack is"
-                                       required type="text"/>
+                                       placeholder="Chamber where rack is" required
+                                       type="text" v-model="sample.chamber"/>
                             </div>
                         </div>
                     </div>
@@ -129,8 +134,8 @@
                             <div class="form-group">
                                 <label for="freezer">Freezer Number</label>
                                 <input class="form-control" disabled="disabled" id="freezer"
-                                       placeholder="Freezer where box is stored"
-                                       required type="text"/>
+                                       placeholder="Freezer where box is stored" required
+                                       type="text" v-model="sample.freezer"/>
                             </div>
                         </div>
 
@@ -138,8 +143,8 @@
                             <div class="form-group">
                                 <label for="lab">Lab</label>
                                 <input class="form-control" disabled="disabled" id="lab"
-                                       placeholder="Lab where freezer is"
-                                       required type="text"/>
+                                       placeholder="Lab where freezer is" required
+                                       type="text" v-model="sample.lab"/>
                             </div>
                         </div>
                     </div>
@@ -172,6 +177,7 @@
                                             :fields="fields"
                                             :v-model="sample.quantity_type"
                                             @change="setQuantityType"
+                                            :value="selectDropDownItemForUpdate('QT-dropdownlist', sample.quantity_type, QTDataList)"
                                             id="QT-dropdownlist"
                                             placeholder='Select a quantity type(e.g. ML, L, G ...)'
                                     ></ejs-dropdownlist>
@@ -193,6 +199,7 @@
                                     :fields="fields"
                                     :v-model="sample.securityLevel"
                                     @change="setSecurityLevel"
+                                    :value="selectDropDownItemForUpdate('securityLevel-dropdownlist', sample.securityLevel, secLevelDataList)"
                                     id="securityLevel-dropdownlist"
                                     placeholder='Select Security Level Needed'
                             ></ejs-dropdownlist>
@@ -231,9 +238,8 @@
                         <div class="col">
                             <div class="form-group">
                                 <label for="period">Select period(Days, Weeks ...):</label>
-                                <select class="custom-select" id="period" @change="setRetentionPeriod" required>
-                                    <option value="" disabled selected>Choose a period</option>
-                                    <option value="1">Days</option>
+                                <select @change="setRetentionPeriod" class="custom-select" id="period" required>
+                                    <option selected value="1">Days</option>
                                     <option value="2">Weeks</option>
                                     <option value="3">Months</option>
                                     <option value="4">Years</option>
@@ -279,9 +285,12 @@
         extractQTData,
         extractUserData,
         getItemDataList,
+        getSampleDetailsForEditing,
         getSelectedBoxSetTextFieldValue,
         getSelectedItemCode,
+        isUpdate,
         secureStoreGetString,
+        selectDropDownItemForUpdate,
         showFlashMessage
     } from "../../utils/util_functions";
     import {
@@ -324,6 +333,13 @@
                     securityLevel: "",
                     code: "",
 
+                    // extra fields
+                    tray: "",
+                    rack: "",
+                    chamber: "",
+                    freezer: "",
+                    lab: "",
+
                 },
                 submitted: false,
 
@@ -343,8 +359,20 @@
         },
 
         methods: {
+            selectDropDownItemForUpdate,
             onLoadPage() {
+                this.$log.info("Is Update True? ", isUpdate())
 
+                if (isUpdate()) {
+                    // call function to fill form
+                    this.fillSampleFormForUpdate()
+                } else {
+                    this.$log.info("Just create a new sample")
+                    this.getDataListItemsForForm()
+                }
+            },
+
+            getDataListItemsForForm() {
                 // GET THEME LIST
                 getItemDataList(theme_resource).then(data => {
                     let themeList = extractApiData(data);
@@ -419,6 +447,10 @@
                         });
                     }
                 })
+
+                this.$log.info(this.userDataList)
+                this.$log.info(this.boxDataList)
+                this.$log.info(this.secLevelDataList)
             },
 
             fillFormFieldsDependentOnBox() {
@@ -572,21 +604,123 @@
             },
 
             formSubmit() {
-                let self = this;
+                if (isUpdate()) {
+                    this.updateSample()
+                } else {
+                    let self = this;
 
-                let loader = this.$loading.show({
-                    isFullPage: true,
-                    canCancel: false,
-                    color: '#074880',
-                    loader: 'dots',
-                    width: 255,
-                    height: 255,
-                    backgroundColor: '#FAAB2C',
-                    opacity: 0.7,
-                    zIndex: 999,
-                });
+                    let loader = this.$loading.show({
+                        isFullPage: true,
+                        canCancel: false,
+                        color: '#074880',
+                        loader: 'dots',
+                        width: 255,
+                        height: 255,
+                        backgroundColor: '#FAAB2C',
+                        opacity: 0.7,
+                        zIndex: 999,
+                    });
 
-                axios.post(sample_resource, {
+                    axios.post(sample_resource, {
+                        theme: this.sample.theme,
+                        user: this.sample.user,
+                        box: this.sample.box,
+                        animal_species: this.sample.species,
+                        sample_type: this.sample.sampleType,
+                        sample_description: this.sample.description,
+                        project: this.sample.project,
+                        project_owner: this.sample.projectOwner,
+                        retention_period: this.sample.convertedRetentionPeriod,
+                        barcode: this.sample.barcode,
+                        analysis: this.sample.analysis,
+                        temperature: this.sample.temperature,
+                        amount: this.sample.amount,
+                        quantity_type: this.sample.quantity_type,
+                        security_level: this.sample.securityLevel,
+                        location_collected: this.sample.locationCollected,
+                        code: this.sample.code,
+                    }, {
+                        headers:
+                            {
+                                Authorization: secureStoreGetString()
+                            }
+                    })
+                        .then((response) => {
+                            setTimeout(() => {
+                                loader.hide()
+                                showFlashMessage(self, 'success', response.data['message'], '');
+                                // todo: redirect to sample view page
+                                countDownTimer(self, 2, '/sample')
+                            }, 4000)
+                        })
+                        .catch((error) => {
+                            loader.hide()
+                            this.$log.error(error);
+                            if (error.response) {
+                                if (error.response.status === 409) {
+                                    showFlashMessage(self, 'error', error.response.data['message'], '');
+                                } else if (error.response.status === 400) {
+                                    showFlashMessage(self, 'error', 'Kindly refill the form', error.response.data['message']);
+                                } else if (error.response.status === 401) {
+                                    showFlashMessage(self, 'error', "Session Expired", 'You need to log in to perform this operation');
+                                    countDownTimer(self, 3, '/login');
+                                } else {
+                                    showFlashMessage(self, 'error', error.response.data['message'], '');
+                                }
+                            }
+                        });
+                }
+            },
+
+            /* UPDATE FUNCTIONS */
+            fillSampleFormForUpdate() {
+                // 1st update the page title
+                this.page_title = "Update Sample"
+
+                // get data-lists for drop-downs
+                this.getDataListItemsForForm()
+
+                // set sample details
+                let sampleForUpdate = getSampleDetailsForEditing()
+
+                this.sample.project = sampleForUpdate['project'];
+                this.sample.projectOwner = sampleForUpdate['project_owner'];
+                this.sample.sampleType = sampleForUpdate['sample_type'];
+                this.sample.species = sampleForUpdate['animal_species'];
+                this.sample.description = sampleForUpdate['sample_description'];
+                this.sample.locationCollected = sampleForUpdate['location_collected'];
+                this.sample.retention = sampleForUpdate['retention_period'];
+                this.sample.barcode = sampleForUpdate['barcode'];
+                this.sample.analysis = sampleForUpdate['analysis'];
+                this.sample.temperature = sampleForUpdate['temperature'];
+                this.sample.amount = sampleForUpdate['amount'];
+                this.sample.code = sampleForUpdate['code'];
+                this.sample.tray = sampleForUpdate['box.tray.number'];
+                this.sample.rack = sampleForUpdate['box.tray.rack.number'];
+                this.sample.chamber = sampleForUpdate['box.tray.rack.chamber.type'];
+                this.sample.freezer = sampleForUpdate['box.tray.rack.chamber.freezer.number'];
+                this.sample.lab = sampleForUpdate['box.tray.rack.chamber.freezer.lab.name']
+                    + " room " + sampleForUpdate['box.tray.rack.chamber.freezer.lab.room'];
+
+                // drop-down data
+                this.sample.theme = sampleForUpdate['theme.name'];
+                this.sample.user = sampleForUpdate['user.first_name'] + " " + sampleForUpdate['user.last_name'];
+                this.sample.box = sampleForUpdate['box.label'];
+                this.sample.quantity_type = sampleForUpdate['quantity.id'];
+                this.sample.securityLevel = sampleForUpdate['security_level'];
+
+                this.$log.info("Theme: " + this.sample.theme)
+                this.$log.info("User: " + this.sample.user)
+                this.$log.info("Box: " + this.sample.box)
+                this.$log.info("QT: " + this.sample.quantity_type)
+                this.$log.info("SL: " + this.sample.securityLevel)
+
+                this.sample.convertedRetentionPeriod = this.sample.retention; // special
+
+            },
+
+            updateSample() {
+                axios.put(sample_resource, {
                     theme: this.sample.theme,
                     user: this.sample.user,
                     box: this.sample.box,
@@ -607,33 +741,11 @@
                 }, {
                     headers:
                         {
+                            code: this.sample.code,
                             Authorization: secureStoreGetString()
                         }
                 })
-                    .then((response) => {
-                        setTimeout(() => {
-                            loader.hide()
-                            showFlashMessage(self, 'success', response.data['message'], '');
-                            // todo: redirect to sample view page
-                            countDownTimer(self, 2, '/sample')
-                        }, 4000)
-                    })
-                    .catch((error) => {
-                        loader.hide()
-                        this.$log.error(error);
-                        if (error.response) {
-                            if (error.response.status === 409) {
-                                showFlashMessage(self, 'error', error.response.data['message'], '');
-                            } else if (error.response.status === 400) {
-                                showFlashMessage(self, 'error', 'Kindly refill the form', error.response.data['message']);
-                            } else if (error.response.status === 401) {
-                                showFlashMessage(self, 'error', "Session Expired", 'You need to log in to perform this operation');
-                                countDownTimer(self, 3, '/login');
-                            } else {
-                                showFlashMessage(self, 'error', error.response.data['message'], '');
-                            }
-                        }
-                    });
+
             },
         },
         created() {

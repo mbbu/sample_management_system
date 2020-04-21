@@ -353,11 +353,28 @@ export function resetUpdateSample() {
     updateSample = false;
 }
 
-export function selectDropDownItemForUpdate(elementId, item) {
+export function selectDropDownItemForUpdate(elementId, item, itemDataList) {
+    console.log("selectDropDownItemForUpdate called! Data passed\n1 elementId: " + elementId + " item " + item + " itemDataList: ", itemDataList)
+    console.log(" The data list length is: " + itemDataList.length)
     // set dropdownItem to the selected item
     let element = document.getElementById(elementId);
-    element.value = item;
-    console.log("Selecting from dd: " + item)
+
+    // look up the datalist for a similar name as the value the holder has;
+    for (var i = 0; i < itemDataList.length; i++) {
+        console.log("Item passed is: " + item + " list has items: " + itemDataList[i].Name + " code: " + itemDataList[i].Code)
+        if (item === itemDataList[i].Name || item === itemDataList[i].Code) {
+            // -> assign the code to the itemCode
+            item = itemDataList[i].Code
+
+            // -> Update the dropdown element value to have the itemName
+            element.value = itemDataList[i].Name
+
+            console.log("Selecting from dd item of code: " + item + " and element value set to: " + element.value)
+            return item
+        } else {
+            console.log("NOT FOUND")
+        }
+    }
 }
 
 // DATE FUNCTIONS
