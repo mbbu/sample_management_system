@@ -37,7 +37,8 @@ class SampleResource(BaseResource):
         'temperature': fields.String,  # todo: check temp return i.e. float
         'amount': fields.Integer,
         'quantity.id': fields.String,
-        'security_level': fields.Integer,
+        'secLevel.code': fields.String,
+        'secLevel.name': fields.String,
         'code': fields.String,
         'created_at': fields.String,
         'updated_at': fields.String,
@@ -118,7 +119,7 @@ class SampleResource(BaseResource):
                     user = get_user_by_email(args[1]).id
                     box = BoxResource.get_box(args[2]).id
                     qt = QuantityTypeResource.get_quantity_type(args[14]).id
-                    # sl = SecurityLevelResource.get_security_level(args[15]).id
+                    sl = SecurityLevelResource.get_security_level(args[15]).id
 
                     old_info = str(sample)
                     sample.theme_id = theme
@@ -136,7 +137,7 @@ class SampleResource(BaseResource):
                     sample.temperature = args[12]
                     sample.amount = args[13]
                     sample.quantity_type = qt
-                    sample.security_level = args[15]
+                    sample.security_level = sl
                     sample.code = code
 
                     sample.updated_at = datetime.now()
