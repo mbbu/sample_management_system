@@ -110,7 +110,8 @@
                         <th headers="loc_blank" id="loc_co5" scope="col"><em><b>RACK NUM</b></em></th>
                         <th headers="loc_blank" id="loc_co6" scope="col"><em><b>TRAY NUM</b></em></th>
                         <th headers="loc_blank" id="loc_co7" scope="col"><em><b>BOX LABEL</b></em></th>
-                        <th headers="loc_blank" id="loc_co8" scope="col"><em><b>RETENTION PERIOD</b></em></th>
+                        <th headers="loc_blank" id="loc_co8" scope="col"><em><b>RETENTION PERIOD (Sample will be stored
+                            until)</b></em></th>
                     </tr>
                     </thead>
                     <tr>
@@ -121,10 +122,10 @@
                         <td v-else-if="!sample.tray">N/A</td>
                         <td headers="loc_co7 loc_c2" v-if="sample.box">{{ sample.box }}</td>
                         <td v-else-if="!sample.box">N/A</td>
-                        <td headers="loc_co8 loc_c2" v-if="sample.convertedRetentionPeriod">
-                            {{sample.convertedRetentionPeriod }}
+                        <td headers="loc_co8 loc_c2" v-if="sample.retention">
+                            {{sample.retention }}
                         </td>
-                        <td v-else-if="!sample.convertedRetentionPeriod">N/A</td>
+                        <td v-else-if="!sample.retention">N/A</td>
                     </tr>
                 </table>
 
@@ -192,7 +193,6 @@
     import {sample_resource} from "../../utils/api_paths";
     import axios from 'axios';
     import {
-        convertDaysAndFormat,
         countDownTimer,
         getSampleCode,
         secureStoreGetString,
@@ -219,7 +219,6 @@
                     box: "",
                     locationCollected: "",
                     retention: "",
-                    convertedRetentionPeriod: "",
                     barcode: "",
                     analysis: "",
                     temperature: "",
@@ -253,7 +252,7 @@
                 this.sample.description = res['sample_description'];
                 this.sample.box = res['box.label'];
                 this.sample.locationCollected = res['location_collected'];
-                this.sample.retention = res['retention_period'];
+                this.sample.retention = res['retention_date'];
                 this.sample.barcode = res['barcode'];
                 this.sample.analysis = res['analysis'];
                 this.sample.temperature = res['temperature'];
@@ -262,7 +261,6 @@
                 this.sample.securityLevel = res['secLevel.name'];
                 this.sample.code = res['code'];
                 this.sample.date = this.dateNow();
-                this.sample.convertedRetentionPeriod = convertDaysAndFormat(this.sample.retention)
                 this.sample.lab = res['box.tray.rack.chamber.freezer.lab.name']
                 this.sample.room = res['box.tray.rack.chamber.freezer.lab.room']
                 this.sample.freezer = res['box.tray.rack.chamber.freezer.number']
