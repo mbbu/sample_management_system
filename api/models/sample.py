@@ -36,6 +36,7 @@ class Sample(BaseModel.db.Model):
     publication = AppDb.relationship('Publication', backref='sample', lazy=True)
     box = AppDb.relationship('Box', backref='sample', lazy=True)
     quantity = AppDb.relationship('QuantityType', backref='quantity_type', lazy=True)
+    secLevel = AppDb.relationship('SecurityLevel', backref='sample', lazy=True)
 
     @staticmethod
     def sample_exists(code):
