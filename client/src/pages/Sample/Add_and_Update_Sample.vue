@@ -231,7 +231,7 @@
                         <div class="col">
                             <div class="form-group">
                                 <label for="retention"> Retention</label>
-                                <input class="form-control" id="retention" required type="number" min="1"
+                                <input class="form-control" id="retention" min="1" required type="number"
                                        v-model="sample.retention"/>
                             </div>
                         </div>
@@ -254,7 +254,7 @@
 
                 <template scope="props" slot="footer">
                     <div class=wizard-footer-left>
-                        <wizard-button :style="props.fillButtonStyle"
+                        <wizard-button :style="props.fillButtonStyle" @click.native="props.prevTab()"
                                        v-if="props.activeTabIndex > 0 && !props.isLastStep">Previous
                         </wizard-button>
                     </div>
@@ -707,8 +707,14 @@
                 this.sample.box = sampleForUpdate['box.label'];
                 this.sample.quantity_type = sampleForUpdate['quantity.id'];
                 this.sample.securityLevel = sampleForUpdate['secLevel.code'];
-                this.sample.convertedRetentionPeriod = this.sample.retention; // special
+                this.sample.convertedRetentionPeriod = this.sample.retention;
 
+                document.getElementById('period').selectedIndex = 1;
+
+                let x = document.getElementById("period").selectedIndex;
+                let y = document.getElementById("period").options;
+
+                document.getElementById('period').value = y[x].text;
             },
 
             updateSample() {
