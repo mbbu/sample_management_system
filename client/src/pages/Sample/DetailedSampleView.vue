@@ -259,7 +259,7 @@
                 this.sample.temperature = res['temperature'];
                 this.sample.amount = res['amount'];
                 this.sample.quantity_type = res['quantity.id'];
-                this.sample.securityLevel = res['security_level'];
+                this.sample.securityLevel = res['secLevel.name'];
                 this.sample.code = res['code'];
                 this.sample.date = this.dateNow();
                 this.sample.convertedRetentionPeriod = convertDaysAndFormat(this.sample.retention)
