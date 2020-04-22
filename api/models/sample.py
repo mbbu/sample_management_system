@@ -15,7 +15,7 @@ class Sample(BaseModel.db.Model):
     location_collected = AppDb.Column(AppDb.String(100), nullable=True)
     project = AppDb.Column(AppDb.String(150), nullable=True, index=True)
     project_owner = AppDb.Column(AppDb.String(100), nullable=True)
-    retention_period = AppDb.Column(AppDb.Integer, nullable=True)  # Default = Days
+    retention_date = AppDb.Column(AppDb.DateTime, nullable=True)
     barcode = AppDb.Column(AppDb.String(100), nullable=True)  # todo: changed to not nullable when module is done
     analysis = AppDb.Column(AppDb.String(100), nullable=True)
     temperature = AppDb.Column(AppDb.DECIMAL(5, 2), nullable=True)

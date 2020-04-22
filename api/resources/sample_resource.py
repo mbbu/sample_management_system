@@ -31,7 +31,7 @@ class SampleResource(BaseResource):
         'location_collected': fields.String,
         'project': fields.String,
         'project_owner': fields.String,
-        'retention_period': fields.Integer,
+        'retention_date': fields.Integer,
         'barcode': fields.String,
         'analysis': fields.String,
         'temperature': fields.String,  # todo: check temp return i.e. float
