@@ -125,7 +125,7 @@
                         <td headers="loc_co8 loc_c2"
                             v-if="sample.retention && isRetentionPeriodValid(sample.retention)">
                             {{sample.retention }} <i class="fas fa-check fa-icon-checked"
-                                                     title="Sample still in storage"></i>
+                                                     title="Sample available"></i>
                         </td>
                         <td class="text-danger font-weight-bold" headers="loc_co8 loc_c2"
                             v-if="sample.retention && !isRetentionPeriodValid(sample.retention)">
@@ -172,13 +172,21 @@
                     </mdb-col>
                     <mdb-col class="d-flex justify-content-end" md="7">
                         <div class="text-center">
-                            <a href="https://redcap.icipe.org/surveys/?s=W7A7TFJ89J">
+                            <div v-if="!isRetentionPeriodValid(sample.retention)">
                                 <button :disabled="!isRetentionPeriodValid(sample.retention)"
                                         class="btn btn-outline-info btn-rounded"
                                         type="button"> Request Sample
                                     <i aria-hidden="true" class="fa fa-inbox menu_icon"> </i>
                                 </button>
-                            </a>
+                            </div>
+                            <div v-else>
+                                <a href="https://redcap.icipe.org/surveys/?s=W7A7TFJ89J">
+                                    <button class="btn btn-outline-info btn-rounded"
+                                            type="button"> Request Sample
+                                        <i aria-hidden="true" class="fa fa-inbox menu_icon"> </i>
+                                    </button>
+                                </a>
+                            </div>
                         </div>
                         <div class="text-center">
                             <button @click="requestUpdateSample" class="btn btn-outline-info btn-rounded"
