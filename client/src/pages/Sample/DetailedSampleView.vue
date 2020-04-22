@@ -122,8 +122,16 @@
                         <td v-else-if="!sample.tray">N/A</td>
                         <td headers="loc_co7 loc_c2" v-if="sample.box">{{ sample.box }}</td>
                         <td v-else-if="!sample.box">N/A</td>
-                        <td headers="loc_co8 loc_c2" v-if="sample.retention">
-                            {{sample.retention }}
+                        <td headers="loc_co8 loc_c2"
+                            v-if="sample.retention && isRetentionPeriodValid(sample.retention)">
+                            {{sample.retention }} <i class="fas fa-check fa-icon-checked"
+                                                     title="Sample still in storage"></i>
+                        </td>
+                        <td class="text-danger font-weight-bold" headers="loc_co8 loc_c2"
+                            v-if="sample.retention && !isRetentionPeriodValid(sample.retention)">
+                            {{sample.retention }} - Sample is overdue by {{overDueRetentionPeriod(sample.retention)}}.
+                            <i class="fas fa-exclamation-triangle fa-icon-exclamation"
+                               title="Sample not available"></i>
                         </td>
                         <td v-else-if="!sample.retention">N/A</td>
                     </tr>
@@ -165,7 +173,9 @@
                     <mdb-col class="d-flex justify-content-end" md="7">
                         <div class="text-center">
                             <a href="https://redcap.icipe.org/surveys/?s=W7A7TFJ89J">
-                                <button class="btn btn-outline-info btn-rounded" type="button"> Request Sample
+                                <button :disabled="!isRetentionPeriodValid(sample.retention)"
+                                        class="btn btn-outline-info btn-rounded"
+                                        type="button"> Request Sample
                                     <i aria-hidden="true" class="fa fa-inbox menu_icon"> </i>
                                 </button>
                             </a>
@@ -195,6 +205,8 @@
     import {
         countDownTimer,
         getSampleCode,
+        isRetentionPeriodValid,
+        overDueRetentionPeriod,
         secureStoreGetString,
         setSampleDetailsForEditing,
         setUpdateSample,
@@ -241,6 +253,7 @@
             }
         },
         methods: {
+            isRetentionPeriodValid, overDueRetentionPeriod,
             setSampleData(res) {
                 this.sample.theme = res['theme.name'];
                 this.sample.user = res['user.first_name'] + " " + res['user.last_name'];
