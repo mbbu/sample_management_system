@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import requests
 from flask import current_app, request
@@ -46,6 +46,14 @@ def non_empty_int(i: int):
 
 def format_str_to_date(date):
     return datetime.strptime(date, '%Y-%m-%d %H:%M').date()
+
+
+def set_date_from_int(num_of_days):
+    date = datetime.now()
+
+    for day in range(num_of_days):
+        date = date + timedelta(days=1)
+    return date
 
 
 """

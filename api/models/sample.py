@@ -52,6 +52,6 @@ class Sample(BaseModel.db.Model):
                '|| analysis={12} || temperature={13} ) >>' \
             .format(self.sample_type, self.sample_description,
                     self.project, self.barcode, self.animal_species,
-                    self.box_id, self.retention_period, self.amount, self.quantity_type, self.code,
+                    self.box_id, self.retention_date, self.amount, self.quantity_type, self.code,
                     self.location_collected,
                     self.project_owner, self.analysis, self.temperature)

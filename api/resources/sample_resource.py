@@ -14,7 +14,7 @@ from api.resources.security_level_resource import SecurityLevelResource
 from api.resources.theme_resource import ThemeResource
 from api.utils import format_and_lower_str, log_create, log_update, log_duplicate, \
     has_required_request_params, export_all_records, log_export_from_redcap, format_str_to_date, non_empty_int, log_304, \
-    get_user_by_email
+    get_user_by_email, set_date_from_int
 
 samples_page = Blueprint('samples_bp', __name__, template_folder='templates')
 
@@ -31,7 +31,7 @@ class SampleResource(BaseResource):
         'location_collected': fields.String,
         'project': fields.String,
         'project_owner': fields.String,
-        'retention_date': fields.Integer,
+        'retention_date': fields.DateTime,
         'barcode': fields.String,
         'analysis': fields.String,
         'temperature': fields.String,  # todo: check temp return i.e. float
@@ -82,7 +82,7 @@ class SampleResource(BaseResource):
             try:
                 sample = Sample(theme_id=theme, user_id=user, box_id=box, animal_species=args[3],
                                 sample_type=args[4], sample_description=args[5], location_collected=args[6],
-                                project=args[7], project_owner=args[8], retention_period=args[9], barcode=args[10],
+                                project=args[7], project_owner=args[8], retention_date=args[9], barcode=args[10],
                                 analysis=args[11], temperature=args[12], amount=args[13], quantity_type=qt,
                                 security_level=sl, code=code)
 
@@ -109,7 +109,8 @@ class SampleResource(BaseResource):
                     args[2] != sample.box_id or args[3] != sample.animal_species or \
                     args[4] != sample.sample_type or args[5] != sample.sample_description \
                     or args[6] != sample.location_collected or args[7] != sample.project \
-                    or args[8] != sample.project_owner or args[9] != sample.retention_period \
+                    or args[8] != sample.project_owner or \
+                    args[9] != sample.retention_date \
                     or args[10] != sample.barcode or args[11] != sample.analysis or args[12] != sample.temperature \
                     or args[13] != sample.amount or args[14] != sample.quantity_type or args[
                 15] != sample.security_level or args[16] != sample.code:
@@ -131,7 +132,7 @@ class SampleResource(BaseResource):
                     sample.location_collected = args[6]
                     sample.project = args[7]
                     sample.project_owner = args[8]
-                    sample.retention_period = args[9]
+                    sample.retention_date = args[9]
                     sample.barcode = args[10]
                     sample.analysis = args[11]
                     sample.temperature = args[12]
@@ -201,7 +202,10 @@ class SampleResource(BaseResource):
         location_collected = args['location_collected']
         project = args['project']
         project_owner = args['project_owner']
-        retention_period = int(args['retention_period'])
+        retention_date = set_date_from_int(int(args['retention_period']))
+        print("Args for retention passed: " + str(args['retention_period']) + " of type: "
+              + str(type(args['retention_period'])))
+        print("Retention period is: " + str(retention_date) + " of type " + str(type(retention_date)))
         barcode = args['barcode']
         analysis = args['analysis']
         temperature = float(args['temperature'])
@@ -212,7 +216,7 @@ class SampleResource(BaseResource):
 
         return [
             theme_id, user_id, box_id, animal_species, sample_type, sample_description, location_collected,
-            project, project_owner, retention_period, barcode, analysis, temperature, amount, quantity_type,
+            project, project_owner, retention_date, barcode, analysis, temperature, amount, quantity_type,
             security_level, code
         ]
 
