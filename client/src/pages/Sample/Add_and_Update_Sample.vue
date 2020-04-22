@@ -706,7 +706,7 @@
                 this.sample.user = sampleForUpdate['user.first_name'] + " " + sampleForUpdate['user.last_name'];
                 this.sample.box = sampleForUpdate['box.label'];
                 this.sample.quantity_type = sampleForUpdate['quantity.id'];
-                this.sample.securityLevel = sampleForUpdate['security_level'];
+                this.sample.securityLevel = sampleForUpdate['secLevel.code'];
                 this.sample.convertedRetentionPeriod = this.sample.retention; // special
 
             },
