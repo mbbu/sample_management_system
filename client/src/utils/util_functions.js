@@ -373,10 +373,18 @@ export function selectDropDownItemForUpdate(elementId, item, itemDataList) {
 }
 
 // DATE FUNCTIONS
-export function convertDaysAndFormat(numberOfDays) {
-    let years = Math.floor(numberOfDays / 365);
-    let months = Math.floor(numberOfDays % 365 / 30);
-    let days = Math.floor(numberOfDays % 365 % 30);
+export function isRetentionPeriodValid(dbDate) {
+    return Date.parse(dbDate) >= Date.now();
+}
+
+export function overDueRetentionPeriod(dbDate) {
+    let timeDiff = Math.abs(Date.parse(dbDate) - Date.now())
+    let oneDay = 1000 * 60 * 60 * 24; //milliseconds
+
+    let totalDays = timeDiff / oneDay; // take out milliseconds and convert to days
+    let years = Math.floor(totalDays / 365)
+    let months = Math.floor(totalDays % 365 / 30)
+    let days = Math.floor(totalDays % 365 % 30)
 
     let yearsDisplay = years > 0 ? years + (years === 1 ? " year " : " years ") : "";
     let monthsDisplay = months > 0 ? months + (months === 1 ? " month " : " months ") : "";
