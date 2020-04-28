@@ -20,6 +20,8 @@ import Publication from "./pages/Publication";
 import DetailedSampleView from "./pages/Sample/DetailedSampleView";
 import {isUpdate} from "./utils/util_functions";
 import UserRole from "./pages/UserProfile/UserRole";
+import UserCard from "./pages/UserProfile/UserCard";
+import EditProfileForm from "./pages/UserProfile/EditProfileForm";
 
 
 Vue.use(Router);
@@ -47,6 +49,20 @@ export default new Router({
             name: 'role',
             alias: ['/role', '/user-roles'],
             component: UserRole,
+        },
+
+        {
+            path: '/user',
+            name: 'user',
+            alias: ['/me'],
+            component: UserCard,
+        },
+
+        {
+            path: '/edit-user',
+            name: 'update-user',
+            alias: ['/update-user'],
+            component: EditProfileForm,
         },
 
         {
