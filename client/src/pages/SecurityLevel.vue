@@ -25,18 +25,19 @@
 
                         <td>
                             <b-icon
-                                    icon="pencil" font-scale="2.0"
-                                    class="border border-info rounded" variant="info"
-                                    v-b-tooltip.hover :title="`Update ${ sec_level.name }`"
-                                    v-b-modal.modal-security-level-edit
+                                    :title="`Update ${ sec_level.name }`"
                                     @mouseover="fillFormForUpdate(sec_level.name, sec_level.code, sec_level.description)"
+                                    class="border border-info rounded" font-scale="2.0"
+                                    icon="pencil" v-b-modal.modal-security-level-edit
+                                    v-b-tooltip.hover
+                                    variant="info"
                             ></b-icon>
                             &nbsp;
                             <b-icon
-                                    icon="trash" font-scale="1.85"
-                                    class="border rounded bg-danger p-1" variant="light"
-                                    v-b-tooltip.hover :title="`Delete ${sec_level.name}!`"
-                                    @click="deleteSecurityLevel(sec_level.code)"
+                                    :title="`Delete ${sec_level.name}!`" @click="deleteSecurityLevel(sec_level.code)"
+                                    class="border rounded bg-danger p-1" font-scale="1.85"
+                                    icon="trash" v-b-tooltip.hover
+                                    variant="light"
                             ></b-icon>
                         </td>
                     </tr>
@@ -46,13 +47,13 @@
 
             <div v-if="!isEditing">
                 <b-modal
-                        title="Add Security Level"
-                        id="modal-security-level"
-                        ok-title="Save"
-                        cancel-variant="danger"
+                        @hidden="clearForm"
                         @ok="createSecurityLevel"
                         @submit="showModal = false"
-                        @hidden="clearForm"
+                        cancel-variant="danger"
+                        id="modal-security-level"
+                        ok-title="Save"
+                        title="Add Security Level"
                 >
                     <form @submit.prevent="createSecurityLevel">
 
@@ -90,13 +91,13 @@
 
             <div v-else-if="isEditing">
                 <b-modal
-                        title="Edit Security Level"
+                        @hidden="clearForm"
                         @ok="updateSecurityLevel(old_code)"
                         @submit="showModal = false"
+                        cancel-variant="danger"
                         id="modal-security-level-edit"
                         ok-title="Update"
-                        cancel-variant="danger"
-                        @hidden="clearForm"
+                        title="Edit Security Level"
                 >
                     <form>
 
@@ -141,9 +142,9 @@
 
 <script>
     import axios from 'axios';
-    import {security_level_resource} from '../../src/utils/api_paths'
+    import {security_level_resource} from '../utils/api_paths'
     import TopNav from "@/components/TopNav";
-    import {secureStoreGetString} from "../utils/util_functions";
+    import {respondTo401, secureStoreGetString, showFlashMessage} from "../utils/util_functions";
 
     export default {
         name: 'SecurityLevel',
@@ -191,6 +192,7 @@
             },
 
             createSecurityLevel: function () {
+                let self = this;
                 axios.post(security_level_resource, {
                     name: this.name,
                     code: this.code,
@@ -203,32 +205,17 @@
                     .then((response) => {
                         this.getSecurityLevel();
                         this.clearForm();
-                        this.flashMessage.show({
-                            status: 'success',
-                            title: response.data['message'], message: ""
-                        });
+                        showFlashMessage(self, 'success', response.data['message'], "")
                     })
                     .catch((error) => {
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 409) {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Error",
-                                    message: error.response.data['message']
-                                });
+                                showFlashMessage(self, 'error', "Error", error.response.data['message'])
                             } else if (error.response.status === 401) {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Session Expired",
-                                    message: "You need to log in to perform this operation"
-                                });
+                                respondTo401(self)
                             } else {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Error",
-                                    message: "Security Level already exists"
-                                });
+                                showFlashMessage(self, 'error', "Error", "Security Level already exists")
                             }
                         }
                     });
@@ -236,6 +223,8 @@
             },
 
             updateSecurityLevel: function (code) {
+                let self = this;
+
                 axios.put(security_level_resource, {
                     name: this.name,
                     code: this.code,
@@ -249,32 +238,17 @@
                 })
                     .then((response) => {
                         this.getSecurityLevel();
-                        this.flashMessage.show({
-                            status: 'success',
-                            title: response.data['message'], message: ""
-                        });
+                        showFlashMessage(self, 'success', response.data['message'], "")
                     })
                     .catch((error) => {
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 304) {
-                                this.flashMessage.show({
-                                    status: 'info',
-                                    title: "Info",
-                                    message: "Record not modified"
-                                });
+                                showFlashMessage(self, 'info', "Record not modified!", "")
                             } else if (error.response.status === 401) {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Session Expired",
-                                    message: "You need to log in to perform this operation"
-                                });
+                                respondTo401(self)
                             } else {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Error",
-                                    message: error.response.data['message']
-                                });
+                                showFlashMessage(self, 'error', "Error", error.response.data['message'])
                             }
                         }
                     });
@@ -282,6 +256,8 @@
             },
 
             deleteSecurityLevel: function (code) {
+                let self = this;
+
                 axios.delete(security_level_resource, {
                     headers:
                         {
@@ -291,29 +267,17 @@
                 })
                     .then((response) => {
                         this.getSecurityLevel();
-                        this.flashMessage.show({
-                            status: 'success',
-                            title: response.data['message'], message: ""
-                        });
+                        showFlashMessage(self, 'success', response.data['message'], "")
                     })
                     .catch((error) => {
                         this.$log.error(error);
                         if (error.response) {
-                            if (error.response.status === 401) {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Session Expired",
-                                    message: "You need to log in to perform this operation"
-                                });
-                            } else {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: error, message: ""
-                                });
-                            }
+                            respondTo401(self)
+                        } else {
+                            showFlashMessage(self, 'error', "Error", error.response.data['message'])
                         }
-                    });
-            },
+                    })
+            }
         },
         created() {
             this.getSecurityLevel();
