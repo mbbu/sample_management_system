@@ -26,6 +26,13 @@ export function countDownTimer(self, countDown, route) {
 }
 
 /*
+* Combined responses for status codes */
+export function respondTo401(self) {
+    this.showFlashMessage(self, 'error', "Session Expired", "You need to log in to perform this operation")
+    this.countDownTimer(self, 3, '/login')
+}
+
+/*
 * Form Util Functions */
 export function viewPassword() {
     let passwordInput = document.getElementById('password');
