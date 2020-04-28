@@ -14,12 +14,14 @@
             <b-nav-item-dropdown right>
                 <!-- Using 'button-content' slot -->
                 <template v-slot:button-content>
-                    <em>User</em>
+                    <i class="fas fa-user fa-2x"></i> <em>User</em>
                 </template>
                 <b-dropdown-item>
-                    <router-link to="/updateprofile"> Profile</router-link>
+                    <i class="far fa-id-badge fa-lg"></i>
+                    <router-link to="/user"> Profile</router-link>
                 </b-dropdown-item>
                 <b-dropdown-item>
+                    <i class="fas fa-sign-out-alt fa-lg"></i>
                     <router-link to="/home"> Sign Out</router-link>
                 </b-dropdown-item>
             </b-nav-item-dropdown>
