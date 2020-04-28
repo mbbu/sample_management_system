@@ -19,6 +19,7 @@ import Tray from "./pages/Tray";
 import Publication from "./pages/Publication";
 import DetailedSampleView from "./pages/Sample/DetailedSampleView";
 import {isUpdate} from "./utils/util_functions";
+import UserRole from "./pages/UserProfile/UserRole";
 
 
 Vue.use(Router);
@@ -39,6 +40,13 @@ export default new Router({
             name: 'register',
             alias: ['/signup'],
             component: SignUp,
+        },
+
+        {
+            path: '/roles',
+            name: 'role',
+            alias: ['/role', '/user-roles'],
+            component: UserRole,
         },
 
         {
