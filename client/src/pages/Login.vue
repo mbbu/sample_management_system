@@ -157,7 +157,8 @@
                             showFlashMessage(self, 'success', 'Logged In', 'Redirecting you to home page in ' +
                                 countDownTimer(self, this.countDown, '/home') + " seconds");
                             // set jwt token required across requests
-                            secureStoreSetString(response.data.message.token, response.data.message.email);
+                            secureStoreSetString(response.data.message.token, response.data.message.email, response.data.message.first_name,
+                                response.data.message.last_name, response.data.message['role.name']);
                         }
                     })
                     .catch((error) => {

@@ -296,7 +296,12 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
     state: {
         jwtString: "",
-        userEmail: ""
+        user: {
+            email: "",
+            firstName: "",
+            lastName: "",
+            role: ""
+        },
 
     },
     plugins: [
@@ -312,8 +317,17 @@ const store = new Vuex.Store({
         jwtToken: (state, value) =>
             value ? (state.jwtString = value) : (state.jwtString = ""),
 
-        userDetails: (state, value) =>
-            value ? (state.userEmail = value) : (state.userEmail = "")
+        userEmail: (state, value) =>
+            value ? (state.user.email = value) : (state.user.email = ""),
+
+        userFirstName: (state, value) =>
+            value ? (state.user.firstName = value) : (state.user.firstName = ""),
+
+        userLastName: (state, value) =>
+            value ? (state.user.lastName = value) : (state.user.lastName = ""),
+
+        userRole: (state, value) =>
+            value ? (state.user.role = value) : (state.user.role = ""),
     }
 });
 
@@ -326,21 +340,38 @@ export function secureStoreGetString() {
     return tokenPrefix + jwtString;
 }
 
-export function secureStoreSetString(jwtString, email) {
+export function secureStoreSetString(jwtString, email, fName, lName, role) {
     store.commit("jwtToken", jwtString);
-    store.commit("userDetails", email)
+    store.commit("userEmail", email);
+    store.commit("userFirstName", fName);
+    store.commit("userLastName", lName);
+    store.commit("userRole", role);
+
+    console.log("Secure store has the following details for user: ", store.state.user)
 }
 
 export function secureStoreDeleteString() {
     store.commit("jwtToken");
     store.commit("userDetails");
+    store.commit("userFirstName");
+    store.commit("userLastName");
+    store.commit("userRole");
 }
 
 export function getUserEmail() {
-    console.log("User email stored: " + store.state.userEmail)
-    return store.state.userEmail
+    return store.state.user.email
 }
 
+export function getStoredUserDetails() {
+    let user = {}
+    user.update({
+        'first_name': store.state.user.firstName,
+        'last_name': store.state.user.lastName,
+        'role': store.state.user.role
+    })
+
+    return user
+}
 
 // accessor for sample code; used when requesting to view detailed sample page
 let sampleCode = ""
@@ -371,9 +402,6 @@ export function isUpdate() {
     return updateSample;
 }
 
-export function resetUpdateSample() {
-    updateSample = false;
-}
 
 export function selectDropDownItemForUpdate(elementId, item, itemDataList) {
     // set dropdownItem to the selected item
