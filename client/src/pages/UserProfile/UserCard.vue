@@ -23,14 +23,11 @@
                             <div class="card-body card-body-cascade text-center pb-0">
 
                                 <!-- NAME -->
-                                <h4 class="card-title"><strong>Alison Belmont</strong></h4>
+                                <h4 class="card-title"><strong><em>Name:</em> {{ response.fullname }}</strong></h4>
                                 <!-- ROLE -->
-                                <h5 class="blue-text pb-2"><strong>Graffiti Artist</strong></h5>
+                                <h5 class="blue-text pb-2"><strong><em>Role:</em> {{ response.role }}</strong></h5>
                                 <!-- CONTACT DETAILS -->
-                                <p class="card-text">Sed ut perspiciatis unde omnis iste natus sit voluptatem
-                                    accusantium
-                                    doloremque
-                                    laudantium, totam rem aperiam. </p>
+                                <p class="card-text"><em>Contact Info: </em> {{ response.email }} </p>
 
                                 <hr>
                                 <mdb-col class="d-flex justify-content-end">
@@ -72,14 +69,27 @@
                             <table class="table table-hover">
                                 <thead class="blue-gradient white-text">
                                 <tr>
+                                    <th scope="col"><em><b>ID</b></em></th>
                                     <th scope="col"><em><b>THEME</b></em></th>
                                     <th scope="col"><em><b>PROJECT</b></em></th>
                                     <th scope="col"><em><b>ANIMAL SPECIES</b></em></th>
+                                    <th scope="col"><em><b>SAMPLE TYPE</b></em></th>
                                     <th scope="col"><em><b>BARCODE</b></em></th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
+                                <tr :key="sample.id" v-for="(sample, index) in response.samples">
+                                    <td> {{index + 1}}</td>
+                                    <td v-if="sample.theme"> {{sample.theme}}</td>
+                                    <td v-else> N/A</td>
+                                    <td v-if="sample.project"> {{sample.project}}</td>
+                                    <td v-else> N/A</td>
+                                    <td v-if="sample.species"> {{sample.species}}</td>
+                                    <td v-else> N/A</td>
+                                    <td v-if="sample.type"> {{sample.type}}</td>
+                                    <td v-else> N/A</td>
+                                    <td v-if="sample.barcode"> {{sample.barcode}}</td>
+                                    <td v-else> N/A</td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -88,6 +98,7 @@
                             <table class="table table-hover">
                                 <thead class="blue-gradient white-text">
                                 <tr>
+                                    <th scope="col"><em><b>ID</b></em></th>
                                     <th scope="col"><em><b>PROJECT OWNER</b></em></th>
                                     <th scope="col"><em><b>SAMPLE OWNER</b></em></th>
                                     <th scope="col"><em><b>ANIMAL SPECIES</b></em></th>
@@ -97,6 +108,25 @@
                                 </thead>
                                 <tbody>
                                 <tr>
+                                    <td>N/A</td>
+                                    <td>N/A</td>
+                                    <td>N/A</td>
+                                    <td>N/A</td>
+                                    <td>N/A</td>
+                                    <b-icon
+                                            class="border border-info rounded"
+                                            font-scale="1.8" icon="eye-fill"
+                                            title="View"
+                                            v-b-tooltip.hover
+                                            variant="info"
+                                    ></b-icon>
+                                    &nbsp;
+                                    <b-icon
+                                            class="border rounded bg-danger p-1"
+                                            font-scale="1.7" icon="trash"
+                                            title="Delete" v-b-tooltip.hover
+                                            variant="light"
+                                    ></b-icon>
                                 </tr>
                                 </tbody>
                             </table>
@@ -105,6 +135,7 @@
                             <table class="table table-hover">
                                 <thead class="blue-gradient white-text">
                                 <tr>
+                                    <th scope="col"><em><b>ID</b></em></th>
                                     <th scope="col"><em><b>THEME</b></em></th>
                                     <th scope="col"><em><b>PROJECT</b></em></th>
                                     <th scope="col"><em><b>TITLE</b></em></th>
@@ -113,7 +144,30 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
+                                <tr :key="publication.id" v-for="(publication, index) in response.publications">
+                                    <td> {{index + 1}}</td>
+                                    <td v-if="publication.theme"> {{publication.theme}}</td>
+                                    <td v-else> N/A</td>
+                                    <td v-if="publication.project"> {{publication.project}}</td>
+                                    <td v-else> N/A</td>
+                                    <td v-if="publication.title"> {{publication.title}}</td>
+                                    <td v-else> N/A</td>
+                                    <td v-if="publication.co_authors"> {{publication.co_authors}}</td>
+                                    <td v-else> N/A</td>
+                                    <b-icon
+                                            class="border border-info rounded"
+                                            font-scale="1.8" icon="eye-fill"
+                                            title="View"
+                                            v-b-tooltip.hover
+                                            variant="info"
+                                    ></b-icon>
+                                    &nbsp;
+                                    <b-icon
+                                            @click="downloadPublication(publication.title)"
+                                            class="border border-info rounded" font-scale="1.8"
+                                            icon="download" title="Download"
+                                            v-b-tooltip.hover variant="info"
+                                    ></b-icon>
                                 </tr>
                                 </tbody>
                             </table>
@@ -132,6 +186,9 @@
 <script>
     import {mdbCard, mdbCardBody, mdbCol, mdbRow} from "mdbvue";
     import TopNav from "@/components/TopNav";
+    import axios from "axios";
+    import {user_resource} from "../../utils/api_paths";
+    import {countDownTimer, getUserEmail, showFlashMessage} from "../../utils/util_functions";
 
     export default {
         name: "UserCard",
@@ -143,8 +200,64 @@
         },
         data() {
             return {
-                page_title: "Me"
+                page_title: "Dashboard",
+                response: null,
             };
+        },
+        methods: {
+            showLoader() {
+                return this.$loading.show({
+                    isFullPage: true,
+                    canCancel: false,
+                    color: '#074880',
+                    loader: 'dots',
+                    width: 255,
+                    height: 255,
+                    backgroundColor: '#FAAB2C',
+                    opacity: 0.7,
+                    zIndex: 999,
+                });
+            },
+
+            getUserDetails(email) {
+                let self = this;
+
+                // show loader while request is being made
+                let loader = this.showLoader()
+
+                axios.get(user_resource, {
+                    headers:
+                        {
+                            email: email,
+                        }
+                })
+                    .then((res) => {
+                        setTimeout(() => {
+                            loader.hide()
+                            this.response = res.data.message;
+                            this.$log.info("Response: " + res.status + " " + res.data +
+                                " this.response has", this.response);
+                        }, 2500)
+                    })
+                    .catch((error) => {
+                        // eslint-disable-next-line
+                        loader.hide()
+                        this.$log.error(error);
+                        if (error.response) {
+                            if (error.response.status === 401) {
+                                showFlashMessage(self, 'error', "Session Expired", 'You need to log in to perform this operation');
+                            } else if (error.response.status === 404) {
+                                showFlashMessage(self, 'error', 'Connection Error', 'Request was timed out');
+                                countDownTimer(self, 3, '/home')
+                            }
+                        }
+                    });
+            },
+        },
+        created() {
+            let email = getUserEmail()
+            this.$log.info("Created of user-card called. Email set to: " + email)
+            this.getUserDetails(email)
         },
         components: {mdbCard, mdbCardBody, mdbRow, mdbCol, TopNav}
     };
