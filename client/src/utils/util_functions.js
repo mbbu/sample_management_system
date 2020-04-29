@@ -363,12 +363,15 @@ export function getUserEmail() {
 }
 
 export function getStoredUserDetails() {
-    let user = {}
-    user.update({
-        'first_name': store.state.user.firstName,
-        'last_name': store.state.user.lastName,
-        'role': store.state.user.role
-    })
+    let user = {
+        'first_name': null,
+        'last_name': null,
+        'role': null,
+    }
+
+    user.first_name = store.state.user.firstName
+    user.last_name = store.state.user.lastName
+    user.role = store.state.user.role
 
     return user
 }
