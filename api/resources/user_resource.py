@@ -4,6 +4,7 @@ from flask import current_app, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restful import fields, marshal, reqparse
 
+from api.models import Sample, Publication
 from api.models.database import BaseModel
 from api.models.user import User
 from api.resources.base_resource import BaseResource
@@ -27,8 +28,7 @@ class UserResource(BaseResource):
 
         if email is not None:
             email = format_and_lower_str(email)
-            user = get_user_by_email(email)
-            return UserResource.get_response(user)
+            return UserResource.UserCombinedInfo(email)
         elif role is not None:
             users = get_users_by_role(role)
             return UserResource.get_response(users)
@@ -195,3 +195,45 @@ class UserResource(BaseResource):
         else:
             data = marshal(user, UserResource.fields)
             return BaseResource.send_json_message(data, 200)
+
+    @staticmethod
+    def UserCombinedInfo(email):
+        user = get_user_by_email(email)
+        if user is None:
+            return BaseResource.send_json_message("User not found", 404)
+        else:
+            user_details = {
+                'fullname': user.first_name + " " + user.last_name,
+                'email': user.email,
+                'role': user.role.name
+            }
+            user_samples = BaseModel.db.session.query(Sample).filter(Sample.user_id == user.id).all()
+
+            user_sample_details = []
+            for sample in user_samples:
+                sample_details = {}
+                theme = sample.theme.name
+                project = sample.project
+                species = sample.animal_species
+                _type = sample.sample_type
+                barcode = sample.barcode
+
+                sample_details.update(
+                    {'theme': theme, 'project': project, 'species': species, 'type': _type, 'barcode': barcode})
+                user_sample_details.append(sample_details)
+
+            user_publications = BaseModel.db.session.query(Publication).filter(Publication.user_id == user.id).all()
+
+            user_pub_details = []
+            for publication in user_publications:
+                publications = {}
+                title = publication.publication_title
+                co_authors = publication.co_authors
+                project = publication.sample.project
+                theme = publication.sample.theme.name
+
+                publications.update({'theme': theme, 'project': project, 'title': title, 'co_authors': co_authors})
+                user_pub_details.append(publications)
+
+            user_details.update({'samples': user_sample_details, 'publications': user_pub_details})
+            return BaseResource.send_json_message(user_details, 200)

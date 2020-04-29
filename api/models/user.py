@@ -1,5 +1,7 @@
 from datetime import datetime
+
 from werkzeug.security import generate_password_hash, check_password_hash
+
 from api.models.database import BaseModel
 
 
@@ -13,7 +15,8 @@ class User(BaseModel.db.Model):
     email = AppDb.Column(AppDb.String(65), index=True, unique=True, nullable=False)
     password = AppDb.Column(AppDb.String(128), nullable=False)
     role_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('role.id', ondelete='SET NULL'), nullable=False)
-    housedata_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('housedata.id', ondelete='SET NULL'), nullable=True)
+    housedata_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('housedata.id', ondelete='SET NULL'),
+                                nullable=True)  # todo - be removed
     # Fields to help in audits
     created_at = AppDb.Column(AppDb.DateTime, nullable=False, default=datetime.now)
     created_by = AppDb.Column(AppDb.String(65), nullable=False)
@@ -24,7 +27,7 @@ class User(BaseModel.db.Model):
     is_deleted = AppDb.Column(AppDb.Boolean, nullable=False, default=False)
 
     # relationship(s)
-    sample_owner = AppDb.relationship('Sample', backref='owner', lazy='dynamic')
+    sample_owner = AppDb.relationship('Sample', backref='owner', lazy=True)
     publication = AppDb.relationship('Publication', back_populates='user')
 
     def __repr__(self):
