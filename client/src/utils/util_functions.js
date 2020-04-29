@@ -28,8 +28,8 @@ export function countDownTimer(self, countDown, route) {
 /*
 * Combined responses for status codes */
 export function respondTo401(self) {
-    this.showFlashMessage(self, 'error', "Session Expired", "You need to log in to perform this operation")
-    this.countDownTimer(self, 3, '/login')
+    showFlashMessage(self, 'error', "Session Expired", "You need to log in to perform this operation")
+    countDownTimer(self, 3, '/login')
 }
 
 /*
