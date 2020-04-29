@@ -295,7 +295,9 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({
     state: {
-        string: ""
+        jwtString: "",
+        userEmail: ""
+
     },
     plugins: [
         createPersistedState({
@@ -308,24 +310,37 @@ const store = new Vuex.Store({
     ],
     mutations: {
         jwtToken: (state, value) =>
-            value ? (state.string = value) : (state.string = "")
+            value ? (state.jwtString = value) : (state.jwtString = ""),
+
+        userDetails: (state, value) =>
+            value ? (state.userEmail = value) : (state.userEmail = "")
     }
 });
 
+/*
+* User Authentication and Identification functions */
 export function secureStoreGetString() {
-    let jwtString = store.state.string;
+    let jwtString = store.state.jwtString;
 
     let tokenPrefix = 'Bearer ';
     return tokenPrefix + jwtString;
 }
 
-export function secureStoreSetString(string) {
-    store.commit("jwtToken", string);
+export function secureStoreSetString(jwtString, email) {
+    store.commit("jwtToken", jwtString);
+    store.commit("userDetails", email)
 }
 
 export function secureStoreDeleteString() {
     store.commit("jwtToken");
+    store.commit("userDetails");
 }
+
+export function getUserEmail() {
+    console.log("User email stored: " + store.state.userEmail)
+    return store.state.userEmail
+}
+
 
 // accessor for sample code; used when requesting to view detailed sample page
 let sampleCode = ""

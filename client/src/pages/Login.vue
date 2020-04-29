@@ -20,8 +20,9 @@
                                         <div class="grey-text">
                                             <!--EMAIL-->
                                             <b-form-group :class="{ 'form-group--error': $v.user.email.$error }">
-                                                <mdb-input id="email" v-model.trim="$v.user.email.$model"
-                                                           label="Your email" icon="envelope" type="email"/>
+                                                <mdb-input icon="envelope" id="email"
+                                                           label="Your email" type="email"
+                                                           v-model.trim="$v.user.email.$model"/>
                                                 <div v-if="$v.user.email.$dirty">
                                                     <div class="error" v-if="!$v.user.email.required">Field is
                                                         required
@@ -35,12 +36,13 @@
                                             <!--PASSWORD-->
                                             <b-form-group :class="{ 'form-group--error': $v.user.password.$error }">
                                                 <div class="row">
-                                                    <mdb-input id="password" v-model.trim="$v.user.password.$model"
-                                                               class="form_input_margin" label="Your password"
-                                                               icon="lock" type="password"/>
-                                                    <span id="view-pwd" class="fa fa-fw fa-eye" aria-hidden="true"
-                                                          v-b-tooltip.hover :title="'see raw password'"
-                                                          @click="viewPassword()"/>
+                                                    <mdb-input class="form_input_margin" icon="lock"
+                                                               id="password" label="Your password"
+                                                               type="password" v-model.trim="$v.user.password.$model"/>
+                                                    <span :title="'see raw password'" @click="viewPassword()"
+                                                          aria-hidden="true"
+                                                          class="fa fa-fw fa-eye" id="view-pwd"
+                                                          v-b-tooltip.hover/>
                                                 </div>
                                                 <div v-if="$v.user.password.$dirty">
                                                     <div class="error" v-if="!$v.user.password.required">Field is
@@ -51,27 +53,28 @@
 
                                             <!-- Remember Me -->
                                             <div class="form-check">
-                                                <input type="checkbox" v-model="$v.user.checked"
-                                                       class="form-check-input" id="materialUnchecked">
+                                                <input class="form-check-input" id="materialUnchecked"
+                                                       type="checkbox" v-model="$v.user.checked">
                                                 <label class="form-check-label" for="materialUnchecked">Remember
                                                     Me?</label>
                                             </div>
                                         </div>
 
                                         <br>
-                                        <p class="font-small grey-text d-flex justify-content-end">Forgot <a href="#"
-                                                                                                             class="dark-grey-text ml-1 font-weight-bold">
+                                        <p class="font-small grey-text d-flex justify-content-end">Forgot <a
+                                                class="dark-grey-text ml-1 font-weight-bold"
+                                                href="#">
                                             Password?</a></p>
                                         <mdb-row class="d-flex align-items-center mb-4 mt-5">
-                                            <mdb-col md="5" class="d-flex align-items-start">
+                                            <mdb-col class="d-flex align-items-start" md="5">
                                                 <div class="text-center">
-                                                    <mdb-btn rounded type="submit" class="z-depth-1a">Login</mdb-btn>
+                                                    <mdb-btn class="z-depth-1a" rounded type="submit">Login</mdb-btn>
                                                 </div>
                                             </mdb-col>
-                                            <mdb-col md="7" class="d-flex justify-content-end">
+                                            <mdb-col class="d-flex justify-content-end" md="7">
                                                 <p class="font-small grey-text mt-3">Don't have an account? <a
-                                                        href="/register"
-                                                        class="dark-grey-text ml-1 font-weight-bold">
+                                                        class="dark-grey-text ml-1 font-weight-bold"
+                                                        href="/register">
                                                     Sign up</a></p>
                                             </mdb-col>
                                         </mdb-row>
@@ -153,7 +156,8 @@
                         if (response.status === 200) {
                             showFlashMessage(self, 'success', 'Logged In', 'Redirecting you to home page in ' +
                                 countDownTimer(self, this.countDown, '/home') + " seconds");
-                            secureStoreSetString(response.data.message.token); // set jwt token required across requests
+                            // set jwt token required across requests
+                            secureStoreSetString(response.data.message.token, response.data.message.email);
                         }
                     })
                     .catch((error) => {
@@ -173,5 +177,5 @@
                     })
             },
         }
-  }
+    }
 </script>

@@ -20,8 +20,9 @@
                                         <div>
                                             <!--FIRST NAME-->
                                             <b-form-group :class="{ 'form-group--error': $v.user.firstName.$error }">
-                                                <mdb-input id="fName" v-model.trim="$v.user.firstName.$model"
-                                                           label="First name" icon="user" type="text"/>
+                                                <mdb-input icon="user" id="fName"
+                                                           label="First name" type="text"
+                                                           v-model.trim="$v.user.firstName.$model"/>
                                                 <div v-if="$v.user.firstName.$dirty">
                                                     <div class="error" v-if="!$v.user.firstName.required">Field is
                                                         required
@@ -35,8 +36,9 @@
 
                                             <!--LAST NAME-->
                                             <b-form-group :class="{ 'form-group--error': $v.user.lastName.$error }">
-                                                <mdb-input id="lName" v-model.trim="$v.user.lastName.$model"
-                                                           label="Last name" icon="user" type="text"/>
+                                                <mdb-input icon="user" id="lName"
+                                                           label="Last name" type="text"
+                                                           v-model.trim="$v.user.lastName.$model"/>
                                                 <div v-if="$v.user.lastName.$dirty">
                                                     <div class="error" v-if="!$v.user.lastName.required">Field is
                                                         required
@@ -52,18 +54,19 @@
                                             <b-form-group class="form_input_margin">
                                                 <i class="fas fa-user-cog"></i> Role: <br/>
                                                 <ejs-dropdownlist
-                                                        id='dropdownlist'
                                                         :dataSource='roleDataList'
                                                         :fields="fields"
-                                                        placeholder='Select a role'
                                                         :v-model="user.role"
+                                                        id='dropdownlist'
+                                                        placeholder='Select a role'
                                                 ></ejs-dropdownlist>
                                             </b-form-group>
 
                                             <!--EMAIL-->
                                             <b-form-group :class="{ 'form-group--error': $v.user.email.$error }">
-                                                <mdb-input id="email" v-model.trim="$v.user.email.$model"
-                                                           label="Your email" icon="envelope" type="email"/>
+                                                <mdb-input icon="envelope" id="email"
+                                                           label="Your email" type="email"
+                                                           v-model.trim="$v.user.email.$model"/>
                                                 <div v-if="$v.user.email.$dirty">
                                                     <div class="error" v-if="!$v.user.email.required">Field is
                                                         required
@@ -77,12 +80,13 @@
                                             <!--PASSWORD-->
                                             <b-form-group :class="{ 'form-group--error': $v.user.password.$error }">
                                                 <div class="row">
-                                                    <mdb-input id="password" v-model.trim="$v.user.password.$model"
-                                                               class="form_input_margin" label="Your password"
-                                                               icon="lock" type="password"/>
-                                                    <span id="view-pwd" class="fa fa-fw fa-eye" aria-hidden="true"
-                                                          v-b-tooltip.hover :title="'see raw password'"
-                                                          @click="viewPassword()"/>
+                                                    <mdb-input class="form_input_margin" icon="lock"
+                                                               id="password" label="Your password"
+                                                               type="password" v-model.trim="$v.user.password.$model"/>
+                                                    <span :title="'see raw password'" @click="viewPassword()"
+                                                          aria-hidden="true"
+                                                          class="fa fa-fw fa-eye" id="view-pwd"
+                                                          v-b-tooltip.hover/>
                                                 </div>
                                                 <div v-if="$v.user.password.$dirty">
                                                     <div class="error" v-if="!$v.user.password.required">Field is
@@ -98,11 +102,11 @@
                                             <!--REPEAT PASSWORD-->
                                             <b-form-group
                                                     :class="{ 'form-group--error': $v.user.confirmPassword.$error }">
-                                                <mdb-input id="confirmPassword"
-                                                           v-model.trim="$v.user.confirmPassword.$model"
+                                                <mdb-input icon="exclamation-triangle"
+                                                           id="confirmPassword"
                                                            label="Confirm your password"
-                                                           icon="exclamation-triangle"
-                                                           type="password"/>
+                                                           type="password"
+                                                           v-model.trim="$v.user.confirmPassword.$model"/>
                                                 <div v-if="$v.user.confirmPassword.$dirty">
                                                     <div class="error" v-if="!$v.user.confirmPassword.required">Field is
                                                         required
@@ -116,15 +120,15 @@
                                         </div>
 
                                         <mdb-row class="d-flex align-items-center mb-4 mt-5">
-                                            <mdb-col md="5" class="d-flex align-items-start">
+                                            <mdb-col class="d-flex align-items-start" md="5">
                                                 <div class="text-center">
-                                                    <mdb-btn rounded type="submit" class="z-depth-1a">Register</mdb-btn>
+                                                    <mdb-btn class="z-depth-1a" rounded type="submit">Register</mdb-btn>
                                                 </div>
                                             </mdb-col>
-                                            <mdb-col md="7" class="d-flex justify-content-end">
+                                            <mdb-col class="d-flex justify-content-end" md="7">
                                                 <p class="font-small grey-text mt-3">Have an account already? <a
-                                                        href="/login"
-                                                        class="dark-grey-text ml-1 font-weight-bold">
+                                                        class="dark-grey-text ml-1 font-weight-bold"
+                                                        href="/login">
                                                     Log In</a></p>
                                             </mdb-col>
                                         </mdb-row>
@@ -265,7 +269,7 @@
                         if (response.status === 201) {
                             showFlashMessage(self, 'success', 'User Created', 'Redirecting you to home page in ' +
                                 countDownTimer(self, this.countDown, '/home') + " seconds");
-                            secureStoreSetString(response.data.message.token);
+                            secureStoreSetString(response.data.message.token, response.data.message.email);
                         }
                     })
                     .catch((error) => {
