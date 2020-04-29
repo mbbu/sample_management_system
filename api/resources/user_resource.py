@@ -125,18 +125,15 @@ class UserResource(BaseResource):
                 last_name = args['last_name']
                 user_email = args['email']
                 role = int(args['role'])
-                password = args['password']
 
                 if first_name != user.first_name or last_name != user.last_name or \
-                        user_email != user.email or role != user.role_id \
-                        or not user.verify_password(password):
+                        user_email != user.email or role != user.role_id:
                     old_info = str(user)
                     try:
                         user.first_name = first_name
                         user.last_name = last_name
                         user.email = user_email
                         user.role_id = role
-                        user.password = User.hash_password(password)
                         user.updated_at = datetime.now()
                         user.updated_by = user.email
 
@@ -181,7 +178,7 @@ class UserResource(BaseResource):
         parser.add_argument('last_name', required=True)
         parser.add_argument('email', required=True, type=standard_non_empty_string)
         parser.add_argument('role', required=True)
-        parser.add_argument('password', required=True)
+        parser.add_argument('password', required=False)
 
         args = parser.parse_args()
         return args
