@@ -33,7 +33,7 @@
                                 <mdb-col class="d-flex justify-content-end">
                                     <a href="/edit-user">
                                         <div class="text-center">
-                                            <button @click="requestUpdateSample"
+                                            <button @click="requestUpdateUser"
                                                     class="btn btn-outline-info btn-rounded"
                                                     type="button"> Update Details
                                                 <i class="fas fa-pencil-alt"></i></button>
@@ -253,10 +253,20 @@
                         }
                     });
             },
+
+            requestUpdateUser() {
+                this.$log.info("Request Update User called")
+                let self = this;
+                let loader = this.showLoader()
+
+                setTimeout(() => {
+                    loader.hide()
+                    countDownTimer(self, 1, '/edit-user')
+                }, 1000)
+            }
         },
         created() {
             let email = getUserEmail()
-            this.$log.info("Created of user-card called. Email set to: " + email)
             this.getUserDetails(email)
         },
         components: {mdbCard, mdbCardBody, mdbRow, mdbCol, TopNav}
