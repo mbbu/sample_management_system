@@ -3,6 +3,7 @@
         <top-nav :page_title="page_title"></top-nav>
         <br>
         <mdb-card>
+            <FlashMessage :position="'center bottom'"></FlashMessage>
             <div class="header pt-3 blue-gradient">
                 <mdb-card-header :data-background-color="dataBackgroundColor">
                     <mdb-row class="d-flex justify-content-center">
@@ -51,6 +52,7 @@
                                     :dataSource='roleDataList'
                                     :fields="fields"
                                     :v-model="user.role"
+                                    :value="selectDropDownItemForUpdate('dropdownlist', user.role, roleDataList)"
                                     id='dropdownlist'
                                     placeholder='Select a role'
                             ></ejs-dropdownlist>
@@ -72,20 +74,19 @@
                     </div>
 
                     <mdb-row class="d-flex align-items-center mb-4 mt-5">
-                        <mdb-col class="d-flex align-items-start" md="5">
+                        <mdb-col class="d-flex justify-content-end" md="12">
+                            <div class="text-center">
+                                <button @click="onSubmit" class="btn btn-outline-info btn-rounded"
+                                        type="button"> Update
+                                    <i class="fas fa-pencil-alt"></i></button>
+                            </div>
+
                             <div class="text-center">
                                 <button @click="deactivateAccount()"
                                         class="btn btn-outline-danger btn-rounded"
                                         type="button"> Deactivate Account
                                     <i class="fas fa-user-lock"></i>
                                 </button>
-                            </div>
-                        </mdb-col>
-                        <mdb-col class="d-flex justify-content-end" md="7">
-                            <div class="text-center">
-                                <button @click="onSubmit" class="btn btn-outline-info btn-rounded"
-                                        type="button"> Update
-                                    <i class="fas fa-pencil-alt"></i></button>
                             </div>
                         </mdb-col>
                     </mdb-row>
@@ -104,7 +105,9 @@
         getSelectedItem,
         getStoredUserDetails,
         getUserEmail,
-        secureStoreSetString,
+        respondTo401,
+        secureStoreGetString,
+        selectDropDownItemForUpdate,
         showFlashMessage,
         viewPassword
     } from '../../utils/util_functions';
@@ -141,7 +144,20 @@
             }
         },
         methods: {
-            viewPassword,
+            viewPassword, selectDropDownItemForUpdate,
+            showLoader() {
+                return this.$loading.show({
+                    isFullPage: true,
+                    canCancel: false,
+                    color: '#074880',
+                    loader: 'dots',
+                    width: 255,
+                    height: 255,
+                    backgroundColor: '#FAAB2C',
+                    opacity: 0.7,
+                    zIndex: 999,
+                });
+            },
             onSubmit() {
                 this.$log.info("FORM SUBMIT METHOD CALLED!");
                 // stop here if form is invalid
@@ -172,19 +188,19 @@
                 this.fillUserFormForUpdate()
             },
 
+            // set user details in form
             fillUserFormForUpdate: function () {
-                // set user details
                 let userForUpdate = getStoredUserDetails()
-                this.$log.info("User for update", userForUpdate)
                 this.user.firstName = userForUpdate['first_name']
                 this.user.lastName = userForUpdate['last_name']
+                this.user.role = userForUpdate['role']
                 this.user.email = getUserEmail()
-
-                this.$log.info("User fields", this.user)
             },
+
 
             updateUser: function (user) {
                 let self = this;
+                let loader = this.showLoader()
 
                 this.user.role = getSelectedItem(this.roleDataList, this.user.role);
                 axios.put(user_resource, {
@@ -192,22 +208,34 @@
                     last_name: user.lastName,
                     email: user.email,
                     role: user.role
+                }, {
+                    headers:
+                        {
+                            Authorization: secureStoreGetString()
+                        }
                 })
                     .then((response) => {
                         // redirect after successful signUp
-                        if (response.status === 201) {
-                            showFlashMessage(self, 'success', 'User Updated', 'Redirecting you to home page in ' +
-                                countDownTimer(self, this.countDown, '/home') + " seconds");
-                            secureStoreSetString(response.data.message.token);
+                        if (response.status === 202) {
+                            setTimeout(() => {
+                                loader.hide()
+                                showFlashMessage(self, 'success', 'User Updated', 'Redirecting you to your dashboard ' +
+                                    countDownTimer(self, 3, '/user') + " seconds");
+                            }, 2500)
                         }
                     })
                     .catch((error) => {
                         this.$log.error(error);
+                        loader.hide()
                         if (error.response) {
                             if (error.response.status === 409) {
                                 showFlashMessage(self, 'error', error.response.data['message'], '');
+                            } else if (error.response.status === 304) {
+                                showFlashMessage(self, 'error', 'Record not modified', "You didn't make any changes");
                             } else if (error.response.status === 400) {
                                 showFlashMessage(self, 'error', error.response.data['message'], 'Kindly refill the form');
+                            } else if (error.response.status === 401) {
+                                respondTo401(self)
                             } else if (error.response.status === 500) {
                                 showFlashMessage(self, 'error', "Fatal Error", 'Admin has been contacted.');
                             } else {
