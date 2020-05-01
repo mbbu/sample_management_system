@@ -393,7 +393,7 @@ export function logOutUser(self) {
                 setTimeout(() => {
                     secureStoreDeleteString()
                     // loader.hide()
-                    showFlashMessage(self, 'success', 'Logged Out', 'Redirecting you to your dashboard ' +
+                    showFlashMessage(self, 'success', 'Logged Out', 'Redirecting you to home page ' +
                         countDownTimer(self, 3, '/home') + " seconds");
                 }, 2500)
             }
