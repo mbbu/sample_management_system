@@ -13,3 +13,4 @@ export var sample_resource = 'http://localhost:5000/sample' || 'http://localhost
 export var role_resource = 'http://localhost:5000/role' || 'http://localhost:5000/roles';
 export var user_resource = 'http://localhost:5000/user' || 'http://localhost:5000/users';
 export var auth_resource = 'http://localhost:5000/auth' || 'http://localhost:5000/login' || 'http://localhost:5000/auth/login';
+export var logout_resource = 'http://localhost:5000/logout' || 'http://localhost:5000/auth/log-out';

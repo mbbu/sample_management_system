@@ -3,6 +3,7 @@ import createPersistedState from "vuex-persistedstate";
 import SecureLS from "secure-ls";
 import Vue from "vue";
 import axios from "axios";
+import {logout_resource} from "./api_paths";
 
 export function showFlashMessage(self, status, title, message) {
     self.flashMessage.show({
@@ -302,7 +303,6 @@ const store = new Vuex.Store({
             lastName: "",
             role: ""
         },
-
     },
     plugins: [
         createPersistedState({
@@ -346,16 +346,14 @@ export function secureStoreSetString(jwtString, email, fName, lName, role) {
     store.commit("userFirstName", fName);
     store.commit("userLastName", lName);
     store.commit("userRole", role);
-
-    console.log("Secure store has the following details for user: ", store.state.user)
 }
 
 export function secureStoreDeleteString() {
-    store.commit("jwtToken");
-    store.commit("userDetails");
-    store.commit("userFirstName");
-    store.commit("userLastName");
-    store.commit("userRole");
+    store.commit("jwtToken", "");
+    store.commit("userEmail", "");
+    store.commit("userFirstName", "");
+    store.commit("userLastName", "");
+    store.commit("userRole", "");
 }
 
 export function getUserEmail() {
@@ -374,6 +372,39 @@ export function getStoredUserDetails() {
     user.role = store.state.user.role
 
     return user
+}
+
+// user status
+export function isUserLoggedIn() {
+    return store.state.jwtString !== "" || getUserEmail() !== "";
+}
+
+export function logOutUser(self) {
+    // let loader = startLoader(self)
+    axios.get(logout_resource, {
+        headers:
+            {
+                Authorization: secureStoreGetString()
+            }
+    })
+        .then((response) => {
+            // redirect after successful signUp
+            if (response.status === 200) {
+                setTimeout(() => {
+                    secureStoreDeleteString()
+                    // loader.hide()
+                    showFlashMessage(self, 'success', 'Logged Out', 'Redirecting you to your dashboard ' +
+                        countDownTimer(self, 3, '/home') + " seconds");
+                }, 2500)
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+            // loader.hide()
+            if (error.response) {
+                showFlashMessage(self, 'error', error.response.data['message'], '');
+            }
+        })
 }
 
 // accessor for sample code; used when requesting to view detailed sample page
@@ -458,8 +489,4 @@ export function startLoader(self) {
         opacity: 0.7,
         zIndex: 999,
     })
-}
-
-export function stopLoader(self) {
-    self.$loading.hide()
 }
