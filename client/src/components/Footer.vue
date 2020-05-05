@@ -1,5 +1,5 @@
 <template>
-    <div class="footer text-white">
+    <div class="footer text-white text-center">
         <p>
             <em>Copyright &copy; {{ getThisYear() }}
                 <br>All rights reserved to I.C.I.P.E.</em>
