@@ -23,7 +23,7 @@
 
 .sidebar {
   height: 100%;
-  width: fit-content;
+  width: 20%;
   position: fixed;
   z-index: 1;
   top: 0;
@@ -31,6 +31,11 @@
   background-color: #074880;
   overflow-x: hidden;
   padding-top: 110px;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.sidebar::-webkit-scrollbar {
+  display: none;
 }
 
 .sidebar a {
@@ -51,7 +56,7 @@
 
 /*active links*/
 .sidebar a.router-link-active {
-  font-weight: 500;
+  font-weight: 700;
   background: #FAAB2C;
 }
 
@@ -60,9 +65,10 @@
   padding: 0px 10px;
 }
 
-@media screen and (max-height: 450px) {
+@media screen and (max-height: 550px) {
   .sidebar {
-    padding-top: 15px;
+    width: fit-content;
+    padding-top: 110px;
   }
 
   .sidebar a {
