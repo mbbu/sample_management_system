@@ -6,11 +6,11 @@
                     <img :src="require('../assets/logo.png')" class="menu_logo"/>
                 </router-link>
             </mdb-navbar-brand>
+            <mdb-navbar-nav>
+                <mdb-nav-item class="item_title" href="#" waves-fixed><h2> {{ page_title }} </h2></mdb-nav-item>
+            </mdb-navbar-nav>
             <mdb-navbar-toggler>
-                <mdb-navbar-nav>
-                    <mdb-nav-item class="item_title" href="#" waves-fixed><h2> {{ page_title }} </h2></mdb-nav-item>
-                </mdb-navbar-nav>
-
+                <mdb-navbar-nav></mdb-navbar-nav>
                 <mdb-form-inline>
                     <mdb-input aria-label="Search" class="mr-sm-2" placeholder="Search" type="text"/>
                     <mdb-btn class="my-0" outline="white" size="sm" type="submit">Search
