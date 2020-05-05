@@ -476,6 +476,10 @@ export function overDueRetentionPeriod(dbDate) {
     return yearsDisplay + monthsDisplay + daysDisplay;
 }
 
+export function getThisYear() {
+    return (new Date().getFullYear()).toString()
+}
+
 // loader function
 export function startLoader(self) {
     self.$loading.show({
