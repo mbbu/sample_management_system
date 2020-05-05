@@ -269,7 +269,8 @@
                         if (response.status === 201) {
                             showFlashMessage(self, 'success', 'User Created', 'Redirecting you to home page in ' +
                                 countDownTimer(self, this.countDown, '/home') + " seconds");
-                            secureStoreSetString(response.data.message.token, response.data.message.email);
+                            secureStoreSetString(response.data.message.token, response.data.message.email, response.data.message.first_name,
+                                response.data.message.last_name, response.data.message['role.name']);
                         }
                     })
                     .catch((error) => {
