@@ -74,19 +74,45 @@
                     </div>
 
                     <mdb-row class="d-flex align-items-center mb-4 mt-5">
-                        <mdb-col class="d-flex justify-content-end" md="12">
+                        <mdb-col class="d-flex align-items-start" md="5">
+                            <a href="/user">
+                                <button class="btn btn-outline-info btn-rounded" type="button">
+                                    <i class="fas fa-arrow-left"></i>
+                                    Back
+                                </button>
+                            </a>
+                        </mdb-col>
+                        <mdb-col class="d-flex justify-content-end" md="7">
                             <div class="text-center">
                                 <button @click="onSubmit" class="btn btn-outline-info btn-rounded"
                                         type="button"> Update
                                     <i class="fas fa-pencil-alt"></i></button>
                             </div>
 
-                            <div class="text-center">
-                                <button @click="deactivateAccount()"
-                                        class="btn btn-outline-danger btn-rounded"
-                                        type="button"> Deactivate Account
-                                    <i class="fas fa-user-lock"></i>
-                                </button>
+                            <!--  DEACTIVATE USER    -->
+                            <div>
+                                <div class="text-center">
+                                    <button v-b-modal.modal-user-deactivate
+                                            class="btn btn-outline-danger btn-rounded"
+                                            type="button"> Deactivate Account
+                                        <i class="fas fa-user-lock"></i>
+                                    </button>
+                                </div>
+
+                                <b-modal
+                                        @ok="deactivateAccount"
+                                        cancel-variant="info"
+                                        id="modal-user-deactivate"
+                                        ok-title="Deactivate"
+                                        ok-variant="danger"
+                                        title="Deactivate Account?"
+                                >
+                                    <p>
+                                        Are you sure you want to deactivate your account?
+                                        <i class="far fa-sad-tear menu_icon"></i>
+                                        You can always reactivate by <em>Signing Up</em> again!
+                                    </p>
+                                </b-modal>
                             </div>
                         </mdb-col>
                     </mdb-row>
@@ -106,6 +132,7 @@
         getStoredUserDetails,
         getUserEmail,
         respondTo401,
+        secureStoreDeleteString,
         secureStoreGetString,
         selectDropDownItemForUpdate,
         showFlashMessage,
@@ -246,6 +273,46 @@
 
             },
             deactivateAccount() {
+                let self = this;
+                let loader = this.showLoader()
+
+                axios.delete(user_resource, {
+                    headers:
+                        {
+                            Authorization: secureStoreGetString()
+                        }
+                })
+                    .then((response) => {
+                        // redirect after successful signUp
+                        if (response.status === 200) {
+                            setTimeout(() => {
+                                secureStoreDeleteString()
+                                loader.hide()
+                                showFlashMessage(self, 'success', 'Account Deactivated', 'Your account has been successfully deactivated.' +
+                                    '\nSorry to see you go.');
+                                +countDownTimer(self, 3, '/home')
+                            }, 2500)
+                        }
+                    })
+                    .catch((error) => {
+                        this.$log.error(error);
+                        loader.hide()
+                        if (error.response) {
+                            if (error.response.status === 409) {
+                                showFlashMessage(self, 'error', error.response.data['message'], '');
+                            } else if (error.response.status === 404) {
+                                showFlashMessage(self, 'error', 'User not found', "");
+                            } else if (error.response.status === 400) {
+                                showFlashMessage(self, 'error', error.response.data['message'], 'Kindly refill the form');
+                            } else if (error.response.status === 401) {
+                                respondTo401(self)
+                            } else if (error.response.status === 500) {
+                                showFlashMessage(self, 'error', "Fatal Error", 'Admin has been contacted.');
+                            } else {
+                                showFlashMessage(self, 'error', error.response.data['message'], '');
+                            }
+                        }
+                    })
             },
         },
         components: {mdbCard, mdbCardHeader, mdbCardBody, mdbRow, mdbCol, mdbInput, TopNav},

@@ -39,11 +39,29 @@
                                                 <i class="fas fa-pencil-alt"></i></button>
                                         </div>
                                     </a>
-                                    <div class="text-center">
-                                        <button @click="deleteSample(sample.code)"
-                                                class="btn btn-outline-danger btn-rounded"
-                                                type="button"> Delete Account
-                                            <i class="far fa-trash-alt"></i></button>
+
+                                    <!--  DELETE USER    -->
+                                    <div>
+                                        <div class="text-center">
+                                            <button v-b-modal.modal-user-delete
+                                                    class="btn btn-outline-danger btn-rounded"
+                                                    type="button"> Delete Account
+                                                <i class="far fa-trash-alt"></i></button>
+                                        </div>
+
+                                        <b-modal
+                                                title="Delete Account?"
+                                                @ok="deleteUser"
+                                                cancel-variant="info"
+                                                ok-variant="danger"
+                                                id="modal-user-delete"
+                                                ok-title="Delete"
+                                        >
+                                            <p>
+                                                Are you sure you want to delete your account?
+                                                <i class="far fa-sad-tear menu_icon"></i>
+                                            </p>
+                                        </b-modal>
                                     </div>
                                 </mdb-col>
                             </div>
@@ -188,7 +206,14 @@
     import TopNav from "@/components/TopNav";
     import axios from "axios";
     import {user_resource} from "../../utils/api_paths";
-    import {countDownTimer, getUserEmail, showFlashMessage} from "../../utils/util_functions";
+    import {
+        countDownTimer,
+        getUserEmail,
+        respondTo401,
+        secureStoreDeleteString,
+        secureStoreGetString,
+        showFlashMessage
+    } from "../../utils/util_functions";
 
     export default {
         name: "UserCard",
@@ -263,6 +288,49 @@
                     loader.hide()
                     countDownTimer(self, 1, '/edit-user')
                 }, 1000)
+            },
+
+            deleteUser() {
+                let self = this;
+                let loader = this.showLoader()
+
+                axios.delete(user_resource, {
+                    headers:
+                        {
+                            Authorization: secureStoreGetString()
+                        }
+                })
+                    .then((response) => {
+                        // redirect after successful signUp
+                        if (response.status === 200) {
+                            setTimeout(() => {
+                                secureStoreDeleteString()
+                                loader.hide()
+                                showFlashMessage(self, 'success', 'Account Deleted', 'Your account has been successfully deleted.' +
+                                    '\nSorry to see you go.');
+                                countDownTimer(self, 3, '/home')
+                            }, 2500)
+                        }
+                    })
+                    .catch((error) => {
+                        this.$log.error(error);
+                        loader.hide()
+                        if (error.response) {
+                            if (error.response.status === 409) {
+                                showFlashMessage(self, 'error', error.response.data['message'], '');
+                            } else if (error.response.status === 404) {
+                                showFlashMessage(self, 'error', 'User not found', "");
+                            } else if (error.response.status === 400) {
+                                showFlashMessage(self, 'error', error.response.data['message'], 'Kindly refill the form');
+                            } else if (error.response.status === 401) {
+                                respondTo401(self)
+                            } else if (error.response.status === 500) {
+                                showFlashMessage(self, 'error', "Fatal Error", 'Admin has been contacted.');
+                            } else {
+                                showFlashMessage(self, 'error', error.response.data['message'], '');
+                            }
+                        }
+                    })
             }
         },
         created() {
