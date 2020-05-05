@@ -9,7 +9,8 @@
 <script>
 
     // import ContentOverlay from '@/components/ContentOverlay.vue';
-    import SideMenu from "./components/Nav";
+    import SideMenu from "./components/SideNav";
+    // import FooterScript from "./components/Footer";
 
     export default {
         components: {
