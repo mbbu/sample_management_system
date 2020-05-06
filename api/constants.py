@@ -10,6 +10,7 @@ APP_CONFIG_ENV_VAR = APP_NAME + "_CONFIG"
 DEV_CONFIG_VAR = "development"
 PROD_CONFIG_VAR = "production"
 SECRET_KEY = APP_NAME + '_SECRET_KEY'
+SECURITY_PASSWORD_SALT = APP_NAME + '_SECURITY_PASSWORD_SALT'
 
 # Redis
 ACCESS_EXPIRES = timedelta(days=7)
@@ -26,3 +27,9 @@ REDCAP_URI = 'https://redcap.icipe.org/api/'
 
 # Variable
 DATE_TIME_NONE = '0001-01-01 00:00'
+
+# Email token valid duration
+EMAIL_TOKEN_EXPIRATION = timedelta(hours=1)
+
+# Email sender
+EMAIL_SENDER = ''  # todo: set email that will send out other mails

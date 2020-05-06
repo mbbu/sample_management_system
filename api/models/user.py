@@ -15,8 +15,13 @@ class User(BaseModel.db.Model):
     email = AppDb.Column(AppDb.String(65), index=True, unique=True, nullable=False)
     password = AppDb.Column(AppDb.String(128), nullable=False)
     role_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('role.id', ondelete='SET NULL'), nullable=False)
-    housedata_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('housedata.id', ondelete='SET NULL'),
-                                nullable=True)  # todo - be removed
+
+    # Fields to help identify account status
+    is_active = AppDb.Column(AppDb.Boolean, nullable=False, default=False)
+    email_confirmation_sent_on = AppDb.Column(AppDb.DateTime, nullable=True)
+    email_confirmed = AppDb.Column(AppDb.Boolean, nullable=False, default=False)
+    email_confirmed_on = AppDb.Column(AppDb.DateTime, nullable=True)
+
     # Fields to help in audits
     created_at = AppDb.Column(AppDb.DateTime, nullable=False, default=datetime.now)
     created_by = AppDb.Column(AppDb.String(65), nullable=False)

@@ -6,6 +6,7 @@ from logging.handlers import SMTPHandler
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
+from flask_mail import Mail
 from flask_restful import Api
 from werkzeug.exceptions import NotFound, InternalServerError
 
@@ -77,6 +78,7 @@ def register_resources(app):
     from api.resources.quantity_type_resource import QuantityTypeResource
     from api.resources.security_level_resource import SecurityLevelResource
     from api.resources.housedata_resource import HouseDataResource
+    from api.resources.email_confirmation.email_confirmation import EmailConfirmationResource
 
     api = Api(app)
     api.add_resource(IndexResource, '/', '/index', '/welcome')
@@ -85,6 +87,7 @@ def register_resources(app):
     api.add_resource(ThemeResource, '/theme', '/themes')
     api.add_resource(RoleResource, '/role', '/roles')
     api.add_resource(UserResource, '/user', '/users')
+    api.add_resource(EmailConfirmationResource, '/confirm/<token>')
 
     api.add_resource(PublicationResource, '/publication', '/publications')
     api.add_resource(SampleResource, '/sample', '/samples')
@@ -154,6 +157,9 @@ def create_app(test_config=None):
     # JWT setup
     app.config['SECRET_KEY'] = os.getenv(SECRET_KEY)
     jwt = JWTManager(app)
+
+    # Flask-Mail SetUp
+    Mail(app)
 
     # Cross-Origin Resource Sharing
     # todo: proper CORS config, to ensure requests to the api are only sent by verified clients

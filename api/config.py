@@ -3,7 +3,7 @@ import os
 
 from flask import has_request_context, request
 
-from api.constants import DATABASE_URI_ENV_NAME, SECRET_KEY, ACCESS_EXPIRES, REFRESH_EXPIRES
+from api.constants import DATABASE_URI_ENV_NAME, SECRET_KEY, ACCESS_EXPIRES, REFRESH_EXPIRES, SECURITY_PASSWORD_SALT
 
 
 # override default log formats
@@ -22,6 +22,7 @@ class BaseConfig(object):
     database_uri = os.getenv(DATABASE_URI_ENV_NAME)
     SQLALCHEMY_DATABASE_URI = database_uri
     SECRET_KEY = os.environ.get(SECRET_KEY) or os.urandom(32)
+    SECURITY_PASSWORD_SALT = os.environ.get(SECURITY_PASSWORD_SALT) or os.urandom(32)
 
     # ADMIN MAILING CONFIG
     MAIL_SERVER = os.environ.get('MAIL_SERVER')
@@ -29,7 +30,8 @@ class BaseConfig(object):
     MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS') is not None
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
-    ADMINS = ['cynthiakamau54@gmail.com']
+    # ADMINS = ['jeffkim207@gmail.com']
+    ADMINS = 'jeffkim207@gmail.com'
 
     # Add Custom log format to config
     LOGGING_FORMAT = RequestFormatter(
