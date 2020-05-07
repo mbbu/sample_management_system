@@ -279,7 +279,8 @@
                 axios.delete(user_resource, {
                     headers:
                         {
-                            Authorization: secureStoreGetString()
+                            Authorization: secureStoreGetString(),
+                            deactivate: true
                         }
                 })
                     .then((response) => {

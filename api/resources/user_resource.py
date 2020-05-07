@@ -159,12 +159,24 @@ class UserResource(BaseResource):
                 return BaseResource.send_json_message("Cannot delete another user", 403)
 
             else:
-                user.is_deleted = True
-                user.deleted_at = datetime.now()
-                user.deleted_by = get_jwt_identity()
-                BaseModel.db.session.commit()
-                current_app.logger.info("{0} deleted {1}".format(get_jwt_identity(), user.email))
-                return BaseResource.send_json_message("User deleted", 200)
+                # decide whether to delete user or deactivate account.
+                # How? Check for deactivate in headers
+
+                if request.headers.get('deactivate'):
+                    print(request.headers.get('deactivate'))
+                    user.is_active = False
+                    user.deactivated_at = datetime.now()
+                    user.deactivated_by = email
+                    BaseModel.db.session.commit()
+                    current_app.logger.info("{0} deactivated {1}".format(get_jwt_identity(), user.email))
+                    return BaseResource.send_json_message("User account deactivated", 200)
+                else:
+                    user.is_deleted = True
+                    user.deleted_at = datetime.now()
+                    user.deleted_by = get_jwt_identity()
+                    BaseModel.db.session.commit()
+                    current_app.logger.info("{0} deleted {1}".format(get_jwt_identity(), user.email))
+                    return BaseResource.send_json_message("User deleted", 200)
 
         current_app.logger.info("{0} trying to delete {1} but does not exist".format(get_jwt_identity(), email))
         return BaseResource.send_json_message("User not found", 404)
