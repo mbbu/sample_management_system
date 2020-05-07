@@ -29,7 +29,7 @@ REDCAP_URI = 'https://redcap.icipe.org/api/'
 DATE_TIME_NONE = '0001-01-01 00:00'
 
 # Email token valid duration
-EMAIL_TOKEN_EXPIRATION = timedelta(hours=1)
+EMAIL_TOKEN_EXPIRATION = 3600  # equivalent to 1 hour
 
 # Email sender
 EMAIL_SENDER = ''  # todo: set email that will send out other mails

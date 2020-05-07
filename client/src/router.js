@@ -46,7 +46,7 @@ export default new Router({
         },
 
         {
-            path: '/confirm/<token>',
+            path: '/confirm/*',
             name: 'user-confirm',
             component: ConfirmUser,
         },
