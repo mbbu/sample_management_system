@@ -23,6 +23,7 @@ import UserRole from "./pages/UserProfile/UserRole";
 import UserCard from "./pages/UserProfile/UserCard";
 import EditProfileForm from "./pages/UserProfile/EditProfileForm";
 import ConfirmUser from "./pages/ConfirmUserAccount/ConfirmUser";
+import ResendConfirmation from "./pages/ConfirmUserAccount/ResendConfirmation";
 
 
 Vue.use(Router);
@@ -49,6 +50,12 @@ export default new Router({
             path: '/confirm/*',
             name: 'user-confirm',
             component: ConfirmUser,
+        },
+
+        {
+            path: '/requestConfirmation',
+            name: 'email-request',
+            component: ResendConfirmation,
         },
 
         {

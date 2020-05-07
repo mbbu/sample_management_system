@@ -4,7 +4,7 @@
 from datetime import datetime
 
 from flask import current_app, render_template
-from flask_restful import marshal, fields
+from flask_restful import marshal, fields, reqparse
 from itsdangerous import URLSafeTimedSerializer
 
 from api import BaseResource, BaseModel
@@ -77,3 +77,14 @@ class EmailConfirmationResource(BaseResource):
             current_app.logger.error('The confirmation link for is invalid or has expired.')
             return BaseResource.send_json_message('The confirmation link is invalid or has expired.'
                                                   '\nRequest another confirmation email', 408)
+
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('email', required=True)
+
+        args = parser.parse_args()
+        email = args['email']
+
+        send_confirmation_email(email)
+
+        return BaseResource.send_json_message("Email sent", 200)

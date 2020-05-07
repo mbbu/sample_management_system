@@ -93,11 +93,11 @@
 <script>
     import axios from 'axios';
     import 'es6-promise/auto';
-    import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
     import TopNav from "../components/TopNav";
-    import {email, required} from "vuelidate/lib/validators";
-    import {countDownTimer, secureStoreSetString, showFlashMessage, viewPassword} from "../utils/util_functions";
     import {auth_resource} from "../utils/api_paths";
+    import {email, required} from "vuelidate/lib/validators";
+    import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
+    import {countDownTimer, secureStoreSetString, showFlashMessage, viewPassword} from "../utils/util_functions";
 
     export default {
         components: {
@@ -178,7 +178,7 @@
                                     response.data.message.last_name, response.data.message['role.name']);
                             } else if (response.status === 203) {
                                 showFlashMessage(self, 'error', response.data.message, 'You can request for reactivation email')
-                                // todo: redirect to confirm account page
+                                countDownTimer(self, 8, '/requestConfirmation')
                             } else if (response.status === 204) {
                                 showFlashMessage(self, 'error', 'User found but account is deactivated!', 'You can reactivate by signing up again')
                             }

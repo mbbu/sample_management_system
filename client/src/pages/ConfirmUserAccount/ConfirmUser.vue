@@ -97,12 +97,10 @@
                         if (error.response) {
                             if (error.response.status === 404) {
                                 this.fail = error.response.data.message + "\nRedirecting you to login now ..."
-                                showFlashMessage(self, 'error', error.response.data.message, "Redirecting you to login")
-                                countDownTimer(self, 10, '/login')
+                                countDownTimer(self, 5, '/login')
                             } else if (error.response.status === 408) {
                                 this.fail = error.response.data.message
-                                showFlashMessage(self, 'error', "Invalid Confirmation", error.response.data.message)
-                                // todo: redirect to resend confirmation email
+                                countDownTimer(self, 5, '/requestConfirmation')
                             }
                         }
                     });

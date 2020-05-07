@@ -87,7 +87,7 @@ def register_resources(app):
     api.add_resource(ThemeResource, '/theme', '/themes')
     api.add_resource(RoleResource, '/role', '/roles')
     api.add_resource(UserResource, '/user', '/users')
-    api.add_resource(EmailConfirmationResource, '/confirm/<token>')
+    api.add_resource(EmailConfirmationResource, '/requestConfirmation', '/confirm/<token>')
 
     api.add_resource(PublicationResource, '/publication', '/publications')
     api.add_resource(SampleResource, '/sample', '/samples')
