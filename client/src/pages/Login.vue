@@ -132,6 +132,20 @@
 
         methods: {
             viewPassword,
+            showLoader() {
+                return this.$loading.show({
+                    isFullPage: true,
+                    canCancel: false,
+                    color: '#074880',
+                    loader: 'spinner',
+                    width: 255,
+                    height: 255,
+                    backgroundColor: '#FAAB2C',
+                    opacity: 0.7,
+                    zIndex: 999,
+                });
+            },
+
             onSubmit() {
                 // stop here if form is invalid
                 this.$v.$touch();
@@ -145,6 +159,7 @@
             },
 
             logInUser: function (user) {
+                let loader = this.showLoader()
                 let self = this;
 
                 axios.post(auth_resource, {
@@ -152,14 +167,22 @@
                     password: user.password
                 })
                     .then((response) => {
-                        // redirect after successful login
-                        if (response.status === 200) {
-                            showFlashMessage(self, 'success', 'Logged In', 'Redirecting you to home page in ' +
-                                countDownTimer(self, this.countDown, '/home') + " seconds");
-                            // set jwt token required across requests
-                            secureStoreSetString(response.data.message.token, response.data.message.email, response.data.message.first_name,
-                                response.data.message.last_name, response.data.message['role.name']);
-                        }
+                        setTimeout(() => {
+                            loader.hide()
+                            // redirect after successful login
+                            if (response.status === 200) {
+                                showFlashMessage(self, 'success', 'Logged In', 'Redirecting you to home page in ' +
+                                    countDownTimer(self, this.countDown, '/home') + " seconds");
+                                // set jwt token required across requests
+                                secureStoreSetString(response.data.message.token, response.data.message.email, response.data.message.first_name,
+                                    response.data.message.last_name, response.data.message['role.name']);
+                            } else if (response.status === 203) {
+                                showFlashMessage(self, 'error', response.data.message, 'You can request for reactivation email')
+                                // todo: redirect to confirm account page
+                            } else if (response.status === 204) {
+                                showFlashMessage(self, 'error', 'User found but account is deactivated!', 'You can reactivate by signing up again')
+                            }
+                        }, 3000)
                     })
                     .catch((error) => {
                         this.$log.error(error);

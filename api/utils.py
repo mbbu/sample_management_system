@@ -66,7 +66,18 @@ def get_active_users():
 
 
 def get_user_by_email(email):
-    return BaseModel.db.session.query(User).filter(User.email == email, User.is_deleted == False).first()
+    return BaseModel.db.session.query(User).filter(User.email == email, User.is_deleted == False,
+                                                   User.is_active == True, User.email_confirmed == True).first()
+
+
+def get_unconfirmed_user(email):
+    return BaseModel.db.session.query(User).filter(User.email == email, User.is_active == False,
+                                                   User.email_confirmed == False).first()
+
+
+def get_deactivated_user(email):
+    return BaseModel.db.session.query(User).filter(User.email == email, User.is_active == False,
+                                                   User.is_deleted == False).first()
 
 
 def get_users_by_role(role):
@@ -75,10 +86,6 @@ def get_users_by_role(role):
 
 def get_users_by_status(status):
     return BaseModel.db.session.query(User).filter(User.is_deleted == status).all()
-
-
-def get_deactivated_user(email):
-    return BaseModel.db.session.query(User).filter(User.email == email, User.is_deleted == True).first()
 
 
 def log_in_user_jwt(user):

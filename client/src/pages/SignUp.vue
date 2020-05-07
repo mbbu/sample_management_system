@@ -154,7 +154,6 @@
         extractApiData,
         getItemDataList,
         getSelectedItem,
-        secureStoreSetString,
         showFlashMessage,
         viewPassword
     } from "../utils/util_functions"
@@ -211,6 +210,20 @@
 
         methods: {
             viewPassword,
+            showLoader() {
+                return this.$loading.show({
+                    isFullPage: true,
+                    canCancel: false,
+                    color: '#074880',
+                    loader: 'spinner',
+                    width: 255,
+                    height: 255,
+                    backgroundColor: '#FAAB2C',
+                    opacity: 0.7,
+                    zIndex: 999,
+                });
+            },
+
             clearForm(user) {
                 user.firstName = null;
                 user.lastName = null;
@@ -254,6 +267,7 @@
 
 
             createUser: function (user) {
+                let loader = this.showLoader()
                 let self = this;
 
                 this.user.role = getSelectedItem(this.roleDataList, this.user.role);
@@ -265,13 +279,14 @@
                     password: user.password
                 })
                     .then((response) => {
-                        // redirect after successful signUp
-                        if (response.status === 201) {
-                            showFlashMessage(self, 'success', 'User Created', 'Redirecting you to home page in ' +
-                                countDownTimer(self, this.countDown, '/home') + " seconds");
-                            secureStoreSetString(response.data.message.token, response.data.message.email, response.data.message.first_name,
-                                response.data.message.last_name, response.data.message['role.name']);
-                        }
+                        setTimeout(() => {
+                            loader.hide()
+                            // redirect after successful signUp
+                            if (response.status === 201) {
+                                showFlashMessage(self, 'success', 'User Created', 'Redirecting you to home page in ' +
+                                    countDownTimer(self, this.countDown, '/home') + " seconds");
+                            }
+                        }, 3500)
                     })
                     .catch((error) => {
                         this.$log.error(error);
