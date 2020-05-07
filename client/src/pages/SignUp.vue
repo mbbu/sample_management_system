@@ -289,6 +289,7 @@
                         }, 3500)
                     })
                     .catch((error) => {
+                        loader.hide()
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 409) {

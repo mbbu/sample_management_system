@@ -185,6 +185,7 @@
                         }, 3000)
                     })
                     .catch((error) => {
+                        loader.hide()
                         this.$log.error(error);
                         this.$log.error("error: ", error.response.status);
                         if (error.response) {

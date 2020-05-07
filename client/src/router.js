@@ -22,6 +22,7 @@ import {isUpdate} from "./utils/util_functions";
 import UserRole from "./pages/UserProfile/UserRole";
 import UserCard from "./pages/UserProfile/UserCard";
 import EditProfileForm from "./pages/UserProfile/EditProfileForm";
+import ConfirmUser from "./pages/ConfirmUserAccount/ConfirmUser";
 
 
 Vue.use(Router);
@@ -42,6 +43,12 @@ export default new Router({
             name: 'register',
             alias: ['/signup'],
             component: SignUp,
+        },
+
+        {
+            path: '/confirm/<token>',
+            name: 'user-confirm',
+            component: ConfirmUser,
         },
 
         {
