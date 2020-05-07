@@ -18,6 +18,8 @@ class User(BaseModel.db.Model):
 
     # Fields to help identify account status
     is_active = AppDb.Column(AppDb.Boolean, nullable=False, default=False)
+    deactivated_at = AppDb.Column(AppDb.DateTime, nullable=True)
+    deactivated_by = AppDb.Column(AppDb.String(65), nullable=True)
     email_confirmation_sent_on = AppDb.Column(AppDb.DateTime, nullable=True)
     email_confirmed = AppDb.Column(AppDb.Boolean, nullable=False, default=False)
     email_confirmed_on = AppDb.Column(AppDb.DateTime, nullable=True)
