@@ -30,6 +30,7 @@ DATE_TIME_NONE = '0001-01-01 00:00'
 
 # Email token valid duration
 EMAIL_TOKEN_EXPIRATION = 3600  # equivalent to 1 hour
+EXPIRATION_AS_HR = EMAIL_TOKEN_EXPIRATION / 60 / 60
 
 # Email sender
 EMAIL_SENDER = ''  # todo: set email that will send out other mails
