@@ -1,6 +1,8 @@
 // paths to API resources
+export var password_reset_resource = 'http://localhost:5000/reset/';
 export var email_confirm_resource = 'http://localhost:5000/confirm/';
 export var quantity_type_resource = 'http://localhost:5000/quantity-type';
+export var request_password_reset_resource = 'http://localhost:5000/forgot';
 export var security_level_resource = 'http://localhost:5000/security-level';
 export var request_confirm_resource = 'http://localhost:5000/requestConfirmation';
 export var box_resource = 'http://localhost:5000/box' || 'http://localhost:5000/boxes';

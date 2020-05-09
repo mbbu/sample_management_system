@@ -24,6 +24,8 @@ import UserCard from "./pages/UserProfile/UserCard";
 import EditProfileForm from "./pages/UserProfile/EditProfileForm";
 import ConfirmUser from "./pages/ConfirmUserAccount/ConfirmUser";
 import ResendConfirmation from "./pages/ConfirmUserAccount/ResendConfirmation";
+import PasswordResetRequest from "./pages/Auth/PasswordResetRequest";
+import PasswordResetConfirmation from "./pages/Auth/PasswordResetConfirmation";
 
 
 Vue.use(Router);
@@ -56,6 +58,19 @@ export default new Router({
             path: '/requestConfirmation',
             name: 'email-request',
             component: ResendConfirmation,
+        },
+
+        {
+            path: '/forgot',
+            name: 'forgot-password',
+            alias: ['/forgotPassword', '/forgot-password', '/forgot-pwd'],
+            component: PasswordResetRequest,
+        },
+
+        {
+            path: '/reset/*',
+            name: 'pwd-reset',
+            component: PasswordResetConfirmation,
         },
 
         {

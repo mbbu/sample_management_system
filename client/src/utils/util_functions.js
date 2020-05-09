@@ -374,6 +374,15 @@ export function getStoredUserDetails() {
     return user
 }
 
+export function strongPassword(password1) {
+    return (
+        /[a-z]/.test(password1) && //checks for a-z
+        /[0-9]/.test(password1) && //checks for 0-9
+        /\W|_/.test(password1) && //checks for special char
+        password1.length >= 6
+    );
+}
+
 // user status
 export function isUserLoggedIn() {
     return store.state.jwtString !== "" || getUserEmail() !== "";

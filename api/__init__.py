@@ -15,6 +15,7 @@ from api.constants import APP_CONFIG_ENV_VAR, DEV_CONFIG_VAR, PROD_CONFIG_VAR, A
 from api.models.database import BaseModel
 from api.resources.base_resource import BaseResource
 from .resources import sample_resource, chamber_resource
+from .resources.password_reset.password_reset import ForgotPasswordResource, PasswordResetResource
 
 
 def get_config_type():
@@ -87,7 +88,10 @@ def register_resources(app):
     api.add_resource(ThemeResource, '/theme', '/themes')
     api.add_resource(RoleResource, '/role', '/roles')
     api.add_resource(UserResource, '/user', '/users')
+
     api.add_resource(EmailConfirmationResource, '/requestConfirmation', '/confirm/<token>')
+    api.add_resource(ForgotPasswordResource, '/forgot')
+    api.add_resource(PasswordResetResource, '/reset/<token>')
 
     api.add_resource(PublicationResource, '/publication', '/publications')
     api.add_resource(SampleResource, '/sample', '/samples')

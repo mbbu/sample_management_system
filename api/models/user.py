@@ -23,6 +23,7 @@ class User(BaseModel.db.Model):
     email_confirmation_sent_on = AppDb.Column(AppDb.DateTime, nullable=True)
     email_confirmed = AppDb.Column(AppDb.Boolean, nullable=False, default=False)
     email_confirmed_on = AppDb.Column(AppDb.DateTime, nullable=True)
+    password_reset_on = AppDb.Column(AppDb.DateTime, nullable=True)
 
     # Fields to help in audits
     created_at = AppDb.Column(AppDb.DateTime, nullable=False, default=datetime.now)

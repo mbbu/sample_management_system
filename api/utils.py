@@ -3,11 +3,12 @@ from datetime import datetime, timedelta
 import requests
 from flask import current_app, request
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jti, get_jwt_identity
+from itsdangerous import URLSafeTimedSerializer
 from mixer.backend.flask import Mixer
 
 from api import revoked_store, BaseResource
 from api.config import BaseConfig
-from api.constants import ACCESS_EXPIRES, REFRESH_EXPIRES, REDCAP_URI
+from api.constants import ACCESS_EXPIRES, REFRESH_EXPIRES, REDCAP_URI, EMAIL_TOKEN_EXPIRATION
 from api.models import *
 from api.models.database import BaseModel
 
@@ -192,3 +193,27 @@ def faker(count, model, model_name):
         num += 1
 
     return BaseResource.send_json_message("{}s created".format(model_name), 200)
+
+
+"""
+    Functions for token generation and confirmation
+"""
+
+
+def generate_confirmation_token(email):
+    serializer = URLSafeTimedSerializer(BaseConfig.SECRET_KEY)
+    return serializer.dumps(email, salt=BaseConfig.SECURITY_PASSWORD_SALT)
+
+
+def confirm_token(token, expiration=EMAIL_TOKEN_EXPIRATION):
+    serializer = URLSafeTimedSerializer(BaseConfig.SECRET_KEY)
+    try:
+        email = serializer.loads(
+            token,
+            salt=BaseConfig.SECURITY_PASSWORD_SALT,
+            max_age=expiration
+        )
+    except Exception as e:
+        current_app.logger.error(e)
+        return False
+    return email

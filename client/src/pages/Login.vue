@@ -63,7 +63,7 @@
                                         <br>
                                         <p class="font-small grey-text d-flex justify-content-end">Forgot <a
                                                 class="dark-grey-text ml-1 font-weight-bold"
-                                                href="#">
+                                                href="/forgot">
                                             Password?</a></p>
                                         <mdb-row class="d-flex align-items-center mb-4 mt-5">
                                             <mdb-col class="d-flex align-items-start" md="5">
