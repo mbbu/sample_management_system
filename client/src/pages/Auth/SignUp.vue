@@ -146,9 +146,9 @@
 <script>
     import axios from 'axios';
     import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
-    import TopNav from "../components/TopNav";
+    import TopNav from "../../components/TopNav";
     import {email, minLength, required, sameAs} from "vuelidate/lib/validators"
-    import {role_resource, user_resource} from "../utils/api_paths";
+    import {role_resource, user_resource} from "../../utils/api_paths";
     import {
         countDownTimer,
         extractApiData,
@@ -156,7 +156,7 @@
         getSelectedItem,
         showFlashMessage,
         viewPassword
-    } from "../utils/util_functions"
+    } from "../../utils/util_functions"
 
     export default {
         name: "SignUp",

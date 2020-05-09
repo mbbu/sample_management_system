@@ -93,11 +93,11 @@
 <script>
     import axios from 'axios';
     import 'es6-promise/auto';
-    import TopNav from "../components/TopNav";
-    import {auth_resource} from "../utils/api_paths";
+    import TopNav from "../../components/TopNav";
+    import {auth_resource} from "../../utils/api_paths";
     import {email, required} from "vuelidate/lib/validators";
     import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
-    import {countDownTimer, secureStoreSetString, showFlashMessage, viewPassword} from "../utils/util_functions";
+    import {countDownTimer, secureStoreSetString, showFlashMessage, viewPassword} from "../../utils/util_functions";
 
     export default {
         components: {

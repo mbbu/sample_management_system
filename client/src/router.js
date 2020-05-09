@@ -4,15 +4,14 @@ import Box from './pages/Box.vue';
 import Sample from './pages/Sample/ListSampleView.vue';
 import Chamber from './pages/Chamber.vue';
 import Theme from './pages/Theme.vue';
-import Login from './pages/Login.vue';
+import Login from './pages/Auth/Login.vue';
 import AddSample from './pages/Sample/Add_and_Update_Sample.vue';
 import Map from './pages/Map.vue';
-import UpdateProfile from './pages/UpdateProfile.vue';
 import SecurityLevel from "./pages/SecurityLevel";
 import QuantityType from "./pages/QuantityType";
 import Lab from "./pages/Lab";
 import Freezer from "./pages/Freezer";
-import SignUp from "./pages/SignUp";
+import SignUp from "./pages/Auth/SignUp";
 import ContactUs from "./pages/ContactUs";
 import Rack from "./pages/Rack";
 import Tray from "./pages/Tray";
@@ -99,12 +98,6 @@ export default new Router({
             name: 'contact',
             alias: ['/contact'],
             component: ContactUs,
-        },
-
-        {
-            path: '/updateprofile',
-            name: 'updateprofile',
-            component: UpdateProfile,
         },
 
         {
