@@ -283,8 +283,8 @@
                             loader.hide()
                             // redirect after successful signUp
                             if (response.status === 201) {
-                                showFlashMessage(self, 'success', 'User Created', 'Redirecting you to home page in ' +
-                                    countDownTimer(self, this.countDown, '/home') + " seconds");
+                                showFlashMessage(self, 'success', response.data.message, '');
+                                countDownTimer(self, this.countDown, '/home')
                             }
                         }, 3500)
                     })

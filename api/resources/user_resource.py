@@ -11,7 +11,7 @@ from api.resources.base_resource import BaseResource
 from api.resources.email_confirmation.email_confirmation import send_confirmation_email
 from api.resources.role_resource import RoleResource
 from api.utils import get_active_users, get_user_by_email, get_users_by_role, get_users_by_status, get_deactivated_user, \
-    log_in_user_jwt, format_and_lower_str, standard_non_empty_string, log_update
+    format_and_lower_str, standard_non_empty_string, log_update
 
 
 class UserResource(BaseResource):
@@ -84,24 +84,17 @@ class UserResource(BaseResource):
                 return BaseResource.send_json_message("Error while adding User", 500)
 
         elif deactivated_user is not None:
-            deactivated_user.is_deleted = False
-            deactivated_user.updated_at = datetime.now()
+            deactivated_user.is_active = True
+            deactivated_user.deactivated_at = None
+            deactivated_user.deactivated_by = None
+            deactivated_user.reactivated_at = datetime.now()
+            deactivated_user.reactivated_by = get_jwt_identity() or deactivated_user.email
             deactivated_user.password = User.hash_password(password)
-            deactivated_user.updated_by = get_jwt_identity() or deactivated_user.email
             BaseModel.db.session.commit()
 
-            # LogIn User
-            login = log_in_user_jwt(deactivated_user)
-            access_token = login.get('access_token')
-            refresh_token = login.get('refresh_token')
-
-            data = marshal(deactivated_user, self.fields)
-            data.update({"token": access_token})
-            data.update({"refresh_token": refresh_token})
-            data.update({"response": "Registered user"})
             current_app.logger.info("User's account has been activated;"
                                     "name={0}, email={1} at time={2}".format(first_name, email, datetime.now()))
-            return BaseResource.send_json_message(data, 201)
+            return BaseResource.send_json_message("Account reactivated. Please login to continue.", 201)
         else:
             current_app.logger.error("Error while adding User :> Duplicate records")
             return BaseResource.send_json_message('User already exists', 409)
@@ -163,10 +156,11 @@ class UserResource(BaseResource):
                 # How? Check for deactivate in headers
 
                 if request.headers.get('deactivate'):
-                    print(request.headers.get('deactivate'))
                     user.is_active = False
                     user.deactivated_at = datetime.now()
                     user.deactivated_by = email
+                    user.reactivated_at = None
+                    user.reactivated_by = None
                     BaseModel.db.session.commit()
                     current_app.logger.info("{0} deactivated {1}".format(get_jwt_identity(), user.email))
                     return BaseResource.send_json_message("User account deactivated", 200)
