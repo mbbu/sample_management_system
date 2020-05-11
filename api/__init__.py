@@ -140,6 +140,20 @@ def config_app(app_instance):
     app_instance.url_map.strict_slashes = False
 
 
+def extensions_set_up(app_instance):
+    app_instance.config['SECRET_KEY'] = os.getenv(SECRET_KEY)
+    # JWT setup
+    jwt = JWTManager(app_instance)
+
+    # Flask-Mail SetUp
+    mail = Mail(app_instance)
+
+    # Database and Migrations setup
+    db = BaseModel.init_app(app_instance)
+
+    return {'jwt': jwt, 'mail': mail, 'db': db}
+
+
 # Application Factory
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
@@ -158,16 +172,13 @@ def create_app(test_config=None):
     # Register Resources
     register_resources(app)
 
-    # JWT setup
-    app.config['SECRET_KEY'] = os.getenv(SECRET_KEY)
-    jwt = JWTManager(app)
-
-    # Flask-Mail SetUp
-    Mail(app)
-
     # Cross-Origin Resource Sharing
     # todo: proper CORS config, to ensure requests to the api are only sent by verified clients
     CORS(app, resources={r'/*': {'origins': '*'}})
+
+    # Extensions SetUp
+    ext = extensions_set_up(app)
+    jwt = ext.get('jwt')
 
     @jwt.token_in_blacklist_loader
     def check_if_token_is_revoked(decrypted_token):
@@ -176,9 +187,6 @@ def create_app(test_config=None):
         if entry is None:
             return True
         return entry == 'true'
-
-    # Database and Migrations setup
-    db = BaseModel.init_app(app)
 
     @app.shell_context_processor
     def make_shell_processor():
