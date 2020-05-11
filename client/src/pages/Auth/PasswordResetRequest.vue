@@ -12,7 +12,7 @@
                                 <div class="header pt-3 blue-gradient">
                                     <mdb-row class="d-flex justify-content-center">
                                         <h3 class="white-text mb-3 pt-3"><i class="fas fa-inbox"></i> Request
-                                            Confirmation Email</h3>
+                                            Password Reset</h3>
                                     </mdb-row>
                                 </div>
 
