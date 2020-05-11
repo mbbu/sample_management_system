@@ -24,6 +24,8 @@ DATABASE_URI_ENV_NAME = APP_NAME + "_DATABASE_URI"
 
 # External URLs and APIs
 REDCAP_URI = 'https://redcap.icipe.org/api/'
+EMAIL_CONFIRM_URI = 'http://localhost:8080/confirm/{0}'
+PASSWORD_RESET_URI = 'http://localhost:8080/reset/{0}'
 
 # Variable
 DATE_TIME_NONE = '0001-01-01 00:00'

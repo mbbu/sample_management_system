@@ -7,35 +7,16 @@ from flask import current_app, render_template
 from flask_restful import reqparse
 
 from api import BaseResource, BaseModel
-from api.constants import EXPIRATION_AS_HR
+from api.constants import EXPIRATION_AS_HR, PASSWORD_RESET_URI
 from api.models import User
 from api.resources.email_confirmation.send_email import send_email
 from api.utils import confirm_token, get_user_by_email, \
     generate_confirmation_token
 
 
-# def generate_confirmation_token(email):
-#     serializer = URLSafeTimedSerializer(BaseConfig.SECRET_KEY)
-#     return serializer.dumps(email, salt=BaseConfig.SECURITY_PASSWORD_SALT)
-#
-#
-# def confirm_token(token, expiration=EMAIL_TOKEN_EXPIRATION):
-#     serializer = URLSafeTimedSerializer(BaseConfig.SECRET_KEY)
-#     try:
-#         email = serializer.loads(
-#             token,
-#             salt=BaseConfig.SECURITY_PASSWORD_SALT,
-#             max_age=expiration
-#         )
-#     except Exception as e:
-#         current_app.logger.error(e)
-#         return False
-#     return email
-
-
-def send_confirmation_email(email):
+def send_pwd_reset_email(email):
     email_token = generate_confirmation_token(email)
-    pwd_url = 'http://localhost:8080/reset/{0}'.format(email_token)
+    pwd_url = PASSWORD_RESET_URI.format(email_token)
     html = render_template("password_reset.html", pwd_url=pwd_url, valid_time=EXPIRATION_AS_HR)
     send_email(email, 'Confirm Your Email Address', template=html)
 
@@ -52,7 +33,7 @@ class ForgotPasswordResource(BaseResource):
         user = get_user_by_email(email)
         if user is None:
             return BaseResource.send_json_message('Sorry no user with given email', 404)
-        send_confirmation_email(email)
+        send_pwd_reset_email(email)
         return BaseResource.send_json_message("Email sent", 200)
 
 

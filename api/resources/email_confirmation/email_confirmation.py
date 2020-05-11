@@ -5,38 +5,17 @@ from datetime import datetime
 
 from flask import current_app, render_template
 from flask_restful import marshal, fields, reqparse
-from itsdangerous import URLSafeTimedSerializer
 
 from api import BaseResource, BaseModel
-from api.config import BaseConfig
-from api.constants import EMAIL_TOKEN_EXPIRATION
+from api.constants import EXPIRATION_AS_HR, EMAIL_CONFIRM_URI
 from api.resources.email_confirmation.send_email import send_email
-from api.utils import log_in_user_jwt, get_unconfirmed_user
-
-
-def generate_confirmation_token(email):
-    serializer = URLSafeTimedSerializer(BaseConfig.SECRET_KEY)
-    return serializer.dumps(email, salt=BaseConfig.SECURITY_PASSWORD_SALT)
-
-
-def confirm_token(token, expiration=EMAIL_TOKEN_EXPIRATION):
-    serializer = URLSafeTimedSerializer(BaseConfig.SECRET_KEY)
-    try:
-        email = serializer.loads(
-            token,
-            salt=BaseConfig.SECURITY_PASSWORD_SALT,
-            max_age=expiration
-        )
-    except Exception as e:
-        current_app.logger.error(e)
-        return False
-    return email
+from api.utils import log_in_user_jwt, get_unconfirmed_user, generate_confirmation_token, confirm_token
 
 
 def send_confirmation_email(email):
     email_token = generate_confirmation_token(email)
-    confirm_url = 'http://localhost:8080/confirm/{0}'.format(email_token)
-    html = render_template("email_confirmation.html", confirm_url=confirm_url, valid_time=EMAIL_TOKEN_EXPIRATION)
+    confirm_url = EMAIL_CONFIRM_URI.format(email_token)
+    html = render_template("email_confirmation.html", confirm_url=confirm_url, valid_time=EXPIRATION_AS_HR)
     send_email(email, 'Confirm Your Email Address', template=html)
 
 
