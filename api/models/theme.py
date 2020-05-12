@@ -9,6 +9,7 @@ class Theme(BaseModel.db.Model):
 
     # relationship
     sample = AppDb.relationship('Sample', backref='theme', lazy=True)
+    projects = AppDb.relationship('Project', backref='theme', lazy=True)
 
     @staticmethod
     def theme_exists(code):
