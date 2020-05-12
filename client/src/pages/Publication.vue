@@ -26,12 +26,14 @@
                         <td> {{publication['sample.project']}}</td>
                         <td>
                             {{publication['user.first_name']}} &nbsp; {{publication['user.last_name']}} &nbsp;
-                            <b-icon
-                                    :title="`Contact author(${ publication['user.email'] })`"
-                                    class="border border-info rounded"
-                                    font-scale="1.5" icon="envelope"
-                                    v-b-tooltip.hover variant="info"
-                            ></b-icon>
+                            <a :href="`mailto:${publication['user.email']}`" target="_blank">
+                                <b-icon
+                                        :title="`Contact author(${ publication['user.email'] })`"
+                                        class="border border-info rounded"
+                                        font-scale="1.5" icon="envelope"
+                                        v-b-tooltip.hover variant="info"
+                                ></b-icon>
+                            </a>
                         </td>
                         <td> {{publication['co_authors']}}</td>
 

@@ -25,12 +25,14 @@
                         <td> {{ project['theme.name'] }}</td>
                         <td>
                             {{ project['lead.first_name'] }} {{ project['lead.last_name'] }}
-                            <b-icon
-                                    :title="`Contact project head (${ project['lead.email'] })`"
-                                    class="border border-info rounded"
-                                    font-scale="1.5" icon="envelope"
-                                    v-b-tooltip.hover variant="info"
-                            ></b-icon>
+                            <a :href="`mailto:${project['lead.email']}`" target="_blank">
+                                <b-icon
+                                        :title="`Contact project head (${ project['lead.email'] })`"
+                                        class="border border-info rounded"
+                                        font-scale="1.5" icon="envelope"
+                                        v-b-tooltip.hover variant="info"
+                                ></b-icon>
+                            </a>
                         </td>
                         <td> {{ project.code }}</td>
                         <td> {{ project.description }}</td>

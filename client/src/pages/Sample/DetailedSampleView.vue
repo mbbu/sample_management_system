@@ -25,8 +25,15 @@
                         <td v-else-if="!sample.project">N/A</td>
                         <td v-if="sample.projectOwner"> {{ sample.projectOwner}}</td>
                         <td v-else-if="!sample.projectOwner">N/A</td>
-                        <td v-if="sample.user"> {{ sample.user}} &nbsp; <i :title="sample.userEmail"
-                                                                           class="far fa-envelope fa-lg"></i></td>
+                        <td v-if="sample.user">
+                            {{ sample.user}} &nbsp;
+
+                            <a :href="`mailto:${ sample.userEmail }`" target="_blank">
+                                <i class="far fa-envelope fa-lg"
+                                   title="Email sample handler? But if you want the sample, request at bottom of the page.">
+                                </i>
+                            </a>
+                        </td>
                         <td v-else-if="!sample.user">N/A</td>
 
                     </tr>
@@ -292,8 +299,6 @@
 
             dateNow() {
                 let now = Date();
-
-                // Converting the number of millisecond in date string
                 return now.toString();
             },
 
