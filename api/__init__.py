@@ -80,12 +80,14 @@ def register_resources(app):
     from api.resources.security_level_resource import SecurityLevelResource
     from api.resources.housedata_resource import HouseDataResource
     from api.resources.email_confirmation.email_confirmation import EmailConfirmationResource
+    from api.resources.project_resource import ProjectResource
 
     api = Api(app)
     api.add_resource(IndexResource, '/', '/index', '/welcome')
     api.add_resource(AuthResource, '/auth', '/login', '/auth/login')
     api.add_resource(LogOutResource, '/logout', '/log-out')
     api.add_resource(ThemeResource, '/theme', '/themes')
+    api.add_resource(ProjectResource, '/project', '/projects')
     api.add_resource(RoleResource, '/role', '/roles')
     api.add_resource(UserResource, '/user', '/users')
 

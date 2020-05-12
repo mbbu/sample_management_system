@@ -6,6 +6,8 @@ class Project(BaseModel.db.Model):
     id = AppDb.Column(AppDb.Integer, primary_key=True)
     code = AppDb.Column(AppDb.String(20), nullable=False, unique=True, index=True)
     theme_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('theme.id', ondelete='SET NULL'), nullable=False)
+    name = AppDb.Column(AppDb.String(255), nullable=False, index=True)
+    head = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('users.id', ondelete='SET NULL'), nullable=False)
     description = AppDb.Column(AppDb.String(255), nullable=True)
 
     # relationship(s) defined here
