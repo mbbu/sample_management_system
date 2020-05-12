@@ -25,6 +25,7 @@ import ConfirmUser from "./pages/ConfirmUserAccount/ConfirmUser";
 import ResendConfirmation from "./pages/ConfirmUserAccount/ResendConfirmation";
 import PasswordResetRequest from "./pages/Auth/PasswordResetRequest";
 import PasswordResetConfirmation from "./pages/Auth/PasswordResetConfirmation";
+import Project from "./pages/Project";
 
 
 Vue.use(Router);
@@ -155,6 +156,13 @@ export default new Router({
             name: 'theme',
             alias: ['/themes'],
             component: Theme,
+        },
+
+        {
+            path: '/project',
+            name: 'project',
+            alias: ['/projects'],
+            component: Project,
         },
 
         {

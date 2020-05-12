@@ -1,7 +1,7 @@
 <template>
     <div class="sidebar">
         <router-link to="/sample">
-            <a> <i class="fas fa-vial menu_icon"></i>
+            <a> <i class="fas fa-vials menu_icon"></i>
                 Samples</a>
         </router-link>
 
@@ -11,6 +11,11 @@
         <router-link to="/themes">
             <a> <i aria-hidden="true" class="fa fa-trophy menu_icon"> </i>
                 Themes</a>
+        </router-link>
+
+        <router-link to="/projects">
+            <a> <i aria-hidden="true" class="fas fa-project-diagram menu_icon"></i>
+                Projects</a>
         </router-link>
 
         <router-link to="/security-level">
