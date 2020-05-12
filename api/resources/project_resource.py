@@ -14,7 +14,11 @@ class ProjectResource(BaseResource):
     fields = {
         'code': fields.String,
         'theme.name': fields.String,
-        'description': fields.String
+        'description': fields.String,
+        'name': fields.String,
+        'lead.first_name': fields.String,
+        'lead.last_name': fields.String,
+        'lead.email': fields.String
     }
 
     def get(self):
