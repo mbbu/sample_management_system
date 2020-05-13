@@ -79,6 +79,23 @@ export function extractApiData(data) {
     return resultObject;
 }
 
+
+export function extractProjectData(data) {
+    let itemList = [];
+    let fields = {text: '', value: ''};
+    let resultObject = {items: itemList, fields: fields};
+
+    for (let item = 0; item < data.length; item++) {
+        itemList.push({
+            'Code': data[item].code,
+            'Name': data[item].name + " headed by " + data[item]['lead.first_name'] + " " + data[item]['lead.last_name']
+        });
+        fields.text = 'Name';
+        fields.value = 'Code';
+    }
+    return resultObject;
+}
+
 export function extractQTData(data) {
     let itemList = [];
     let fields = {text: '', value: ''};

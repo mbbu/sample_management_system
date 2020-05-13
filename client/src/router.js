@@ -26,6 +26,7 @@ import ResendConfirmation from "./pages/ConfirmUserAccount/ResendConfirmation";
 import PasswordResetRequest from "./pages/Auth/PasswordResetRequest";
 import PasswordResetConfirmation from "./pages/Auth/PasswordResetConfirmation";
 import Project from "./pages/Project";
+import FetchSample from "./pages/REDCapPages/FetchSample";
 
 
 Vue.use(Router);
@@ -212,6 +213,14 @@ export default new Router({
             name: 'Publication',
             alias: ['/publications'],
             component: Publication,
+        },
+
+        // redcap routes
+        {
+            path: '/redcap-samples',
+            name: 'RedcapSamples',
+            alias: ['/redcap-sample', '/redcapsample'],
+            component: FetchSample,
         },
 
 
