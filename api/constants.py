@@ -23,7 +23,7 @@ revoked_store = redis.StrictRedis(host='localhost', port=6379, db=0,
 DATABASE_URI_ENV_NAME = APP_NAME + "_DATABASE_URI"
 
 # External URLs and APIs
-REDCAP_URI = 'https://redcap.icipe.org/api/'
+REDCAP_URI = 'https://redcap.icipe.org/redcap/api/'
 EMAIL_CONFIRM_URI = 'http://localhost:8080/confirm/{0}'
 PASSWORD_RESET_URI = 'http://localhost:8080/reset/{0}'
 
