@@ -1,10 +1,9 @@
-from datetime import timedelta, datetime
+from datetime import datetime
 
-from flask import current_app, request, Blueprint
+from flask import current_app, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restful import fields, marshal, reqparse
 
-from api.constants import DATE_TIME_NONE
 from api.models.database import BaseModel
 from api.models.sample import Sample
 from api.resources.base_resource import BaseResource
@@ -13,10 +12,8 @@ from api.resources.quantity_type_resource import QuantityTypeResource
 from api.resources.security_level_resource import SecurityLevelResource
 from api.resources.theme_resource import ThemeResource
 from api.utils import format_and_lower_str, log_create, log_update, log_duplicate, \
-    has_required_request_params, export_all_records, log_export_from_redcap, format_str_to_date, non_empty_int, log_304, \
+    has_required_request_params, non_empty_int, log_304, \
     get_user_by_email, set_date_from_int
-
-samples_page = Blueprint('samples_bp', __name__, template_folder='templates')
 
 
 class SampleResource(BaseResource):
@@ -34,7 +31,7 @@ class SampleResource(BaseResource):
         'retention_date': fields.DateTime,
         'barcode': fields.String,
         'analysis': fields.String,
-        'temperature': fields.String,  # todo: check temp return i.e. float
+        'temperature': fields.String,
         'amount': fields.Integer,
         'quantity.id': fields.String,
         'secLevel.code': fields.String,
@@ -223,102 +220,3 @@ class SampleResource(BaseResource):
     @staticmethod
     def get_sample(sample_code):
         return BaseModel.db.session.query(Sample).filter_by(code=sample_code).first()
-
-
-class SaveSampleFromREDCap(BaseResource):
-    @jwt_required
-    def post(self):
-        # get any filters for data export e.g. date, record_id ...
-        parser = reqparse.RequestParser()
-        parser.add_argument('from', required=False)
-        parser.add_argument('to', required=False)
-        parser.add_argument('record_id', required=False)
-
-        args = parser.parse_args()
-
-        if args['from'] or args['to'] or args['record_id'] is None:
-            start_date = None
-            end_date = None
-            record_id = None
-        else:
-            start_date = format_str_to_date(args['from'] + str(' 00:00'))
-            end_date = format_str_to_date(args['to'] + str(' 00:00'))
-            record_id = args['record_id']
-
-        sample_records = export_all_records()
-        if sample_records == 404:
-            # todo: mail admin on redcap error
-            return BaseResource.send_json_message("Redcap error. Admin contacted.", 404)
-        else:
-            if (start_date or end_date or record_id) is None:
-                # save all the samples to the db
-                SaveSampleFromREDCap.save_all_samples(sample_records)
-            else:
-                # save samples according to the filters passed
-                SaveSampleFromREDCap.save_samples_filtered_by_date(sample_records, start_date, end_date)
-
-    @staticmethod
-    def save_all_samples(sample_records):
-        for sample in sample_records:
-            user = int(sample['users'].strip() or 0) or None
-            animal_species = sample['source_sample']
-            _type = sample['sample_type']
-            description = sample['sa_description']
-            location = sample['loc_sample']
-            owner = sample['pi']
-            amount = int(sample['number_samples_collected'].strip() or 0) or None
-            box = int(sample['box_number'].strip() or 0) or None
-            theme = int(sample['theme'].strip() or 0) or None
-            security_level = int(sample['risk_level'].strip() or 0) or None
-            record_id = sample['identifier_sample']
-
-            if not Sample.sample_exists(record_id):
-                sample = Sample(code=record_id, theme_id=theme, user_id=user, box_id=box, animal_species=animal_species,
-                                sample_type=_type, sample_description=description, location_collected=location,
-                                project_owner=owner, amount=amount, security_level=security_level)
-
-                BaseModel.db.session.add(sample)
-                BaseModel.db.session.commit()
-                log_export_from_redcap(sample)
-            log_duplicate(Sample.query.filter(Sample.code == record_id).first())
-            return BaseResource.send_json_message("Sample already exists", 409)
-        return BaseResource.send_json_message("Samples successfully fetched and saved", 201)
-
-    @staticmethod
-    def save_samples_filtered_by_date(sample_records, start_date, end_date):
-        days_count = end_date - start_date
-
-        for day in range(days_count.days + 1):
-            day = start_date + timedelta(days=day)
-            print(day)
-
-            for sample in sample_records:
-                _date = format_str_to_date(sample['date'] or DATE_TIME_NONE)
-
-                if day == _date:
-                    user = int(sample['users'].strip() or 0) or None
-                    animal_species = sample['source_sample']
-                    _type = sample['sample_type']
-                    description = sample['sa_description']
-                    location = sample['loc_sample']
-                    owner = sample['pi']
-                    amount = int(sample['number_samples_collected'].strip() or 0) or None
-                    box = int(sample['box_number'].strip() or 0) or None
-                    theme = int(sample['theme'].strip() or 0) or None
-                    security_level = int(sample['risk_level'].strip() or 0) or None
-                    record_id = sample['identifier_sample']
-
-                    if not Sample.sample_exists(record_id):
-                        sample = Sample(code=record_id, theme_id=theme, user_id=user, box_id=box,
-                                        animal_species=animal_species, sample_type=_type,
-                                        sample_description=description,
-                                        location_collected=location, project_owner=owner, amount=amount,
-                                        security_level=security_level)
-
-                        BaseModel.db.session.add(sample)
-                        BaseModel.db.session.commit()
-                        log_export_from_redcap(sample)
-                    log_duplicate(Sample.query.filter(Sample.code == record_id).first())
-                    return BaseResource.send_json_message("Sample already exists", 409)
-        return BaseResource.send_json_message(
-            "Samples from date {0} to date {1} saved".format(start_date, end_date), 201)
