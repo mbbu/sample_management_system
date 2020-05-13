@@ -1,18 +1,20 @@
 from datetime import timedelta
 
+import requests
+from flask import request, current_app
 from flask_jwt_extended import jwt_required
 from flask_restful import reqparse
 
-from api import BaseResource, BaseModel
-from api.constants import DATE_TIME_NONE
+from api import BaseResource, BaseModel, BaseConfig
+from api.constants import DATE_TIME_NONE, REDCAP_URI
 from api.models import Sample
-from api.utils import format_str_to_date, export_all_records, log_export_from_redcap, log_duplicate
+from api.utils import format_str_to_date, log_export_from_redcap, log_duplicate
 
 
 class SaveSampleFromREDCap(BaseResource):
     @jwt_required
     def post(self):
-        print("Call of post")
+        # print("Call of post")
         # get any filters for data export e.g. date, record_id ...
         parser = reqparse.RequestParser()
         parser.add_argument('from', required=False)
@@ -31,11 +33,13 @@ class SaveSampleFromREDCap(BaseResource):
             record_id = args['record_id']
 
         sample_records = export_all_records()
-        print(sample_records)
+        # print(sample_records)
 
-        if sample_records == 404:
+        if sample_records == 500:
             # todo: mail admin on redcap error
-            return BaseResource.send_json_message("Redcap error. Admin contacted.", 404)
+            return BaseResource.send_json_message("Redcap error. Admin contacted.", 500)
+        elif not sample_records:
+            return BaseResource.send_json_message("No sample records found", 404)
         else:
             if (start_date or end_date or record_id) is None:
                 # save all the samples to the db
@@ -109,3 +113,31 @@ class SaveSampleFromREDCap(BaseResource):
                     return BaseResource.send_json_message("Sample already exists", 409)
         return BaseResource.send_json_message(
             "Samples from date {0} to date {1} saved".format(start_date, end_date), 201)
+
+
+"""
+    REDCap API functions
+"""
+
+
+# fetch all records
+def export_all_records():
+    # print("Redcap contact made")
+    token = request.headers.get('token')
+    data = {
+        'token': BaseConfig.REDCap_API_TOKEN or token,
+        'content': 'record',
+        'format': 'json',
+        'returnFormat': 'json'
+    }
+
+    try:
+        response = requests.post(REDCAP_URI, data)
+        # print(response)
+        # print(response.status_code)
+        # print(response.json())
+        return response.json()
+
+    except Exception as e:
+        current_app.logger.error(e)
+        return 500

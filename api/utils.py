@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 
-import requests
 from flask import current_app, request
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jti, get_jwt_identity
 from itsdangerous import URLSafeTimedSerializer
@@ -8,7 +7,7 @@ from mixer.backend.flask import Mixer
 
 from api import revoked_store, BaseResource
 from api.config import BaseConfig
-from api.constants import ACCESS_EXPIRES, REFRESH_EXPIRES, REDCAP_URI, EMAIL_TOKEN_EXPIRATION
+from api.constants import ACCESS_EXPIRES, REFRESH_EXPIRES, EMAIL_TOKEN_EXPIRATION
 from api.models import *
 from api.models.database import BaseModel
 
@@ -152,27 +151,6 @@ def has_required_request_params(record_identity):
         return record_identity(*args, **kwargs)
 
     return wrapper
-
-
-"""
-    REDCap API functions
-"""
-
-
-# fetch all records
-def export_all_records():
-    token = request.headers.get('token')
-    data = {
-        'token': BaseConfig.REDCap_API_TOKEN or token,
-        'content': 'record',
-        'format': 'json',
-        'returnFormat': 'json'
-    }
-    response = requests.post(REDCAP_URI, data)
-
-    if response.status_code == 200:
-        return response.json()
-    return 404
 
 
 """
