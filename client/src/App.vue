@@ -9,7 +9,8 @@
 <script>
 
     // import ContentOverlay from '@/components/ContentOverlay.vue';
-    import SideMenu from "./components/Nav";
+    import SideMenu from "./components/SideNav";
+    // import FooterScript from "./components/Footer";
 
     export default {
         components: {
@@ -32,5 +33,6 @@
     @import "../node_modules/@fortawesome/fontawesome-free/css/all.min.css";
     @import "../node_modules/mdbootstrap/css/bootstrap.min.css";
     @import "../node_modules/mdbvue/lib/css/mdb.min.css";
+    @import '../node_modules/vue-loading-overlay/dist/vue-loading.css';
 </style>
 

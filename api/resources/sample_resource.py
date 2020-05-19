@@ -1,38 +1,52 @@
-from datetime import timedelta, datetime
+from datetime import datetime
 
-from flask import current_app, request, Blueprint
+from flask import current_app, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restful import fields, marshal, reqparse
 
-from api.constants import DATE_TIME_NONE
 from api.models.database import BaseModel
 from api.models.sample import Sample
 from api.resources.base_resource import BaseResource
+from api.resources.box_resource import BoxResource
+from api.resources.quantity_type_resource import QuantityTypeResource
+from api.resources.security_level_resource import SecurityLevelResource
+from api.resources.theme_resource import ThemeResource
 from api.utils import format_and_lower_str, log_create, log_update, log_duplicate, \
-    has_required_request_params, export_all_records, log_export_from_redcap, format_str_to_date, non_empty_int, log_304
-
-samples_page = Blueprint('samples_bp', __name__, template_folder='templates')
+    has_required_request_params, non_empty_int, log_304, \
+    get_user_by_email, set_date_from_int
 
 
 class SampleResource(BaseResource):
     fields = {
         'theme.name': fields.String,
         'user.email': fields.String,
-        'box.label': fields.String,
+        'user.first_name': fields.String,
+        'user.last_name': fields.String,
         'animal_species': fields.String,
         'sample_type': fields.String,
         'sample_description': fields.String,
         'location_collected': fields.String,
         'project': fields.String,
         'project_owner': fields.String,
-        'retention_period': fields.Integer,
+        'retention_date': fields.DateTime,
         'barcode': fields.String,
         'analysis': fields.String,
-        'temperature': fields.String,  # todo: check temp return i.e. float
+        'temperature': fields.String,
         'amount': fields.Integer,
         'quantity.id': fields.String,
-        'security_level': fields.Integer,
-        'code': fields.String
+        'secLevel.code': fields.String,
+        'secLevel.name': fields.String,
+        'code': fields.String,
+        'created_at': fields.String,
+        'updated_at': fields.String,
+        'box.label': fields.String,
+        'box.tray.number': fields.Integer,
+        'box.tray.rack.number': fields.Integer,
+        'box.tray.rack.chamber.type': fields.String,
+        'box.tray.rack.chamber.freezer.number': fields.Integer,
+        'box.tray.rack.chamber.freezer.lab.name': fields.String,
+        'box.tray.rack.chamber.freezer.lab.room': fields.Integer
+
     }
 
     def get(self):
@@ -55,14 +69,19 @@ class SampleResource(BaseResource):
     def post(self):
         args = SampleResource.sample_args()
         code = format_and_lower_str(args[16])
+        theme = ThemeResource.get_theme(args[0]).id
+        user = get_user_by_email(args[1]).id
+        box = BoxResource.get_box(args[2]).id
+        qt = QuantityTypeResource.get_quantity_type(args[14]).id
+        sl = SecurityLevelResource.get_security_level(args[15]).id
 
         if not Sample.sample_exists(code):
             try:
-                sample = Sample(theme_id=args[0], user_id=args[1], box_id=args[2], animal_species=args[3],
+                sample = Sample(theme_id=theme, user_id=user, box_id=box, animal_species=args[3],
                                 sample_type=args[4], sample_description=args[5], location_collected=args[6],
-                                project=args[7], project_owner=args[8], retention_period=args[9], barcode=args[10],
-                                analysis=args[11], temperature=args[12], amount=args[13], quantity_type=args[14],
-                                security_level=args[15], code=code)
+                                project=args[7], project_owner=args[8], retention_date=args[9], barcode=args[10],
+                                analysis=args[11], temperature=args[12], amount=args[13], quantity_type=qt,
+                                security_level=sl, code=code)
 
                 BaseModel.db.session.add(sample)
                 BaseModel.db.session.commit()
@@ -87,29 +106,37 @@ class SampleResource(BaseResource):
                     args[2] != sample.box_id or args[3] != sample.animal_species or \
                     args[4] != sample.sample_type or args[5] != sample.sample_description \
                     or args[6] != sample.location_collected or args[7] != sample.project \
-                    or args[8] != sample.project_owner or args[9] != sample.retention_period \
+                    or args[8] != sample.project_owner or \
+                    args[9] != sample.retention_date \
                     or args[10] != sample.barcode or args[11] != sample.analysis or args[12] != sample.temperature \
                     or args[13] != sample.amount or args[14] != sample.quantity_type or args[
                 15] != sample.security_level or args[16] != sample.code:
                 try:
+                    code = format_and_lower_str(args[16])
+                    theme = ThemeResource.get_theme(args[0]).id
+                    user = get_user_by_email(args[1]).id
+                    box = BoxResource.get_box(args[2]).id
+                    qt = QuantityTypeResource.get_quantity_type(args[14]).id
+                    sl = SecurityLevelResource.get_security_level(args[15]).id
+
                     old_info = str(sample)
-                    sample.theme_id = args[0]
-                    sample.user_id = args[1]
-                    sample.box_id = args[2]
+                    sample.theme_id = theme
+                    sample.user_id = user
+                    sample.box_id = box
                     sample.animal_species = args[3]
                     sample.sample_type = args[4]
                     sample.sample_description = args[5]
                     sample.location_collected = args[6]
                     sample.project = args[7]
                     sample.project_owner = args[8]
-                    sample.retention_period = args[9]
+                    sample.retention_date = args[9]
                     sample.barcode = args[10]
                     sample.analysis = args[11]
                     sample.temperature = args[12]
                     sample.amount = args[13]
-                    sample.quantity_type = args[14]
-                    sample.security_level = args[15]
-                    sample.code = args[16]
+                    sample.quantity_type = qt
+                    sample.security_level = sl
+                    sample.code = code
 
                     sample.updated_at = datetime.now()
                     BaseModel.db.session.commit()
@@ -135,9 +162,7 @@ class SampleResource(BaseResource):
             return BaseResource.send_json_message("Sample not found", 404)
 
         else:
-            sample.is_deleted = True
-            sample.deleted_at = datetime.now()
-            sample.deleted_by = get_jwt_identity()
+            BaseModel.db.session.delete(sample)
             BaseModel.db.session.commit()
             current_app.logger.info("{0} deleted {1}".format(get_jwt_identity(), sample.user_id))
             return BaseResource.send_json_message("Sample deleted", 200)
@@ -165,8 +190,8 @@ class SampleResource(BaseResource):
 
         args = parser.parse_args()
 
-        theme_id = int(args['theme'])
-        user_id = int(args['user'])
+        theme_id = args['theme']
+        user_id = args['user']
         box_id = args['box']
         animal_species = args['animal_species']
         sample_type = args['sample_type']
@@ -174,7 +199,10 @@ class SampleResource(BaseResource):
         location_collected = args['location_collected']
         project = args['project']
         project_owner = args['project_owner']
-        retention_period = int(args['retention_period'])
+        retention_date = set_date_from_int(int(args['retention_period']))
+        print("Args for retention passed: " + str(args['retention_period']) + " of type: "
+              + str(type(args['retention_period'])))
+        print("Retention period is: " + str(retention_date) + " of type " + str(type(retention_date)))
         barcode = args['barcode']
         analysis = args['analysis']
         temperature = float(args['temperature'])
@@ -185,109 +213,10 @@ class SampleResource(BaseResource):
 
         return [
             theme_id, user_id, box_id, animal_species, sample_type, sample_description, location_collected,
-            project, project_owner, retention_period, barcode, analysis, temperature, amount, quantity_type,
+            project, project_owner, retention_date, barcode, analysis, temperature, amount, quantity_type,
             security_level, code
         ]
 
     @staticmethod
     def get_sample(sample_code):
         return BaseModel.db.session.query(Sample).filter_by(code=sample_code).first()
-
-
-class SaveSampleFromREDCap(BaseResource):
-    @jwt_required
-    def post(self):
-        # get any filters for data export e.g. date, record_id ...
-        parser = reqparse.RequestParser()
-        parser.add_argument('from', required=False)
-        parser.add_argument('to', required=False)
-        parser.add_argument('record_id', required=False)
-
-        args = parser.parse_args()
-
-        if args['from'] or args['to'] or args['record_id'] is None:
-            start_date = None
-            end_date = None
-            record_id = None
-        else:
-            start_date = format_str_to_date(args['from'] + str(' 00:00'))
-            end_date = format_str_to_date(args['to'] + str(' 00:00'))
-            record_id = args['record_id']
-
-        sample_records = export_all_records()
-        if sample_records == 404:
-            # todo: mail admin on redcap error
-            return BaseResource.send_json_message("Redcap error. Admin contacted.", 404)
-        else:
-            if (start_date or end_date or record_id) is None:
-                # save all the samples to the db
-                SaveSampleFromREDCap.save_all_samples(sample_records)
-            else:
-                # save samples according to the filters passed
-                SaveSampleFromREDCap.save_samples_filtered_by_date(sample_records, start_date, end_date)
-
-    @staticmethod
-    def save_all_samples(sample_records):
-        for sample in sample_records:
-            user = int(sample['users'].strip() or 0) or None
-            animal_species = sample['source_sample']
-            _type = sample['sample_type']
-            description = sample['sa_description']
-            location = sample['loc_sample']
-            owner = sample['pi']
-            amount = int(sample['number_samples_collected'].strip() or 0) or None
-            box = int(sample['box_number'].strip() or 0) or None
-            theme = int(sample['theme'].strip() or 0) or None
-            security_level = int(sample['risk_level'].strip() or 0) or None
-            record_id = sample['identifier_sample']
-
-            if not Sample.sample_exists(record_id):
-                sample = Sample(code=record_id, theme_id=theme, user_id=user, box_id=box, animal_species=animal_species,
-                                sample_type=_type, sample_description=description, location_collected=location,
-                                project_owner=owner, amount=amount, security_level=security_level)
-
-                BaseModel.db.session.add(sample)
-                BaseModel.db.session.commit()
-                log_export_from_redcap(sample)
-            log_duplicate(Sample.query.filter(Sample.code == record_id).first())
-            return BaseResource.send_json_message("Sample already exists", 409)
-        return BaseResource.send_json_message("Samples successfully fetched and saved", 201)
-
-    @staticmethod
-    def save_samples_filtered_by_date(sample_records, start_date, end_date):
-        days_count = end_date - start_date
-
-        for day in range(days_count.days + 1):
-            day = start_date + timedelta(days=day)
-            print(day)
-
-            for sample in sample_records:
-                _date = format_str_to_date(sample['date'] or DATE_TIME_NONE)
-
-                if day == _date:
-                    user = int(sample['users'].strip() or 0) or None
-                    animal_species = sample['source_sample']
-                    _type = sample['sample_type']
-                    description = sample['sa_description']
-                    location = sample['loc_sample']
-                    owner = sample['pi']
-                    amount = int(sample['number_samples_collected'].strip() or 0) or None
-                    box = int(sample['box_number'].strip() or 0) or None
-                    theme = int(sample['theme'].strip() or 0) or None
-                    security_level = int(sample['risk_level'].strip() or 0) or None
-                    record_id = sample['identifier_sample']
-
-                    if not Sample.sample_exists(record_id):
-                        sample = Sample(code=record_id, theme_id=theme, user_id=user, box_id=box,
-                                        animal_species=animal_species, sample_type=_type,
-                                        sample_description=description,
-                                        location_collected=location, project_owner=owner, amount=amount,
-                                        security_level=security_level)
-
-                        BaseModel.db.session.add(sample)
-                        BaseModel.db.session.commit()
-                        log_export_from_redcap(sample)
-                    log_duplicate(Sample.query.filter(Sample.code == record_id).first())
-                    return BaseResource.send_json_message("Sample already exists", 409)
-        return BaseResource.send_json_message(
-            "Samples from date {0} to date {1} saved".format(start_date, end_date), 201)

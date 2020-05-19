@@ -10,6 +10,7 @@ APP_CONFIG_ENV_VAR = APP_NAME + "_CONFIG"
 DEV_CONFIG_VAR = "development"
 PROD_CONFIG_VAR = "production"
 SECRET_KEY = APP_NAME + '_SECRET_KEY'
+SECURITY_PASSWORD_SALT = APP_NAME + '_SECURITY_PASSWORD_SALT'
 
 # Redis
 ACCESS_EXPIRES = timedelta(days=7)
@@ -22,7 +23,16 @@ revoked_store = redis.StrictRedis(host='localhost', port=6379, db=0,
 DATABASE_URI_ENV_NAME = APP_NAME + "_DATABASE_URI"
 
 # External URLs and APIs
-REDCAP_URI = 'https://redcap.icipe.org/api/'
+REDCAP_URI = 'https://redcap.icipe.org/redcap/api/'
+EMAIL_CONFIRM_URI = 'http://localhost:8080/confirm/{0}'
+PASSWORD_RESET_URI = 'http://localhost:8080/reset/{0}'
 
 # Variable
 DATE_TIME_NONE = '0001-01-01 00:00'
+
+# Email token valid duration
+EMAIL_TOKEN_EXPIRATION = 3600  # equivalent to 1 hour
+EXPIRATION_AS_HR = EMAIL_TOKEN_EXPIRATION / 60 / 60
+
+# Email sender
+EMAIL_SENDER = ''  # todo: set email that will send out other mails

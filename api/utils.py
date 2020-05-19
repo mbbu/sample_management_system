@@ -1,13 +1,13 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
-import requests
 from flask import current_app, request
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jti, get_jwt_identity
+from itsdangerous import URLSafeTimedSerializer
 from mixer.backend.flask import Mixer
 
 from api import revoked_store, BaseResource
 from api.config import BaseConfig
-from api.constants import ACCESS_EXPIRES, REFRESH_EXPIRES, REDCAP_URI
+from api.constants import ACCESS_EXPIRES, REFRESH_EXPIRES, EMAIL_TOKEN_EXPIRATION
 from api.models import *
 from api.models.database import BaseModel
 
@@ -48,6 +48,14 @@ def format_str_to_date(date):
     return datetime.strptime(date, '%Y-%m-%d %H:%M').date()
 
 
+def set_date_from_int(num_of_days):
+    date = datetime.now()
+
+    for day in range(num_of_days):
+        date = date + timedelta(days=1)
+    return date
+
+
 """
     Functions for requesting user resources. 
 """
@@ -58,7 +66,18 @@ def get_active_users():
 
 
 def get_user_by_email(email):
-    return BaseModel.db.session.query(User).filter(User.email == email, User.is_deleted == False).first()
+    return BaseModel.db.session.query(User).filter(User.email == email, User.is_deleted == False,
+                                                   User.is_active == True, User.email_confirmed == True).first()
+
+
+def get_unconfirmed_user(email):
+    return BaseModel.db.session.query(User).filter(User.email == email, User.is_active == False,
+                                                   User.email_confirmed == False).first()
+
+
+def get_deactivated_user(email):
+    return BaseModel.db.session.query(User).filter(User.email == email, User.is_active == False,
+                                                   User.is_deleted == False).first()
 
 
 def get_users_by_role(role):
@@ -67,10 +86,6 @@ def get_users_by_role(role):
 
 def get_users_by_status(status):
     return BaseModel.db.session.query(User).filter(User.is_deleted == status).all()
-
-
-def get_deactivated_user(email):
-    return BaseModel.db.session.query(User).filter(User.email == email, User.is_deleted == True).first()
 
 
 def log_in_user_jwt(user):
@@ -139,27 +154,6 @@ def has_required_request_params(record_identity):
 
 
 """
-    REDCap API functions
-"""
-
-
-# fetch all records
-def export_all_records():
-    token = request.headers.get('token')
-    data = {
-        'token': BaseConfig.REDCap_API_TOKEN or token,
-        'content': 'record',
-        'format': 'json',
-        'returnFormat': 'json'
-    }
-    response = requests.post(REDCAP_URI, data)
-
-    if response.status_code == 200:
-        return response.json()
-    return 404
-
-
-"""
     Faker function; helps to create new random records in the database. 
     takes two argument;
         a) count - number of records to create
@@ -177,3 +171,27 @@ def faker(count, model, model_name):
         num += 1
 
     return BaseResource.send_json_message("{}s created".format(model_name), 200)
+
+
+"""
+    Functions for token generation and confirmation
+"""
+
+
+def generate_confirmation_token(email):
+    serializer = URLSafeTimedSerializer(BaseConfig.SECRET_KEY)
+    return serializer.dumps(email, salt=BaseConfig.SECURITY_PASSWORD_SALT)
+
+
+def confirm_token(token, expiration=EMAIL_TOKEN_EXPIRATION):
+    serializer = URLSafeTimedSerializer(BaseConfig.SECRET_KEY)
+    try:
+        email = serializer.loads(
+            token,
+            salt=BaseConfig.SECURITY_PASSWORD_SALT,
+            max_age=expiration
+        )
+    except Exception as e:
+        current_app.logger.error(e)
+        return False
+    return email

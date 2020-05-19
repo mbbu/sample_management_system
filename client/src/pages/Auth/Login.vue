@@ -20,8 +20,9 @@
                                         <div class="grey-text">
                                             <!--EMAIL-->
                                             <b-form-group :class="{ 'form-group--error': $v.user.email.$error }">
-                                                <mdb-input id="email" v-model.trim="$v.user.email.$model"
-                                                           label="Your email" icon="envelope" type="email"/>
+                                                <mdb-input icon="envelope" id="email"
+                                                           label="Your email" type="email"
+                                                           v-model.trim="$v.user.email.$model"/>
                                                 <div v-if="$v.user.email.$dirty">
                                                     <div class="error" v-if="!$v.user.email.required">Field is
                                                         required
@@ -35,12 +36,13 @@
                                             <!--PASSWORD-->
                                             <b-form-group :class="{ 'form-group--error': $v.user.password.$error }">
                                                 <div class="row">
-                                                    <mdb-input id="password" v-model.trim="$v.user.password.$model"
-                                                               class="form_input_margin" label="Your password"
-                                                               icon="lock" type="password"/>
-                                                    <span id="view-pwd" class="fa fa-fw fa-eye" aria-hidden="true"
-                                                          v-b-tooltip.hover :title="'see raw password'"
-                                                          @click="viewPassword()"/>
+                                                    <mdb-input class="form_input_margin" icon="lock"
+                                                               id="password" label="Your password"
+                                                               type="password" v-model.trim="$v.user.password.$model"/>
+                                                    <span :title="'see raw password'" @click="viewPassword()"
+                                                          aria-hidden="true"
+                                                          class="fa fa-fw fa-eye" id="view-pwd"
+                                                          v-b-tooltip.hover/>
                                                 </div>
                                                 <div v-if="$v.user.password.$dirty">
                                                     <div class="error" v-if="!$v.user.password.required">Field is
@@ -51,27 +53,28 @@
 
                                             <!-- Remember Me -->
                                             <div class="form-check">
-                                                <input type="checkbox" v-model="$v.user.checked"
-                                                       class="form-check-input" id="materialUnchecked">
+                                                <input class="form-check-input" id="materialUnchecked"
+                                                       type="checkbox" v-model="$v.user.checked">
                                                 <label class="form-check-label" for="materialUnchecked">Remember
                                                     Me?</label>
                                             </div>
                                         </div>
 
                                         <br>
-                                        <p class="font-small grey-text d-flex justify-content-end">Forgot <a href="#"
-                                                                                                             class="dark-grey-text ml-1 font-weight-bold">
+                                        <p class="font-small grey-text d-flex justify-content-end">Forgot <a
+                                                class="dark-grey-text ml-1 font-weight-bold"
+                                                href="/forgot">
                                             Password?</a></p>
                                         <mdb-row class="d-flex align-items-center mb-4 mt-5">
-                                            <mdb-col md="5" class="d-flex align-items-start">
+                                            <mdb-col class="d-flex align-items-start" md="5">
                                                 <div class="text-center">
-                                                    <mdb-btn rounded type="submit" class="z-depth-1a">Login</mdb-btn>
+                                                    <mdb-btn class="z-depth-1a" rounded type="submit">Login</mdb-btn>
                                                 </div>
                                             </mdb-col>
-                                            <mdb-col md="7" class="d-flex justify-content-end">
+                                            <mdb-col class="d-flex justify-content-end" md="7">
                                                 <p class="font-small grey-text mt-3">Don't have an account? <a
-                                                        href="/register"
-                                                        class="dark-grey-text ml-1 font-weight-bold">
+                                                        class="dark-grey-text ml-1 font-weight-bold"
+                                                        href="/register">
                                                     Sign up</a></p>
                                             </mdb-col>
                                         </mdb-row>
@@ -90,11 +93,11 @@
 <script>
     import axios from 'axios';
     import 'es6-promise/auto';
-    import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
-    import TopNav from "../components/TopNav";
+    import TopNav from "../../components/TopNav";
+    import {auth_resource} from "../../utils/api_paths";
     import {email, required} from "vuelidate/lib/validators";
-    import {countDownTimer, secureStoreSetString, showFlashMessage, viewPassword} from "../utils/util_functions";
-    import {auth_resource} from "../utils/api_paths";
+    import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
+    import {countDownTimer, secureStoreSetString, showFlashMessage, viewPassword} from "../../utils/util_functions";
 
     export default {
         components: {
@@ -129,6 +132,20 @@
 
         methods: {
             viewPassword,
+            showLoader() {
+                return this.$loading.show({
+                    isFullPage: true,
+                    canCancel: false,
+                    color: '#074880',
+                    loader: 'spinner',
+                    width: 255,
+                    height: 255,
+                    backgroundColor: '#FAAB2C',
+                    opacity: 0.7,
+                    zIndex: 999,
+                });
+            },
+
             onSubmit() {
                 // stop here if form is invalid
                 this.$v.$touch();
@@ -142,6 +159,7 @@
             },
 
             logInUser: function (user) {
+                let loader = this.showLoader()
                 let self = this;
 
                 axios.post(auth_resource, {
@@ -149,13 +167,25 @@
                     password: user.password
                 })
                     .then((response) => {
-                        // redirect after successful login
-                        if (response.status === 200) {
-                            showFlashMessage(self, 'success', 'Logged In', 'Redirecting you to home page in ' + countDownTimer(self, this.countDown) + " seconds");
-                            secureStoreSetString(response.data.message.token); // set jwt token required across requests
-                        }
+                        setTimeout(() => {
+                            loader.hide()
+                            // redirect after successful login
+                            if (response.status === 200) {
+                                showFlashMessage(self, 'success', 'Logged In', 'Redirecting you to home page in ' +
+                                    countDownTimer(self, this.countDown, '/home') + " seconds");
+                                // set jwt token required across requests
+                                secureStoreSetString(response.data.message.token, response.data.message.email, response.data.message.first_name,
+                                    response.data.message.last_name, response.data.message['role.name']);
+                            } else if (response.status === 203) {
+                                showFlashMessage(self, 'error', response.data.message, 'You can request for reactivation email')
+                                countDownTimer(self, 8, '/requestConfirmation')
+                            } else if (response.status === 204) {
+                                showFlashMessage(self, 'error', 'User found but account is deactivated!', 'You can reactivate by signing up again')
+                            }
+                        }, 3000)
                     })
                     .catch((error) => {
+                        loader.hide()
                         this.$log.error(error);
                         this.$log.error("error: ", error.response.status);
                         if (error.response) {
@@ -172,5 +202,5 @@
                     })
             },
         }
-  }
+    }
 </script>

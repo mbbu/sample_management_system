@@ -15,7 +15,7 @@ class Sample(BaseModel.db.Model):
     location_collected = AppDb.Column(AppDb.String(100), nullable=True)
     project = AppDb.Column(AppDb.String(150), nullable=True, index=True)
     project_owner = AppDb.Column(AppDb.String(100), nullable=True)
-    retention_period = AppDb.Column(AppDb.Integer, nullable=True)  # Default = Days
+    retention_date = AppDb.Column(AppDb.DateTime, nullable=True)
     barcode = AppDb.Column(AppDb.String(100), nullable=True)  # todo: changed to not nullable when module is done
     analysis = AppDb.Column(AppDb.String(100), nullable=True)
     temperature = AppDb.Column(AppDb.DECIMAL(5, 2), nullable=True)
@@ -36,6 +36,7 @@ class Sample(BaseModel.db.Model):
     publication = AppDb.relationship('Publication', backref='sample', lazy=True)
     box = AppDb.relationship('Box', backref='sample', lazy=True)
     quantity = AppDb.relationship('QuantityType', backref='quantity_type', lazy=True)
+    secLevel = AppDb.relationship('SecurityLevel', backref='sample', lazy=True)
 
     @staticmethod
     def sample_exists(code):
@@ -51,6 +52,6 @@ class Sample(BaseModel.db.Model):
                '|| analysis={12} || temperature={13} ) >>' \
             .format(self.sample_type, self.sample_description,
                     self.project, self.barcode, self.animal_species,
-                    self.box_id, self.retention_period, self.amount, self.quantity_type, self.code,
+                    self.box_id, self.retention_date, self.amount, self.quantity_type, self.code,
                     self.location_collected,
                     self.project_owner, self.analysis, self.temperature)

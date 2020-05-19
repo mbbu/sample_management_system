@@ -9,7 +9,6 @@ class SecurityLevel(BaseModel.db.Model):
     description = AppDb.Column(AppDb.String(65), nullable=True)
 
     # relationship(s) defined here
-    sample = AppDb.relationship('Sample', backref='security', lazy='dynamic')
 
     @staticmethod
     def security_level_exists(code):

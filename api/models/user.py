@@ -1,5 +1,7 @@
 from datetime import datetime
+
 from werkzeug.security import generate_password_hash, check_password_hash
+
 from api.models.database import BaseModel
 
 
@@ -13,7 +15,18 @@ class User(BaseModel.db.Model):
     email = AppDb.Column(AppDb.String(65), index=True, unique=True, nullable=False)
     password = AppDb.Column(AppDb.String(128), nullable=False)
     role_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('role.id', ondelete='SET NULL'), nullable=False)
-    housedata_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('housedata.id', ondelete='SET NULL'), nullable=True)
+
+    # Fields to help identify account status
+    is_active = AppDb.Column(AppDb.Boolean, nullable=False, default=False)
+    deactivated_at = AppDb.Column(AppDb.DateTime, nullable=True)
+    deactivated_by = AppDb.Column(AppDb.String(65), nullable=True)
+    reactivated_at = AppDb.Column(AppDb.DateTime, nullable=True)
+    reactivated_by = AppDb.Column(AppDb.String(65), nullable=True)
+    email_confirmation_sent_on = AppDb.Column(AppDb.DateTime, nullable=True)
+    email_confirmed = AppDb.Column(AppDb.Boolean, nullable=False, default=False)
+    email_confirmed_on = AppDb.Column(AppDb.DateTime, nullable=True)
+    password_reset_on = AppDb.Column(AppDb.DateTime, nullable=True)
+
     # Fields to help in audits
     created_at = AppDb.Column(AppDb.DateTime, nullable=False, default=datetime.now)
     created_by = AppDb.Column(AppDb.String(65), nullable=False)
@@ -24,8 +37,9 @@ class User(BaseModel.db.Model):
     is_deleted = AppDb.Column(AppDb.Boolean, nullable=False, default=False)
 
     # relationship(s)
-    sample_owner = AppDb.relationship('Sample', backref='owner', lazy='dynamic')
+    sample_owner = AppDb.relationship('Sample', backref='owner', lazy=True)
     publication = AppDb.relationship('Publication', back_populates='user')
+    projects = AppDb.relationship('Project', backref='lead', lazy=True)
 
     def __repr__(self):
         return '<< User: (name={0} || email={1}) >>'.format(self.first_name, self.email)

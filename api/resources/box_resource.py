@@ -5,6 +5,7 @@ from flask_restful import fields, marshal, reqparse
 from api.models.box import Box
 from api.models.database import BaseModel
 from api.resources.base_resource import BaseResource
+from api.resources.tray_resource import TrayResource
 from api.utils import format_and_lower_str, log_create, log_duplicate, log_update, log_delete, \
     has_required_request_params, non_empty_string, non_empty_int, standard_non_empty_string, log_304
 
@@ -39,7 +40,7 @@ class BoxResource(BaseResource):
     @jwt_required
     def post(self):
         args = BoxResource.box_args()
-        tray = args['tray']
+        tray = TrayResource.get_tray(args['tray']).id
         label = args['label']
         code = args['code']
 
@@ -69,7 +70,7 @@ class BoxResource(BaseResource):
             return BaseResource.send_json_message("Box not found", 404)
 
         args = BoxResource.box_args()
-        tray = args['tray']
+        tray = TrayResource.get_tray(args['tray']).id
         label = args['label']
         code = args['code']
 

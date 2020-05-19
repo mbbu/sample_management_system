@@ -4,7 +4,7 @@ from flask_restful import fields, reqparse, marshal
 
 from api.constants import ACCESS_EXPIRES, REFRESH_EXPIRES, revoked_store
 from api.resources.base_resource import BaseResource
-from api.utils import non_empty_string, get_user_by_email
+from api.utils import non_empty_string, get_user_by_email, get_unconfirmed_user, get_deactivated_user
 
 
 class AuthResource(BaseResource):
@@ -12,6 +12,7 @@ class AuthResource(BaseResource):
         'email': fields.String,
         'first_name': fields.String,
         'last_name': fields.String,
+        'role.name': fields.String,
     }
 
     def post(self):
@@ -27,6 +28,13 @@ class AuthResource(BaseResource):
         user = get_user_by_email(email)
 
         if user is None:
+            # check if the user exists but their account is unconfirmed
+            unconfirmed_user = get_unconfirmed_user(email)
+            deactivated_user = get_deactivated_user(email)
+            if unconfirmed_user:
+                return BaseResource.send_json_message("User found but account not confirmed!", 203)
+            elif deactivated_user:
+                return BaseResource.send_json_message("", 204)
             return BaseResource.send_json_message("User not found", 404)
 
         elif user.verify_password(password):

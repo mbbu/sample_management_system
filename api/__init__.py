@@ -6,6 +6,7 @@ from logging.handlers import SMTPHandler
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
+from flask_mail import Mail
 from flask_restful import Api
 from werkzeug.exceptions import NotFound, InternalServerError
 
@@ -14,6 +15,7 @@ from api.constants import APP_CONFIG_ENV_VAR, DEV_CONFIG_VAR, PROD_CONFIG_VAR, A
 from api.models.database import BaseModel
 from api.resources.base_resource import BaseResource
 from .resources import sample_resource, chamber_resource
+from .resources.password_reset.password_reset import ForgotPasswordResource, PasswordResetResource
 
 
 def get_config_type():
@@ -64,7 +66,7 @@ def register_resources(app):
     from api.resources.index_resource import IndexResource
     from api.resources.auth_resource import AuthResource, LogOutResource
     from api.resources.theme_resource import ThemeResource
-    from api.resources.sample_resource import SampleResource, SaveSampleFromREDCap
+    from api.resources.sample_resource import SampleResource
     from api.resources.user_resource import UserResource
     from api.resources.publication_resource import PublicationResource
     from api.resources.box_resource import BoxResource
@@ -77,14 +79,22 @@ def register_resources(app):
     from api.resources.quantity_type_resource import QuantityTypeResource
     from api.resources.security_level_resource import SecurityLevelResource
     from api.resources.housedata_resource import HouseDataResource
+    from api.resources.email_confirmation.email_confirmation import EmailConfirmationResource
+    from api.resources.project_resource import ProjectResource
+    from .resources.redcap_requests.fetch_sample_resource import SaveSampleFromREDCap
 
     api = Api(app)
     api.add_resource(IndexResource, '/', '/index', '/welcome')
     api.add_resource(AuthResource, '/auth', '/login', '/auth/login')
     api.add_resource(LogOutResource, '/logout', '/log-out')
     api.add_resource(ThemeResource, '/theme', '/themes')
+    api.add_resource(ProjectResource, '/project', '/projects')
     api.add_resource(RoleResource, '/role', '/roles')
     api.add_resource(UserResource, '/user', '/users')
+
+    api.add_resource(EmailConfirmationResource, '/requestConfirmation', '/confirm/<token>')
+    api.add_resource(ForgotPasswordResource, '/forgot')
+    api.add_resource(PasswordResetResource, '/reset/<token>')
 
     api.add_resource(PublicationResource, '/publication', '/publications')
     api.add_resource(SampleResource, '/sample', '/samples')
@@ -133,6 +143,20 @@ def config_app(app_instance):
     app_instance.url_map.strict_slashes = False
 
 
+def extensions_set_up(app_instance):
+    app_instance.config['SECRET_KEY'] = os.getenv(SECRET_KEY)
+    # JWT setup
+    jwt = JWTManager(app_instance)
+
+    # Flask-Mail SetUp
+    mail = Mail(app_instance)
+
+    # Database and Migrations setup
+    db = BaseModel.init_app(app_instance)
+
+    return {'jwt': jwt, 'mail': mail, 'db': db}
+
+
 # Application Factory
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
@@ -151,13 +175,13 @@ def create_app(test_config=None):
     # Register Resources
     register_resources(app)
 
-    # JWT setup
-    app.config['SECRET_KEY'] = os.getenv(SECRET_KEY)
-    jwt = JWTManager(app)
-
     # Cross-Origin Resource Sharing
     # todo: proper CORS config, to ensure requests to the api are only sent by verified clients
     CORS(app, resources={r'/*': {'origins': '*'}})
+
+    # Extensions SetUp
+    ext = extensions_set_up(app)
+    jwt = ext.get('jwt')
 
     @jwt.token_in_blacklist_loader
     def check_if_token_is_revoked(decrypted_token):
@@ -166,9 +190,6 @@ def create_app(test_config=None):
         if entry is None:
             return True
         return entry == 'true'
-
-    # Database and Migrations setup
-    db = BaseModel.init_app(app)
 
     @app.shell_context_processor
     def make_shell_processor():

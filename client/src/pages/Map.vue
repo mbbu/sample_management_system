@@ -1,29 +1,29 @@
 <template>
 <div class="vue-world-map">
-  <Map />
+  <top-nav :page_title="page_title"></top-nav>
+  <FlashMessage :position="'center bottom'"></FlashMessage>
+  <Map/>
 </div>
 </template>
 
 <script>
-import chroma from 'chroma-js';
-import Map from '../components/MapView';
-import {
-  getDynamicMapCss,
-  getBaseCss,
-  getCombinedCssString,
-} from '../styles/dynamic-map-css.js';
-export default {
-  components: { Map },
-  watch: {
-    countryData() {
-      this.renderMapCSS();
+  import chroma from 'chroma-js';
+  import Map from '../components/MapView';
+  import {getBaseCss, getCombinedCssString, getDynamicMapCss,} from '../styles/dynamic-map-css.js';
+  import TopNav from "@/components/TopNav";
+
+  export default {
+    components: {Map, TopNav},
+    watch: {
+      countryData() {
+        this.renderMapCSS();
+      },
     },
-  },
-  props: {
-    lowColor: {
-      type: String,
-      default: 'red',
-    },
+    props: {
+      lowColor: {
+        type: String,
+        default: 'red',
+      },
     highColor: {
       type: String,
       default: '#d83737',
@@ -43,6 +43,7 @@ export default {
   },
   data() {
     return {
+      page_title: "Home",
       node: document.createElement('style'),
       chromaScale: chroma.scale([this.$props.lowColor, this.$props.highColor]),
     };
