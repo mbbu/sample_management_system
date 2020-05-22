@@ -36,3 +36,10 @@ EXPIRATION_AS_HR = EMAIL_TOKEN_EXPIRATION / 60 / 60
 
 # Email sender
 EMAIL_SENDER = ''  # todo: set email that will send out other mails
+
+# role constants
+SYSADMIN = -1
+THEMEADMIN = 1
+
+FORBIDDEN_FUNCTION_ACCESS_RESPONSE_CODE = 403
+FORBIDDEN_FUNCTION_ACCESS_RESPONSE = "Cannot access this function, you are not an admin"
