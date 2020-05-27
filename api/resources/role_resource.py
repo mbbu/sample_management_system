@@ -5,6 +5,7 @@ from flask_restful import reqparse, marshal, fields
 from api.models.database import BaseModel
 from api.models.role import Role
 from api.resources.base_resource import BaseResource
+from api.resources.decorators.user_role_decorators import is_sys_admin
 from api.utils import format_and_lower_str, log_create, log_duplicate, \
     log_update, log_delete, has_required_request_params, standard_non_empty_string, log_304
 
@@ -28,6 +29,7 @@ class RoleResource(BaseResource):
             return BaseResource.send_json_message(data, 200)
 
     @jwt_required
+    @is_sys_admin
     def post(self):
         args = RoleResource.role_parser()
         code = args['code']
@@ -50,6 +52,7 @@ class RoleResource(BaseResource):
         return BaseResource.send_json_message("Role already exists", 409)
 
     @jwt_required
+    @is_sys_admin
     @has_required_request_params
     def put(self):
         code = format_and_lower_str(request.headers['code'])
@@ -82,6 +85,7 @@ class RoleResource(BaseResource):
             return BaseResource.send_json_message("No changes made", 304)
 
     @jwt_required
+    @is_sys_admin
     @has_required_request_params
     def delete(self):
         code = format_and_lower_str(request.headers['code'])
