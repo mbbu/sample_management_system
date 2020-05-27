@@ -5,6 +5,7 @@ from flask_restful import marshal, reqparse, fields
 from api.models.database import BaseModel
 from api.models.laboratory import Laboratory
 from api.resources.base_resource import BaseResource
+from api.resources.decorators.user_role_decorators import is_theme_admin
 from api.utils import format_and_lower_str, log_update, log_delete, log_duplicate, log_create, \
     has_required_request_params, standard_non_empty_string, log_304
 
@@ -34,6 +35,7 @@ class LaboratoryResource(BaseResource):
                 return BaseResource.send_json_message(data, 200)
 
     @jwt_required
+    @is_theme_admin
     def post(self):
         args = LaboratoryResource.laboratory_parser()
 
@@ -62,6 +64,7 @@ class LaboratoryResource(BaseResource):
         return BaseResource.send_json_message("Laboratory already exists", 409)
 
     @jwt_required
+    @is_theme_admin
     @has_required_request_params
     def put(self):
         code = format_and_lower_str(request.headers['code'])
@@ -95,6 +98,7 @@ class LaboratoryResource(BaseResource):
             return BaseResource.send_json_message("No changes were made", 304)
 
     @jwt_required
+    @is_theme_admin
     @has_required_request_params
     def delete(self):
         code = format_and_lower_str(request.headers['code'])
