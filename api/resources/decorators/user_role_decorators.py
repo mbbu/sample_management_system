@@ -56,9 +56,9 @@ def is_sample_owner(sample_restricted_func):
     """
 
     def wrapper(*args, **kwargs):
-        user_id = get_jwt_identity()
+        user_id = get_user_by_email(get_jwt_identity()).id
         sample_owner = Sample.query.filter(Sample.user_id == user_id).first()
-        if not sample_owner:
+        if not (sample_owner or is_theme_admin or is_sys_admin):
             return BaseResource.send_json_message(FORBIDDEN_FUNCTION_ACCESS_RESPONSE,
                                                   FORBIDDEN_FUNCTION_ACCESS_RESPONSE_CODE)
         return sample_restricted_func(*args, **kwargs)
