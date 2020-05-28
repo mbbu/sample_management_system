@@ -5,6 +5,7 @@ from flask_restful import fields, marshal, reqparse
 from api.models.database import BaseModel
 from api.models.freezer import Freezer
 from api.resources.base_resource import BaseResource
+from api.resources.decorators.user_role_decorators import is_theme_admin
 from api.resources.lab_resource import LaboratoryResource
 from api.utils import format_and_lower_str, non_empty_int, log_create, has_required_request_params, \
     log_update, log_delete, log_duplicate, standard_non_empty_string, non_empty_string, log_304
@@ -37,6 +38,7 @@ class FreezerResource(BaseResource):
                 return BaseResource.send_json_message(data, 200)
 
     @jwt_required
+    @is_theme_admin
     def post(self):
         args = FreezerResource.freezer_args()
         if type(args['laboratory']) is str:
@@ -70,6 +72,7 @@ class FreezerResource(BaseResource):
         return BaseResource.send_json_message("Freezer already exists", 409)
 
     @jwt_required
+    @is_theme_admin
     @has_required_request_params
     def put(self):
         code = format_and_lower_str(request.headers['code'])
@@ -110,6 +113,7 @@ class FreezerResource(BaseResource):
             return BaseResource.send_json_message("No changes made", 304)
 
     @jwt_required
+    @is_theme_admin
     @has_required_request_params
     def delete(self):
         code = format_and_lower_str(request.headers['code'])
