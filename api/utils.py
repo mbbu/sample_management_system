@@ -61,6 +61,10 @@ def set_date_from_int(num_of_days):
 """
 
 
+def get_any_user_by_email(email):
+    return BaseModel.db.session.query(User).filter(User.email == email).first()
+
+
 def get_active_users():
     return BaseModel.db.session.query(User).filter(User.is_deleted == False).all()
 
