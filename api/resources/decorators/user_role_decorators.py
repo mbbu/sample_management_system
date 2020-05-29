@@ -80,4 +80,25 @@ def is_sample_owner(sample_restricted_func):
             return BaseResource.send_json_message("Cannot access this function, you are not the sample owner",
                                                   FORBIDDEN_FUNCTION_ACCESS_RESPONSE_CODE)
         return sample_restricted_func(*args, **kwargs)
+
+    return wrapper
+
+
+def authorized_to_deactivate_user(deactivate_user_restricted_function):
+    """
+    Decorator func to check if the user is the admin allowing them to deactivate other user accounts
+    :param deactivate_user_restricted_function:
+    :return:
+    """
+
+    def wrapper(*args, **kwargs):
+        # check if user requesting deactivation is in their account or is the system admin
+        user = get_user_by_email(get_jwt_identity())
+        admin = User.query.join(Role).filter(User.id == user.id, Role.code == SYSADMIN).first()
+
+        if (get_jwt_identity() != user.email) and not admin:
+            return BaseResource.send_json_message("You cannot delete another user!",
+                                                  FORBIDDEN_FUNCTION_ACCESS_RESPONSE_CODE)
+        return deactivate_user_restricted_function(*args, **kwargs)
+
     return wrapper

@@ -44,4 +44,4 @@ SYSADMIN = "-1"
 THEMEADMIN = "1"
 
 FORBIDDEN_FUNCTION_ACCESS_RESPONSE_CODE = 403
-FORBIDDEN_FUNCTION_ACCESS_RESPONSE = "Cannot access this function, you are not an admin!"
+FORBIDDEN_FUNCTION_ACCESS_RESPONSE = "You cannot access this function, you are not an admin!"

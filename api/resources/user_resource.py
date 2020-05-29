@@ -8,6 +8,7 @@ from api.models import Sample, Publication
 from api.models.database import BaseModel
 from api.models.user import User
 from api.resources.base_resource import BaseResource
+from api.resources.decorators.user_role_decorators import authorized_to_deactivate_user
 from api.resources.email_confirmation.email_confirmation import send_confirmation_email
 from api.resources.role_resource import RoleResource
 from api.utils import get_active_users, get_user_by_email, get_users_by_role, get_users_by_status, get_deactivated_user, \
@@ -143,34 +144,31 @@ class UserResource(BaseResource):
         return BaseResource.send_json_message("User not found", 404)
 
     @jwt_required
+    @authorized_to_deactivate_user
     def delete(self):
         email = format_and_lower_str(get_jwt_identity())
         user = get_user_by_email(email)
 
         if user is not None:
-            if get_jwt_identity() != user.email:
-                return BaseResource.send_json_message("Cannot delete another user", 403)
+            # decide whether to delete user or deactivate account.
+            # How? Check for deactivate in headers
 
+            if request.headers.get('deactivate'):
+                user.is_active = False
+                user.deactivated_at = datetime.now()
+                user.deactivated_by = email
+                user.reactivated_at = None
+                user.reactivated_by = None
+                BaseModel.db.session.commit()
+                current_app.logger.info("{0} deactivated {1}".format(get_jwt_identity(), user.email))
+                return BaseResource.send_json_message("User account deactivated", 200)
             else:
-                # decide whether to delete user or deactivate account.
-                # How? Check for deactivate in headers
-
-                if request.headers.get('deactivate'):
-                    user.is_active = False
-                    user.deactivated_at = datetime.now()
-                    user.deactivated_by = email
-                    user.reactivated_at = None
-                    user.reactivated_by = None
-                    BaseModel.db.session.commit()
-                    current_app.logger.info("{0} deactivated {1}".format(get_jwt_identity(), user.email))
-                    return BaseResource.send_json_message("User account deactivated", 200)
-                else:
-                    user.is_deleted = True
-                    user.deleted_at = datetime.now()
-                    user.deleted_by = get_jwt_identity()
-                    BaseModel.db.session.commit()
-                    current_app.logger.info("{0} deleted {1}".format(get_jwt_identity(), user.email))
-                    return BaseResource.send_json_message("User deleted", 200)
+                user.is_deleted = True
+                user.deleted_at = datetime.now()
+                user.deleted_by = get_jwt_identity()
+                BaseModel.db.session.commit()
+                current_app.logger.info("{0} deleted {1}".format(get_jwt_identity(), user.email))
+                return BaseResource.send_json_message("User deleted", 200)
 
         current_app.logger.info("{0} trying to delete {1} but does not exist".format(get_jwt_identity(), email))
         return BaseResource.send_json_message("User not found", 404)
