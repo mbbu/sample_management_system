@@ -8,6 +8,7 @@ from api.models.database import BaseModel
 from api.models.sample import Sample
 from api.resources.base_resource import BaseResource
 from api.resources.box_resource import BoxResource
+from api.resources.decorators.user_role_decorators import is_sample_owner
 from api.resources.quantity_type_resource import QuantityTypeResource
 from api.resources.security_level_resource import SecurityLevelResource
 from api.resources.theme_resource import ThemeResource
@@ -95,6 +96,7 @@ class SampleResource(BaseResource):
         return BaseResource.send_json_message("Sample already exists", 409)
 
     @jwt_required
+    @is_sample_owner
     @has_required_request_params
     def put(self):
         code = format_and_lower_str(request.headers['code'])
@@ -153,6 +155,7 @@ class SampleResource(BaseResource):
         return BaseResource.send_json_message("Sample not found", 404)
 
     @jwt_required
+    @is_sample_owner
     @has_required_request_params
     def delete(self):
         code = format_and_lower_str(request.headers['code'])
