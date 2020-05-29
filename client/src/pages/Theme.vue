@@ -121,7 +121,7 @@
     import axios from 'axios';
     import {theme_resource} from '../../src/utils/api_paths'
     import TopNav from "@/components/TopNav";
-    import {secureStoreGetString} from '../utils/util_functions'
+    import {secureStoreGetString, showFlashMessage} from '../utils/util_functions'
 
     export default {
         name: 'Theme',
@@ -166,6 +166,7 @@
             },
 
             createTheme: function () {
+                let self = this;
                 axios.post(theme_resource, {
                     name: this.name,
                     code: this.code,
@@ -197,6 +198,8 @@
                                     title: "Session Expired",
                                     message: "You need to log in to perform this operation"
                                 });
+                            } else if (error.response.status === 403) {
+                                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
                             } else {
                                 this.flashMessage.show({
                                     status: 'error',
@@ -242,6 +245,8 @@
                                     title: "Session Expired",
                                     message: "You need to log in to perform this operation"
                                 });
+                            } else if (error.response.status === 403) {
+                                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
                             } else {
                                 this.flashMessage.show({
                                     status: 'error',
@@ -277,6 +282,8 @@
                                     title: "Session Expired",
                                     message: "You need to log in to perform this operation"
                                 });
+                            } else if (error.response.status === 403) {
+                                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
                             } else {
                                 this.flashMessage.show({
                                     status: 'error',

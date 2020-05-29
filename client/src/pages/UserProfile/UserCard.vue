@@ -324,6 +324,8 @@
                                 showFlashMessage(self, 'error', error.response.data['message'], 'Kindly refill the form');
                             } else if (error.response.status === 401) {
                                 respondTo401(self)
+                            } else if (error.response.status === 403) {
+                                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
                             } else if (error.response.status === 500) {
                                 showFlashMessage(self, 'error', "Fatal Error", 'Admin has been contacted.');
                             } else {

@@ -345,6 +345,8 @@
                                 showFlashMessage(self, 'error', error.response.data['message'], 'Kindly refill the form');
                             } else if (error.response.status === 401) {
                                 showFlashMessage(self, 'error', "Session Expired", 'You need to log in to perform this operation');
+                            } else if (error.response.status === 403) {
+                                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
                             } else {
                                 showFlashMessage(self, 'error', error.response.data['message'], '');
                             }
@@ -383,6 +385,8 @@
                                 showFlashMessage(self, 'info', 'Record not modified!', '');
                             } else if (error.response.status === 401) {
                                 showFlashMessage(self, 'error', "Session Expired", 'You need to log in to perform this operation');
+                            } else if (error.response.status === 403) {
+                                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
                             } else {
                                 showFlashMessage(self, 'error', error.response.data['message'], '');
                             }
@@ -408,6 +412,8 @@
                         if (error.response) {
                             if (error.response.status === 401) {
                                 showFlashMessage(self, 'error', "Session Expired", 'You need to log in to perform this operation');
+                            } else if (error.response.status === 403) {
+                                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
                             } else {
                                 showFlashMessage(self, 'error', error.response.data['message'], '');
                             }
