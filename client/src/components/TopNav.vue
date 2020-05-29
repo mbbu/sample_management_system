@@ -3,7 +3,7 @@
         <mdb-navbar class="top-nav" dark position="top" scrolling>
             <mdb-navbar-brand href="#">
                 <router-link to="/index">
-                    <img :src="require('../assets/logo.png')" class="menu_logo"/>
+                    <img :src="getCompanyLogo()" alt="Logo" class="menu_logo"/>
                 </router-link>
             </mdb-navbar-brand>
             <mdb-navbar-nav>
@@ -110,6 +110,9 @@
             }
         },
         methods: {
+            getCompanyLogo() {
+                return require('../assets/logo.png')
+            },
             getUser() {
                 this.isAuth = isUserLoggedIn()
                 if (this.isAuth === true) {
