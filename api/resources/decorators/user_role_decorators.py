@@ -40,7 +40,8 @@ def is_theme_admin(theme_admin_restricted_func):
     def wrapper(*args, **kwargs):
         user_id = get_user_by_email(get_jwt_identity()).id
         theme_admin = User.query.join(Role).filter(User.id == user_id, Role.code == THEMEADMIN).first()
-        if not theme_admin or not is_sys_admin:
+        sys_admin = User.query.join(Role).filter(User.id == user_id, Role.code == SYSADMIN).first()
+        if not theme_admin or not sys_admin:
             return BaseResource.send_json_message(FORBIDDEN_FUNCTION_ACCESS_RESPONSE,
                                                   FORBIDDEN_FUNCTION_ACCESS_RESPONSE_CODE)
         return theme_admin_restricted_func(*args, **kwargs)
