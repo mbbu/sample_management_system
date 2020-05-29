@@ -222,6 +222,7 @@
         getSampleCode,
         isRetentionPeriodValid,
         overDueRetentionPeriod,
+        respondTo401,
         secureStoreGetString,
         setSampleDetailsForEditing,
         setUpdateSample,
@@ -343,7 +344,7 @@
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 401) {
-                                showFlashMessage(self, 'error', "Session Expired", 'You need to log in to perform this operation');
+                                respondTo401(self);
                             } else if (error.response.status === 404) {
                                 showFlashMessage(self, 'error', 'Connection Error', 'Request was timed out');
                                 countDownTimer(self, 3, '/sample')
@@ -386,8 +387,7 @@
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 401) {
-                                showFlashMessage(self, 'error', "Session Expired", 'You need to log in to perform this operation');
-                                countDownTimer(self, 3, '/login')
+                                respondTo401(self);
                             } else if (error.response.status === 403) {
                                 showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
                             } else {

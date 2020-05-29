@@ -143,7 +143,7 @@
     import axios from 'axios';
     import {lab_resource} from '../../src/utils/api_paths'
     import TopNav from "@/components/TopNav";
-    import {secureStoreGetString, showFlashMessage} from "../utils/util_functions";
+    import {respondTo401, secureStoreGetString, showFlashMessage} from "../utils/util_functions";
 
     export default {
         name: 'Lab',
@@ -219,11 +219,7 @@
                                     message: error.response.data['message']
                                 });
                             } else if (error.response.status === 401) {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Session Expired",
-                                    message: "You need to log in to perform this operation"
-                                });
+                                respondTo401(self)
                             } else if (error.response.status === 403) {
                                 showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
                             } else {
@@ -268,11 +264,7 @@
                                     message: "Record not modified"
                                 });
                             } else if (error.response.status === 401) {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Session Expired",
-                                    message: "You need to log in to perform this operation"
-                                });
+                                respondTo401(self)
                             } else if (error.response.status === 403) {
                                 showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
                             } else {
@@ -307,11 +299,7 @@
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 401) {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Session Expired",
-                                    message: "You need to log in to perform this operation"
-                                });
+                                respondTo401(self)
                             } else if (error.response.status === 403) {
                                 showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
                             } else {

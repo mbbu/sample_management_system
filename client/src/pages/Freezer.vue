@@ -171,6 +171,7 @@
         extractApiData,
         getItemDataList,
         getSelectedItem,
+        respondTo401,
         secureStoreGetString,
         showFlashMessage
     } from "../utils/util_functions";
@@ -283,7 +284,7 @@
                             } else if (error.response.status === 400) {
                                 showFlashMessage(self, 'error', error.response.data['message'], 'Kindly refill the form');
                             } else if (error.response.status === 401) {
-                                showFlashMessage(self, 'error', "Session Expired", 'You need to log in to perform this operation');
+                                respondTo401(self);
                             } else if (error.response.status === 403) {
                                 showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
                             } else {
@@ -321,7 +322,7 @@
                             if (error.response.status === 304) {
                                 showFlashMessage(self, 'info', 'Record not modified!', '');
                             } else if (error.response.status === 401) {
-                                showFlashMessage(self, 'error', "Session Expired", 'You need to log in to perform this operation');
+                                respondTo401(self);
                             } else if (error.response.status === 403) {
                                 showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
                             } else {
@@ -348,7 +349,7 @@
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 401) {
-                                showFlashMessage(self, 'error', "Session Expired", 'You need to log in to perform this operation');
+                                respondTo401(self);
                             } else if (error.response.status === 403) {
                                 showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
                             } else {

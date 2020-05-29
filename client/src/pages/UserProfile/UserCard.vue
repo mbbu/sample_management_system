@@ -270,7 +270,7 @@
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 401) {
-                                showFlashMessage(self, 'error', "Session Expired", 'You need to log in to perform this operation');
+                                respondTo401(self);
                             } else if (error.response.status === 404) {
                                 showFlashMessage(self, 'error', 'Connection Error', 'Request was timed out');
                                 countDownTimer(self, 3, '/home')
