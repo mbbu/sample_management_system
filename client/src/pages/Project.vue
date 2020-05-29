@@ -210,7 +210,7 @@
     } from "../utils/util_functions";
     import {project_resource, theme_resource, user_resource} from "../utils/api_paths";
     import axios from "axios";
-    import TopNav from "@/components/TopNav";
+    import TopNav from "../components/TopNav";
 
     export default {
         name: "Project",

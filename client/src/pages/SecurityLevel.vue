@@ -143,7 +143,7 @@
 <script>
     import axios from 'axios';
     import {security_level_resource} from '../utils/api_paths'
-    import TopNav from "@/components/TopNav";
+    import TopNav from "../components/TopNav";
     import {respondTo401, secureStoreGetString, showFlashMessage} from "../utils/util_functions";
 
     export default {

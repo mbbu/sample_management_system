@@ -141,8 +141,8 @@
 
 <script>
     import axios from 'axios';
-    import {lab_resource} from '../../src/utils/api_paths'
-    import TopNav from "@/components/TopNav";
+    import {lab_resource} from '../utils/api_paths'
+    import TopNav from "../components/TopNav";
     import {respondTo401, secureStoreGetString, showFlashMessage} from "../utils/util_functions";
 
     export default {

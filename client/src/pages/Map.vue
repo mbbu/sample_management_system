@@ -10,7 +10,7 @@
   import chroma from 'chroma-js';
   import Map from '../components/MapView';
   import {getBaseCss, getCombinedCssString, getDynamicMapCss,} from '../styles/dynamic-map-css.js';
-  import TopNav from "@/components/TopNav";
+  import TopNav from "../components/TopNav";
 
   export default {
     components: {Map, TopNav},

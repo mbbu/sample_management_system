@@ -203,7 +203,7 @@
 </template>
 <script>
     import {mdbCard, mdbCardBody, mdbCol, mdbRow} from "mdbvue";
-    import TopNav from "@/components/TopNav";
+    import TopNav from "../../components/TopNav";
     import axios from "axios";
     import {user_resource} from "../../utils/api_paths";
     import {

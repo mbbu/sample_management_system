@@ -144,8 +144,8 @@
 
 <script>
     import axios from 'axios';
-    import {rack_resource, tray_resource} from '../../src/utils/api_paths'
-    import TopNav from "@/components/TopNav";
+    import {rack_resource, tray_resource} from '../utils/api_paths'
+    import TopNav from "../components/TopNav";
     import {
         extractRackData,
         getItemDataList,

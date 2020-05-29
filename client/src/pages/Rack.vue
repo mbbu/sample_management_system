@@ -144,8 +144,8 @@
 
 <script>
     import axios from 'axios';
-    import {chamber_resource, rack_resource} from '../../src/utils/api_paths'
-    import TopNav from "@/components/TopNav";
+    import {chamber_resource, rack_resource} from '../utils/api_paths'
+    import TopNav from "../components/TopNav";
     import {
         extractChamberData,
         getItemDataList,

@@ -123,7 +123,7 @@
 </template>
 <script>
     import {mdbCard, mdbCardBody, mdbCardHeader, mdbCol, mdbInput, mdbRow} from "mdbvue";
-    import TopNav from "@/components/TopNav";
+    import TopNav from "../../components/TopNav";
     import {
         countDownTimer,
         extractApiData,
