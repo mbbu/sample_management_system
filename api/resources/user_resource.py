@@ -8,7 +8,7 @@ from api.models import Sample, Publication
 from api.models.database import BaseModel
 from api.models.user import User
 from api.resources.base_resource import BaseResource
-from api.resources.decorators.user_role_decorators import authorized_to_deactivate_user
+from api.resources.decorators.user_role_decorators import authorized_to_modify_user
 from api.resources.email_confirmation.email_confirmation import send_confirmation_email
 from api.resources.role_resource import RoleResource
 from api.utils import get_active_users, get_user_by_email, get_users_by_role, get_users_by_status, get_deactivated_user, \
@@ -101,6 +101,7 @@ class UserResource(BaseResource):
             return BaseResource.send_json_message('User already exists', 409)
 
     @jwt_required
+    @authorized_to_modify_user
     def put(self):
         email = format_and_lower_str(get_jwt_identity())
         user = get_user_by_email(email)
@@ -144,7 +145,7 @@ class UserResource(BaseResource):
         return BaseResource.send_json_message("User not found", 404)
 
     @jwt_required
-    @authorized_to_deactivate_user
+    @authorized_to_modify_user
     def delete(self):
         email = format_and_lower_str(get_jwt_identity())
         user = get_user_by_email(email)

@@ -84,7 +84,7 @@ def is_sample_owner(sample_restricted_func):
     return wrapper
 
 
-def authorized_to_deactivate_user(deactivate_user_restricted_function):
+def authorized_to_modify_user(deactivate_user_restricted_function):
     """
     Decorator func to check if the user is the admin allowing them to deactivate other user accounts
     :param deactivate_user_restricted_function:
