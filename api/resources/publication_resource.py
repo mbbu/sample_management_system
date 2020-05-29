@@ -5,6 +5,7 @@ from flask_restful import fields, marshal, reqparse
 from api.models.database import BaseModel
 from api.models.publication import Publication
 from api.resources.base_resource import BaseResource
+from api.resources.decorators.user_role_decorators import is_publication_owner
 from api.resources.sample_resource import SampleResource
 from api.utils import log_create, log_duplicate, log_update, log_delete, format_and_lower_str, \
     has_required_request_params, non_empty_int, log_304, get_user_by_email
@@ -71,6 +72,7 @@ class PublicationResource(BaseResource):
         return BaseResource.send_json_message('Publication already exists', 409)
 
     @jwt_required
+    @is_publication_owner
     @has_required_request_params
     def put(self):
         pub_title = format_and_lower_str(request.headers['title'])
@@ -107,6 +109,7 @@ class PublicationResource(BaseResource):
         return BaseResource.send_json_message('Publication not found', 404)
 
     @jwt_required
+    @is_publication_owner
     @has_required_request_params
     def delete(self):
         pub_title = format_and_lower_str(request.headers['title'])

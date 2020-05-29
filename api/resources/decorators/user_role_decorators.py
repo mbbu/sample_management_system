@@ -102,3 +102,38 @@ def authorized_to_modify_user(deactivate_user_restricted_function):
         return deactivate_user_restricted_function(*args, **kwargs)
 
     return wrapper
+
+
+def is_publication_owner(publication_restricted_func):
+    """
+    Decorator func to check if the user is the admin before executing a function
+    :param publication_restricted_func:
+    :return:
+    """
+
+    def wrapper(*args, **kwargs):
+        user_id = get_user_by_email(get_jwt_identity()).id
+
+        # check if they are publication owners
+        user_publications = Sample.query.filter(Sample.user_id == user_id).all()
+        this_publication_code = request.headers['title']
+        publication_owner = False
+
+        for publication in user_publications:
+            if publication.code == this_publication_code:
+                publication_owner = True
+                break
+            else:
+                publication_owner = False
+                break
+
+        # check if they are either a system admin or theme admin
+        sys_admin = User.query.join(Role).filter(User.id == user_id, Role.code == SYSADMIN).first()
+        theme_admin = User.query.join(Role).filter(User.id == user_id, Role.code == THEMEADMIN).first()
+
+        if not publication_owner and theme_admin is None and sys_admin is None:
+            return BaseResource.send_json_message("Cannot access this function, you are not the publication owner",
+                                                  FORBIDDEN_FUNCTION_ACCESS_RESPONSE_CODE)
+        return publication_restricted_func(*args, **kwargs)
+
+    return wrapper
