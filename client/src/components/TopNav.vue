@@ -34,7 +34,7 @@
                             </mdb-dropdown-item>
                             <mdb-dropdown-item>
                                 <i class="fas fa-sign-out-alt fa-lg"></i>
-                                <router-link @click.native="signOut" to="/home"> Sign Out</router-link>
+                                <router-link @click.native="signOut" to="#"> Sign Out</router-link>
                             </mdb-dropdown-item>
                         </mdb-dropdown-menu>
                     </mdb-dropdown>
