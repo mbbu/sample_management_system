@@ -178,30 +178,19 @@
                     .then((response) => {
                         this.getTheme();
                         this.clearForm();
-                        this.flashMessage.show({
-                            status: 'success',
-                            title: response.data['message'], message: ""
-                        });
+                        showFlashMessage(self, 'success', response.data['message'], '')
                     })
                     .catch((error) => {
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 409) {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Error",
-                                    message: error.response.data['message']
-                                });
+                                showFlashMessage(self, 'error', 'Error', error.response.data['message'])
                             } else if (error.response.status === 401) {
                                 respondTo401(self);
                             } else if (error.response.status === 403) {
                                 showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
                             } else {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Error",
-                                    message: "Theme name already exists"
-                                });
+                                showFlashMessage(self, 'error', 'Error', 'Theme name already exists')
                             }
                         }
                     });
@@ -222,30 +211,19 @@
                 })
                     .then((response) => {
                         this.getTheme();
-                        this.flashMessage.show({
-                            status: 'success',
-                            title: response.data['message'], message: ""
-                        });
+                        showFlashMessage(self, 'success', response.data['message'], '')
                     })
                     .catch((error) => {
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 304) {
-                                this.flashMessage.show({
-                                    status: 'info',
-                                    title: "Info",
-                                    message: "Record not modified"
-                                });
+                                showFlashMessage(self, 'info', 'Info', 'Record not modified!')
                             } else if (error.response.status === 401) {
                                 respondTo401(self);
                             } else if (error.response.status === 403) {
                                 showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
                             } else {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Error",
-                                    message: error.response.data['message']
-                                });
+                                showFlashMessage(self, 'error', 'Error', error.response.data['message'])
                             }
                         }
                     });
@@ -262,10 +240,7 @@
                 })
                     .then((response) => {
                         this.getTheme();
-                        this.flashMessage.show({
-                            status: 'success',
-                            title: response.data['message'], message: ""
-                        });
+                        showFlashMessage(self, 'success', response.data['message'], '')
                     })
                     .catch((error) => {
                         this.$log.error(error);
@@ -275,10 +250,7 @@
                             } else if (error.response.status === 403) {
                                 showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
                             } else {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: error, message: ""
-                                });
+                                showFlashMessage(self, 'error', 'Error', error.response.data['message'])
                             }
                         }
                     });
@@ -286,7 +258,6 @@
         },
         created() {
             this.getTheme();
-            // this.$log.info('Test Logging')
         },
         components: {TopNav}
     };
