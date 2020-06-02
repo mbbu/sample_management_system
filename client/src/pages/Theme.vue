@@ -190,7 +190,7 @@
                             } else if (error.response.status === 403) {
                                 showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
                             } else {
-                                showFlashMessage(self, 'error', 'Error', 'Theme name already exists')
+                                showFlashMessage(self, 'error', 'Error', error.response.data['message'])
                             }
                         }
                     });
