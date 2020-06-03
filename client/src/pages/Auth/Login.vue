@@ -97,7 +97,13 @@
     import {auth_resource} from "../../utils/api_paths";
     import {email, required} from "vuelidate/lib/validators";
     import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
-    import {countDownTimer, secureStoreSetString, showFlashMessage, viewPassword} from "../../utils/util_functions";
+    import {
+        countDownTimer,
+        secureStoreSetString,
+        showFlashMessage,
+        startLoader,
+        viewPassword
+    } from "../../utils/util_functions";
 
     export default {
         components: {
@@ -132,20 +138,6 @@
 
         methods: {
             viewPassword,
-            showLoader() {
-                return this.$loading.show({
-                    isFullPage: true,
-                    canCancel: false,
-                    color: '#074880',
-                    loader: 'spinner',
-                    width: 255,
-                    height: 255,
-                    backgroundColor: '#FAAB2C',
-                    opacity: 0.7,
-                    zIndex: 999,
-                });
-            },
-
             onSubmit() {
                 // stop here if form is invalid
                 this.$v.$touch();
@@ -153,13 +145,11 @@
                     this.$log.info("FORM INVALID!");
                     return;
                 }
-                this.$log.info("FORM VALID!");
-                // api call to authentication user.
                 this.logInUser(this.user);
             },
 
             logInUser: function (user) {
-                let loader = this.showLoader()
+                let loader = startLoader(this)
                 let self = this;
 
                 axios.post(auth_resource, {

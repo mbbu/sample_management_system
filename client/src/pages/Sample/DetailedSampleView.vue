@@ -226,7 +226,8 @@
         secureStoreGetString,
         setSampleDetailsForEditing,
         setUpdateSample,
-        showFlashMessage
+        showFlashMessage,
+        startLoader
     } from "../../utils/util_functions";
 
     export default {
@@ -303,25 +304,9 @@
                 return now.toString();
             },
 
-            showLoader() {
-                return this.$loading.show({
-                    isFullPage: true,
-                    canCancel: false,
-                    color: '#074880',
-                    loader: 'bars',
-                    width: 255,
-                    height: 255,
-                    backgroundColor: '#FAAB2C',
-                    opacity: 0.7,
-                    zIndex: 999,
-                });
-            },
-
             getSampleByCode(code) {
                 let self = this;
-
-                // show loader while request is being made
-                let loader = this.showLoader()
+                let loader = startLoader(this)
 
                 axios.get(sample_resource, {
                     headers:
@@ -355,7 +340,7 @@
 
             requestUpdateSample() {
                 let self = this;
-                let loader = this.showLoader()
+                let loader = startLoader(this)
 
                 setTimeout(() => {
                     loader.hide()
@@ -367,8 +352,8 @@
 
             deleteSample: function (code) {
                 let self = this;
+                let loader = startLoader(this)
 
-                let loader = this.showLoader()
                 axios.delete(sample_resource, {
                     headers:
                         {

@@ -59,7 +59,7 @@
     import {email, required} from "vuelidate/lib/validators";
     import axios from "axios";
     import {request_password_reset_resource} from "../../utils/api_paths";
-    import {countDownTimer, showFlashMessage} from "../../utils/util_functions";
+    import {countDownTimer, showFlashMessage, startLoader} from "../../utils/util_functions";
     import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
     import TopNav from "../../components/TopNav";
 
@@ -79,19 +79,6 @@
             }
         },
         methods: {
-            showLoader() {
-                return this.$loading.show({
-                    isFullPage: true,
-                    canCancel: false,
-                    color: '#074880',
-                    loader: 'spinner',
-                    width: 255,
-                    height: 255,
-                    backgroundColor: '#FAAB2C',
-                    opacity: 0.7,
-                    zIndex: 999,
-                });
-            },
             onSubmit() {
                 this.$v.$touch();
                 if (this.$v.$invalid) {
@@ -100,7 +87,7 @@
                 this.sendResetEmail(this.user);
             },
             sendResetEmail(user) {
-                let loader = this.showLoader()
+                let loader = startLoader(this)
                 let self = this;
                 axios.post(request_password_reset_resource, {email: user.email})
                     .then((response) => {

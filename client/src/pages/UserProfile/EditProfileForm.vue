@@ -136,6 +136,7 @@
         secureStoreGetString,
         selectDropDownItemForUpdate,
         showFlashMessage,
+        startLoader,
         viewPassword
     } from '../../utils/util_functions';
     import {email, minLength, required} from "vuelidate/lib/validators";
@@ -172,29 +173,12 @@
         },
         methods: {
             viewPassword, selectDropDownItemForUpdate,
-            showLoader() {
-                return this.$loading.show({
-                    isFullPage: true,
-                    canCancel: false,
-                    color: '#074880',
-                    loader: 'dots',
-                    width: 255,
-                    height: 255,
-                    backgroundColor: '#FAAB2C',
-                    opacity: 0.7,
-                    zIndex: 999,
-                });
-            },
             onSubmit() {
-                this.$log.info("FORM SUBMIT METHOD CALLED!");
-                // stop here if form is invalid
                 this.$v.$touch();
                 if (this.$v.$invalid) {
                     this.$log.info("FORM INVALID!");
                     return;
                 }
-                this.$log.info("FORM VALID!");
-                // api call to create user.
                 this.updateUser(this.user);
             },
             onLoadPage() {
@@ -227,7 +211,7 @@
 
             updateUser: function (user) {
                 let self = this;
-                let loader = this.showLoader()
+                let loader = startLoader(this)
 
                 this.user.role = getSelectedItem(this.roleDataList, this.user.role);
                 axios.put(user_resource, {
@@ -276,7 +260,7 @@
             },
             deactivateAccount() {
                 let self = this;
-                let loader = this.showLoader()
+                let loader = startLoader(this)
 
                 axios.delete(user_resource, {
                     headers:
