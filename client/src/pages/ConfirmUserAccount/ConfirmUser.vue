@@ -39,7 +39,7 @@
     import TopNav from "../../components/TopNav";
     import {mdbCard, mdbCardBody, mdbCol, mdbRow} from "mdbvue";
     import {email_confirm_resource} from "../../utils/api_paths";
-    import {countDownTimer, secureStoreSetString, showFlashMessage} from "../../utils/util_functions";
+    import {countDownTimer, secureStoreSetString, showFlashMessage, startLoader} from "../../utils/util_functions";
 
     export default {
         name: "ConfirmUser",
@@ -54,23 +54,9 @@
         },
 
         methods: {
-            showLoader() {
-                return this.$loading.show({
-                    isFullPage: true,
-                    canCancel: false,
-                    color: '#074880',
-                    loader: 'spinner',
-                    width: 255,
-                    height: 255,
-                    backgroundColor: '#FAAB2C',
-                    opacity: 0.7,
-                    zIndex: 999,
-                });
-            },
-
             checkAccount(path) {
                 let self = this;
-                let loader = this.showLoader()
+                let loader = startLoader(this)
 
                 axios.get(path)
                     .then((response) => {

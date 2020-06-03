@@ -6,6 +6,7 @@ from api.models.database import BaseModel
 from api.models.rack import Rack
 from api.resources.base_resource import BaseResource
 from api.resources.chamber_resource import ChamberResource
+from api.resources.decorators.user_role_decorators import is_theme_admin
 from api.utils import format_and_lower_str, log_create, log_duplicate, log_update, log_delete, \
     has_required_request_params, standard_non_empty_string, log_304, non_empty_int
 
@@ -35,6 +36,7 @@ class RackResource(BaseResource):
                 return BaseResource.send_json_message(data, 200)
 
     @jwt_required
+    @is_theme_admin
     def post(self):
         args = RackResource.rack_parser()
         if type(args['chamber']) is str:
@@ -62,6 +64,7 @@ class RackResource(BaseResource):
         return BaseResource.send_json_message("Rack already exists", 409)
 
     @jwt_required
+    @is_theme_admin
     @has_required_request_params
     def put(self):
         code = format_and_lower_str(request.headers['code'])
@@ -96,6 +99,7 @@ class RackResource(BaseResource):
         return BaseResource.send_json_message("Rack not found", 404)
 
     @jwt_required
+    @is_theme_admin
     @has_required_request_params
     def delete(self):
         code = format_and_lower_str(request.headers['code'])

@@ -135,6 +135,7 @@
         extractProjectData,
         getItemDataList,
         getSelectedItemCode,
+        respondTo401,
         secureStoreGetString,
         showFlashMessage
     } from "../../utils/util_functions";
@@ -270,8 +271,7 @@
                             if (error.response.status === 400) {
                                 showFlashMessage(self, 'error', 'Kindly refill the form', error.response.data['message']);
                             } else if (error.response.status === 401 || error.response.status === 422) {
-                                showFlashMessage(self, 'error', "Session Expired", 'You need to log in to perform this operation');
-                                countDownTimer(self, 3, '/login');
+                                respondTo401(self);
                             } else if (error.response.status === 404) {
                                 showFlashMessage(self, 'error', error.response.data['message'], '');
                             }

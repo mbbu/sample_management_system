@@ -94,7 +94,13 @@
     import axios from "axios";
     import TopNav from "../../components/TopNav";
     import {password_reset_resource} from "../../utils/api_paths";
-    import {countDownTimer, showFlashMessage, strongPassword, viewPassword} from "../../utils/util_functions";
+    import {
+        countDownTimer,
+        showFlashMessage,
+        startLoader,
+        strongPassword,
+        viewPassword
+    } from "../../utils/util_functions";
     import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
     import {required, sameAs} from "vuelidate/lib/validators";
 
@@ -123,20 +129,6 @@
 
         methods: {
             viewPassword,
-            showLoader() {
-                return this.$loading.show({
-                    isFullPage: true,
-                    canCancel: false,
-                    color: '#074880',
-                    loader: 'spinner',
-                    width: 255,
-                    height: 255,
-                    backgroundColor: '#FAAB2C',
-                    opacity: 0.7,
-                    zIndex: 999,
-                });
-            },
-
             onSubmit() {
                 // stop here if form is invalid
                 this.$v.$touch();
@@ -149,7 +141,7 @@
 
             resetPassword(path) {
                 let self = this;
-                let loader = this.showLoader()
+                let loader = startLoader(this)
 
                 axios.post(path, {
                     password: this.user.password

@@ -141,9 +141,9 @@
 
 <script>
     import axios from 'axios';
-    import {lab_resource} from '../../src/utils/api_paths'
-    import TopNav from "@/components/TopNav";
-    import {secureStoreGetString} from "../utils/util_functions";
+    import {lab_resource} from '../utils/api_paths'
+    import TopNav from "../components/TopNav";
+    import {respondTo401, secureStoreGetString, showFlashMessage} from "../utils/util_functions";
 
     export default {
         name: 'Lab',
@@ -191,6 +191,7 @@
             },
 
             createLab: function () {
+                let self = this;
                 axios.post(lab_resource, {
                     name: this.name,
                     code: this.code,
@@ -203,32 +204,19 @@
                     .then((response) => {
                         this.getLab();
                         this.clearForm();
-                        this.flashMessage.show({
-                            status: 'success',
-                            title: response.data['message'], message: ""
-                        });
+                        showFlashMessage(self, 'success', response.data['message'], '')
                     })
                     .catch((error) => {
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 409) {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Error",
-                                    message: error.response.data['message']
-                                });
+                                showFlashMessage(self, 'error', 'Error', error.response.data['message'])
                             } else if (error.response.status === 401) {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Session Expired",
-                                    message: "You need to log in to perform this operation"
-                                });
+                                respondTo401(self)
+                            } else if (error.response.status === 403) {
+                                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
                             } else {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Error",
-                                    message: "Lab already exists"
-                                });
+                                showFlashMessage(self, 'error', 'Error', error.response.data['message'])
                             }
                         }
                     });
@@ -236,6 +224,7 @@
             },
 
             updateLab: function (code) {
+                let self = this;
                 axios.put(lab_resource, {
                     name: this.name,
                     code: this.code,
@@ -249,32 +238,19 @@
                 })
                     .then((response) => {
                         this.getLab();
-                        this.flashMessage.show({
-                            status: 'success',
-                            title: response.data['message'], message: ""
-                        });
+                        showFlashMessage(self, 'success', response.data['message'], '')
                     })
                     .catch((error) => {
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 304) {
-                                this.flashMessage.show({
-                                    status: 'info',
-                                    title: "Info",
-                                    message: "Record not modified"
-                                });
+                                showFlashMessage(self, 'info', 'Info', 'Record not modified!')
                             } else if (error.response.status === 401) {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Session Expired",
-                                    message: "You need to log in to perform this operation"
-                                });
+                                respondTo401(self)
+                            } else if (error.response.status === 403) {
+                                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
                             } else {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Error",
-                                    message: error.response.data['message']
-                                });
+                                showFlashMessage(self, 'error', 'Error', error.response.data['message'])
                             }
                         }
                     });
@@ -282,6 +258,7 @@
             },
 
             deleteLab: function (code) {
+                let self = this;
                 axios.delete(lab_resource, {
                     headers:
                         {
@@ -291,25 +268,17 @@
                 })
                     .then((response) => {
                         this.getLab();
-                        this.flashMessage.show({
-                            status: 'success',
-                            title: response.data['message'], message: ""
-                        });
+                        showFlashMessage(self, 'success', response.data['message'], '')
                     })
                     .catch((error) => {
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 401) {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Session Expired",
-                                    message: "You need to log in to perform this operation"
-                                });
+                                respondTo401(self)
+                            } else if (error.response.status === 403) {
+                                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
                             } else {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: error, message: ""
-                                });
+                                showFlashMessage(self, 'error', 'Error', error.response.data['message'])
                             }
                         }
                     });

@@ -5,9 +5,10 @@ from flask_restful import fields, marshal, reqparse
 from api.models.database import BaseModel
 from api.models.publication import Publication
 from api.resources.base_resource import BaseResource
+from api.resources.decorators.user_role_decorators import is_publication_owner
 from api.resources.sample_resource import SampleResource
 from api.utils import log_create, log_duplicate, log_update, log_delete, format_and_lower_str, \
-    has_required_request_params, non_empty_int, log_304, get_user_by_email
+    has_required_request_params, non_empty_int, log_304, get_any_user_by_email
 
 
 class PublicationResource(BaseResource):
@@ -43,7 +44,7 @@ class PublicationResource(BaseResource):
     def post(self):
         args = PublicationResource.publication_parser()
         sample_id = SampleResource.get_sample(args['sample']).id
-        user_id = get_user_by_email(args['user']).id
+        user_id = get_any_user_by_email(args['user']).id
         sample_results = args['sample_results']
         publication_title = format_and_lower_str(args['publication_title'])
         co_authors = args['co_authors']
@@ -71,6 +72,7 @@ class PublicationResource(BaseResource):
         return BaseResource.send_json_message('Publication already exists', 409)
 
     @jwt_required
+    @is_publication_owner
     @has_required_request_params
     def put(self):
         pub_title = format_and_lower_str(request.headers['title'])
@@ -79,7 +81,7 @@ class PublicationResource(BaseResource):
         if publication is not None:
             args = PublicationResource.publication_parser()
             sample = SampleResource.get_sample(args['sample']).id
-            user = get_user_by_email(args['user']).id
+            user = get_any_user_by_email(args['user']).id
             sample_results = args['sample_results']
             publication_title = format_and_lower_str(args['publication_title'])
             co_authors = args['co_authors']
@@ -107,6 +109,7 @@ class PublicationResource(BaseResource):
         return BaseResource.send_json_message('Publication not found', 404)
 
     @jwt_required
+    @is_publication_owner
     @has_required_request_params
     def delete(self):
         pub_title = format_and_lower_str(request.headers['title'])

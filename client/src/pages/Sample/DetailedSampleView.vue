@@ -222,10 +222,12 @@
         getSampleCode,
         isRetentionPeriodValid,
         overDueRetentionPeriod,
+        respondTo401,
         secureStoreGetString,
         setSampleDetailsForEditing,
         setUpdateSample,
-        showFlashMessage
+        showFlashMessage,
+        startLoader
     } from "../../utils/util_functions";
 
     export default {
@@ -302,25 +304,9 @@
                 return now.toString();
             },
 
-            showLoader() {
-                return this.$loading.show({
-                    isFullPage: true,
-                    canCancel: false,
-                    color: '#074880',
-                    loader: 'bars',
-                    width: 255,
-                    height: 255,
-                    backgroundColor: '#FAAB2C',
-                    opacity: 0.7,
-                    zIndex: 999,
-                });
-            },
-
             getSampleByCode(code) {
                 let self = this;
-
-                // show loader while request is being made
-                let loader = this.showLoader()
+                let loader = startLoader(this)
 
                 axios.get(sample_resource, {
                     headers:
@@ -343,7 +329,7 @@
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 401) {
-                                showFlashMessage(self, 'error', "Session Expired", 'You need to log in to perform this operation');
+                                respondTo401(self);
                             } else if (error.response.status === 404) {
                                 showFlashMessage(self, 'error', 'Connection Error', 'Request was timed out');
                                 countDownTimer(self, 3, '/sample')
@@ -354,7 +340,7 @@
 
             requestUpdateSample() {
                 let self = this;
-                let loader = this.showLoader()
+                let loader = startLoader(this)
 
                 setTimeout(() => {
                     loader.hide()
@@ -366,8 +352,8 @@
 
             deleteSample: function (code) {
                 let self = this;
+                let loader = startLoader(this)
 
-                let loader = this.showLoader()
                 axios.delete(sample_resource, {
                     headers:
                         {
@@ -386,8 +372,9 @@
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 401) {
-                                showFlashMessage(self, 'error', "Session Expired", 'You need to log in to perform this operation');
-                                countDownTimer(self, 3, '/login')
+                                respondTo401(self);
+                            } else if (error.response.status === 403) {
+                                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
                             } else {
                                 showFlashMessage(self, 'error', error.response.data['message'], '');
                             }

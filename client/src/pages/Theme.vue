@@ -119,9 +119,9 @@
 
 <script>
     import axios from 'axios';
-    import {theme_resource} from '../../src/utils/api_paths'
-    import TopNav from "@/components/TopNav";
-    import {secureStoreGetString} from '../utils/util_functions'
+    import {theme_resource} from '../utils/api_paths'
+    import TopNav from "../components/TopNav";
+    import {respondTo401, secureStoreGetString, showFlashMessage} from '../utils/util_functions'
 
     export default {
         name: 'Theme',
@@ -166,6 +166,7 @@
             },
 
             createTheme: function () {
+                let self = this;
                 axios.post(theme_resource, {
                     name: this.name,
                     code: this.code,
@@ -177,32 +178,19 @@
                     .then((response) => {
                         this.getTheme();
                         this.clearForm();
-                        this.flashMessage.show({
-                            status: 'success',
-                            title: response.data['message'], message: ""
-                        });
+                        showFlashMessage(self, 'success', response.data['message'], '')
                     })
                     .catch((error) => {
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 409) {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Error",
-                                    message: error.response.data['message']
-                                });
+                                showFlashMessage(self, 'error', 'Error', error.response.data['message'])
                             } else if (error.response.status === 401) {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Session Expired",
-                                    message: "You need to log in to perform this operation"
-                                });
+                                respondTo401(self);
+                            } else if (error.response.status === 403) {
+                                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
                             } else {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Error",
-                                    message: "Theme name already exists"
-                                });
+                                showFlashMessage(self, 'error', 'Error', error.response.data['message'])
                             }
                         }
                     });
@@ -210,6 +198,7 @@
             },
 
             updateTheme: function (code) {
+                let self = this;
                 axios.put(theme_resource, {
                     name: this.name,
                     code: this.code,
@@ -222,32 +211,19 @@
                 })
                     .then((response) => {
                         this.getTheme();
-                        this.flashMessage.show({
-                            status: 'success',
-                            title: response.data['message'], message: ""
-                        });
+                        showFlashMessage(self, 'success', response.data['message'], '')
                     })
                     .catch((error) => {
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 304) {
-                                this.flashMessage.show({
-                                    status: 'info',
-                                    title: "Info",
-                                    message: "Record not modified"
-                                });
+                                showFlashMessage(self, 'info', 'Info', 'Record not modified!')
                             } else if (error.response.status === 401) {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Session Expired",
-                                    message: "You need to log in to perform this operation"
-                                });
+                                respondTo401(self);
+                            } else if (error.response.status === 403) {
+                                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
                             } else {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Error",
-                                    message: error.response.data['message']
-                                });
+                                showFlashMessage(self, 'error', 'Error', error.response.data['message'])
                             }
                         }
                     });
@@ -255,6 +231,7 @@
             },
 
             deleteTheme: function (code) {
+                let self = this;
                 axios.delete(theme_resource, {
                     headers: {
                         code: code,
@@ -263,25 +240,17 @@
                 })
                     .then((response) => {
                         this.getTheme();
-                        this.flashMessage.show({
-                            status: 'success',
-                            title: response.data['message'], message: ""
-                        });
+                        showFlashMessage(self, 'success', response.data['message'], '')
                     })
                     .catch((error) => {
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 401) {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: "Session Expired",
-                                    message: "You need to log in to perform this operation"
-                                });
+                                respondTo401(self);
+                            } else if (error.response.status === 403) {
+                                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
                             } else {
-                                this.flashMessage.show({
-                                    status: 'error',
-                                    title: error, message: ""
-                                });
+                                showFlashMessage(self, 'error', 'Error', error.response.data['message'])
                             }
                         }
                     });
@@ -289,7 +258,6 @@
         },
         created() {
             this.getTheme();
-            // this.$log.info('Test Logging')
         },
         components: {TopNav}
     };

@@ -143,7 +143,7 @@
 <script>
     import axios from 'axios';
     import {role_resource} from '../../utils/api_paths'
-    import TopNav from "@/components/TopNav";
+    import TopNav from "../../components/TopNav";
     import {respondTo401, secureStoreGetString, showFlashMessage} from "../../utils/util_functions";
 
     export default {
@@ -214,6 +214,8 @@
                                 showFlashMessage(self, 'error', "Error", error.response.data['message'])
                             } else if (error.response.status === 401) {
                                 respondTo401(self)
+                            } else if (error.response.status === 403) {
+                                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
                             } else {
                                 showFlashMessage(self, 'error', "Error", "User Role already exists")
                             }
@@ -247,6 +249,8 @@
                                 showFlashMessage(self, 'info', "Record not modified!", "")
                             } else if (error.response.status === 401) {
                                 respondTo401(self)
+                            } else if (error.response.status === 403) {
+                                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
                             } else {
                                 showFlashMessage(self, 'error', "Error", error.response.data['message'])
                             }
@@ -271,8 +275,10 @@
                     })
                     .catch((error) => {
                         this.$log.error(error);
-                        if (error.response) {
+                        if (error.response.status === 401) {
                             respondTo401(self)
+                        } else if (error.response.status === 403) {
+                            showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
                         } else {
                             showFlashMessage(self, 'error', "Error", error.response.data['message'])
                         }

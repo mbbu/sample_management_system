@@ -26,6 +26,8 @@ DATABASE_URI_ENV_NAME = APP_NAME + "_DATABASE_URI"
 REDCAP_URI = 'https://redcap.icipe.org/redcap/api/'
 EMAIL_CONFIRM_URI = 'http://localhost:8080/confirm/{0}'
 PASSWORD_RESET_URI = 'http://localhost:8080/reset/{0}'
+SAMPLE_COLLECTION_FORM = 'https://redcap.icipe.org/redcap/surveys/?s=EAC9JMJWWT'
+SAMPLE_MANAGEMENT_FORM = 'https://redcap.icipe.org/redcap/surveys/?s=3LWMHELP7P'
 
 # Variable
 DATE_TIME_NONE = '0001-01-01 00:00'
@@ -36,3 +38,10 @@ EXPIRATION_AS_HR = EMAIL_TOKEN_EXPIRATION / 60 / 60
 
 # Email sender
 EMAIL_SENDER = ''  # todo: set email that will send out other mails
+
+# role constants
+SYSADMIN = "-1"
+THEMEADMIN = "1"
+
+FORBIDDEN_FUNCTION_ACCESS_RESPONSE_CODE = 403
+FORBIDDEN_FUNCTION_ACCESS_RESPONSE = "You cannot access this function, you are not an admin!"

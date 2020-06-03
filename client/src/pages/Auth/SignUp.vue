@@ -155,6 +155,7 @@
         getItemDataList,
         getSelectedItem,
         showFlashMessage,
+        startLoader,
         viewPassword
     } from "../../utils/util_functions"
 
@@ -210,20 +211,6 @@
 
         methods: {
             viewPassword,
-            showLoader() {
-                return this.$loading.show({
-                    isFullPage: true,
-                    canCancel: false,
-                    color: '#074880',
-                    loader: 'spinner',
-                    width: 255,
-                    height: 255,
-                    backgroundColor: '#FAAB2C',
-                    opacity: 0.7,
-                    zIndex: 999,
-                });
-            },
-
             clearForm(user) {
                 user.firstName = null;
                 user.lastName = null;
@@ -235,15 +222,12 @@
             },
 
             onSubmit() {
-                this.$log.info("FORM SUBMIT METHOD CALLED!");
                 // stop here if form is invalid
                 this.$v.$touch();
                 if (this.$v.$invalid) {
                     this.$log.info("FORM INVALID!");
                     return;
                 }
-                this.$log.info("FORM VALID!");
-                // api call to create user.
                 this.createUser(this.user);
             },
 
@@ -260,14 +244,12 @@
                             'Name': roleList.items[i].Name,
                         });
                     }
-                    this.$log.info("Extracted data as json fields: ", this.fields);
-                    this.$log.info("Extracted roleDataList items: ", this.roleDataList)
                 })
             },
 
 
             createUser: function (user) {
-                let loader = this.showLoader()
+                let loader = startLoader(this)
                 let self = this;
 
                 this.user.role = getSelectedItem(this.roleDataList, this.user.role);

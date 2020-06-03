@@ -5,6 +5,7 @@ from flask_restful import reqparse, fields, marshal
 from api.models.database import BaseModel
 from api.models.theme import Theme
 from api.resources.base_resource import BaseResource
+from api.resources.decorators.user_role_decorators import is_sys_admin
 from api.utils import log_duplicate, log_304, format_and_lower_str, has_required_request_params, log_create, log_update, \
     standard_non_empty_string, non_empty_string
 
@@ -33,6 +34,7 @@ class ThemeResource(BaseResource):
                 return BaseResource.send_json_message(data, 200)
 
     @jwt_required
+    @is_sys_admin
     def post(self):
         args = ThemeResource.theme_parser()
         code = args['code']
@@ -54,6 +56,7 @@ class ThemeResource(BaseResource):
         return BaseResource.send_json_message("Theme already exists", 409)
 
     @jwt_required
+    @is_sys_admin
     @has_required_request_params
     def put(self):
         code = format_and_lower_str(request.headers.get('code'))
@@ -83,6 +86,7 @@ class ThemeResource(BaseResource):
         return BaseResource.send_json_message("Theme not found", 404)
 
     @jwt_required
+    @is_sys_admin
     @has_required_request_params
     def delete(self):
         code = format_and_lower_str(request.headers.get('code'))

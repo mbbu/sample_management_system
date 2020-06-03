@@ -5,6 +5,7 @@ from flask_restful import fields, marshal, reqparse
 from api.models.database import BaseModel
 from api.models.security_level import SecurityLevel
 from api.resources.base_resource import BaseResource
+from api.resources.decorators.user_role_decorators import is_theme_admin
 from api.utils import format_and_lower_str, has_required_request_params, log_update, log_delete, \
     standard_non_empty_string, log_create, log_304
 
@@ -32,6 +33,7 @@ class SecurityLevelResource(BaseResource):
             return BaseResource.send_json_message(data, 200)
 
     @jwt_required
+    @is_theme_admin
     def post(self):
         args = SecurityLevelResource.security_level_parser()
         code = args['code']
@@ -54,6 +56,7 @@ class SecurityLevelResource(BaseResource):
         return BaseResource.send_json_message("Security level already exists", 409)
 
     @jwt_required
+    @is_theme_admin
     @has_required_request_params
     def put(self):
         code = format_and_lower_str(request.headers['code'])
@@ -88,6 +91,7 @@ class SecurityLevelResource(BaseResource):
             return BaseResource.send_json_message("No changes made", 304)
 
     @jwt_required
+    @is_theme_admin
     @has_required_request_params
     def delete(self):
         code = format_and_lower_str(request.headers['code'])

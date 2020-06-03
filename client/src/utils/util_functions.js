@@ -406,7 +406,7 @@ export function isUserLoggedIn() {
 }
 
 export function logOutUser(self) {
-    // let loader = startLoader(self)
+    let loader = startLoader(self)
     axios.get(logout_resource, {
         headers:
             {
@@ -418,7 +418,7 @@ export function logOutUser(self) {
             if (response.status === 200) {
                 setTimeout(() => {
                     secureStoreDeleteString()
-                    // loader.hide()
+                    loader.hide()
                     showFlashMessage(self, 'success', 'Logged Out', 'Redirecting you to home page ' +
                         countDownTimer(self, 3, '/home') + " seconds");
                 }, 2500)
@@ -426,7 +426,7 @@ export function logOutUser(self) {
         })
         .catch((error) => {
             console.log(error);
-            // loader.hide()
+            loader.hide()
             if (error.response) {
                 showFlashMessage(self, 'error', error.response.data['message'], '');
             }
@@ -508,7 +508,7 @@ export function getThisYear() {
 
 // loader function
 export function startLoader(self) {
-    self.$loading.show({
+    return self.$loading.show({
         isFullPage: true,
         canCancel: false,
         color: '#074880',
