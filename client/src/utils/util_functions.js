@@ -336,7 +336,7 @@ const store = new Vuex.Store({
             value ? (state.jwtString = value) : (state.jwtString = ""),
 
         userInfo: (state, payload) => {
-            payload ?
+            return payload ?
                 (
                     state.user = {
                         email: payload.email,
@@ -347,7 +347,12 @@ const store = new Vuex.Store({
                 )
                 :
                 (
-                    state.user = {}
+                    state.user = {
+                        email: "",
+                        firstName: "",
+                        lastName: "",
+                        role: ""
+                    }
                 )
         },
     }
@@ -374,7 +379,7 @@ export function secureStoreSetString(jwtString, email, fName, lName, role) {
 
 export function secureStoreDeleteString() {
     store.commit("jwtToken", null);
-    store.commit('userInfo', {});
+    store.commit('userInfo', null);
 }
 
 export function getUserEmail() {
