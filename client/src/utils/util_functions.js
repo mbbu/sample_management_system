@@ -306,6 +306,7 @@ export function selectItemForUpdate(item) {
 
 /*
 * Set secure storage for jwt tokens */
+// todo: redesign secure store.
 
 const ls = new SecureLS({isCompression: false});
 
@@ -334,17 +335,21 @@ const store = new Vuex.Store({
         jwtToken: (state, value) =>
             value ? (state.jwtString = value) : (state.jwtString = ""),
 
-        userEmail: (state, value) =>
-            value ? (state.user.email = value) : (state.user.email = ""),
-
-        userFirstName: (state, value) =>
-            value ? (state.user.firstName = value) : (state.user.firstName = ""),
-
-        userLastName: (state, value) =>
-            value ? (state.user.lastName = value) : (state.user.lastName = ""),
-
-        userRole: (state, value) =>
-            value ? (state.user.role = value) : (state.user.role = ""),
+        userInfo: (state, payload) => {
+            payload ?
+                (
+                    state.user = {
+                        email: payload.email,
+                        firstName: payload.firstName,
+                        lastName: payload.lastName,
+                        role: payload.role,
+                    }
+                )
+                :
+                (
+                    state.user = {}
+                )
+        },
     }
 });
 
@@ -359,18 +364,17 @@ export function secureStoreGetString() {
 
 export function secureStoreSetString(jwtString, email, fName, lName, role) {
     store.commit("jwtToken", jwtString);
-    store.commit("userEmail", email);
-    store.commit("userFirstName", fName);
-    store.commit("userLastName", lName);
-    store.commit("userRole", role);
+    store.commit('userInfo', {
+        email: email,
+        firstName: fName,
+        lastName: lName,
+        role: role
+    });
 }
 
 export function secureStoreDeleteString() {
-    store.commit("jwtToken", "");
-    store.commit("userEmail", "");
-    store.commit("userFirstName", "");
-    store.commit("userLastName", "");
-    store.commit("userRole", "");
+    store.commit("jwtToken", null);
+    store.commit('userInfo', {});
 }
 
 export function getUserEmail() {
