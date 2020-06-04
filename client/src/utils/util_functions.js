@@ -363,8 +363,12 @@ const store = new Vuex.Store({
 export function secureStoreGetString() {
     let jwtString = store.state.jwtString;
 
-    let tokenPrefix = 'Bearer ';
-    return tokenPrefix + jwtString;
+    if (jwtString != null) {
+        return 'Bearer ' + jwtString;
+    } else {
+        // ensures server returns 401 rather than 422
+        return ""
+    }
 }
 
 export function secureStoreSetString(jwtString, email, fName, lName, role) {
