@@ -110,5 +110,8 @@ venv.bak/
 # bash scripts
 *.sh
 
+# test database files
+*.db
+
 # personal test files
 extras/*
