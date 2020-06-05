@@ -7,7 +7,7 @@ import Theme from './pages/Theme.vue';
 import Login from './pages/Auth/Login.vue';
 import AddSample from './pages/Sample/Add_and_Update_Sample.vue';
 import Map from './pages/Map.vue';
-import SecurityLevel from "./pages/SecurityLevel";
+import BioHazardLevel from "./pages/BioHazardLevel";
 import QuantityType from "./pages/QuantityType";
 import Lab from "./pages/Lab";
 import Freezer from "./pages/Freezer";
@@ -167,10 +167,10 @@ export default new Router({
         },
 
         {
-            path: '/security-level',
-            name: 'SecurityLevel',
-            alias: ['/securitylevel'],
-            component: SecurityLevel,
+            path: '/bio-hazard-level',
+            name: 'BioHazardLevel',
+            alias: ['/biohazardlevel'],
+            component: BioHazardLevel,
         },
 
         {
