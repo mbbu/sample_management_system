@@ -23,26 +23,17 @@
 
                                             <mdb-row>
                                                 <mdb-col md="12">
-                                                    <!-- LIST POPULATED FROM PROJECT RESOURCE -->
-                                                    <b-form-group class="form_input_margin">
-                                                        <i class="fas fa-project-diagram"></i> Project: <br/>
-                                                        <ejs-dropdownlist
-                                                                :dataSource='projectDataList'
-                                                                :fields="fields"
-                                                                :v-model="request.project"
-                                                                id='dropdownlist'
-                                                                placeholder='Select a project'
-                                                        ></ejs-dropdownlist>
-                                                    </b-form-group>
+                                                    <mdb-input icon="fas fa-project-diagram" id="project"
+                                                               v-model="request.project"
+                                                               label="Enter Project Id" type="text"/>
                                                 </mdb-col>
                                             </mdb-row>
 
                                             <br>
 
-                                            <h4><label>Download Mode</label></h4>
                                             <mdb-row>
                                                 <!-- DATE PICKER -->
-                                                <mdb-col md="5">
+                                                <mdb-col md="10">
                                                     <label title="Specify dates to download samples of">
                                                         Date Range (From-To):
                                                     </label>
@@ -54,28 +45,12 @@
                                                             v-model="request.date_range"
                                                     ></functional-calendar>
                                                 </mdb-col>
-
-                                                <mdb-col md="5" style="border-left: 5px solid grey; height: auto">
-                                                    <label title="Download all samples for this project">
-                                                        Download all samples:
-                                                    </label>
-                                                    <!-- ALL -->
-                                                    <Checkbox :size="32" id="downloadCheck" v-model="request.all">
-                                                        Download all?
-                                                    </Checkbox>
-                                                </mdb-col>
                                             </mdb-row>
                                         </div>
 
                                         <br>
                                         <mdb-row class="d-flex align-items-center mb-4 mt-5">
-                                            <mdb-col class="d-flex align-items-start grey-text" md="5">
-                                                <p v-b-modal.modal-ask-project>
-                                                    <i class="fas fa-sad-cry"></i> Can't see project? <em>Ask
-                                                    here</em>
-                                                </p>
-                                            </mdb-col>
-                                            <mdb-col class="d-flex justify-content-end" md="7">
+                                            <mdb-col class="d-flex justify-content-end" md="12">
                                                 <div class="text-center">
                                                     <mdb-btn class="z-depth-1a" rounded type="submit">Request</mdb-btn>
                                                 </div>
@@ -87,63 +62,24 @@
                         </mdb-col>
                     </mdb-row>
                 </section>
-
-                <div>
-                    <b-modal
-                            @hidden="clearForm"
-                            @ok="askProject"
-                            @submit="showModal = false"
-                            cancel-variant="danger"
-                            id="modal-ask-project"
-                            ok-title="Request"
-                            title="Ask about project"
-                    >
-                        <form @submit.prevent="askProject">
-
-                            <b-form-group id="form-title-group" label="Title:" label-for="form-title-input">
-                                <b-form-input
-                                        id="form-title-input"
-                                        placeholder="Enter Title"
-                                        required="true"
-                                        type="text"
-                                        v-model="projectRequest.title"
-                                ></b-form-input>
-                            </b-form-group>
-
-                            <b-form-group id="form-head-group" label="Head(PI):" label-for="form-head-input">
-                                <b-form-input
-                                        id="form-head-input"
-                                        placeholder="Enter Head"
-                                        required="true"
-                                        type="text"
-                                        v-model="projectRequest.head"></b-form-input>
-                            </b-form-group>
-                        </form>
-                    </b-modal>
-                </div>
-
             </div>
         </div>
     </div>
 </template>
 
 <script>
-    import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbRow} from "mdbvue";
+    import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
     import TopNav from "../../components/TopNav";
     import {
         countDownTimer,
-        extractProjectData,
-        getItemDataList,
-        getSelectedItemCode,
         respondTo401,
         secureStoreGetString,
-        showFlashMessage
+        showFlashMessage, startLoader
     } from "../../utils/util_functions";
-    import {project_resource, redcap_sample_resource} from "../../utils/api_paths";
+    import {redcap_sample_resource} from "../../utils/api_paths";
     import {FunctionalCalendar} from 'vue-functional-calendar';
     import ErrorsDisplay from "../../components/ErrorsDisplay";
     import axios from "axios";
-    import Checkbox from 'vue-material-checkbox'
 
     export default {
         name: "FetchSample",
@@ -153,8 +89,8 @@
             mdbCard,
             mdbCol,
             mdbRow,
+            mdbInput,
             TopNav,
-            Checkbox,
             mdbCardBody,
             ErrorsDisplay,
             FunctionalCalendar
@@ -169,13 +105,6 @@
                     date_range: null,
                     to: null,
                     from: null,
-                    all: false
-                },
-                projectDataList: [],
-                fields: {text: '', value: ''},
-                projectRequest: {
-                    title: null,
-                    head: null
                 },
                 errors: [],
             }
@@ -185,31 +114,15 @@
             clearForm() {
                 this.request.project = null;
                 this.request.date_range = null;
-                this.projectRequest.head = null;
-                this.projectRequest.title = null;
-            },
-
-            onLoadPage() {
-                getItemDataList(project_resource).then(data => {
-                    let projectList = extractProjectData(data);
-                    this.fields = projectList['fields'];
-                    for (let i = 0; i < projectList.items.length; i++) {
-                        this.projectDataList.push({
-                            'Code': projectList.items[i].Code,
-                            'Name': projectList.items[i].Name,
-                        });
-                    }
-                })
             },
 
             onSubmit() {
                 this.errors = []
-                this.request.project = getSelectedItemCode('dropdownlist', this.projectDataList)
                 // ensure fields are not empty
                 if (!this.request.project) {
                     this.errors.push("Project is required!")
-                } else if (!this.request.date_range && this.request.all === false) {
-                    this.errors.push(" Enter dates or check the check box!")
+                } else if (!this.request.date_range) {
+                    this.errors.push(" Enter date range is required")
                 } else {
                     // determine date range
                     this.dateSetter()
@@ -227,24 +140,9 @@
                 }
             },
 
-            askProject() {
-
-            },
-
-
             fetchSamples() {
                 let self = this;
-                let loader = this.$loading.show({
-                    isFullPage: true,
-                    canCancel: false,
-                    color: '#074880',
-                    loader: 'dots',
-                    width: 255,
-                    height: 255,
-                    backgroundColor: '#FAAB2C',
-                    opacity: 0.7,
-                    zIndex: 999,
-                });
+                let loader = startLoader(this);
 
                 axios.post(redcap_sample_resource, {
                     project: this.request.project,
@@ -270,7 +168,7 @@
                         if (error.response) {
                             if (error.response.status === 400) {
                                 showFlashMessage(self, 'error', 'Kindly refill the form', error.response.data['message']);
-                            } else if (error.response.status === 401 || error.response.status === 422) {
+                            } else if (error.response.status === 401) {
                                 respondTo401(self);
                             } else if (error.response.status === 404) {
                                 showFlashMessage(self, 'error', error.response.data['message'], '');
@@ -280,10 +178,6 @@
 
             }
         },
-
-        created() {
-            this.onLoadPage()
-        }
     }
 </script>
 
