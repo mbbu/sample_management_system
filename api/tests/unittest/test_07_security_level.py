@@ -141,7 +141,7 @@ def test_update_non_existing_security_level(client):
 def test_update_security_level_without_identity(client):
     create_security_level(client)
     response = client.put(security_level_resource_route, json=security_level_updated_data, headers={
-        'Authorization': 'Bearer {}'.format(access_token)  # <-- missing security_level code in header
+        'Authorization': 'Bearer {}'.format(access_token)  # <-- missing bio_hazard_level code in header
     })
     assert response.status_code == 400
 

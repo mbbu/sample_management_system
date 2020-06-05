@@ -420,7 +420,7 @@ sample_data = {
     # 'temp_str': temp_val,
     'amount': 100,
     'quantity_type': 'l',
-    'security_level': 1,
+    'bio_hazard_level': 1,
     'code': sample_code,
 
 }
@@ -441,7 +441,7 @@ sample_updated_data = {
     'temperature': '35.00',
     'amount': 100,
     'quantity_type': 'l',
-    'security_level': 1,
+    'bio_hazard_level': 1,
     'code': sample_code
 }
 

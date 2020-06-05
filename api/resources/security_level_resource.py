@@ -2,8 +2,8 @@ from flask import current_app, request
 from flask_jwt_extended import jwt_required
 from flask_restful import fields, marshal, reqparse
 
+from api.models.bio_hazard_level import BioHazardLevel
 from api.models.database import BaseModel
-from api.models.security_level import SecurityLevel
 from api.resources.base_resource import BaseResource
 from api.resources.decorators.user_role_decorators import is_theme_admin
 from api.utils import format_and_lower_str, has_required_request_params, log_update, log_delete, \
@@ -26,7 +26,7 @@ class SecurityLevelResource(BaseResource):
             data = marshal(security_level, self.fields)
             return BaseResource.send_json_message(data, 200)
         else:
-            security_level = SecurityLevel.query.all()
+            security_level = BioHazardLevel.query.all()
             if security_level is None:
                 return BaseResource.send_json_message("Security levels not found", 404)
             data = marshal(security_level, self.fields)
@@ -40,9 +40,9 @@ class SecurityLevelResource(BaseResource):
         name = args['name']
         description = args['description']
 
-        if not SecurityLevel.security_level_exists(code):
+        if not BioHazardLevel.bio_hazard_level_exists(code):
             try:
-                security_level = SecurityLevel(code=code, name=name, description=description)
+                security_level = BioHazardLevel(code=code, name=name, description=description)
                 BaseModel.db.session.add(security_level)
                 BaseModel.db.session.commit()
                 log_create(security_level)
@@ -116,4 +116,4 @@ class SecurityLevelResource(BaseResource):
 
     @staticmethod
     def get_security_level(code):
-        return BaseModel.db.session.query(SecurityLevel).filter_by(code=code).first()
+        return BaseModel.db.session.query(BioHazardLevel).filter_by(code=code).first()

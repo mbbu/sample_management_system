@@ -27,8 +27,8 @@ class Sample(BaseModel.db.Model):
     # Default = Celsius
     amount = AppDb.Column(AppDb.Integer, nullable=True)  # todo set a default value
     quantity_type = AppDb.Column(AppDb.String, AppDb.ForeignKey('quantity_type.id', ondelete='SET NULL'), nullable=True)
-    security_level = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('security_level.id', ondelete='SET NULL'),
-                                  nullable=True)
+    bio_hazard_level = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('bio_hazard_level.id', ondelete='SET NULL'),
+                                    nullable=True)
     code = AppDb.Column(AppDb.String, nullable=False, unique=True)
 
     # relationship(s)
@@ -36,7 +36,7 @@ class Sample(BaseModel.db.Model):
     publication = AppDb.relationship('Publication', backref='sample', lazy=True)
     box = AppDb.relationship('Box', backref='sample', lazy=True)
     quantity = AppDb.relationship('QuantityType', backref='quantity_type', lazy=True)
-    secLevel = AppDb.relationship('SecurityLevel', backref='sample', lazy=True)
+    bioHazardLevel = AppDb.relationship('BioHazardLevel', backref='sample', lazy=True)
 
     @staticmethod
     def sample_exists(code):

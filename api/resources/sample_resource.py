@@ -35,8 +35,8 @@ class SampleResource(BaseResource):
         'temperature': fields.String,
         'amount': fields.Integer,
         'quantity.id': fields.String,
-        'secLevel.code': fields.String,
-        'secLevel.name': fields.String,
+        'bioHazardLevel.code': fields.String,
+        'bioHazardLevel.name': fields.String,
         'code': fields.String,
         'created_at': fields.String,
         'updated_at': fields.String,
@@ -112,7 +112,7 @@ class SampleResource(BaseResource):
                     args[9] != sample.retention_date \
                     or args[10] != sample.barcode or args[11] != sample.analysis or args[12] != sample.temperature \
                     or args[13] != sample.amount or args[14] != sample.quantity_type or args[
-                15] != sample.security_level or args[16] != sample.code:
+                15] != sample.bio_hazard_level or args[16] != sample.code:
                 try:
                     code = format_and_lower_str(args[16])
                     theme = ThemeResource.get_theme(args[0]).id
@@ -137,7 +137,7 @@ class SampleResource(BaseResource):
                     sample.temperature = args[12]
                     sample.amount = args[13]
                     sample.quantity_type = qt
-                    sample.security_level = sl
+                    sample.bio_hazard_level = sl
                     sample.code = code
 
                     sample.updated_at = datetime.now()
@@ -188,7 +188,7 @@ class SampleResource(BaseResource):
         parser.add_argument('temperature', required=True)
         parser.add_argument('amount', required=True)
         parser.add_argument('quantity_type', required=True)
-        parser.add_argument('security_level', required=True)
+        parser.add_argument('bio_hazard_level', required=True)
         parser.add_argument('code', required=True)
 
         args = parser.parse_args()
@@ -211,7 +211,7 @@ class SampleResource(BaseResource):
         temperature = float(args['temperature'])
         amount = int(args['amount'])
         quantity_type = str(args['quantity_type'])
-        security_level = format_and_lower_str(args['security_level'])
+        security_level = format_and_lower_str(args['bio_hazard_level'])
         code = format_and_lower_str(args['code'])
 
         return [
