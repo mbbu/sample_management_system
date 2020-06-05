@@ -1,7 +1,7 @@
 from api.models.database import BaseModel
 
 
-class SecurityLevel(BaseModel.db.Model):
+class BioHazardLevel(BaseModel.db.Model):
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
     code = AppDb.Column(AppDb.String(65), nullable=True)
@@ -11,13 +11,13 @@ class SecurityLevel(BaseModel.db.Model):
     # relationship(s) defined here
 
     @staticmethod
-    def security_level_exists(code):
-        if SecurityLevel.query.filter(
-                SecurityLevel.code == code
+    def bio_hazard_level_exists(code):
+        if BioHazardLevel.query.filter(
+                BioHazardLevel.code == code
         ).first():
             return True
         return False
 
     def __repr__(self):
-        return '<< SecurityLevel: ( code={0} || name={1} || description={2} )>>'.format(self.code, self.name,
-                                                                                        self.description)
+        return '<< BioHazardLevel: ( code={0} || name={1} || description={2} )>>'.format(self.code, self.name,
+                                                                                         self.description)
