@@ -77,7 +77,7 @@ def register_resources(app):
     from api.resources.freezer_resource import FreezerResource
     from api.resources.lab_resource import LaboratoryResource
     from api.resources.quantity_type_resource import QuantityTypeResource
-    from api.resources.security_level_resource import SecurityLevelResource
+    from api.resources.bio_hazard_level_resource import BioHazardLevelResource
     from api.resources.housedata_resource import HouseDataResource
     from api.resources.email_confirmation.email_confirmation import EmailConfirmationResource
     from api.resources.project_resource import ProjectResource
@@ -108,7 +108,7 @@ def register_resources(app):
     api.add_resource(LaboratoryResource, '/lab', '/laboratory')
 
     api.add_resource(QuantityTypeResource, '/quantity-type')
-    api.add_resource(SecurityLevelResource, '/security-level')
+    api.add_resource(BioHazardLevelResource, '/bio-hazard-level')
 
     api.add_resource(HouseDataResource, '/house-data')
 
