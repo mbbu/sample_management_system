@@ -6,7 +6,6 @@ from api.constants import PENDING_STATUS
 from api.models import SampleRequest
 from api.models.database import BaseModel
 from api.resources.base_resource import BaseResource
-from api.resources.decorators.user_role_decorators import is_sys_admin
 from api.resources.sample_resource import SampleResource
 from api.utils import format_and_lower_str, log_create, log_update, log_delete, has_required_request_params, log_304, \
     get_user_by_email
