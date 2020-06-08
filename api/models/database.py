@@ -26,10 +26,11 @@ class BaseModel(object):
         from api.models.publication import Publication
         from api.models.quantity_type import QuantityType
         from api.models.project import Project
+        from api.models.sample_request import SampleRequest
         return [
             Role, User, Theme, Sample,
-            Box, Tray, Rack, QuantityType,
-            Chamber, Freezer, Laboratory, Publication, Project
+            Box, Tray, Rack, QuantityType, Chamber,
+            Freezer, Laboratory, Publication, Project, SampleRequest
         ]
 
     @staticmethod

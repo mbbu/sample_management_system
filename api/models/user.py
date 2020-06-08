@@ -40,6 +40,7 @@ class User(BaseModel.db.Model):
     sample_owner = AppDb.relationship('Sample', backref='owner', lazy=True)
     publication = AppDb.relationship('Publication', back_populates='user')
     projects = AppDb.relationship('Project', backref='lead', lazy=True)
+    sample_requests = AppDb.relationship('SampleRequest', backref='requester', lazy=True)
 
     def __repr__(self):
         return '<< User: (name={0} || email={1}) >>'.format(self.first_name, self.email)
