@@ -34,7 +34,7 @@ class Sample(BaseModel.db.Model):
     # relationship(s)
     box = AppDb.relationship('Box', backref='sample', lazy=True)
     user = AppDb.relationship('User', backref='sample', lazy=True)
-    requests = AppDb.relationship('SampleRequest', backref='sample', lazy=True)
+    requests = AppDb.relationship('SampleRequest', backref='requested_sample', lazy=True)
     publication = AppDb.relationship('Publication', backref='sample', lazy=True)
     quantity = AppDb.relationship('QuantityType', backref='quantity_type', lazy=True)
     bioHazardLevel = AppDb.relationship('BioHazardLevel', backref='sample', lazy=True)
