@@ -13,3 +13,8 @@ class SampleRequest(BaseModel.db.Model):
     response_date = AppDb.Column(AppDb.DateTime, nullable=True)
     status = AppDb.Column(AppDb.String(25), nullable=False)  # is the request pending, approved or rejected?
     notes = AppDb.Column(AppDb.Text, nullable=True)  # Any special issues about the sample request e.g. on reject
+
+    def __repr__(self):
+        return '<< SampleRequest: (user={0} || sample={1} || amount={2} ' \
+               '|| request_date={3} || response_date={4}) || status={5} || notes={6}>>'\
+            .format(self.user, self.sample, self.amount, self.request_date, self.response_date, self.status, self.notes)
