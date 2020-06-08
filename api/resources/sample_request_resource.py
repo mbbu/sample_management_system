@@ -1,4 +1,4 @@
-from flask import current_app, request
+from flask import current_app, request, render_template
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restful import reqparse, marshal, fields
 
@@ -6,6 +6,7 @@ from api.constants import PENDING_STATUS
 from api.models import SampleRequest
 from api.models.database import BaseModel
 from api.resources.base_resource import BaseResource
+from api.resources.email_confirmation.send_email import send_email
 from api.resources.sample_resource import SampleResource
 from api.utils import format_and_lower_str, log_create, log_update, log_delete, has_required_request_params, log_304, \
     get_user_by_email
@@ -39,16 +40,26 @@ class SampleRequestResource(BaseResource):
     @jwt_required
     def post(self):
         args = SampleRequestResource.sample_request_parser()
+        date = args['date'] if args['date'] is not None else "Unspecified date"
         amount = args['amount']
-        user = get_user_by_email(get_jwt_identity()).id
-        sample = SampleResource.get_sample(args['sample']).id
+        user = get_user_by_email(get_jwt_identity())
+        sample = SampleResource.get_sample(args['sample'])
 
         try:
-            sample_request = SampleRequest(user=user, sample=sample, amount=amount, status=PENDING_STATUS)
+            sample_request = SampleRequest(user=user.id, sample=sample.id, amount=amount, status=PENDING_STATUS)
             BaseModel.db.session.add(sample_request)
             BaseModel.db.session.commit()
             log_create(sample_request)
-            # todo: send email
+
+            storage = str(sample.box.tray.rack.chamber.freezer.lab.name) + ' Lab, freezer number ' + \
+                      str(sample.box.tray.rack.chamber.freezer.number) + ' in a box labeled ' + str(sample.box.label)
+
+            send_sample_request_email(email=sample.user.email, handler=sample.user.first_name,
+                                      requester_name=user.first_name + ' ' + user.last_name,
+                                      requester_email=user.email, species=sample.animal_species, qt=sample.quantity.id,
+                                      sample_type=sample.sample_type, location=sample.location_collected,
+                                      available=sample.amount, storage=storage, amount=amount, date=date)
+
             return BaseResource.send_json_message("Sample request made successfully", 201)
 
         except Exception as e:
@@ -106,6 +117,7 @@ class SampleRequestResource(BaseResource):
         parser = reqparse.RequestParser()
         parser.add_argument('sample', required=True)
         parser.add_argument('amount', required=True)
+        parser.add_argument('date', required=False)
 
         args = parser.parse_args()
         return args
@@ -117,3 +129,12 @@ class SampleRequestResource(BaseResource):
     @staticmethod
     def get_sample_request_with_pending_status(code):
         return BaseModel.db.session.query(SampleRequest).filter_by(id=code, status=PENDING_STATUS).first()
+
+
+def send_sample_request_email(email, handler, requester_name, requester_email, species, sample_type, location,
+                              available, storage, amount, qt, date):
+    html = render_template("sample_request.html",
+                           requester_name=requester_name, requester_email=requester_email, qt=qt,
+                           species=species, type=sample_type, location=location, handler=handler,
+                           available_amount=available, storage=storage, amount=amount, date=date)
+    send_email(email, 'Sample Request', template=html)
