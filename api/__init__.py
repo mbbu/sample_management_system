@@ -82,7 +82,7 @@ def register_resources(app):
     from api.resources.email_confirmation.email_confirmation import EmailConfirmationResource
     from api.resources.project_resource import ProjectResource
     from .resources.redcap_requests.fetch_sample_resource import SaveSampleFromREDCap
-    from api.resources.sample_request_resource import SampleRequestResource
+    from api.resources.sample_request_and_response.sample_request_resource import SampleRequestResource
 
     api = Api(app)
     api.add_resource(IndexResource, '/', '/index', '/welcome')
