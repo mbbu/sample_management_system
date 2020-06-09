@@ -80,15 +80,27 @@ class SampleRequestResource(BaseResource):
         else:
             args = SampleRequestResource.sample_request_parser()
             amount = args['amount']
+            user = get_user_by_email(get_jwt_identity())
+            sample = SampleResource.get_sample(sample_request.requested_sample.code)
 
-            if amount != sample_request.amount:
+            if not args:
+                # todo: send a reminder.
+                return
+
+            elif amount != sample_request.amount:
                 old_info = str(sample_request)
+                former_amount = str(sample_request.amount)
 
                 try:
                     sample_request.amount = amount
                     BaseModel.db.session.commit()
                     log_update(old_info, sample_request)
-                    # todo ... resend mail
+
+                    send_sample_request_update_email(email=sample.user.email, handler=sample.user.first_name,
+                                                     requester_name=user.first_name + ' ' + user.last_name,
+                                                     requester_email=user.email, former_amount=former_amount,
+                                                     available=sample.amount, amount=amount, qt=sample.quantity.id)
+
                     return BaseResource.send_json_message("Updated sample request successfully", 202)
 
                 except Exception as e:
@@ -137,4 +149,12 @@ def send_sample_request_email(email, handler, requester_name, requester_email, s
                            requester_name=requester_name, requester_email=requester_email, qt=qt,
                            species=species, type=sample_type, location=location, handler=handler,
                            available_amount=available, storage=storage, amount=amount, date=date)
+    send_email(email, 'Sample Request', template=html)
+
+
+def send_sample_request_update_email(email, handler, requester_name, requester_email, former_amount,
+                                     available, amount, qt):
+    html = render_template("sample_request_update.html",
+                           requester_name=requester_name, requester_email=requester_email, qt=qt,
+                           handler=handler, former_amount=former_amount, available_amount=available, amount=amount)
     send_email(email, 'Sample Request', template=html)
