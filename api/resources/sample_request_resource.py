@@ -70,7 +70,6 @@ class SampleRequestResource(BaseResource):
     @jwt_required
     @has_required_request_params
     def put(self):
-        # todo: more modifications on sample request response
         code = format_and_lower_str(request.headers['code'])
         sample_request = SampleRequestResource.get_sample_request_with_pending_status(code)
 
@@ -83,10 +82,20 @@ class SampleRequestResource(BaseResource):
             user = get_user_by_email(get_jwt_identity())
             sample = SampleResource.get_sample(sample_request.requested_sample.code)
 
-            if not args:
-                # todo: send a reminder.
-                return
+            if request.headers['resend']:
+                # SEND A REMINDER EMAIL TO SAMPLE HANDLER
+                storage = str(sample.box.tray.rack.chamber.freezer.lab.name) + ' Lab, freezer number ' + \
+                          str(sample.box.tray.rack.chamber.freezer.number) + ' in a box labeled ' + str(
+                    sample.box.label)
 
+                send_reminder_to_handler(email=sample.user.email, handler=sample.user.first_name,
+                                         requester_name=user.first_name + ' ' + user.last_name,
+                                         requester_email=user.email, species=sample.animal_species,
+                                         qt=sample.quantity.id,sample_type=sample.sample_type,
+                                         location=sample.location_collected, available=sample.amount,
+                                         storage=storage, amount=amount)
+
+            # MAKE AN UPDATE TO THE SAMPLE AND NOTIFY THE HANDLER OF THE CHANGE
             elif amount != sample_request.amount:
                 old_info = str(sample_request)
                 former_amount = str(sample_request.amount)
@@ -157,4 +166,13 @@ def send_sample_request_update_email(email, handler, requester_name, requester_e
     html = render_template("sample_request_update.html",
                            requester_name=requester_name, requester_email=requester_email, qt=qt,
                            handler=handler, former_amount=former_amount, available_amount=available, amount=amount)
-    send_email(email, 'Sample Request', template=html)
+    send_email(email, 'Sample Request Update', template=html)
+
+
+def send_reminder_to_handler(email, handler, requester_name, requester_email, species, sample_type, location,
+                             available, storage, amount, qt):
+    html = render_template("sample_request_reminder.html",
+                           requester_name=requester_name, requester_email=requester_email, qt=qt,
+                           species=species, type=sample_type, location=location, handler=handler,
+                           available_amount=available, storage=storage, amount=amount)
+    send_email(email, 'Sample Request Reminder', template=html)
