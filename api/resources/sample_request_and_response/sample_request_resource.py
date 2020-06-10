@@ -79,11 +79,11 @@ class SampleRequestResource(BaseResource):
 
         else:
             args = SampleRequestResource.sample_request_parser()
-            amount = args['amount']
+            amount = int(args['amount'])
             user = get_user_by_email(get_jwt_identity())
             sample = SampleResource.get_sample(sample_request.requested_sample.code)
 
-            if request.headers['resend']:
+            if request.headers['resend'] == 'resend':
                 # SEND A REMINDER EMAIL TO SAMPLE HANDLER
                 storage = str(sample.box.tray.rack.chamber.freezer.lab.name) + ' Lab, freezer number ' + \
                           str(sample.box.tray.rack.chamber.freezer.number) + ' in a box labeled ' + str(
@@ -94,31 +94,36 @@ class SampleRequestResource(BaseResource):
                                          requester_email=user.email, species=sample.animal_species,
                                          qt=sample.quantity.id, sample_type=sample.sample_type,
                                          location=sample.location_collected, available=sample.amount,
-                                         storage=storage, amount=amount)
+                                         storage=storage, amount=amount, sample_request=sample_request.id)
+
+                return BaseResource.send_json_message("Email reminder sent", 200)
 
             # MAKE AN UPDATE TO THE SAMPLE AND NOTIFY THE HANDLER OF THE CHANGE
-            elif amount != sample_request.amount:
-                old_info = str(sample_request)
-                former_amount = str(sample_request.amount)
+            elif request.headers['resend'] == 'update':
+                if amount != sample_request.amount:
+                    old_info = str(sample_request)
+                    former_amount = str(sample_request.amount)
 
-                try:
-                    sample_request.amount = amount
-                    BaseModel.db.session.commit()
-                    log_update(old_info, sample_request)
+                    try:
+                        sample_request.amount = amount
+                        BaseModel.db.session.commit()
+                        log_update(old_info, sample_request)
 
-                    send_sample_request_update_email(email=sample.user.email, handler=sample.user.first_name,
-                                                     requester_name=user.first_name + ' ' + user.last_name,
-                                                     requester_email=user.email, former_amount=former_amount,
-                                                     available=sample.amount, amount=amount, qt=sample.quantity.id)
+                        send_sample_request_update_email(email=sample.user.email, handler=sample.user.first_name,
+                                                         requester_name=user.first_name + ' ' + user.last_name,
+                                                         requester_email=user.email, former_amount=former_amount,
+                                                         available=sample.amount, amount=amount, qt=sample.quantity.id,
+                                                         sample_request=sample_request.id)
 
-                    return BaseResource.send_json_message("Updated sample request successfully", 202)
+                        return BaseResource.send_json_message("Updated sample request successfully", 202)
 
-                except Exception as e:
-                    current_app.logger.error(e)
-                    BaseModel.db.session.rollback()
-                    return BaseResource.send_json_message("Error while updating sample request", 500)
-            log_304(sample_request)
-            return BaseResource.send_json_message("No changes made", 304)
+                    except Exception as e:
+                        current_app.logger.error(e)
+                        BaseModel.db.session.rollback()
+                        return BaseResource.send_json_message("Error while updating sample request", 500)
+                log_304(sample_request)
+                return BaseResource.send_json_message("No changes made", 304)
+            return BaseResource.send_json_message("Not found", 404)
 
     @jwt_required
     @has_required_request_params
@@ -153,11 +158,32 @@ class SampleRequestResource(BaseResource):
         return BaseModel.db.session.query(SampleRequest).filter_by(id=code, status=PENDING_STATUS).first()
 
 
+'''
+    The functions below prepare an email to be sent to the sample handler. They receive;
+        * email
+        * handler
+        * requester details
+        * species
+        * sample-type
+        * location
+        * available amount
+        * storage
+        * requested amount
+        * the quantity type
+        * date
+        * sample
+        
+    In return it sets the token and updates the response url and passes the email to send_email function.
+        
+'''
+
+expiration_date = set_date_from_int(TOKEN_EXPIRATION_AS_DAYS)
+
+
 def send_sample_request_email(email, handler, requester_name, requester_email, species, sample_type, location,
                               available, storage, amount, qt, date, sample_request):
     sample_request_token = generate_confirmation_token(sample_request)
     sample_request_response_url = SAMPLE_REQUEST_RESPONSE.format(sample_request_token)
-    expiration_date = set_date_from_int(TOKEN_EXPIRATION_AS_DAYS)
 
     html = render_template("sample_request.html",
                            requester_name=requester_name, requester_email=requester_email, qt=qt,
@@ -169,17 +195,27 @@ def send_sample_request_email(email, handler, requester_name, requester_email, s
 
 
 def send_sample_request_update_email(email, handler, requester_name, requester_email, former_amount,
-                                     available, amount, qt):
+                                     available, amount, qt, sample_request):
+    sample_request_token = generate_confirmation_token(sample_request)
+    sample_request_response_url = SAMPLE_REQUEST_RESPONSE.format(sample_request_token)
+
     html = render_template("sample_request_update.html",
                            requester_name=requester_name, requester_email=requester_email, qt=qt,
-                           handler=handler, former_amount=former_amount, available_amount=available, amount=amount)
+                           handler=handler, former_amount=former_amount, available_amount=available, amount=amount,
+                           sample_request_response_url=sample_request_response_url,
+                           expiration_days=TOKEN_EXPIRATION_AS_DAYS, expiration_date=expiration_date)
     send_email(email, 'Sample Request Update', template=html)
 
 
 def send_reminder_to_handler(email, handler, requester_name, requester_email, species, sample_type, location,
-                             available, storage, amount, qt):
+                             available, storage, amount, qt, sample_request):
+    sample_request_token = generate_confirmation_token(sample_request)
+    sample_request_response_url = SAMPLE_REQUEST_RESPONSE.format(sample_request_token)
+
     html = render_template("sample_request_reminder.html",
                            requester_name=requester_name, requester_email=requester_email, qt=qt,
                            species=species, type=sample_type, location=location, handler=handler,
-                           available_amount=available, storage=storage, amount=amount)
+                           available_amount=available, storage=storage, amount=amount,
+                           sample_request_response_url=sample_request_response_url,
+                           expiration_days=TOKEN_EXPIRATION_AS_DAYS, expiration_date=expiration_date)
     send_email(email, 'Sample Request Reminder', template=html)
