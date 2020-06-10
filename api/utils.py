@@ -7,7 +7,7 @@ from mixer.backend.flask import Mixer
 
 from api import revoked_store, BaseResource
 from api.config import BaseConfig
-from api.constants import ACCESS_EXPIRES, REFRESH_EXPIRES, EMAIL_TOKEN_EXPIRATION
+from api.constants import ACCESS_EXPIRES, REFRESH_EXPIRES, EMAIL_TOKEN_EXPIRATION, TOKEN_EXPIRATION
 from api.models import *
 from api.models.database import BaseModel
 
@@ -53,7 +53,7 @@ def set_date_from_int(num_of_days):
 
     for day in range(num_of_days):
         date = date + timedelta(days=1)
-    return date
+    return date.strftime('%d-%m-%Y %H:%M')
 
 
 """
@@ -182,9 +182,14 @@ def faker(count, model, model_name):
 """
 
 
-def generate_confirmation_token(email):
+def generate_confirmation_token(known_var):
+    """
+    :arg: some known variable that is to be kept secret
+    :param known_var:
+    :return: serialized token
+    """
     serializer = URLSafeTimedSerializer(BaseConfig.SECRET_KEY)
-    return serializer.dumps(email, salt=BaseConfig.SECURITY_PASSWORD_SALT)
+    return serializer.dumps(known_var, salt=BaseConfig.SECURITY_PASSWORD_SALT)
 
 
 def confirm_token(token, expiration=EMAIL_TOKEN_EXPIRATION):
@@ -199,3 +204,17 @@ def confirm_token(token, expiration=EMAIL_TOKEN_EXPIRATION):
         current_app.logger.error(e)
         return False
     return email
+
+
+def confirm_token_from_email(token, expiration=TOKEN_EXPIRATION):
+    serializer = URLSafeTimedSerializer(BaseConfig.SECRET_KEY)
+    try:
+        known_var = serializer.loads(
+            token,
+            salt=BaseConfig.SECURITY_PASSWORD_SALT,
+            max_age=expiration
+        )
+    except Exception as e:
+        current_app.logger.error(e)
+        return False
+    return known_var
