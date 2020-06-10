@@ -101,7 +101,7 @@ def register_resources(app):
     api.add_resource(PublicationResource, '/publication', '/publications')
     api.add_resource(SampleResource, '/sample', '/samples')
     api.add_resource(SampleRequestResource, '/sample-request', '/request-sample')
-    api.add_resource(SampleRequestResponseResource, '/sample-request-response', '/request-response')
+    api.add_resource(SampleRequestResponseResource, '/sample-request-response/<token>', '/request-response/<token>')
     api.add_resource(SaveSampleFromREDCap, '/redcap-samples')
     api.add_resource(BoxResource, '/box', '/boxes')
     api.add_resource(TrayResource, '/tray', '/trays')

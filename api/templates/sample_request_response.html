@@ -1,0 +1,48 @@
+<p>
+    Hi {{ requester_name }}, your request to use the below-listed sample has been {{ status }};
+<ul>
+    <li><b>Species:</b> <em>{{ species }}</em></li>
+    <li><b>Type:</b> <em>{{ type }} </em></li>
+    <li><b>Collected from:</b> <em>{{ location }}</em></li>
+</ul>
+
+{% if status == approved %}
+<div>
+    This sample is located in the {{ storage }}. The amount approved from your request was {{ approved_amount }} {{ qt
+    }}.
+    <br>
+    {% if notes != '' %}
+    <div>
+        The sample handler would also like you to note the following;
+        <br>
+        <blockquote> - {{ notes }}</blockquote>
+    </div>
+    {% else %}
+    <div></div>
+    {% endif %}
+    <br>
+    <br>
+    Please click the link to access the sample {{ lims_url }}.
+</div>
+
+{% elif status == declined %}
+<div>
+    Sorry, your request was not approved.
+    <br>
+    {% if notes != '' %}
+    <div>
+        The following reason(s) was given;
+        <br>
+        <blockquote> - {{ notes }}</blockquote>
+    </div>
+    {% else %}
+    <div>No reason was given for the decline</div>
+    {% endif %}
+</div>
+{% endif %}
+
+<br>
+<br>
+-- <br>
+Questions? Comments? Email admin@icipe.org
+</p>
