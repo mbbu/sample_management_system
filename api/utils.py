@@ -45,10 +45,20 @@ def non_empty_int(i: int):
 
 
 def format_str_to_date(date):
+    """
+    Function takes a date string and converts it to a date object
+    :param date:
+    :return:
+    """
     return datetime.strptime(date, '%Y-%m-%d %H:%M').date()
 
 
 def set_date_from_int(num_of_days):
+    """
+    Function increments date by number of days passed
+    :param num_of_days:
+    :return: date
+    """
     date = datetime.now()
 
     for day in range(num_of_days):
