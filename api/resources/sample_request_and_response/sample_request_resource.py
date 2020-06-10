@@ -2,14 +2,14 @@ from flask import current_app, request, render_template
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restful import reqparse, marshal, fields
 
-from api.constants import PENDING_STATUS
+from api.constants import PENDING_STATUS, SAMPLE_REQUEST_RESPONSE, TOKEN_EXPIRATION_AS_DAYS
 from api.models import SampleRequest
 from api.models.database import BaseModel
 from api.resources.base_resource import BaseResource
 from api.resources.email_confirmation.send_email import send_email
 from api.resources.sample_resource import SampleResource
 from api.utils import format_and_lower_str, log_create, log_update, log_delete, has_required_request_params, log_304, \
-    get_user_by_email
+    get_user_by_email, generate_confirmation_token, set_date_from_int
 
 
 class SampleRequestResource(BaseResource):
@@ -55,10 +55,11 @@ class SampleRequestResource(BaseResource):
                       str(sample.box.tray.rack.chamber.freezer.number) + ' in a box labeled ' + str(sample.box.label)
 
             send_sample_request_email(email=sample.user.email, handler=sample.user.first_name,
-                                      requester_name=user.first_name + ' ' + user.last_name,
-                                      requester_email=user.email, species=sample.animal_species, qt=sample.quantity.id,
+                                      requester_name=user.first_name + ' ' + user.last_name, requester_email=user.email,
+                                      species=sample.animal_species, qt=sample.quantity.id,
                                       sample_type=sample.sample_type, location=sample.location_collected,
-                                      available=sample.amount, storage=storage, amount=amount, date=date)
+                                      available=sample.amount, storage=storage, amount=amount, date=date,
+                                      sample_request=sample_request.id)
 
             return BaseResource.send_json_message("Sample request made successfully", 201)
 
@@ -91,7 +92,7 @@ class SampleRequestResource(BaseResource):
                 send_reminder_to_handler(email=sample.user.email, handler=sample.user.first_name,
                                          requester_name=user.first_name + ' ' + user.last_name,
                                          requester_email=user.email, species=sample.animal_species,
-                                         qt=sample.quantity.id,sample_type=sample.sample_type,
+                                         qt=sample.quantity.id, sample_type=sample.sample_type,
                                          location=sample.location_collected, available=sample.amount,
                                          storage=storage, amount=amount)
 
@@ -153,11 +154,17 @@ class SampleRequestResource(BaseResource):
 
 
 def send_sample_request_email(email, handler, requester_name, requester_email, species, sample_type, location,
-                              available, storage, amount, qt, date):
+                              available, storage, amount, qt, date, sample_request):
+    sample_request_token = generate_confirmation_token(sample_request)
+    sample_request_response_url = SAMPLE_REQUEST_RESPONSE.format(sample_request_token)
+    expiration_date = set_date_from_int(TOKEN_EXPIRATION_AS_DAYS)
+
     html = render_template("sample_request.html",
                            requester_name=requester_name, requester_email=requester_email, qt=qt,
                            species=species, type=sample_type, location=location, handler=handler,
-                           available_amount=available, storage=storage, amount=amount, date=date)
+                           available_amount=available, storage=storage, amount=amount, date=date,
+                           sample_request_response_url=sample_request_response_url,
+                           expiration_days=TOKEN_EXPIRATION_AS_DAYS, expiration_date=expiration_date)
     send_email(email, 'Sample Request', template=html)
 
 
