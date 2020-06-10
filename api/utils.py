@@ -202,29 +202,23 @@ def generate_confirmation_token(known_var):
     return serializer.dumps(known_var, salt=BaseConfig.SECURITY_PASSWORD_SALT)
 
 
-def confirm_token(token, expiration=EMAIL_TOKEN_EXPIRATION):
+def confirm_token(token):
     serializer = URLSafeTimedSerializer(BaseConfig.SECRET_KEY)
     try:
         email = serializer.loads(
             token,
             salt=BaseConfig.SECURITY_PASSWORD_SALT,
-            max_age=expiration
+            max_age=EMAIL_TOKEN_EXPIRATION
         )
+        return email
     except Exception as e:
         current_app.logger.error(e)
-        return False
-    return email
-
-
-def confirm_token_from_email(token, expiration=TOKEN_EXPIRATION):
-    serializer = URLSafeTimedSerializer(BaseConfig.SECRET_KEY)
     try:
         known_var = serializer.loads(
             token,
             salt=BaseConfig.SECURITY_PASSWORD_SALT,
-            max_age=expiration
+            max_age=TOKEN_EXPIRATION
         )
+        return known_var
     except Exception as e:
         current_app.logger.error(e)
-        return False
-    return known_var
