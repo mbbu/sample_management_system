@@ -115,6 +115,7 @@ class SampleRequestResource(BaseResource):
                                                          available=sample.amount, amount=amount, qt=sample.quantity.id,
                                                          sample_request=sample_request.id)
 
+                        BaseModel.db.session.commit()
                         return BaseResource.send_json_message("Updated sample request successfully", 202)
 
                     except Exception as e:
