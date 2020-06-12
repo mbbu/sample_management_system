@@ -168,6 +168,46 @@
                     </tr>
                     </tbody>
                 </table>
+
+                <!-- SAMPLE REQUEST FORM -->
+                <b-modal
+                        @hidden="clearForm"
+                        @ok="requestSample(sample.code)"
+                        cancel-variant="danger"
+                        id="modal-sample-request"
+                        ok-title="Request"
+                        title="Request Sample"
+                >
+                    <form>
+
+                        <b-form-group id="form-amount-group"
+                                      label="Amount:" label-for="form-amount-input">
+                            <b-form-input
+                                    :max="sample.amount"
+                                    id="form-amount-input"
+                                    min=1
+                                    placeholder="Enter Amount"
+                                    required="true"
+                                    type="number"
+                                    v-model="sampleRequest.amount"
+                            ></b-form-input>
+                        </b-form-group>
+
+                        <label title="Specify the date you would like to start using the sample">
+                            Date (Specify the date you would like to start using the sample):
+                        </label>
+                        <functional-calendar
+                                :change-month-function='true' :change-year-function='true'
+                                :is-dark="true" :is-date-picker='true'
+                                :is-layout-expandable="true"
+                                :is-typeable="true"
+                                :limits='{min: sampleRequest.today, max:getMaxRequestDate}'
+                                v-model="sampleRequest.date"
+                        ></functional-calendar>
+                    </form>
+                </b-modal>
+
+                <!--  PAGE FOOTER BUTTONS  -->
                 <mdb-row class="d-flex align-items-center mb-4 mt-5">
                     <mdb-col class="d-flex align-items-start" md="5">
                         <a href="/sample">
@@ -187,12 +227,11 @@
                                 </button>
                             </div>
                             <div v-else>
-                                <a href="https://redcap.icipe.org/surveys/?s=W7A7TFJ89J">
-                                    <button class="btn btn-outline-info btn-rounded"
-                                            type="button"> Request Sample
-                                        <i aria-hidden="true" class="fa fa-inbox menu_icon"> </i>
-                                    </button>
-                                </a>
+                                <button class="btn btn-outline-info btn-rounded"
+                                        type="button"
+                                        v-b-modal.modal-sample-request> Request Sample
+                                    <i aria-hidden="true" class="fa fa-inbox menu_icon"> </i>
+                                </button>
                             </div>
                         </div>
                         <div class="text-center">
@@ -213,9 +252,10 @@
 </template>
 
 <script>
-    import TopNav from "../../components/TopNav";
     import {mdbCol, mdbRow} from "mdbvue";
-    import {sample_resource} from "../../utils/api_paths";
+    import TopNav from "../../components/TopNav";
+    import {sample_request_resource, sample_resource} from "../../utils/api_paths";
+    import {FunctionalCalendar} from 'vue-functional-calendar';
     import axios from 'axios';
     import {
         countDownTimer,
@@ -267,8 +307,24 @@
                     tray: "",
                     date: "",
                 },
+
+                sampleRequest: {
+                    amount: null,
+                    date: null,
+                    /* dates are limited to make sure a request is not made for a date that has already passed or
+                       when the sample is no longer in retention. The maximum date is placed under compute to avoid
+                        onLoad errors since sample by then is not set. */
+                    today: new Date().toLocaleDateString('en-GB'),
+                },
             }
         },
+
+        computed: {
+            getMaxRequestDate: function () {
+                return new Date(this.sample.retention).toLocaleDateString('en-GB')
+            },
+        },
+
         methods: {
             isRetentionPeriodValid, overDueRetentionPeriod,
             setSampleData(res) {
@@ -350,6 +406,48 @@
                 }, 1000)
             },
 
+            requestSample: function (code) {
+                let self = this;
+                let loader = startLoader(this)
+
+                axios.post(sample_request_resource, {
+                    sample: code,
+                    amount: this.sampleRequest.amount,
+                    date: this.sampleRequest.date.selectedDate
+                }, {
+                    headers: {
+                        Authorization: secureStoreGetString()
+                    }
+                })
+                    .then((response) => {
+                        setTimeout(() => {
+                            loader.hide()
+                            if (response.status === 201) {
+                                showFlashMessage(self, 'success', response.data['message'], '')
+                            }
+                        }, 1000)
+                    })
+                    .catch((error) => {
+                        this.$log.error(error);
+                        if (error.response) {
+                            if (error.response.status === 409) {
+                                showFlashMessage(self, 'error', 'Error', error.response.data['message'])
+                            } else if (error.response.status === 401) {
+                                respondTo401(self);
+                            } else if (error.response.status === 403) {
+                                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
+                            } else {
+                                showFlashMessage(self, 'error', 'Error', error.response.data['message'])
+                            }
+                        }
+                    })
+            },
+
+            clearForm() {
+                this.sampleRequest.date = null
+                this.sampleRequest.amount = null
+            },
+
             deleteSample: function (code) {
                 let self = this;
                 let loader = startLoader(this)
@@ -382,7 +480,7 @@
                     });
             },
         },
-        components: {TopNav, mdbCol, mdbRow},
+        components: {TopNav, mdbCol, mdbRow, FunctionalCalendar},
         created() {
             let code = getSampleCode()
             this.getSampleByCode(code)
