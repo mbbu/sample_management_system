@@ -121,6 +121,8 @@ class SaveSampleFromREDCap(BaseResource):
                 log_export_from_redcap(sample)
                 return BaseResource.send_json_message("Samples successfully fetched and saved", 201)
             log_duplicate(Sample.query.filter(Sample.code == code).first())
+            # if an existing sample is encountered, do not return before finishing on other samples,
+            # instead move control back to the for loop
             continue
         return BaseResource.send_json_message("Sample already exists", 409)
 
