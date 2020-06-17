@@ -95,6 +95,18 @@ class SaveSampleFromREDCap(BaseResource):
             box = None if AttributeError else BoxResource.get_box(sample_record['box_id']).id
             theme = None if AttributeError else ThemeResource.get_theme(sample_record['theme']).id
             code = sample_record['sample_id']
+            amount = sample_record['amount']
+            location_collected = {'lat': sample_record['lat'], 'long': sample_record['longitude']}
+
+            print(user)
+            print(sample_type)
+            print(project)
+            print(box)
+            print(theme)
+            print(code)
+            print(amount)
+            print(location_collected)
+            print(type(location_collected))
 
 
         #     # user = int(sample['users'].strip() or 0) or None
