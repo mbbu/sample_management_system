@@ -1,11 +1,12 @@
 import requests
-from flask import request, current_app
-from flask_jwt_extended import jwt_required
+from flask import request, current_app, render_template
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from api import BaseResource, BaseModel, BaseConfig
 from api.constants import REDCAP_URI
 from api.models import Sample
 from api.resources.box_resource import BoxResource
+from api.resources.email_confirmation.send_email import send_email
 from api.resources.theme_resource import ThemeResource
 from api.utils import log_export_from_redcap, log_duplicate, get_user_by_email
 
@@ -15,8 +16,11 @@ class SaveSampleFromREDCap(BaseResource):
     def get(self):
         sample_records = export_all_records()
 
-        if sample_records == 500:
-            # todo: mail admin on redcap error
+        if exception is not None:
+            current_user = get_user_by_email(get_jwt_identity())
+            user = current_user.first_name + " " + current_user.last_name
+            user_email = get_user_by_email(get_jwt_identity()).email
+            send_email_on_redcap_issue(email=BaseConfig.ADMINS, error=exception, user=user, user_email=user_email)
             return BaseResource.send_json_message("Redcap error. Admin contacted.", 500)
         elif not sample_records:
             return BaseResource.send_json_message("No sample records found", 404)
@@ -101,8 +105,10 @@ class SaveSampleFromREDCap(BaseResource):
     REDCap API functions
 """
 
-
 # fetch all records
+exception = None
+
+
 def export_all_records():
     token = request.headers.get('token')
     data = {
@@ -118,4 +124,11 @@ def export_all_records():
 
     except Exception as e:
         current_app.logger.error(e)
-        return 500
+        global exception
+        exception = e
+        return exception
+
+
+def send_email_on_redcap_issue(email, error, user, user_email):
+    html = render_template("redcap_error.html", user_email=user_email, user=user, error=error)
+    send_email(email, 'REDCap Error', template=html)
