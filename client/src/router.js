@@ -7,7 +7,7 @@ import Theme from './pages/Theme.vue';
 import Login from './pages/Auth/Login.vue';
 import AddSample from './pages/Sample/Add_and_Update_Sample.vue';
 import Map from './pages/Map.vue';
-import SecurityLevel from "./pages/SecurityLevel";
+import BioHazardLevel from "./pages/BioHazardLevel";
 import QuantityType from "./pages/QuantityType";
 import Lab from "./pages/Lab";
 import Freezer from "./pages/Freezer";
@@ -27,6 +27,7 @@ import PasswordResetRequest from "./pages/Auth/PasswordResetRequest";
 import PasswordResetConfirmation from "./pages/Auth/PasswordResetConfirmation";
 import Project from "./pages/Project";
 import FetchSample from "./pages/REDCapPages/FetchSample";
+import SampleRequestResponse from "./pages/SampleRequest/SampleRequestResponse";
 
 
 Vue.use(Router);
@@ -167,10 +168,10 @@ export default new Router({
         },
 
         {
-            path: '/security-level',
-            name: 'SecurityLevel',
-            alias: ['/securitylevel'],
-            component: SecurityLevel,
+            path: '/bio-hazard-level',
+            name: 'BioHazardLevel',
+            alias: ['/biohazardlevel'],
+            component: BioHazardLevel,
         },
 
         {
@@ -223,6 +224,12 @@ export default new Router({
             component: FetchSample,
         },
 
+        {
+            path: '/request-response/*',
+            name: 'SampleRequestResponse',
+            alias: ['/sample-request-response/*'],
+            component: SampleRequestResponse,
+        },
 
     ],
 });

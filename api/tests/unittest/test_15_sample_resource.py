@@ -43,7 +43,7 @@ def test_create_sample_with_missing_info(client):
         'temperature': 35.0,
         'amount': 100,
         'quantity_type': 'l',
-        'security_level': 1,
+        'bio_hazard_level': 1,
         'code': sample_code
     }, headers=sample_headers)
 
@@ -109,7 +109,7 @@ def test_get_sample(client):
             assert data['message'][item]['temperature'] == '35.00'
             assert data['message'][item]['amount'] == 100
             assert data['message'][item]['quantity.id'] == 'l'
-            assert data['message'][item]['security_level'] == 1
+            assert data['message'][item]['bio_hazard_level'] == 1
             assert data['message'][item]['code'] == format_and_lower_str(sample_code)
 
 
@@ -134,7 +134,7 @@ def test_get_sample_by_param(client):
     assert data['message']['temperature'] == '35.00'
     assert data['message']['amount'] == 100
     assert data['message']['quantity.id'] == 'l'
-    assert data['message']['security_level'] == 1
+    assert data['message']['bio_hazard_level'] == 1
     assert data['message']['code'] == format_and_lower_str(sample_code)
 
 

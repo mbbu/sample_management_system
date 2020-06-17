@@ -18,9 +18,9 @@
                 Projects</a>
         </router-link>
 
-        <router-link to="/security-level">
-            <a> <i aria-hidden="true" class="fa fa-exclamation-triangle menu_icon"> </i>
-                Security Level</a>
+        <router-link to="/bio-hazard-level">
+            <a> <i aria-hidden="true" class="fas fa-biohazard menu_icon"> </i>
+                Bio Hazard Level</a>
         </router-link>
 
         <router-link to="/quantity-type">

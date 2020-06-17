@@ -7,7 +7,7 @@ from mixer.backend.flask import Mixer
 
 from api import revoked_store, BaseResource
 from api.config import BaseConfig
-from api.constants import ACCESS_EXPIRES, REFRESH_EXPIRES, EMAIL_TOKEN_EXPIRATION
+from api.constants import ACCESS_EXPIRES, REFRESH_EXPIRES, EMAIL_TOKEN_EXPIRATION, TOKEN_EXPIRATION
 from api.models import *
 from api.models.database import BaseModel
 
@@ -45,15 +45,25 @@ def non_empty_int(i: int):
 
 
 def format_str_to_date(date):
+    """
+    Function takes a date string and converts it to a date object
+    :param date:
+    :return:
+    """
     return datetime.strptime(date, '%Y-%m-%d %H:%M').date()
 
 
 def set_date_from_int(num_of_days):
+    """
+    Function increments date by number of days passed
+    :param num_of_days:
+    :return: date
+    """
     date = datetime.now()
 
     for day in range(num_of_days):
         date = date + timedelta(days=1)
-    return date
+    return date.strftime('%d-%m-%Y %H:%M')
 
 
 """
@@ -182,20 +192,33 @@ def faker(count, model, model_name):
 """
 
 
-def generate_confirmation_token(email):
+def generate_confirmation_token(known_var):
+    """
+    :arg: some known variable that is to be kept secret
+    :param known_var:
+    :return: serialized token
+    """
     serializer = URLSafeTimedSerializer(BaseConfig.SECRET_KEY)
-    return serializer.dumps(email, salt=BaseConfig.SECURITY_PASSWORD_SALT)
+    return serializer.dumps(known_var, salt=BaseConfig.SECURITY_PASSWORD_SALT)
 
 
-def confirm_token(token, expiration=EMAIL_TOKEN_EXPIRATION):
+def confirm_token(token):
     serializer = URLSafeTimedSerializer(BaseConfig.SECRET_KEY)
     try:
         email = serializer.loads(
             token,
             salt=BaseConfig.SECURITY_PASSWORD_SALT,
-            max_age=expiration
+            max_age=EMAIL_TOKEN_EXPIRATION
         )
+        return email
     except Exception as e:
         current_app.logger.error(e)
-        return False
-    return email
+    try:
+        known_var = serializer.loads(
+            token,
+            salt=BaseConfig.SECURITY_PASSWORD_SALT,
+            max_age=TOKEN_EXPIRATION
+        )
+        return known_var
+    except Exception as e:
+        current_app.logger.error(e)

@@ -17,24 +17,24 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="sec_level.id" v-for="(sec_level, index) in response.message">
+                    <tr :key="bio_hazard.id" v-for="(bio_hazard, index) in response.message">
                         <td> {{ index + 1 }}</td>
-                        <td> {{ sec_level.name }}</td>
-                        <td> {{ sec_level.code }}</td>
-                        <td> {{ sec_level.description }}</td>
+                        <td> {{ bio_hazard.name }}</td>
+                        <td> {{ bio_hazard.code }}</td>
+                        <td> {{ bio_hazard.description }}</td>
 
                         <td>
                             <b-icon
-                                    :title="`Update ${ sec_level.name }`"
-                                    @mouseover="fillFormForUpdate(sec_level.name, sec_level.code, sec_level.description)"
+                                    :title="`Update ${ bio_hazard.name }`"
+                                    @mouseover="fillFormForUpdate(bio_hazard.name, bio_hazard.code, bio_hazard.description)"
                                     class="border border-info rounded" font-scale="2.0"
-                                    icon="pencil" v-b-modal.modal-security-level-edit
+                                    icon="pencil" v-b-modal.modal-bio-level-edit
                                     v-b-tooltip.hover
                                     variant="info"
                             ></b-icon>
                             &nbsp;
                             <b-icon
-                                    :title="`Delete ${sec_level.name}!`" @click="deleteSecurityLevel(sec_level.code)"
+                                    :title="`Delete ${bio_hazard.name}!`" @click="deleteBioHazardLevel(bio_hazard.code)"
                                     class="border rounded bg-danger p-1" font-scale="1.85"
                                     icon="trash" v-b-tooltip.hover
                                     variant="light"
@@ -48,14 +48,14 @@
             <div v-if="!isEditing">
                 <b-modal
                         @hidden="clearForm"
-                        @ok="createSecurityLevel"
+                        @ok="createBioHazardLevel"
                         @submit="showModal = false"
                         cancel-variant="danger"
-                        id="modal-security-level"
+                        id="modal-bio-level"
                         ok-title="Save"
-                        title="Add Security Level"
+                        title="Add Bio Hazard Level"
                 >
-                    <form @submit.prevent="createSecurityLevel">
+                    <form @submit.prevent="createBioHazardLevel">
 
                         <b-form-group id="form-name-group" label="Name:" label-for="form-name-input">
                             <b-form-input
@@ -92,12 +92,12 @@
             <div v-else-if="isEditing">
                 <b-modal
                         @hidden="clearForm"
-                        @ok="updateSecurityLevel(old_code)"
+                        @ok="updateBioHazardLevel(old_code)"
                         @submit="showModal = false"
                         cancel-variant="danger"
-                        id="modal-security-level-edit"
+                        id="modal-bio-level-edit"
                         ok-title="Update"
-                        title="Edit Security Level"
+                        title="Edit Bio Hazard Level"
                 >
                     <form>
 
@@ -133,8 +133,8 @@
                 </b-modal>
             </div>
             <b-button class="float_btn"
-                      v-b-modal.modal-security-level variant="primary"
-            >Add Security Level
+                      v-b-modal.modal-bio-level variant="primary"
+            >Add Bio Hazard Level
             </b-button>
         </div>
     </div>
@@ -142,15 +142,15 @@
 
 <script>
     import axios from 'axios';
-    import {security_level_resource} from '../utils/api_paths'
+    import {bio_hazard_level_resource} from '../utils/api_paths'
     import TopNav from "../components/TopNav";
     import {respondTo401, secureStoreGetString, showFlashMessage} from "../utils/util_functions";
 
     export default {
-        name: 'SecurityLevel',
+        name: 'BioHazardLevel',
         data() {
             return {
-                page_title: "Security Level",
+                page_title: "Bio Hazard Level",
                 response: [],
                 name: null,
                 code: null,
@@ -179,8 +179,8 @@
                 this.showModal = true;
             },
 
-            getSecurityLevel() {
-                axios.get(security_level_resource)
+            getBioHazardLevel() {
+                axios.get(bio_hazard_level_resource)
                     .then((res) => {
                         this.$log.info("Response: " + res.status + " " + res.data['message']);
                         this.response = res.data;
@@ -191,9 +191,9 @@
                     });
             },
 
-            createSecurityLevel: function () {
+            createBioHazardLevel: function () {
                 let self = this;
-                axios.post(security_level_resource, {
+                axios.post(bio_hazard_level_resource, {
                     name: this.name,
                     code: this.code,
                     description: this.desc,
@@ -203,7 +203,7 @@
                     }
                 })
                     .then((response) => {
-                        this.getSecurityLevel();
+                        this.getBioHazardLevel();
                         this.clearForm();
                         showFlashMessage(self, 'success', response.data['message'], "")
                     })
@@ -217,17 +217,17 @@
                             } else if (error.response.status === 403) {
                                 showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
                             } else {
-                                showFlashMessage(self, 'error', "Error", "Security Level already exists")
+                                showFlashMessage(self, 'error', "Error", error.response.data['message'])
                             }
                         }
                     });
                 this.clearForm();
             },
 
-            updateSecurityLevel: function (code) {
+            updateBioHazardLevel: function (code) {
                 let self = this;
 
-                axios.put(security_level_resource, {
+                axios.put(bio_hazard_level_resource, {
                     name: this.name,
                     code: this.code,
                     description: this.desc,
@@ -239,7 +239,7 @@
                         }
                 })
                     .then((response) => {
-                        this.getSecurityLevel();
+                        this.getBioHazardLevel();
                         showFlashMessage(self, 'success', response.data['message'], "")
                     })
                     .catch((error) => {
@@ -259,10 +259,10 @@
                 this.clearForm();
             },
 
-            deleteSecurityLevel: function (code) {
+            deleteBioHazardLevel: function (code) {
                 let self = this;
 
-                axios.delete(security_level_resource, {
+                axios.delete(bio_hazard_level_resource, {
                     headers:
                         {
                             code: code,
@@ -270,7 +270,7 @@
                         }
                 })
                     .then((response) => {
-                        this.getSecurityLevel();
+                        this.getBioHazardLevel();
                         showFlashMessage(self, 'success', response.data['message'], "")
                     })
                     .catch((error) => {
@@ -286,7 +286,7 @@
             }
         },
         created() {
-            this.getSecurityLevel();
+            this.getBioHazardLevel();
         },
         components: {TopNav}
     };

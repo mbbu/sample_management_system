@@ -300,7 +300,7 @@
         box_resource,
         quantity_type_resource,
         sample_resource,
-        security_level_resource,
+        bio_hazard_level_resource,
         theme_resource,
         user_resource
     } from "../../utils/api_paths";
@@ -439,7 +439,7 @@
                 })
 
                 // GET SECURITY LEVEL LIST
-                getItemDataList(security_level_resource).then(data => {
+                getItemDataList(bio_hazard_level_resource).then(data => {
                     let secLevelList = extractApiData(data);
 
                     // update local variables with data from API
@@ -706,7 +706,7 @@
                 this.sample.user = sampleForUpdate['user.first_name'] + " " + sampleForUpdate['user.last_name'];
                 this.sample.box = sampleForUpdate['box.label'];
                 this.sample.quantity_type = sampleForUpdate['quantity.id'];
-                this.sample.securityLevel = sampleForUpdate['secLevel.code'];
+                this.sample.securityLevel = sampleForUpdate['bioHazardLevel.code'];
                 this.sample.convertedRetentionPeriod = this.sample.retention;
 
                 document.getElementById('period').selectedIndex = 1;

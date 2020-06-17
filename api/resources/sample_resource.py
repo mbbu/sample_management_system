@@ -7,10 +7,10 @@ from flask_restful import fields, marshal, reqparse
 from api.models.database import BaseModel
 from api.models.sample import Sample
 from api.resources.base_resource import BaseResource
+from api.resources.bio_hazard_level_resource import BioHazardLevelResource
 from api.resources.box_resource import BoxResource
 from api.resources.decorators.user_role_decorators import is_sample_owner
 from api.resources.quantity_type_resource import QuantityTypeResource
-from api.resources.security_level_resource import SecurityLevelResource
 from api.resources.theme_resource import ThemeResource
 from api.utils import format_and_lower_str, log_create, log_update, log_duplicate, \
     has_required_request_params, non_empty_int, log_304, \
@@ -35,8 +35,8 @@ class SampleResource(BaseResource):
         'temperature': fields.String,
         'amount': fields.Integer,
         'quantity.id': fields.String,
-        'secLevel.code': fields.String,
-        'secLevel.name': fields.String,
+        'bioHazardLevel.code': fields.String,
+        'bioHazardLevel.name': fields.String,
         'code': fields.String,
         'created_at': fields.String,
         'updated_at': fields.String,
@@ -74,7 +74,7 @@ class SampleResource(BaseResource):
         user = get_user_by_email(args[1]).id
         box = BoxResource.get_box(args[2]).id
         qt = QuantityTypeResource.get_quantity_type(args[14]).id
-        sl = SecurityLevelResource.get_security_level(args[15]).id
+        sl = BioHazardLevelResource.get_bio_hazard_level(args[15]).id
 
         if not Sample.sample_exists(code):
             try:
@@ -112,14 +112,14 @@ class SampleResource(BaseResource):
                     args[9] != sample.retention_date \
                     or args[10] != sample.barcode or args[11] != sample.analysis or args[12] != sample.temperature \
                     or args[13] != sample.amount or args[14] != sample.quantity_type or args[
-                15] != sample.security_level or args[16] != sample.code:
+                15] != sample.bio_hazard_level or args[16] != sample.code:
                 try:
                     code = format_and_lower_str(args[16])
                     theme = ThemeResource.get_theme(args[0]).id
                     user = get_user_by_email(args[1]).id
                     box = BoxResource.get_box(args[2]).id
                     qt = QuantityTypeResource.get_quantity_type(args[14]).id
-                    sl = SecurityLevelResource.get_security_level(args[15]).id
+                    sl = BioHazardLevelResource.get_bio_hazard_level(args[15]).id
 
                     old_info = str(sample)
                     sample.theme_id = theme
@@ -137,7 +137,7 @@ class SampleResource(BaseResource):
                     sample.temperature = args[12]
                     sample.amount = args[13]
                     sample.quantity_type = qt
-                    sample.security_level = sl
+                    sample.bio_hazard_level = sl
                     sample.code = code
 
                     sample.updated_at = datetime.now()
@@ -188,7 +188,7 @@ class SampleResource(BaseResource):
         parser.add_argument('temperature', required=True)
         parser.add_argument('amount', required=True)
         parser.add_argument('quantity_type', required=True)
-        parser.add_argument('security_level', required=True)
+        parser.add_argument('bio_hazard_level', required=True)
         parser.add_argument('code', required=True)
 
         args = parser.parse_args()
@@ -211,7 +211,7 @@ class SampleResource(BaseResource):
         temperature = float(args['temperature'])
         amount = int(args['amount'])
         quantity_type = str(args['quantity_type'])
-        security_level = format_and_lower_str(args['security_level'])
+        security_level = format_and_lower_str(args['bio_hazard_level'])
         code = format_and_lower_str(args['code'])
 
         return [

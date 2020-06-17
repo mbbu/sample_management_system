@@ -245,6 +245,7 @@ export function getSelectedItem(itemDataList, itemVar) {
     }
 }
 
+// todo: ideal fn
 export function getSelectedItemCode(elementId, itemDataList) {
     let item = document.getElementById(elementId).value;
 

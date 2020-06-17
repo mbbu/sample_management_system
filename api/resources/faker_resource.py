@@ -38,7 +38,7 @@ class FakeDataResource(BaseResource):
             db_model = Sample
             return faker(count, db_model, model)
         elif model == 'security level':
-            db_model = SecurityLevel
+            db_model = BioHazardLevel
             return faker(count, db_model, model)
         elif model == 'theme':
             db_model = Theme
