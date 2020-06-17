@@ -36,4 +36,4 @@ class BaseModel(object):
     @staticmethod
     def init_app(app):
         db = BaseModel.init_db(app)
-        Migrate(app=app, db=db)
+        Migrate(app=app, db=db, compare_type=True)
