@@ -1,7 +1,6 @@
 import requests
 from flask import request, current_app
 from flask_jwt_extended import jwt_required
-from flask_restful import reqparse
 
 from api import BaseResource, BaseModel, BaseConfig
 from api.constants import REDCAP_URI
@@ -13,29 +12,8 @@ from api.utils import log_export_from_redcap, log_duplicate, get_user_by_email
 
 class SaveSampleFromREDCap(BaseResource):
     @jwt_required
-    def post(self):
-        print("Call of post")
-
-        parser = reqparse.RequestParser()
-        parser.add_argument('from', required=False)
-        parser.add_argument('to', required=False)
-        parser.add_argument('project', required=False)
-
-        args = parser.parse_args()
-
-        # if args['from'] or args['to'] or args['project'] is None:
-        #     start_date = None
-        #     end_date = None
-        #     project = None
-        # else:
-
-        # todo: resolve issue with format of datetime
-        # start_date = format_str_to_date(args['from'] + str(' 00:00'))
-        # end_date = format_str_to_date(args['to'] + str(' 00:00'))
-        # project = args['project']
-
+    def get(self):
         sample_records = export_all_records()
-        print(sample_records)
 
         if sample_records == 500:
             # todo: mail admin on redcap error
@@ -43,16 +21,11 @@ class SaveSampleFromREDCap(BaseResource):
         elif not sample_records:
             return BaseResource.send_json_message("No sample records found", 404)
         else:
-            # if (start_date or end_date or project) is None:
-            # save all the samples to the db
             return SaveSampleFromREDCap.save_all_samples(sample_records)
-            # else:
-            # save samples according to the filters passed
-            # SaveSampleFromREDCap.save_samples_filtered_by_date(sample_records, start_date, end_date)
 
     @staticmethod
     def save_all_samples(sample_records):
-        for sample_record in sample_records:
+        for sample in sample_records:
             """
                 data returned from redcap:
                     {
@@ -87,16 +60,16 @@ class SaveSampleFromREDCap(BaseResource):
 
             # use python ternary operator to avoid errors
 
-            user = None if AttributeError else get_user_by_email(sample_record['mail']).id
+            user = None if AttributeError else get_user_by_email(sample['mail']).id
             # todo: if user is not assigned, then assign it either to admin or theme admin
-            sample_type = sample_record['sample_type_collected']
-            project = sample_record['project']
-            box = None if AttributeError else BoxResource.get_box(sample_record['box_id']).id
-            theme = None if AttributeError else ThemeResource.get_theme(sample_record['theme']).id
-            code = sample_record['sample_id']
-            amount = None if ValueError else int(sample_record['amount'])
-            location = {'lat': sample_record['lat'], 'long': sample_record['longitude']}
-            owner = sample_record['staff_in_charge']
+            sample_type = sample['sample_type_collected']
+            project = sample['project']
+            box = None if AttributeError else BoxResource.get_box(sample['box_id']).id
+            theme = None if AttributeError else ThemeResource.get_theme(sample['theme']).id
+            code = sample['sample_id']
+            amount = None if ValueError else int(sample['amount'])
+            location = {'lat': sample['lat'], 'long': sample['longitude']}
+            owner = sample['staff_in_charge']
 
             # todo: fields-not-found
             '''
@@ -109,7 +82,6 @@ class SaveSampleFromREDCap(BaseResource):
                  Retention
             '''
             if not Sample.sample_exists(code):
-                print("success if block")
                 sample = Sample(code=code, theme_id=theme, user_id=user, box_id=box,
                                 sample_type=sample_type, location_collected=location,
                                 project_owner=owner, amount=amount)
@@ -132,7 +104,6 @@ class SaveSampleFromREDCap(BaseResource):
 
 # fetch all records
 def export_all_records():
-    # print("Redcap contact made")
     token = request.headers.get('token')
     data = {
         'token': BaseConfig.REDCap_API_TOKEN or token,
@@ -143,9 +114,6 @@ def export_all_records():
 
     try:
         response = requests.post(REDCAP_URI, data)
-        # print(response)
-        # print(response.status_code)
-        # print(response.json())
         return response.json()
 
     except Exception as e:
