@@ -19,6 +19,7 @@ from api.utils import format_and_lower_str, log_create, log_update, log_duplicat
 
 class SampleResource(BaseResource):
     fields = {
+        'status': fields.String,
         'theme.name': fields.String,
         'user.email': fields.String,
         'user.first_name': fields.String,
