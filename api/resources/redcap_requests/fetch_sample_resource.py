@@ -5,9 +5,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from api import BaseResource, BaseModel, BaseConfig
 from api.constants import REDCAP_URI
 from api.models import Sample
-from api.resources.box_resource import BoxResource
 from api.resources.email_confirmation.send_email import send_email
-from api.resources.theme_resource import ThemeResource
 from api.utils import log_export_from_redcap, log_duplicate, get_user_by_email
 
 
@@ -30,65 +28,20 @@ class SaveSampleFromREDCap(BaseResource):
     @staticmethod
     def save_all_samples(sample_records):
         for sample in sample_records:
-            """
-                data returned from redcap:
-                    {
-                    "name":"andrewespira", ? user_id
-                    "mail":"aespira@icipe.org", ? user_id
-                    "theme":"1", -> theme_id how to know theme 
-                    "project":"IBCARP", -> project
-                    ??"sample_type":"1", -> sample_type how to know sample types
-                    "sample_id":"bm01_c2_01", -> ? code
-                    "box_id":"cd-07", -> box_id
-                    "date_return":"2020-05-30 11:55",
-                    $"project_name":"ibcarp",
-                    "staff_in_charge":"andre espira", -> ? user_id
-                    "collection_type":"gf", -> ? description
-                    "longitude":"36.8968905","lat":"-1.2215215000000001", -> location_collected
-                    "label_sample":"cd",
-                    ??"sample_type_collected":"blood", -> sample_type
-                    ??"amount":"400", -> amount
-                    "condition":"safe", -> ? security_level
-                    "level":"7",
-                    
-                    
-                    //"record_id":"1",
-                    //"rack_id":"4",
-                    //"sample_request_form_complete":"2",
-                    //"lab":"1", -> ?
-                    //"project_id":"008",
-                    //"room_id":"ml-05", -> ?
-                    //"freezer_id":"mbbu-005", -> ?
-                    }         
-            """
 
             # use python ternary operator to avoid errors
-
             user = None if AttributeError else get_user_by_email(sample['mail']).id
-            # todo: if user is not assigned, then assign it either to admin or theme admin
-            sample_type = sample['sample_type_collected']
-            project = sample['project']
-            box = None if AttributeError else BoxResource.get_box(sample['box_id']).id
-            theme = None if AttributeError else ThemeResource.get_theme(sample['theme']).id
+            # todo request staff-in-charge to enter email
             code = sample['sample_id']
-            amount = None if ValueError else int(sample['amount'])
+            project = sample['project']
             location = {'lat': sample['lat'], 'long': sample['longitude']}
-            owner = sample['staff_in_charge']
+            owner = sample['staff_in_charge']  # todo: PI field not found
+            sample_type = sample['sample_type_collected']
 
-            # todo: fields-not-found
-            '''
-                 animal_species
-                 sample_description
-                 security_level
-                 QT
-                 SL
-                 Temp
-                 Retention
-            '''
             if not Sample.sample_exists(code):
-                sample = Sample(code=code, theme_id=theme, user_id=user, box_id=box,
-                                sample_type=sample_type, location_collected=location,
-                                project_owner=owner, amount=amount)
+                sample = Sample(code=code, user_id=user, sample_type=sample_type,
+                                location_collected=location,
+                                project=project, project_owner=owner)
 
                 BaseModel.db.session.add(sample)
                 BaseModel.db.session.commit()
