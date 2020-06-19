@@ -47,6 +47,10 @@ THEMEADMIN = "1"
 FORBIDDEN_FUNCTION_ACCESS_RESPONSE_CODE = 403
 FORBIDDEN_FUNCTION_ACCESS_RESPONSE = "You cannot access this function, you are not an admin!"
 
+# sample status constants
+SAMPLE_IN_LAB = 'COMPLETE'
+SAMPLE_FROM_FIELD = 'INCOMPLETE'
+
 # sample request constants
 PENDING_STATUS = 'PENDING'
 APPROVED_STATUS = 'APPROVED'

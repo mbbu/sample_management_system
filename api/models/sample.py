@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from api.constants import SAMPLE_FROM_FIELD
 from api.models.database import BaseModel
 
 
@@ -30,6 +31,7 @@ class Sample(BaseModel.db.Model):
     bio_hazard_level = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('bio_hazard_level.id', ondelete='SET NULL'),
                                     nullable=True)
     code = AppDb.Column(AppDb.String, nullable=False, unique=True)
+    status = AppDb.Column(AppDb.String, nullable=False, default=SAMPLE_FROM_FIELD)
 
     # relationship(s)
     box = AppDb.relationship('Box', backref='sample', lazy=True)
