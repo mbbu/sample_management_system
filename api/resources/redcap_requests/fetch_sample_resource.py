@@ -3,7 +3,7 @@ from flask import request, current_app, render_template
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from api import BaseResource, BaseModel, BaseConfig
-from api.constants import REDCAP_URI
+from api.constants import REDCAP_URI, SAMPLE_FROM_FIELD
 from api.models import Sample
 from api.resources.email_confirmation.send_email import send_email
 from api.utils import log_export_from_redcap, log_duplicate, get_user_by_email
@@ -39,9 +39,8 @@ class SaveSampleFromREDCap(BaseResource):
             sample_type = sample['sample_type_collected']
 
             if not Sample.sample_exists(code):
-                sample = Sample(code=code, user_id=user, sample_type=sample_type,
-                                location_collected=location,
-                                project=project, project_owner=owner)
+                sample = Sample(code=code, user_id=user, sample_type=sample_type, location_collected=location,
+                                project=project, project_owner=owner, status=SAMPLE_FROM_FIELD)
 
                 BaseModel.db.session.add(sample)
                 BaseModel.db.session.commit()
