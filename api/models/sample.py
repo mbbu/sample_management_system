@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from api.constants import SAMPLE_FROM_FIELD
 from api.models.database import BaseModel
 
 
@@ -12,11 +13,11 @@ class Sample(BaseModel.db.Model):
     animal_species = AppDb.Column(AppDb.String(100), nullable=True, index=True)
     sample_type = AppDb.Column(AppDb.String(100), nullable=True, index=True)
     sample_description = AppDb.Column(AppDb.String(150), nullable=True)
-    location_collected = AppDb.Column(AppDb.String(100), nullable=True)
+    location_collected = AppDb.Column(AppDb.JSON, nullable=True)
     project = AppDb.Column(AppDb.String(150), nullable=True, index=True)
     project_owner = AppDb.Column(AppDb.String(100), nullable=True)
     retention_date = AppDb.Column(AppDb.DateTime, nullable=True)
-    barcode = AppDb.Column(AppDb.String(100), nullable=True)  # todo: changed to not nullable when module is done
+    barcode = AppDb.Column(AppDb.String(100), nullable=True)
     analysis = AppDb.Column(AppDb.String(100), nullable=True)
     temperature = AppDb.Column(AppDb.DECIMAL(5, 2), nullable=True)
     created_at = AppDb.Column(AppDb.DateTime, nullable=True, default=datetime.now)
@@ -25,18 +26,20 @@ class Sample(BaseModel.db.Model):
     deleted_by = AppDb.Column(AppDb.String(65), nullable=True)
 
     # Default = Celsius
-    amount = AppDb.Column(AppDb.Integer, nullable=True)  # todo set a default value
+    amount = AppDb.Column(AppDb.Integer, nullable=True, default=0)
     quantity_type = AppDb.Column(AppDb.String, AppDb.ForeignKey('quantity_type.id', ondelete='SET NULL'), nullable=True)
-    security_level = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('security_level.id', ondelete='SET NULL'),
-                                  nullable=True)
+    bio_hazard_level = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('bio_hazard_level.id', ondelete='SET NULL'),
+                                    nullable=True)
     code = AppDb.Column(AppDb.String, nullable=False, unique=True)
+    status = AppDb.Column(AppDb.String, nullable=False, default=SAMPLE_FROM_FIELD)
 
     # relationship(s)
-    user = AppDb.relationship('User', backref='sample', lazy=True)
-    publication = AppDb.relationship('Publication', backref='sample', lazy=True)
     box = AppDb.relationship('Box', backref='sample', lazy=True)
+    user = AppDb.relationship('User', backref='sample', lazy=True)
+    requests = AppDb.relationship('SampleRequest', backref='requested_sample', lazy=True)
+    publication = AppDb.relationship('Publication', backref='sample', lazy=True)
     quantity = AppDb.relationship('QuantityType', backref='quantity_type', lazy=True)
-    secLevel = AppDb.relationship('SecurityLevel', backref='sample', lazy=True)
+    bioHazardLevel = AppDb.relationship('BioHazardLevel', backref='sample', lazy=True)
 
     @staticmethod
     def sample_exists(code):

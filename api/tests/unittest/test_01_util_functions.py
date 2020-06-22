@@ -143,5 +143,5 @@ def test_get_samples_by_code(client):
     assert sample.temperature == decimal.Decimal(sample_data['temperature'])
     assert sample.amount == sample_data['amount']
     assert sample.quantity.id == sample_data['quantity_type']
-    assert sample.security_level == sample_data['security_level']
+    assert sample.bio_hazard_level == sample_data['bio_hazard_level']
     assert sample.code == format_and_lower_str(sample_code)

@@ -1,0 +1,22 @@
+<p>
+    Hi {{ handler }}, {{ requester_name }} ({{ requester_email }}) made a request to use your sample;
+<ul>
+    <li><b>Species:</b> <em>{{ species }}</em></li>
+    <li><b>Type:</b> <em>{{ type }} </em></li>
+    <li><b>Collected from:</b> <em>{{ location }}</em></li>
+</ul>
+
+This sample is located in the {{ storage }} and the available amount is {{ available_amount }} {{ qt }}.
+{{ requester_name }} would like access to {{ amount }} {{ qt }}.
+
+<br>
+<br>
+Please click the link to respond {{sample_request_response_url}}.
+Note this link is valid for {{ expiration_days }} days. Kindly make your response before {{ expiration_date }}.
+
+
+<br>
+<br>
+-- <br>
+Questions? Comments? Email admin@icipe.org
+</p>

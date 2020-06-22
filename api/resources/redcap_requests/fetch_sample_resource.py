@@ -1,128 +1,67 @@
-from datetime import timedelta
-
 import requests
-from flask import request, current_app
-from flask_jwt_extended import jwt_required
-from flask_restful import reqparse
+from flask import request, current_app, render_template
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from api import BaseResource, BaseModel, BaseConfig
-from api.constants import DATE_TIME_NONE, REDCAP_URI
+from api.constants import REDCAP_URI, SAMPLE_FROM_FIELD
 from api.models import Sample
-from api.utils import format_str_to_date, log_export_from_redcap, log_duplicate
+from api.resources.email_confirmation.send_email import send_email
+from api.utils import log_export_from_redcap, log_duplicate, get_user_by_email
 
 
 class SaveSampleFromREDCap(BaseResource):
     @jwt_required
-    def post(self):
-        # print("Call of post")
-        # get any filters for data export e.g. date, record_id ...
-        parser = reqparse.RequestParser()
-        parser.add_argument('from', required=False)
-        parser.add_argument('to', required=False)
-        parser.add_argument('record_id', required=False)
-
-        args = parser.parse_args()
-
-        if args['from'] or args['to'] or args['record_id'] is None:
-            start_date = None
-            end_date = None
-            record_id = None
-        else:
-            start_date = format_str_to_date(args['from'] + str(' 00:00'))
-            end_date = format_str_to_date(args['to'] + str(' 00:00'))
-            record_id = args['record_id']
-
+    def get(self):
         sample_records = export_all_records()
-        # print(sample_records)
 
-        if sample_records == 500:
-            # todo: mail admin on redcap error
+        if exception is not None:
+            current_user = get_user_by_email(get_jwt_identity())
+            user = current_user.first_name + " " + current_user.last_name
+            user_email = get_user_by_email(get_jwt_identity()).email
+            send_email_on_redcap_issue(email=BaseConfig.ADMINS, error=exception, user=user, user_email=user_email)
             return BaseResource.send_json_message("Redcap error. Admin contacted.", 500)
         elif not sample_records:
             return BaseResource.send_json_message("No sample records found", 404)
         else:
-            if (start_date or end_date or record_id) is None:
-                # save all the samples to the db
-                SaveSampleFromREDCap.save_all_samples(sample_records)
-            else:
-                # save samples according to the filters passed
-                SaveSampleFromREDCap.save_samples_filtered_by_date(sample_records, start_date, end_date)
+            return SaveSampleFromREDCap.save_all_samples(sample_records)
 
     @staticmethod
     def save_all_samples(sample_records):
         for sample in sample_records:
-            user = int(sample['users'].strip() or 0) or None
-            animal_species = sample['source_sample']
-            _type = sample['sample_type']
-            description = sample['sa_description']
-            location = sample['loc_sample']
-            owner = sample['pi']
-            amount = int(sample['number_samples_collected'].strip() or 0) or None
-            box = int(sample['box_number'].strip() or 0) or None
-            theme = int(sample['theme'].strip() or 0) or None
-            security_level = int(sample['risk_level'].strip() or 0) or None
-            record_id = sample['identifier_sample']
 
-            if not Sample.sample_exists(record_id):
-                sample = Sample(code=record_id, theme_id=theme, user_id=user, box_id=box, animal_species=animal_species,
-                                sample_type=_type, sample_description=description, location_collected=location,
-                                project_owner=owner, amount=amount, security_level=security_level)
+            # use python ternary operator to avoid errors
+            user = None if AttributeError else get_user_by_email(sample['mail']).id
+            # todo request staff-in-charge to enter email
+            code = sample['sample_id']
+            project = sample['project']
+            location = {'lat': sample['lat'], 'long': sample['longitude']}
+            owner = sample['staff_in_charge']  # todo: PI field not found
+            sample_type = sample['sample_type_collected']
+
+            if not Sample.sample_exists(code):
+                sample = Sample(code=code, user_id=user, sample_type=sample_type, location_collected=location,
+                                project=project, project_owner=owner, status=SAMPLE_FROM_FIELD)
 
                 BaseModel.db.session.add(sample)
                 BaseModel.db.session.commit()
                 log_export_from_redcap(sample)
-            log_duplicate(Sample.query.filter(Sample.code == record_id).first())
-            return BaseResource.send_json_message("Sample already exists", 409)
-        return BaseResource.send_json_message("Samples successfully fetched and saved", 201)
-
-    @staticmethod
-    def save_samples_filtered_by_date(sample_records, start_date, end_date):
-        days_count = end_date - start_date
-
-        for day in range(days_count.days + 1):
-            day = start_date + timedelta(days=day)
-            print(day)
-
-            for sample in sample_records:
-                _date = format_str_to_date(sample['date'] or DATE_TIME_NONE)
-
-                if day == _date:
-                    user = int(sample['users'].strip() or 0) or None
-                    animal_species = sample['source_sample']
-                    _type = sample['sample_type']
-                    description = sample['sa_description']
-                    location = sample['loc_sample']
-                    owner = sample['pi']
-                    amount = int(sample['number_samples_collected'].strip() or 0) or None
-                    box = int(sample['box_number'].strip() or 0) or None
-                    theme = int(sample['theme'].strip() or 0) or None
-                    security_level = int(sample['risk_level'].strip() or 0) or None
-                    record_id = sample['identifier_sample']
-
-                    if not Sample.sample_exists(record_id):
-                        sample = Sample(code=record_id, theme_id=theme, user_id=user, box_id=box,
-                                        animal_species=animal_species, sample_type=_type,
-                                        sample_description=description,
-                                        location_collected=location, project_owner=owner, amount=amount,
-                                        security_level=security_level)
-
-                        BaseModel.db.session.add(sample)
-                        BaseModel.db.session.commit()
-                        log_export_from_redcap(sample)
-                    log_duplicate(Sample.query.filter(Sample.code == record_id).first())
-                    return BaseResource.send_json_message("Sample already exists", 409)
-        return BaseResource.send_json_message(
-            "Samples from date {0} to date {1} saved".format(start_date, end_date), 201)
+                return BaseResource.send_json_message("Samples successfully fetched and saved", 201)
+            log_duplicate(Sample.query.filter(Sample.code == code).first())
+            # if an existing sample is encountered, do not return before finishing on other samples,
+            # instead move control back to the for loop
+            continue
+        return BaseResource.send_json_message("Sample already exists", 409)
 
 
 """
     REDCap API functions
 """
 
-
 # fetch all records
+exception = None
+
+
 def export_all_records():
-    # print("Redcap contact made")
     token = request.headers.get('token')
     data = {
         'token': BaseConfig.REDCap_API_TOKEN or token,
@@ -133,11 +72,15 @@ def export_all_records():
 
     try:
         response = requests.post(REDCAP_URI, data)
-        # print(response)
-        # print(response.status_code)
-        # print(response.json())
         return response.json()
 
     except Exception as e:
         current_app.logger.error(e)
-        return 500
+        global exception
+        exception = e
+        return exception
+
+
+def send_email_on_redcap_issue(email, error, user, user_email):
+    html = render_template("redcap_error.html", user_email=user_email, user=user, error=error)
+    send_email(email, 'REDCap Error', template=html)
