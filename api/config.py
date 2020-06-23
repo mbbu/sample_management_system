@@ -23,6 +23,7 @@ class BaseConfig(object):
     SQLALCHEMY_DATABASE_URI = database_uri
     SECRET_KEY = os.environ.get(SECRET_KEY) or os.urandom(32)
     SECURITY_PASSWORD_SALT = os.environ.get(SECURITY_PASSWORD_SALT) or os.urandom(32)
+    ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URL')
 
     # ADMIN MAILING CONFIG
     MAIL_SERVER = os.environ.get('MAIL_SERVER')
