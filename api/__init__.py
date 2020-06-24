@@ -188,8 +188,8 @@ def create_app(test_config=None):
     ext = extensions_set_up(app)
     jwt = ext.get('jwt')
 
-    app.elasticsearch = Elasticsearch([app.config['ELASTICSEARCH_URL']]) \
-        if app.config['ELASTICSEARCH_URL'] else None  # todo: replace
+    app.elasticsearch = Elasticsearch([BaseConfig.ELASTICSEARCH_URL]) \
+        if BaseConfig.ELASTICSEARCH_URL else None
 
     @jwt.token_in_blacklist_loader
     def check_if_token_is_revoked(decrypted_token):
