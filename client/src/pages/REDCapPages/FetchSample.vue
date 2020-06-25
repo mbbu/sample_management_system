@@ -20,17 +20,6 @@
                                 <mdb-card-body class="mx-4 mt-4">
                                     <form @submit.prevent="onSubmit">
                                         <div class="black-text">
-
-                                            <mdb-row>
-                                                <mdb-col md="12">
-                                                    <mdb-input icon="fas fa-project-diagram" id="project"
-                                                               v-model="request.project"
-                                                               label="Enter Project Id" type="text"/>
-                                                </mdb-col>
-                                            </mdb-row>
-
-                                            <br>
-
                                             <mdb-row>
                                                 <!-- DATE PICKER -->
                                                 <mdb-col md="10">
@@ -68,13 +57,14 @@
 </template>
 
 <script>
-    import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
+    import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbRow} from "mdbvue";
     import TopNav from "../../components/TopNav";
     import {
         countDownTimer,
         respondTo401,
         secureStoreGetString,
-        showFlashMessage, startLoader
+        showFlashMessage,
+        startLoader
     } from "../../utils/util_functions";
     import {redcap_sample_resource} from "../../utils/api_paths";
     import {FunctionalCalendar} from 'vue-functional-calendar';
@@ -89,7 +79,6 @@
             mdbCard,
             mdbCol,
             mdbRow,
-            mdbInput,
             TopNav,
             mdbCardBody,
             ErrorsDisplay,
@@ -118,10 +107,7 @@
 
             onSubmit() {
                 this.errors = []
-                // ensure fields are not empty
-                if (!this.request.project) {
-                    this.errors.push("Project is required!")
-                } else if (!this.request.date_range) {
+                if (!this.request.date_range) {
                     this.errors.push(" Enter date range is required")
                 } else {
                     // determine date range
@@ -144,21 +130,17 @@
                 let self = this;
                 let loader = startLoader(this);
 
-                axios.post(redcap_sample_resource, {
-                    project: this.request.project,
-                    from: this.request.from,
-                    to: this.request.to
-                }, {
-                    headers:
-                        {
-                            Authorization: secureStoreGetString()
-                        }
-                })
+                axios.get(redcap_sample_resource,
+                    {
+                        headers:
+                            {
+                                Authorization: secureStoreGetString()
+                            }
+                    })
                     .then((response) => {
                         setTimeout(() => {
                             loader.hide()
                             showFlashMessage(self, 'success', response.data['message'], '');
-                            // todo: redirect to sample view page
                             countDownTimer(self, 2, '/sample')
                         }, 4000)
                     })
@@ -175,12 +157,7 @@
                             }
                         }
                     });
-
             }
         },
     }
 </script>
-
-<style scoped>
-
-</style>
