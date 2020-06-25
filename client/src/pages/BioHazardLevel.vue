@@ -2,7 +2,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12">
-                <top-nav :page_title="page_title"></top-nav>
+                <top-nav :page_title="page_title" v-bind:search_query.sync="search"></top-nav>
 
                 <FlashMessage :position="'center bottom'"></FlashMessage>
                 <br> <br>
@@ -17,7 +17,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="bio_hazard.id" v-for="(bio_hazard, index) in response.message">
+                    <tr :key="bio_hazard.id" v-for="(bio_hazard, index) in filteredList">
                         <td> {{ index + 1 }}</td>
                         <td> {{ bio_hazard.name }}</td>
                         <td> {{ bio_hazard.code }}</td>
@@ -142,8 +142,9 @@
 
 <script>
     import axios from 'axios';
-    import {bio_hazard_level_resource} from '../utils/api_paths'
     import TopNav from "../components/TopNav";
+    import EventBus from '../components/EventBus';
+    import {bio_hazard_level_resource} from '../utils/api_paths'
     import {respondTo401, secureStoreGetString, showFlashMessage} from "../utils/util_functions";
 
     export default {
@@ -152,6 +153,8 @@
             return {
                 page_title: "Bio Hazard Level",
                 response: [],
+                bioHazardList: [],
+                search: '',
                 name: null,
                 code: null,
                 desc: null,
@@ -162,6 +165,22 @@
                 isEditing: false,
             };
         },
+
+        mounted() {
+            EventBus.$on('searchQuery', (payload) => {
+                this.search = payload
+                this.filteredList()
+            })
+        },
+
+        computed: {
+            filteredList() {
+                return this.bioHazardList.filter(bioHazard => {
+                    return bioHazard.name.toLowerCase().includes(this.search.toLowerCase())
+                })
+            }
+        },
+
         methods: {
             clearForm() {
                 this.name = null;
@@ -184,6 +203,7 @@
                     .then((res) => {
                         this.$log.info("Response: " + res.status + " " + res.data['message']);
                         this.response = res.data;
+                        this.bioHazardList = this.response.message
                     })
                     .catch((error) => {
                         // eslint-disable-next-line
