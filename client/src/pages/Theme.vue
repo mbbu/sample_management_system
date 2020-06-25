@@ -2,10 +2,10 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12">
-                <top-nav :page_title="page_title" v-bind:search_query="search"></top-nav>
+                <top-nav :page_title="page_title" v-bind:search_query.sync="search"></top-nav>
 
                 <FlashMessage :position="'center bottom'"></FlashMessage>
-                <br> <br>
+                <br>
                 <table class=" table table-hover">
                     <thead>
                     <tr>
@@ -153,7 +153,6 @@
         computed: {
             filteredList() {
                 return this.themeList.filter(theme => {
-                    console.log("SEARCH: " + this.search);
                     return theme.name.toLowerCase().includes(this.search.toLowerCase())
                 })
             }
