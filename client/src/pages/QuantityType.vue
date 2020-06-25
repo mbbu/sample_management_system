@@ -2,7 +2,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12">
-                <top-nav :page_title="page_title"></top-nav>
+                <top-nav :page_title="page_title" v-bind:search_query.sync="search"></top-nav>
 
                 <FlashMessage :position="'center bottom'"></FlashMessage>
                 <br> <br>
@@ -17,26 +17,27 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="sec_level.id" v-for="(sec_level, index) in response.message">
+                    <tr :key="qt.id" v-for="(qt, index) in filteredList">
                         <td> {{ index + 1 }}</td>
-                        <td> {{ sec_level.name }}</td>
-                        <td> {{ sec_level.id }}</td>
-                        <td> {{ sec_level.description }}</td>
+                        <td> {{ qt.name }}</td>
+                        <td> {{ qt.id }}</td>
+                        <td> {{ qt.description }}</td>
 
                         <td>
                             <b-icon
-                                    icon="pencil" font-scale="2.0"
-                                    class="border border-info rounded" variant="info"
-                                    v-b-tooltip.hover :title="`Update ${ sec_level.name }`"
-                                    v-b-modal.modal-quantity-type-edit
-                                    @mouseover="fillFormForUpdate(sec_level.name, sec_level.id, sec_level.description)"
+                                    :title="`Update ${ qt.name }`"
+                                    @mouseover="fillFormForUpdate(qt.name, qt.id, qt.description)"
+                                    class="border border-info rounded" font-scale="2.0"
+                                    icon="pencil" v-b-modal.modal-quantity-type-edit
+                                    v-b-tooltip.hover
+                                    variant="info"
                             ></b-icon>
                             &nbsp;
                             <b-icon
-                                    icon="trash" font-scale="1.85"
-                                    class="border rounded bg-danger p-1" variant="light"
-                                    v-b-tooltip.hover :title="`Delete ${sec_level.name}!`"
-                                    @click="deleteQuantityType(sec_level.id)"
+                                    :title="`Delete ${qt.name}!`" @click="deleteQuantityType(qt.id)"
+                                    class="border rounded bg-danger p-1" font-scale="1.85"
+                                    icon="trash" v-b-tooltip.hover
+                                    variant="light"
                             ></b-icon>
                         </td>
                     </tr>
@@ -46,13 +47,13 @@
 
             <div v-if="!isEditing">
                 <b-modal
-                        title="Add Quantity Type"
-                        id="modal-quantity-type"
-                        ok-title="Save"
-                        cancel-variant="danger"
+                        @hidden="clearForm"
                         @ok="createQuantityType"
                         @submit="showModal = false"
-                        @hidden="clearForm"
+                        cancel-variant="danger"
+                        id="modal-quantity-type"
+                        ok-title="Save"
+                        title="Add Quantity Type"
                 >
                     <form @submit.prevent="createQuantityType">
 
@@ -90,13 +91,13 @@
 
             <div v-else-if="isEditing">
                 <b-modal
-                        title="Edit Quantity Type"
+                        @hidden="clearForm"
                         @ok="updateQuantityType(old_code)"
                         @submit="showModal = false"
+                        cancel-variant="danger"
                         id="modal-quantity-type-edit"
                         ok-title="Update"
-                        cancel-variant="danger"
-                        @hidden="clearForm"
+                        title="Edit Quantity Type"
                 >
                     <form>
 
@@ -144,6 +145,7 @@
     import {quantity_type_resource} from '../utils/api_paths'
     import TopNav from "../components/TopNav";
     import {respondTo401, secureStoreGetString, showFlashMessage} from "../utils/util_functions";
+    import EventBus from '../components/EventBus';
 
     export default {
         name: 'QuantityType',
@@ -154,6 +156,8 @@
                 name: null,
                 code: null,
                 desc: null,
+                search: '',
+                QTList: [],
 
                 // values for data modification
                 old_code: null,
@@ -161,6 +165,22 @@
                 isEditing: false,
             };
         },
+
+        mounted() {
+            EventBus.$on('searchQuery', (payload) => {
+                this.search = payload
+                this.filteredList()
+            })
+        },
+
+        computed: {
+            filteredList() {
+                return this.QTList.filter(qt => {
+                    return qt.name.toLowerCase().includes(this.search.toLowerCase())
+                })
+            }
+        },
+
         methods: {
             clearForm() {
                 this.name = null;
@@ -183,6 +203,7 @@
                     .then((res) => {
                         this.$log.info("Response: " + res.status + " " + res.data['message']);
                         this.response = res.data;
+                        this.QTList = this.response.message
                     })
                     .catch((error) => {
                         // eslint-disable-next-line
