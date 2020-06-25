@@ -12,7 +12,9 @@
             <mdb-navbar-toggler>
                 <mdb-navbar-nav></mdb-navbar-nav>
                 <mdb-form-inline>
-                    <mdb-input aria-label="Search" class="mr-sm-2" placeholder="Search" type="text"/>
+                    <mdb-input @change="getSearchQuery()" aria-label="Search" class="mr-sm-2" id="search"
+                               placeholder="Search"
+                               type="text" v-model="search_query"/>
                     <mdb-btn class="my-0" outline="white" size="sm" type="submit">Search
                         <i aria-hidden="true" class="fas fa-search"></i></mdb-btn>
                 </mdb-form-inline>
@@ -79,7 +81,7 @@
 </template>
 
 <script>
-    import {getStoredUserDetails, isUserLoggedIn, logOutUser} from '../utils/util_functions';
+    import {getStoredUserDetails, isUserLoggedIn, logOutUser,} from '../utils/util_functions';
     import {
         mdbBtn,
         mdbDropdown,
@@ -94,6 +96,7 @@
         mdbNavbarToggler,
         mdbNavItem
     } from 'mdbvue'
+    import EventBus from '../components/EventBus';
 
     export default {
         name: 'top-nav',
@@ -101,6 +104,10 @@
             page_title: {
                 type: String,
                 required: true,
+            },
+            search_query: {
+                type: String,
+                required: false,
             }
         },
         data() {
@@ -121,6 +128,11 @@
                 } else {
                     this.userName = null
                 }
+            },
+
+            getSearchQuery() {
+                let query = document.getElementById('search').value;
+                EventBus.$emit('searchQuery', query);
             },
 
             signOut() {
