@@ -2,7 +2,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12">
-                <top-nav :page_title="page_title"></top-nav>
+                <top-nav :page_title="page_title" v-bind:search_query.sync="search"></top-nav>
 
                 <FlashMessage :position="'center bottom'"></FlashMessage>
                 <br> <br>
@@ -17,7 +17,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="lab.id" v-for="(lab, index) in response.message">
+                    <tr :key="lab.id" v-for="(lab, index) in filteredList">
                         <td> {{ index + 1 }}</td>
                         <td> {{ lab.name }}</td>
                         <td> {{ lab.code }}</td>
@@ -144,6 +144,7 @@
     import {lab_resource} from '../utils/api_paths'
     import TopNav from "../components/TopNav";
     import {respondTo401, secureStoreGetString, showFlashMessage} from "../utils/util_functions";
+    import EventBus from '../components/EventBus';
 
     export default {
         name: 'Lab',
@@ -154,6 +155,8 @@
                 name: null,
                 code: null,
                 room: null,
+                search: '',
+                labList: [],
 
                 // values for data modification
                 old_code: null,
@@ -161,6 +164,22 @@
                 isEditing: false,
             };
         },
+
+        mounted() {
+            EventBus.$on('searchQuery', (payload) => {
+                this.search = payload
+                this.filteredList()
+            })
+        },
+
+        computed: {
+            filteredList() {
+                return this.labList.filter(lab => {
+                    return lab.name.toLowerCase().includes(this.search.toLowerCase())
+                })
+            }
+        },
+
         methods: {
             clearForm() {
                 this.name = null;
@@ -183,6 +202,7 @@
                     .then((res) => {
                         this.$log.info("Response: " + res.status + " " + res.data['message']);
                         this.response = res.data;
+                        this.labList = res.data['message']
                     })
                     .catch((error) => {
                         // eslint-disable-next-line
