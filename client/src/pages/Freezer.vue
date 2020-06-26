@@ -2,7 +2,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12">
-                <top-nav :page_title="page_title"></top-nav>
+                <top-nav :page_title="page_title" v-bind:search_query.sync="search"></top-nav>
 
                 <FlashMessage :position="'center bottom'"></FlashMessage>
                 <br> <br>
@@ -18,7 +18,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="freezer.id" v-for="(freezer, index) in response.message">
+                    <tr :key="freezer.id" v-for="(freezer, index) in filteredList">
                         <td> {{ index + 1 }}</td>
                         <td> {{ freezer['lab.name'] }}</td>
                         <td> {{ freezer.room }}</td>
@@ -27,18 +27,19 @@
 
                         <td>
                             <b-icon
-                                    icon="pencil" font-scale="2.0"
-                                    class="border border-info rounded" variant="info"
-                                    v-b-tooltip.hover :title="`Update freezer ${ freezer.number }`"
-                                    v-b-modal.modal-freezer-edit
+                                    :title="`Update freezer ${ freezer.number }`"
                                     @mouseover="fillFormForUpdate(freezer.number, freezer.code, freezer.room, freezer['lab.name'])"
+                                    class="border border-info rounded" font-scale="2.0"
+                                    icon="pencil" v-b-modal.modal-freezer-edit
+                                    v-b-tooltip.hover
+                                    variant="info"
                             ></b-icon>
                             &nbsp;
                             <b-icon
-                                    icon="trash" font-scale="1.85"
-                                    class="border rounded bg-danger p-1" variant="light"
-                                    v-b-tooltip.hover :title="`Delete freezer ${freezer.number}!`"
-                                    @click="deleteFreezer(freezer.code)"
+                                    :title="`Delete freezer ${freezer.number}!`" @click="deleteFreezer(freezer.code)"
+                                    class="border rounded bg-danger p-1" font-scale="1.85"
+                                    icon="trash" v-b-tooltip.hover
+                                    variant="light"
                             ></b-icon>
                         </td>
                     </tr>
@@ -48,22 +49,22 @@
 
             <div v-if="!isEditing">
                 <b-modal
-                        title="Add Freezer"
-                        id="modal-freezer"
-                        ok-title="Save"
-                        cancel-variant="danger"
+                        @hidden="clearForm"
                         @ok="createFreezer"
                         @submit="clearForm"
-                        @hidden="clearForm"
+                        cancel-variant="danger"
+                        id="modal-freezer"
+                        ok-title="Save"
+                        title="Add Freezer"
                 >
                     <form @submit.prevent="createFreezer">
                         <b-form-group id="form-lab-group" label="Lab:" label-for="form-lab-input">
                             <ejs-dropdownlist
-                                    id='dropdownlist'
                                     :dataSource='labDataList'
                                     :fields="fields"
-                                    placeholder='Select a lab'
                                     :v-model="laboratory"
+                                    id='dropdownlist'
+                                    placeholder='Select a lab'
                             ></ejs-dropdownlist>
                         </b-form-group>
 
@@ -103,23 +104,23 @@
 
             <div v-else-if="isEditing">
                 <b-modal
-                        title="Edit Freezer"
+                        @hidden="clearForm"
                         @ok="updateFreezer(old_code)"
+                        @shown="selectLabItemForUpdate(laboratory)"
                         @submit="showModal = false"
+                        cancel-variant="danger"
                         id="modal-freezer-edit"
                         ok-title="Update"
-                        cancel-variant="danger"
-                        @shown="selectLabItemForUpdate(laboratory)"
-                        @hidden="clearForm"
+                        title="Edit Freezer"
                 >
                     <form>
                         <b-form-group id="form-lab-group-edit" label="Lab:" label-for="form-lab-input">
                             <ejs-dropdownlist
-                                    id='dropdownlist'
                                     :dataSource='labDataList'
                                     :fields="fields"
-                                    placeholder='Select a lab'
                                     :v-model="laboratory"
+                                    id='dropdownlist'
+                                    placeholder='Select a lab'
                             ></ejs-dropdownlist>
                         </b-form-group>
 
@@ -175,6 +176,7 @@
         secureStoreGetString,
         showFlashMessage
     } from "../utils/util_functions";
+    import EventBus from '../components/EventBus';
 
     export default {
         name: 'Freezer',
@@ -188,6 +190,7 @@
                 room: null,
                 labDataList: [],
                 fields: {text: '', value: ''},
+                search: '',
 
                 // values for data modification
                 old_code: null,
@@ -195,6 +198,22 @@
                 isEditing: false,
             };
         },
+
+        mounted() {
+            EventBus.$on('searchQuery', (payload) => {
+                this.search = payload
+                this.filteredList()
+            })
+        },
+
+        computed: {
+            filteredList() {
+                return this.response.filter(freezer => {
+                    return freezer.number.toString().toLowerCase().includes(this.search.toLowerCase())
+                })
+            }
+        },
+
         methods: {
             // Util Functions
             clearForm() {
@@ -230,8 +249,6 @@
                             'Name': labList.items[i].Name,
                         });
                     }
-                    this.$log.info("Extracted data as json fields: ", this.fields);
-                    this.$log.info("Extracted labDataList items: ", this.labDataList)
                 })
             },
 
@@ -247,7 +264,7 @@
                 axios.get(freezer_resource)
                     .then((res) => {
                         this.$log.info("Response: " + res.status + " " + res.data['message']);
-                        this.response = res.data;
+                        this.response = res.data['message'];
                     })
                     .catch((error) => {
                         // eslint-disable-next-line
