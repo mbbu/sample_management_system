@@ -2,7 +2,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12">
-                <top-nav :page_title="page_title"></top-nav>
+                <top-nav :page_title="page_title" v-bind:search_query.sync="search"></top-nav>
 
                 <FlashMessage :position="'center bottom'"></FlashMessage>
                 <br> <br>
@@ -17,7 +17,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="rack.id" v-for="(rack, index) in response.message">
+                    <tr :key="rack.id" v-for="(rack, index) in filteredList">
                         <td> {{ index + 1 }}</td>
                         <td> {{rack.number}}</td>
                         <td> {{rack.code}}</td>
@@ -25,18 +25,19 @@
 
                         <td>
                             <b-icon
-                                    icon="pencil" font-scale="2.0"
-                                    class="border border-info rounded" variant="info"
-                                    v-b-tooltip.hover :title="`Update rack ${ rack.code }`"
-                                    v-b-modal.modal-freezer-edit
+                                    :title="`Update rack ${ rack.code }`"
                                     @mouseover="fillFormForUpdate(rack['chamber.type'], rack.number, rack.code)"
+                                    class="border border-info rounded" font-scale="2.0"
+                                    icon="pencil" v-b-modal.modal-freezer-edit
+                                    v-b-tooltip.hover
+                                    variant="info"
                             ></b-icon>
                             &nbsp;
                             <b-icon
-                                    icon="trash" font-scale="1.85"
-                                    class="border rounded bg-danger p-1" variant="light"
-                                    v-b-tooltip.hover :title="`Delete rack ${rack.code}!`"
-                                    @click="deleteRack(rack.code)"
+                                    :title="`Delete rack ${rack.code}!`" @click="deleteRack(rack.code)"
+                                    class="border rounded bg-danger p-1" font-scale="1.85"
+                                    icon="trash" v-b-tooltip.hover
+                                    variant="light"
                             ></b-icon>
                         </td>
                     </tr>
@@ -47,21 +48,21 @@
             <div v-if="!isEditing">
                 <b-modal
                         :title="`Add ${page_title}`"
-                        id="modal-freezer"
-                        ok-title="Save"
-                        cancel-variant="danger"
+                        @hidden="clearForm"
                         @ok="createRack"
                         @submit="clearForm"
-                        @hidden="clearForm"
+                        cancel-variant="danger"
+                        id="modal-freezer"
+                        ok-title="Save"
                 >
                     <form @submit.prevent="createRack">
                         <b-form-group id="form-lab-group" label="Chamber Type:" label-for="form-lab-input">
                             <ejs-dropdownlist
-                                    id='dropdownlist'
                                     :dataSource='chamberDataList'
                                     :fields="fields"
-                                    placeholder='Select a chamber'
                                     :v-model="freezer"
+                                    id='dropdownlist'
+                                    placeholder='Select a chamber'
                             ></ejs-dropdownlist>
                         </b-form-group>
 
@@ -92,23 +93,23 @@
             <div v-else-if="isEditing">
                 <b-modal
                         :title="`Edit ${page_title}`"
+                        @hidden="clearForm"
                         @ok="updateRack(old_code)"
+                        @shown="selectItemForUpdate(chamber)"
                         @submit="showModal = false"
+                        cancel-variant="danger"
                         id="modal-freezer-edit"
                         ok-title="Update"
-                        cancel-variant="danger"
-                        @shown="selectItemForUpdate(chamber)"
-                        @hidden="clearForm"
                 >
                     <form>
                         <b-form-group id="form-freezer-group-edit" label="Freezer Number:"
                                       label-for="form-freezer-input">
                             <ejs-dropdownlist
-                                    id='dropdownlist'
                                     :dataSource='chamberDataList'
                                     :fields="fields"
-                                    placeholder='Select a chamber'
                                     :v-model="freezer"
+                                    id='dropdownlist'
+                                    placeholder='Select a chamber'
                             ></ejs-dropdownlist>
                         </b-form-group>
 
@@ -155,6 +156,8 @@
         selectItemForUpdate,
         showFlashMessage
     } from "../utils/util_functions";
+    import EventBus from '../components/EventBus';
+
 
     export default {
         name: 'Rack',
@@ -165,6 +168,7 @@
                 chamber: null,
                 code: null,
                 number: null,
+                search: '',
                 chamberDataList: [],
                 fields: {text: '', value: ''},
 
@@ -174,6 +178,22 @@
                 isEditing: false,
             };
         },
+
+        mounted() {
+            EventBus.$on('searchQuery', (payload) => {
+                this.search = payload
+                this.filteredList()
+            })
+        },
+
+        computed: {
+            filteredList() {
+                return this.response.filter(rack => {
+                    return rack.number.toString().toLowerCase().includes(this.search.toLowerCase())
+                })
+            }
+        },
+
         methods: {
             selectItemForUpdate,
             // Util Functions
@@ -217,7 +237,7 @@
                 axios.get(rack_resource)
                     .then((res) => {
                         this.$log.info("Response: " + res.status + " " + res.data['message']);
-                        this.response = res.data;
+                        this.response = res.data['message'];
                     })
                     .catch((error) => {
                         // eslint-disable-next-line
