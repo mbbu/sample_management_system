@@ -2,7 +2,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12">
-                <top-nav :page_title="page_title"></top-nav>
+                <top-nav :page_title="page_title" v-bind:search_query.sync="search"></top-nav>
 
                 <FlashMessage :position="'center bottom'"></FlashMessage>
                 <br> <br>
@@ -18,7 +18,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="chamber.id" v-for="(chamber, index) in response.message">
+                    <tr :key="chamber.id" v-for="(chamber, index) in filteredList">
                         <td> {{ index + 1 }}</td>
                         <td> {{chamber.type}}</td>
                         <td> {{chamber.code}}</td>
@@ -27,18 +27,19 @@
 
                         <td>
                             <b-icon
-                                    icon="pencil" font-scale="2.0"
-                                    class="border border-info rounded" variant="info"
-                                    v-b-tooltip.hover :title="`Update chamber ${ chamber.code }`"
-                                    v-b-modal.modal-freezer-edit
+                                    :title="`Update chamber ${ chamber.code }`"
                                     @mouseover="fillFormForUpdate(chamber['freezer.number'], chamber.type, chamber.code)"
+                                    class="border border-info rounded" font-scale="2.0"
+                                    icon="pencil" v-b-modal.modal-freezer-edit
+                                    v-b-tooltip.hover
+                                    variant="info"
                             ></b-icon>
                             &nbsp;
                             <b-icon
-                                    icon="trash" font-scale="1.85"
-                                    class="border rounded bg-danger p-1" variant="light"
-                                    v-b-tooltip.hover :title="`Delete chamber ${chamber.code}!`"
-                                    @click="deleteChamber(chamber.code)"
+                                    :title="`Delete chamber ${chamber.code}!`" @click="deleteChamber(chamber.code)"
+                                    class="border rounded bg-danger p-1" font-scale="1.85"
+                                    icon="trash" v-b-tooltip.hover
+                                    variant="light"
                             ></b-icon>
                         </td>
                     </tr>
@@ -49,21 +50,21 @@
             <div v-if="!isEditing">
                 <b-modal
                         :title="`Add ${page_title}`"
-                        id="modal-freezer"
-                        ok-title="Save"
-                        cancel-variant="danger"
+                        @hidden="clearForm"
                         @ok="createChamber"
                         @submit="clearForm"
-                        @hidden="clearForm"
+                        cancel-variant="danger"
+                        id="modal-freezer"
+                        ok-title="Save"
                 >
                     <form @submit.prevent="createChamber">
                         <b-form-group id="form-lab-group" label="Freezer Number:" label-for="form-lab-input">
                             <ejs-dropdownlist
-                                    id='dropdownlist'
                                     :dataSource='freezerDataList'
                                     :fields="fields"
-                                    placeholder='Select a freezer'
                                     :v-model="freezer"
+                                    id='dropdownlist'
+                                    placeholder='Select a freezer'
                             ></ejs-dropdownlist>
                         </b-form-group>
 
@@ -94,23 +95,23 @@
             <div v-else-if="isEditing">
                 <b-modal
                         :title="`Edit ${page_title}`"
+                        @hidden="clearForm"
                         @ok="updateChamber(old_code)"
+                        @shown="selectItemForUpdate(freezer)"
                         @submit="showModal = false"
+                        cancel-variant="danger"
                         id="modal-freezer-edit"
                         ok-title="Update"
-                        cancel-variant="danger"
-                        @shown="selectItemForUpdate(freezer)"
-                        @hidden="clearForm"
                 >
                     <form>
                         <b-form-group id="form-freezer-group-edit" label="Freezer Number:"
                                       label-for="form-freezer-input">
                             <ejs-dropdownlist
-                                    id='dropdownlist'
                                     :dataSource='freezerDataList'
                                     :fields="fields"
-                                    placeholder='Select a freezer'
                                     :v-model="freezer"
+                                    id='dropdownlist'
+                                    placeholder='Select a freezer'
                             ></ejs-dropdownlist>
                         </b-form-group>
 
@@ -157,6 +158,7 @@
         selectItemForUpdate,
         showFlashMessage
     } from "../utils/util_functions";
+    import EventBus from '../components/EventBus';
 
     export default {
         name: 'Chamber',
@@ -167,6 +169,7 @@
                 freezer: null,
                 code: null,
                 type: null,
+                search: '',
                 freezerDataList: [],
                 fields: {text: '', value: ''},
 
@@ -176,6 +179,22 @@
                 isEditing: false,
             };
         },
+
+        mounted() {
+            EventBus.$on('searchQuery', (payload) => {
+                this.search = payload
+                this.filteredList()
+            })
+        },
+
+        computed: {
+            filteredList() {
+                return this.response.filter(chamber => {
+                    return chamber.type.toLowerCase().includes(this.search.toLowerCase())
+                })
+            }
+        },
+
         methods: {
             selectItemForUpdate,
             // Util Functions
@@ -221,7 +240,7 @@
                 axios.get(chamber_resource)
                     .then((res) => {
                         this.$log.info("Response: " + res.status + " " + res.data['message']);
-                        this.response = res.data;
+                        this.response = res.data['message'];
                     })
                     .catch((error) => {
                         // eslint-disable-next-line
