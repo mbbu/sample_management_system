@@ -2,7 +2,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12">
-                <top-nav :page_title="page_title"></top-nav>
+                <top-nav :page_title="page_title" v-bind:search_query.sync="search"></top-nav>
 
                 <FlashMessage :position="'center bottom'"></FlashMessage>
                 <br> <br>
@@ -19,7 +19,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="publication.id" v-for="(publication, index) in response.message">
+                    <tr :key="publication.id" v-for="(publication, index) in filteredList">
                         <td> {{ index + 1 }}</td>
                         <td> {{publication.publication_title}}</td>
                         <td> {{publication['sample.theme.name']}}</td>
@@ -221,6 +221,7 @@
         secureStoreGetString,
         showFlashMessage
     } from "../utils/util_functions";
+    import EventBus from '../components/EventBus';
 
     export default {
         name: "Publication",
@@ -228,6 +229,7 @@
             return {
                 page_title: "Publications",
                 response: [],
+                search: '',
                 publication: {
                     title: null,
                     sample: null,
@@ -245,6 +247,21 @@
                 old_title: null,
                 showModal: true,
                 isEditing: false,
+            }
+        },
+
+        mounted() {
+            EventBus.$on('searchQuery', (payload) => {
+                this.search = payload
+                this.filteredList()
+            })
+        },
+
+        computed: {
+            filteredList() {
+                return this.response.filter(publication => {
+                    return publication.publication_title.toLowerCase().includes(this.search.toLowerCase())
+                })
             }
         },
 
@@ -297,8 +314,8 @@
                 this.clearForm();
                 axios.get(publication_resource)
                     .then((res) => {
-                        this.$log.info("Response: " + res.status + " " + res.data['message']);
-                        this.response = res.data;
+                        this.$log.info("Response: " + res.status + " ", res.data['message']);
+                        this.response = res.data['message'];
                     })
                     .catch((error) => {
                         // eslint-disable-next-line
