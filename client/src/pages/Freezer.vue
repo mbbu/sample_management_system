@@ -5,6 +5,35 @@
                 <top-nav :page_title="page_title" v-bind:search_query.sync="search"></top-nav>
 
                 <FlashMessage :position="'center bottom'"></FlashMessage>
+                <br>
+                <div id="filters">
+                    <details>
+                        <summary class="filter-summary">Filters</summary>
+                        <hr>
+                        <ul>
+                            <p> By code</p>
+                            <li :key="filter" v-for="filter in codeFilters">
+                                <label>
+                                    <input :checked="filters.includes(filter)" @change="toggleFilter(filter)"
+                                           type="checkbox">
+                                    <span>{{ filter }}</span>
+                                </label>
+                            </li>
+                        </ul>
+
+                        <ul>
+                            <p> By Room</p>
+                            <li :key="filter" v-for="filter in roomFilters">
+                                <label>
+                                    <input :checked="filters.includes(filter)" @change="toggleFilter(filter)"
+                                           type="checkbox">
+                                    <span>{{ filter }}</span>
+                                </label>
+                            </li>
+                        </ul>
+                    </details>
+                </div>
+
                 <br> <br>
                 <table class=" table table-hover">
                     <thead>
@@ -18,7 +47,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="freezer.id" v-for="(freezer, index) in filteredList">
+                    <tr :key="freezer.id" v-for="(freezer, index) in matchedFilteredAndSearch">
                         <td> {{ index + 1 }}</td>
                         <td> {{ freezer['lab.name'] }}</td>
                         <td> {{ freezer.room }}</td>
@@ -191,6 +220,7 @@
                 labDataList: [],
                 fields: {text: '', value: ''},
                 search: '',
+                filters: [],
 
                 // values for data modification
                 old_code: null,
@@ -202,12 +232,78 @@
         mounted() {
             EventBus.$on('searchQuery', (payload) => {
                 this.search = payload
-                this.filteredList()
+                this.matchedFilteredAndSearch()
             })
         },
 
         computed: {
+            possibleFilters() {
+                let possibleLiters = []
+
+                let room = this.response
+                    .map(({room}) => room)
+                    .filter((value, index, self) => self.indexOf(value) === index);
+
+                let code = this.response
+                    .map(({code}) => code)
+                    .filter((value, index, self) => self.indexOf(value) === index);
+
+                possibleLiters.push(room, code)
+
+                return possibleLiters
+            },
+
+            codeFilters() {
+                return this.response
+                    .map(({code}) => code)
+                    .filter((value, index, self) => self.indexOf(value) === index);
+            },
+
+            roomFilters() {
+                return this.response
+                    .map(({room}) => room)
+                    .filter((value, index, self) => self.indexOf(value) === index);
+            },
+
+            matchedProducts() {
+                return this.filters.length
+                    ? this.response.filter(freezer => this.filters.some(filter => freezer.room.match(filter)))
+                    : this.response
+            },
+
+            matchedFilteredAndSearch() {
+                let filterRoom = this.filters.length
+                    ? this.response.filter(freezer => this.filters.some(filter => freezer.room.match(filter)))
+                    : this.response
+
+                let filterCode = this.filters.length
+                    ? this.response.filter(freezer => this.filters.some(filter => freezer.code.match(filter)))
+                    : this.response
+
+                let searchList = this.response.filter(freezer => {
+                    return freezer.number.toString().toLowerCase().includes(this.search.toLowerCase())
+                })
+
+                console.log("filter room", filterRoom)
+                console.log("filter code", filterCode)
+                console.log("search", searchList)
+
+
+                if ((filterRoom.length !== this.response.length) && (filterRoom.length > searchList.length)) {
+                    console.log("Search filter called")
+                    return searchList
+                } else if (searchList.length !== this.response.length) {
+                    return searchList
+                } else if (filterRoom.length !== this.response.length) {
+                    return filterRoom
+                } else if (filterCode.length !== this.response.length) {
+                    return filterCode
+                }
+                return this.response
+            },
+
             filteredList() {
+                console.log("FILTERED LIST")
                 return this.response.filter(freezer => {
                     return freezer.number.toString().toLowerCase().includes(this.search.toLowerCase())
                 })
@@ -215,6 +311,13 @@
         },
 
         methods: {
+
+            toggleFilter: function (newFilter) {
+                console.log("Toggle filter", newFilter)
+                this.filters = !this.filters.includes(newFilter)
+                    ? [...this.filters, newFilter]
+                    : this.filters.filter(filter => filter !== newFilter)
+            },
             // Util Functions
             clearForm() {
                 this.laboratory = null;
@@ -263,7 +366,7 @@
                 this.clearForm();
                 axios.get(freezer_resource)
                     .then((res) => {
-                        this.$log.info("Response: " + res.status + " " + res.data['message']);
+                        this.$log.info("Response: " + res.status + " ", res.data['message']);
                         this.response = res.data['message'];
                     })
                     .catch((error) => {
