@@ -6,6 +6,7 @@
 
                 <FlashMessage :position="'center bottom'"></FlashMessage>
 
+                <br>
                 <mdb-card>
                     <details>
                         <summary class="pt-3 blue-gradient d-flex justify-content-center white-text"><h5>Filters</h5>
@@ -38,7 +39,6 @@
                                             </label>
                                         </li>
                                     </ul>
-
                                 </mdb-col>
                             </mdb-row>
                         </mdb-card-body>
@@ -196,9 +196,8 @@
                     </form>
                 </b-modal>
             </div>
-            <b-button class="float_btn"
-                      v-b-modal.modal-freezer variant="primary"
-            >Add Freezer
+            <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-freezer variant="primary">
+                <span>Add Freezer</span> <i class="fas fa-plus-circle menu_icon"></i>
             </b-button>
         </div>
     </div>

@@ -26,13 +26,25 @@ body {
   margin-top: 80px;
 }
 
+button span {
+  max-width: 0;
+  -webkit-transition: max-width 1s;
+  transition: max-width 1s;
+  display: inline-block;
+  vertical-align: top;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+button:hover span {
+  max-width: 7rem;
+}
+
 .float_btn {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  border-radius: 5%;
+  bottom: -5px;
+  right: -5px;
   text-align: center;
-  box-shadow: 2px 2px 3px #999;
 }
 
 .form_input_margin {
