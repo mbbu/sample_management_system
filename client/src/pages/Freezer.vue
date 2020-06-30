@@ -15,13 +15,15 @@
                             <mdb-row>
                                 <mdb-col class="d-flex align-items-start" md="5">
                                     <ul>
-                                        <p> By code</p>
-                                        <li :key="filter" v-for="filter in codeFilters">
+                                        <li><em>By Lab</em>
+                                            <hr>
+                                        </li>
+                                        <li :key="filter" v-for="filter in labFilters">
                                             <label>
                                                 <input :checked="filters.includes(filter)"
                                                        @change="toggleFilter(filter)"
                                                        type="checkbox">
-                                                <span>{{ filter }}</span>
+                                                <span> {{ filter }}</span>
                                             </label>
                                         </li>
                                     </ul>
@@ -29,13 +31,15 @@
 
                                 <mdb-col class="d-flex align-items-start" md="5">
                                     <ul>
-                                        <p> By Room</p>
+                                        <li><em>By Room</em>
+                                            <hr>
+                                        </li>
                                         <li :key="filter" v-for="filter in roomFilters">
                                             <label>
                                                 <input :checked="filters.includes(filter)"
                                                        @change="toggleFilter(filter)"
                                                        type="checkbox">
-                                                <span>{{ filter }}</span>
+                                                <span> {{ filter }}</span>
                                             </label>
                                         </li>
                                     </ul>
@@ -49,12 +53,12 @@
                 <table class=" table table-hover">
                     <thead>
                     <tr>
-                        <th scope="col"> Id</th>
-                        <th scope="col"> Lab Located</th>
-                        <th scope="col"> Room</th>
-                        <th scope="col"> Freezer Number</th>
-                        <th scope="col"> Code</th>
-                        <th scope="col"> Actions</th>
+                        <th class="table-header-style" scope="col"> Id</th>
+                        <th class="table-header-style" scope="col"> Lab Located</th>
+                        <th class="table-header-style" scope="col"> Room</th>
+                        <th class="table-header-style" scope="col"> Freezer Number</th>
+                        <th class="table-header-style" scope="col"> Code</th>
+                        <th class="table-header-style" scope="col"> Actions</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -243,30 +247,14 @@
         mounted() {
             EventBus.$on('searchQuery', (payload) => {
                 this.search = payload
-                this.matchedFilteredAndSearch()
+                this.filteredList()
             })
         },
 
         computed: {
-            possibleFilters() {
-                let possibleLiters = []
-
-                let room = this.response
-                    .map(({room}) => room)
-                    .filter((value, index, self) => self.indexOf(value) === index);
-
-                let code = this.response
-                    .map(({code}) => code)
-                    .filter((value, index, self) => self.indexOf(value) === index);
-
-                possibleLiters.push(room, code)
-
-                return possibleLiters
-            },
-
-            codeFilters() {
+            labFilters() {
                 return this.response
-                    .map(({code}) => code)
+                    .map(({['lab.name']: lab}) => lab)
                     .filter((value, index, self) => self.indexOf(value) === index);
             },
 
@@ -276,29 +264,18 @@
                     .filter((value, index, self) => self.indexOf(value) === index);
             },
 
-            matchedProducts() {
-                return this.filters.length
-                    ? this.response.filter(freezer => this.filters.some(filter => freezer.room.match(filter)))
-                    : this.response
-            },
+            matchedFilteredAndSearch: function () {
 
-            matchedFilteredAndSearch() {
                 let filterRoom = this.filters.length
                     ? this.response.filter(freezer => this.filters.some(filter => freezer.room.match(filter)))
                     : this.response
 
                 let filterCode = this.filters.length
-                    ? this.response.filter(freezer => this.filters.some(filter => freezer.code.match(filter)))
+                    ? this.response.filter(freezer => this.filters.some(filter => freezer['lab.name'].match(filter)))
                     : this.response
 
-                let searchList = this.response.filter(freezer => {
-                    return freezer.number.toString().toLowerCase().includes(this.search.toLowerCase())
-                })
-
-                console.log("filter room", filterRoom)
-                console.log("filter code", filterCode)
-                console.log("search", searchList)
-
+                console.log("Filter by Code ", filterCode)
+                let searchList = this.filteredList()
 
                 if ((filterRoom.length !== this.response.length) && (filterRoom.length > searchList.length)) {
                     console.log("Search filter called")
@@ -308,27 +285,45 @@
                 } else if (filterRoom.length !== this.response.length) {
                     return filterRoom
                 } else if (filterCode.length !== this.response.length) {
+                    console.log(filterCode, " Was Filter by Code ")
                     return filterCode
                 }
                 return this.response
             },
 
-            filteredList() {
-                console.log("FILTERED LIST")
-                return this.response.filter(freezer => {
-                    return freezer.number.toString().toLowerCase().includes(this.search.toLowerCase())
-                })
-            }
         },
 
         methods: {
 
             toggleFilter: function (newFilter) {
-                console.log("Toggle filter", newFilter)
+                console.log("Toggle filter", newFilter, ' of type ' + typeof newFilter)
                 this.filters = !this.filters.includes(newFilter)
                     ? [...this.filters, newFilter]
                     : this.filters.filter(filter => filter !== newFilter)
+                console.log("All filters: ", this.filters)
             },
+
+            filteredList() {
+                return this.response.filter(freezer => {
+                    for (let count = 0; count <= this.response.length; count++) {
+                        let byRoom = freezer.room.toString().toLowerCase().includes(this.search.toLowerCase())
+                        let byCode = freezer.code.toString().toLowerCase().includes(this.search.toLowerCase())
+                        let byNumber = freezer.number.toString().toLowerCase().includes(this.search.toLowerCase())
+                        let byLabName = freezer['lab.name'].toString().toLowerCase().includes(this.search.toLowerCase())
+
+                        if (byNumber === true) {
+                            return byNumber
+                        } else if (byRoom) {
+                            return byRoom
+                        } else if (byCode) {
+                            return byCode
+                        } else if (byLabName) {
+                            return byLabName
+                        }
+                    }
+                })
+            },
+
             // Util Functions
             clearForm() {
                 this.laboratory = null;
