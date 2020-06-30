@@ -132,9 +132,8 @@
                     </form>
                 </b-modal>
             </div>
-            <b-button class="float_btn"
-                      v-b-modal.modal-bio-level variant="primary"
-            >Add Bio Hazard Level
+            <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-bio-level variant="primary">
+                <span>Add Bio Hazard Level</span> <i class="fas fa-plus-circle menu_icon"></i>
             </b-button>
         </div>
     </div>

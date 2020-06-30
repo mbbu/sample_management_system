@@ -28,7 +28,7 @@
                                     :title="`Update tray ${ tray.code }`"
                                     @mouseover="fillFormForUpdate(tray['rack.number'], tray.number, tray.code)"
                                     class="border border-info rounded" font-scale="2.0"
-                                    icon="pencil" v-b-modal.modal-freezer-edit
+                                    icon="pencil" v-b-modal.modal-tray-edit
                                     v-b-tooltip.hover
                                     variant="info"
                             ></b-icon>
@@ -52,7 +52,7 @@
                         @ok="createTray"
                         @submit="clearForm"
                         cancel-variant="danger"
-                        id="modal-freezer"
+                        id="modal-tray"
                         ok-title="Save"
                 >
                     <form @submit.prevent="createTray">
@@ -98,7 +98,7 @@
                         @shown="selectItemForUpdate(rack)"
                         @submit="showModal = false"
                         cancel-variant="danger"
-                        id="modal-freezer-edit"
+                        id="modal-tray-edit"
                         ok-title="Update"
                 >
                     <form>
@@ -135,9 +135,8 @@
                     </form>
                 </b-modal>
             </div>
-            <b-button class="float_btn"
-                      v-b-modal.modal-freezer variant="primary"
-            >Add Tray
+            <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-tray variant="primary">
+                <span>Add Tray</span> <i class="fas fa-plus-circle menu_icon"></i>
             </b-button>
         </div>
     </div>

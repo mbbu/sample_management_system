@@ -201,9 +201,8 @@
                     </form>
                 </b-modal>
             </div>
-            <b-button class="float_btn"
-                      v-b-modal.modal-publication variant="primary"
-            >Add Publication
+            <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-publication variant="primary">
+                <span>Add Publication</span> <i class="fas fa-plus-circle menu_icon"></i>
             </b-button>
         </div>
     </div>
