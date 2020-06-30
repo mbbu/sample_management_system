@@ -5,36 +5,47 @@
                 <top-nav :page_title="page_title" v-bind:search_query.sync="search"></top-nav>
 
                 <FlashMessage :position="'center bottom'"></FlashMessage>
-                <br>
-                <div id="filters">
+
+                <mdb-card>
                     <details>
-                        <summary class="filter-summary">Filters</summary>
-                        <hr>
-                        <ul>
-                            <p> By code</p>
-                            <li :key="filter" v-for="filter in codeFilters">
-                                <label>
-                                    <input :checked="filters.includes(filter)" @change="toggleFilter(filter)"
-                                           type="checkbox">
-                                    <span>{{ filter }}</span>
-                                </label>
-                            </li>
-                        </ul>
+                        <summary class="pt-3 blue-gradient d-flex justify-content-center white-text"><h5>Filters</h5>
+                        </summary>
+                        <mdb-card-body>
+                            <mdb-row>
+                                <mdb-col class="d-flex align-items-start" md="5">
+                                    <ul>
+                                        <p> By code</p>
+                                        <li :key="filter" v-for="filter in codeFilters">
+                                            <label>
+                                                <input :checked="filters.includes(filter)"
+                                                       @change="toggleFilter(filter)"
+                                                       type="checkbox">
+                                                <span>{{ filter }}</span>
+                                            </label>
+                                        </li>
+                                    </ul>
+                                </mdb-col>
 
-                        <ul>
-                            <p> By Room</p>
-                            <li :key="filter" v-for="filter in roomFilters">
-                                <label>
-                                    <input :checked="filters.includes(filter)" @change="toggleFilter(filter)"
-                                           type="checkbox">
-                                    <span>{{ filter }}</span>
-                                </label>
-                            </li>
-                        </ul>
+                                <mdb-col class="d-flex align-items-start" md="5">
+                                    <ul>
+                                        <p> By Room</p>
+                                        <li :key="filter" v-for="filter in roomFilters">
+                                            <label>
+                                                <input :checked="filters.includes(filter)"
+                                                       @change="toggleFilter(filter)"
+                                                       type="checkbox">
+                                                <span>{{ filter }}</span>
+                                            </label>
+                                        </li>
+                                    </ul>
+
+                                </mdb-col>
+                            </mdb-row>
+                        </mdb-card-body>
                     </details>
-                </div>
+                </mdb-card>
+                <br>
 
-                <br> <br>
                 <table class=" table table-hover">
                     <thead>
                     <tr>
@@ -206,6 +217,7 @@
         showFlashMessage
     } from "../utils/util_functions";
     import EventBus from '../components/EventBus';
+    import {mdbCard, mdbCardBody, mdbCol, mdbRow} from "mdbvue";
 
     export default {
         name: 'Freezer',
@@ -482,6 +494,6 @@
         created() {
             this.getFreezer();
         },
-        components: {TopNav}
+        components: {TopNav, mdbCard, mdbCardBody, mdbRow, mdbCol}
     };
 </script>
