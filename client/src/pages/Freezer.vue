@@ -228,6 +228,7 @@
             return {
                 page_title: "Freezer",
                 response: [],
+                freezerList: [],
                 laboratory: null,
                 number: null,
                 code: null,
@@ -269,15 +270,23 @@
              * @returns {null|[]|*}
              */
             matchFiltersAndSearch: function () {
-                let filterByRoom = this.filters.length
-                    ? this.response.filter(freezer => this.filters.some(filter => freezer.room.match(filter)))
-                    : null
-
-                let filterByLab = this.filters.length
-                    ? this.response.filter(freezer => this.filters.some(filter => freezer['lab.name'].match(filter)))
-                    : null
+                // let filterByRoom = this.filters.length
+                //     ? this.freezerList.filter(freezer => this.filters.some(filter => freezer.room.match(filter)))
+                //     : null
+                //
+                // let filterByLab = this.filters.length
+                //     ? this.freezerList.filter(freezer => this.filters.some(filter => freezer['lab.name'].match(filter)))
+                //     : null
 
                 let searchList = this.search ? this.filteredList() : null
+                let filteredData = this.filterData(this.freezerList)
+                console.log("Filters applied: ", filteredData)
+                console.log("Filtered lab: ", filteredData.lab)
+                console.log("Filtered room: ", filteredData.room)
+                //
+                let filterByLab = filteredData.lab
+                let filterByRoom = filteredData.room
+
 
                 if (searchList !== null) {
                     return searchList
@@ -286,13 +295,18 @@
                     return filterByLab.length < filterByRoom.length ?
                         filterByLab : filterByRoom
                 } else if (filterByLab !== null && filterByLab.length > 0) {
+                    this.freezerList = filterByLab // eslint-disable-line
+                    console.log("Response now has filtered labs ... new response -> ", this.freezerList)
+                    this.filterData(filterByLab)
                     return filterByLab
                 } else if (filterByRoom !== null && filterByRoom.length > 0) {
+                    this.freezerList = filterByRoom // eslint-disable-line
+                    this.filterData(filterByRoom)
+                    console.log("Response now has filtered rooms ... new response ", this.freezerList)
                     return filterByRoom
                 }
-                return this.response
+                return this.freezerList
             },
-
         },
 
         methods: {
@@ -301,6 +315,23 @@
                 this.filters = !this.filters.includes(newFilter)
                     ? [...this.filters, newFilter]
                     : this.filters.filter(filter => filter !== newFilter)
+
+                if (this.filters.length === 0) {
+                    this.freezerList = this.response
+                }
+            },
+
+            filterData(data) {
+                console.log("FilterData called: ", data)
+                let filterByRoom = this.filters.length
+                    ? data.filter(freezer => this.filters.some(filter => freezer.room.match(filter)))
+                    : null
+
+                let filterByLab = this.filters.length
+                    ? data.filter(freezer => this.filters.some(filter => freezer['lab.name'].match(filter)))
+                    : null
+
+                return {'lab': filterByLab, 'room': filterByRoom}
             },
 
             filteredList() {
@@ -374,6 +405,7 @@
                     .then((res) => {
                         this.$log.info("Response: " + res.status + " ", res.data['message']);
                         this.response = res.data['message'];
+                        this.freezerList = this.response
                     })
                     .catch((error) => {
                         // eslint-disable-next-line
