@@ -62,7 +62,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="freezer.id" v-for="(freezer, index) in matchedFilteredAndSearch">
+                    <tr :key="freezer.id" v-for="(freezer, index) in matchFiltersAndSearch">
                         <td> {{ index + 1 }}</td>
                         <td> {{ freezer['lab.name'] }}</td>
                         <td> {{ freezer.room }}</td>
@@ -264,8 +264,11 @@
                     .filter((value, index, self) => self.indexOf(value) === index);
             },
 
-            matchedFilteredAndSearch: function () {
-
+            /**
+             * function checks for any filters or searches applied to the data and returns filtered/searched list.
+             * @returns {null|[]|*}
+             */
+            matchFiltersAndSearch: function () {
                 let filterByRoom = this.filters.length
                     ? this.response.filter(freezer => this.filters.some(filter => freezer.room.match(filter)))
                     : null
@@ -275,18 +278,16 @@
                     : null
 
                 let searchList = this.search ? this.filteredList() : null
-                console.log("Filter by Room ", filterByRoom)
-                console.log("Filter by Code ", filterByLab)
-                console.log("search ", searchList)
 
                 if (searchList !== null) {
-                    console.log("search list called")
                     return searchList
+                } else if (this.filters.length > 1) {
+                    // Possibly, multiple filters have been applied. Return the array with the least elements
+                    return filterByLab.length < filterByRoom.length ?
+                        filterByLab : filterByRoom
                 } else if (filterByLab !== null && filterByLab.length > 0) {
-                    console.log("Filter by Code called")
                     return filterByLab
                 } else if (filterByRoom !== null && filterByRoom.length > 0) {
-                    console.log("filter by room called")
                     return filterByRoom
                 }
                 return this.response
@@ -297,12 +298,9 @@
         methods: {
 
             toggleFilter: function (newFilter) {
-                console.log("Toggle filter", newFilter, ' of type ' + typeof newFilter)
                 this.filters = !this.filters.includes(newFilter)
                     ? [...this.filters, newFilter]
                     : this.filters.filter(filter => filter !== newFilter)
-                console.log("All filters: ", this.filters)
-                this.matchedFilteredAndSearch()
             },
 
             filteredList() {
