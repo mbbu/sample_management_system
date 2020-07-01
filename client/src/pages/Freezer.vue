@@ -266,27 +266,28 @@
 
             matchedFilteredAndSearch: function () {
 
-                let filterRoom = this.filters.length
+                let filterByRoom = this.filters.length
                     ? this.response.filter(freezer => this.filters.some(filter => freezer.room.match(filter)))
-                    : this.response
+                    : null
 
-                let filterCode = this.filters.length
+                let filterByLab = this.filters.length
                     ? this.response.filter(freezer => this.filters.some(filter => freezer['lab.name'].match(filter)))
-                    : this.response
+                    : null
 
-                console.log("Filter by Code ", filterCode)
-                let searchList = this.filteredList()
+                let searchList = this.search ? this.filteredList() : null
+                console.log("Filter by Room ", filterByRoom)
+                console.log("Filter by Code ", filterByLab)
+                console.log("search ", searchList)
 
-                if ((filterRoom.length !== this.response.length) && (filterRoom.length > searchList.length)) {
-                    console.log("Search filter called")
+                if (searchList !== null) {
+                    console.log("search list called")
                     return searchList
-                } else if (searchList.length !== this.response.length) {
-                    return searchList
-                } else if (filterRoom.length !== this.response.length) {
-                    return filterRoom
-                } else if (filterCode.length !== this.response.length) {
-                    console.log(filterCode, " Was Filter by Code ")
-                    return filterCode
+                } else if (filterByLab !== null && filterByLab.length > 0) {
+                    console.log("Filter by Code called")
+                    return filterByLab
+                } else if (filterByRoom !== null && filterByRoom.length > 0) {
+                    console.log("filter by room called")
+                    return filterByRoom
                 }
                 return this.response
             },
@@ -301,6 +302,7 @@
                     ? [...this.filters, newFilter]
                     : this.filters.filter(filter => filter !== newFilter)
                 console.log("All filters: ", this.filters)
+                this.matchedFilteredAndSearch()
             },
 
             filteredList() {
