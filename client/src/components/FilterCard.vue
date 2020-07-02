@@ -42,6 +42,7 @@
             }
         },
 
+        // todo: rename allFilters due to duplicate key conflict
         props: {
             allFilters: {
                 required: true,
