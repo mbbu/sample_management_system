@@ -4,36 +4,12 @@
             <div class="col-sm-12">
                 <top-nav :page_title="page_title" v-bind:search_query.sync="search"></top-nav>
 
+                <!-- FLASH MESSAGES -->
                 <FlashMessage :position="'center bottom'"></FlashMessage>
 
                 <br>
-                <mdb-card>
-                    <details>
-                        <summary class="pt-3 blue-gradient d-flex justify-content-center white-text"><h5>Filters</h5>
-                        </summary>
-                        <mdb-card-body>
-                            <mdb-row>
-                                <div :key="possibleFilter" v-for="possibleFilter in allFilters">
-                                    <mdb-col :md="` ${(12 / allFilters.length) }`" class="d-flex align-items-start">
-                                        <ul :key="title" v-for="(values, title) in possibleFilter">
-                                            <li><em>{{title}}</em>
-                                                <hr>
-                                            </li>
-                                            <li :key="filter" v-for="filter in values">
-                                                <label>
-                                                    <input :checked="filters.includes(filter)"
-                                                           @change="toggleFilter(filter)"
-                                                           type="checkbox">
-                                                    <span> {{ filter }}</span>
-                                                </label>
-                                            </li>
-                                        </ul>
-                                    </mdb-col>
-                                </div>
-                            </mdb-row>
-                        </mdb-card-body>
-                    </details>
-                </mdb-card>
+                <!-- FILTER CARD SECTION -->
+                <filter-card :all-filters="allFilters"></filter-card>
                 <br>
 
                 <table class=" table table-hover">
@@ -206,11 +182,11 @@
         showFlashMessage
     } from "../utils/util_functions";
     import EventBus from '../components/EventBus';
-    import {mdbCard, mdbCardBody, mdbCol, mdbRow} from "mdbvue";
+    import FilterCard from "../components/FilterCard";
 
     export default {
         name: 'Freezer',
-        components: {TopNav, mdbCard, mdbCardBody, mdbRow, mdbCol},
+        components: {TopNav, FilterCard},
 
         data() {
             return {
@@ -241,6 +217,13 @@
             EventBus.$on('searchQuery', (payload) => {
                 this.search = payload
                 this.searchData()
+            })
+
+            EventBus.$on('filters', (payload) => {
+                this.filters = payload
+                if (this.filters.length === 0) {
+                    this.freezerList = this.response
+                }
             })
         },
 
