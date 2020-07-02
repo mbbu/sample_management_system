@@ -132,9 +132,8 @@
                     </form>
                 </b-modal>
             </div>
-            <b-button class="float_btn"
-                      v-b-modal.modal-quantity-type variant="primary"
-            >Add Quantity Type
+            <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-quantity-type variant="primary">
+                <span>Add Quantity Type</span> <i class="fas fa-plus-circle menu_icon"></i>
             </b-button>
         </div>
     </div>

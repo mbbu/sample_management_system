@@ -110,9 +110,8 @@
                     </form>
                 </b-modal>
             </div>
-            <b-button class="float_btn"
-                      v-b-modal.modal-theme variant="primary"
-            >Add Theme
+            <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-theme variant="primary">
+                <span>Add Theme</span> <i class="fas fa-plus-circle menu_icon"></i>
             </b-button>
         </div>
     </div>

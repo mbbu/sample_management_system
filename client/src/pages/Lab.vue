@@ -25,18 +25,19 @@
 
                         <td>
                             <b-icon
-                                    icon="pencil" font-scale="2.0"
-                                    class="border border-info rounded" variant="info"
-                                    v-b-tooltip.hover :title="`Update ${ lab.name }`"
-                                    v-b-modal.modal-lab-edit
+                                    :title="`Update ${ lab.name }`"
                                     @mouseover="fillFormForUpdate(lab.name, lab.code, lab.room)"
+                                    class="border border-info rounded" font-scale="2.0"
+                                    icon="pencil" v-b-modal.modal-lab-edit
+                                    v-b-tooltip.hover
+                                    variant="info"
                             ></b-icon>
                             &nbsp;
                             <b-icon
-                                    icon="trash" font-scale="1.85"
-                                    class="border rounded bg-danger p-1" variant="light"
-                                    v-b-tooltip.hover :title="`Delete ${lab.name}!`"
-                                    @click="deleteLab(lab.code)"
+                                    :title="`Delete ${lab.name}!`" @click="deleteLab(lab.code)"
+                                    class="border rounded bg-danger p-1" font-scale="1.85"
+                                    icon="trash" v-b-tooltip.hover
+                                    variant="light"
                             ></b-icon>
                         </td>
                     </tr>
@@ -46,13 +47,13 @@
 
             <div v-if="!isEditing">
                 <b-modal
-                        title="Add Lab"
-                        id="modal-lab"
-                        ok-title="Save"
-                        cancel-variant="danger"
+                        @hidden="clearForm"
                         @ok="createLab"
                         @submit="showModal = false"
-                        @hidden="clearForm"
+                        cancel-variant="danger"
+                        id="modal-lab"
+                        ok-title="Save"
+                        title="Add Lab"
                 >
                     <form @submit.prevent="createLab">
 
@@ -90,13 +91,13 @@
 
             <div v-else-if="isEditing">
                 <b-modal
-                        title="Edit Lab"
+                        @hidden="clearForm"
                         @ok="updateLab(old_code)"
                         @submit="showModal = false"
+                        cancel-variant="danger"
                         id="modal-lab-edit"
                         ok-title="Update"
-                        cancel-variant="danger"
-                        @hidden="clearForm"
+                        title="Edit Lab"
                 >
                     <form>
 
@@ -131,9 +132,8 @@
                     </form>
                 </b-modal>
             </div>
-            <b-button class="float_btn"
-                      v-b-modal.modal-lab variant="primary"
-            >Add Lab
+            <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-lab variant="primary">
+                <span>Add Lab</span> <i class="fas fa-plus-circle menu_icon"></i>
             </b-button>
         </div>
     </div>
