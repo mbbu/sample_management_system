@@ -63,7 +63,7 @@
                             <ejs-dropdownlist
                                     :dataSource='rackDataList'
                                     :fields="fields"
-                                    :v-model="freezer"
+                                    :v-model="rack"
                                     id='dropdownlist'
                                     placeholder='Select a rack'
                             ></ejs-dropdownlist>
@@ -105,12 +105,12 @@
                         ok-title="Update"
                 >
                     <form>
-                        <b-form-group id="form-freezer-group-edit" label="Rack Number:"
-                                      label-for="form-freezer-input">
+                        <b-form-group id="form-rack-group-edit" label="Rack Number:"
+                                      label-for="form-rack-input">
                             <ejs-dropdownlist
                                     :dataSource='rackDataList'
                                     :fields="fields"
-                                    :v-model="freezer"
+                                    :v-model="rack"
                                     id='dropdownlist'
                                     placeholder='Select a rack'
                             ></ejs-dropdownlist>
