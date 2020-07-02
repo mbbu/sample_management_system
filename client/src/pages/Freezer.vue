@@ -13,7 +13,6 @@
                         </summary>
                         <mdb-card-body>
                             <mdb-row>
-
                                 <div :key="possibleFilter" v-for="possibleFilter in allFilters">
                                     <mdb-col :md="` ${(12 / allFilters.length) }`" class="d-flex align-items-start">
                                         <ul :key="title" v-for="(values, title) in possibleFilter">
@@ -31,38 +30,6 @@
                                         </ul>
                                     </mdb-col>
                                 </div>
-
-                                <!--                                <mdb-col class="d-flex align-items-start" md="12">-->
-                                <!--                                    <ul>-->
-                                <!--                                        <li><em>By Lab</em>-->
-                                <!--                                            <hr>-->
-                                <!--                                        </li>-->
-                                <!--                                        <li :key="filter" v-for="filter in allFilters">-->
-                                <!--                                            <label>-->
-                                <!--                                                <input :checked="filters.includes(filter)"-->
-                                <!--                                                       @change="toggleFilter(filter)"-->
-                                <!--                                                       type="checkbox">-->
-                                <!--                                                <span> {{ filter }}</span>-->
-                                <!--                                            </label>-->
-                                <!--                                        </li>-->
-                                <!--                                    </ul>-->
-                                <!--                                </mdb-col>-->
-
-                                <!--                                <mdb-col class="d-flex align-items-start" md="4">-->
-                                <!--                                    <ul>-->
-                                <!--                                        <li><em>By Room</em>-->
-                                <!--                                            <hr>-->
-                                <!--                                        </li>-->
-                                <!--                                        <li :key="filter" v-for="filter in roomFilters">-->
-                                <!--                                            <label>-->
-                                <!--                                                <input :checked="filters.includes(filter)"-->
-                                <!--                                                       @change="toggleFilter(filter)"-->
-                                <!--                                                       type="checkbox">-->
-                                <!--                                                <span> {{ filter }}</span>-->
-                                <!--                                            </label>-->
-                                <!--                                        </li>-->
-                                <!--                                    </ul>-->
-                                <!--                                </mdb-col>-->
                             </mdb-row>
                         </mdb-card-body>
                     </details>
@@ -243,6 +210,8 @@
 
     export default {
         name: 'Freezer',
+        components: {TopNav, mdbCard, mdbCardBody, mdbRow, mdbCol},
+
         data() {
             return {
                 page_title: "Freezer",
@@ -264,14 +233,21 @@
             };
         },
 
+        created() {
+            this.getFreezer();
+        },
+
         mounted() {
             EventBus.$on('searchQuery', (payload) => {
                 this.search = payload
-                this.filteredList()
+                this.searchData()
             })
         },
 
         computed: {
+            /**
+             * return a list of dictionaries containing the filters required
+             */
             allFilters: function () {
                 return [
                     {
@@ -287,37 +263,16 @@
                 ]
             },
 
-            labFilters() {
-                return this.response
-                    .map(({['lab.name']: lab}) => lab)
-                    .filter((value, index, self) => self.indexOf(value) === index);
-            },
-
-            roomFilters() {
-                return this.response
-                    .map(({room}) => room)
-                    .filter((value, index, self) => self.indexOf(value) === index);
-            },
-
             /**
              * function checks for any filters or searches applied to the data and returns filtered/searched list.
              * @returns {null|[]|*}
              */
             matchFiltersAndSearch: function () {
-                // let filterByRoom = this.filters.length
-                //     ? this.freezerList.filter(freezer => this.filters.some(filter => freezer.room.match(filter)))
-                //     : null
-                //
-                // let filterByLab = this.filters.length
-                //     ? this.freezerList.filter(freezer => this.filters.some(filter => freezer['lab.name'].match(filter)))
-                //     : null
-
-                let searchList = this.search ? this.filteredList() : null
+                let searchList = this.search ? this.searchData() : null
+                /* freezerList,which is a copy of response, is passed as the data here instead of response to avoid
+                mutating response data.*/
                 let filteredData = this.filterData(this.freezerList)
-                console.log("Filters applied: ", filteredData)
-                console.log("Filtered lab: ", filteredData.lab)
-                console.log("Filtered room: ", filteredData.room)
-                //
+
                 let filterByLab = filteredData.lab
                 let filterByRoom = filteredData.room
 
@@ -330,13 +285,11 @@
                         filterByLab : filterByRoom
                 } else if (filterByLab !== null && filterByLab.length > 0) {
                     this.freezerList = filterByLab // eslint-disable-line
-                    console.log("Response now has filtered labs ... new response -> ", this.freezerList)
                     this.filterData(filterByLab)
                     return filterByLab
                 } else if (filterByRoom !== null && filterByRoom.length > 0) {
                     this.freezerList = filterByRoom // eslint-disable-line
                     this.filterData(filterByRoom)
-                    console.log("Response now has filtered rooms ... new response ", this.freezerList)
                     return filterByRoom
                 }
                 return this.freezerList
@@ -344,51 +297,6 @@
         },
 
         methods: {
-
-            toggleFilter: function (newFilter) {
-                this.filters = !this.filters.includes(newFilter)
-                    ? [...this.filters, newFilter]
-                    : this.filters.filter(filter => filter !== newFilter)
-
-                if (this.filters.length === 0) {
-                    this.freezerList = this.response
-                }
-            },
-
-            filterData(data) {
-                console.log("FilterData called: ", data)
-                let filterByRoom = this.filters.length
-                    ? data.filter(freezer => this.filters.some(filter => freezer.room.match(filter)))
-                    : null
-
-                let filterByLab = this.filters.length
-                    ? data.filter(freezer => this.filters.some(filter => freezer['lab.name'].match(filter)))
-                    : null
-
-                return {'lab': filterByLab, 'room': filterByRoom}
-            },
-
-            filteredList() {
-                return this.response.filter(freezer => {
-                    for (let count = 0; count <= this.response.length; count++) {
-                        let byRoom = freezer.room.toString().toLowerCase().includes(this.search.toLowerCase())
-                        let byCode = freezer.code.toString().toLowerCase().includes(this.search.toLowerCase())
-                        let byNumber = freezer.number.toString().toLowerCase().includes(this.search.toLowerCase())
-                        let byLabName = freezer['lab.name'].toString().toLowerCase().includes(this.search.toLowerCase())
-
-                        if (byNumber === true) {
-                            return byNumber
-                        } else if (byRoom) {
-                            return byRoom
-                        } else if (byCode) {
-                            return byCode
-                        } else if (byLabName) {
-                            return byLabName
-                        }
-                    }
-                })
-            },
-
             // Util Functions
             clearForm() {
                 this.laboratory = null;
@@ -413,7 +321,6 @@
             onLoadPage() {
                 getItemDataList(lab_resource).then(data => {
                     let labList = extractApiData(data);
-                    this.$log.info("Role list json: ", JSON.stringify(labList));
 
                     // update local variables with data from API
                     this.fields = labList['fields'];
@@ -437,7 +344,6 @@
                 this.clearForm();
                 axios.get(freezer_resource)
                     .then((res) => {
-                        this.$log.info("Response: " + res.status + " ", res.data['message']);
                         this.response = res.data['message'];
                         this.freezerList = this.response
                     })
@@ -550,10 +456,50 @@
                         }
                     });
             },
+
+            /* Methods associated with searching and filtering of data in the page */
+            toggleFilter: function (newFilter) {
+                this.filters = !this.filters.includes(newFilter)
+                    ? [...this.filters, newFilter]
+                    : this.filters.filter(filter => filter !== newFilter)
+
+                if (this.filters.length === 0) {
+                    this.freezerList = this.response
+                }
+            },
+
+            filterData(data) {
+                let filterByRoom = this.filters.length
+                    ? data.filter(freezer => this.filters.some(filter => freezer.room.match(filter)))
+                    : null
+
+                let filterByLab = this.filters.length
+                    ? data.filter(freezer => this.filters.some(filter => freezer['lab.name'].match(filter)))
+                    : null
+
+                return {'lab': filterByLab, 'room': filterByRoom}
+            },
+
+            searchData() {
+                return this.response.filter(freezer => {
+                    for (let count = 0; count <= this.response.length; count++) {
+                        let byRoom = freezer.room.toString().toLowerCase().includes(this.search.toLowerCase())
+                        let byCode = freezer.code.toString().toLowerCase().includes(this.search.toLowerCase())
+                        let byNumber = freezer.number.toString().toLowerCase().includes(this.search.toLowerCase())
+                        let byLabName = freezer['lab.name'].toString().toLowerCase().includes(this.search.toLowerCase())
+
+                        if (byNumber === true) {
+                            return byNumber
+                        } else if (byRoom) {
+                            return byRoom
+                        } else if (byCode) {
+                            return byCode
+                        } else if (byLabName) {
+                            return byLabName
+                        }
+                    }
+                })
+            },
         },
-        created() {
-            this.getFreezer();
-        },
-        components: {TopNav, mdbCard, mdbCardBody, mdbRow, mdbCol}
     };
 </script>
