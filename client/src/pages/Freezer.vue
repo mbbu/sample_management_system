@@ -321,6 +321,7 @@
                 var element = document.getElementById("dropdownlist");
                 element.value = laboratory;
             },
+            // end of Util functions
 
             // Functions to interact with api
             getFreezer() {
@@ -439,18 +440,9 @@
                         }
                     });
             },
+            //end of methods for api interaction
 
             /* Methods associated with searching and filtering of data in the page */
-            toggleFilter: function (newFilter) {
-                this.filters = !this.filters.includes(newFilter)
-                    ? [...this.filters, newFilter]
-                    : this.filters.filter(filter => filter !== newFilter)
-
-                if (this.filters.length === 0) {
-                    this.freezerList = this.response
-                }
-            },
-
             filterData(data) {
                 let filterByRoom = this.filters.length
                     ? data.filter(freezer => this.filters.some(filter => freezer.room.match(filter)))
@@ -483,6 +475,7 @@
                     }
                 })
             },
+            // end-of methods for search and filter
         },
     };
 </script>

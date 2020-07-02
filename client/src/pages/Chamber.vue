@@ -292,6 +292,7 @@
                     }
                 })
             },
+            // end of Util functions
 
             // Functions to interact with api
             getChamber() {
@@ -408,18 +409,10 @@
                         }
                     });
             },
+            //end of methods for api interaction
 
             /* Methods associated with searching and filtering of data in the page */
-            toggleFilter: function (newFilter) {
-                this.filters = !this.filters.includes(newFilter)
-                    ? [...this.filters, newFilter]
-                    : this.filters.filter(filter => filter !== newFilter)
-
-                if (this.filters.length === 0) {
-                    this.freezerList = this.response
-                }
-            },
-
+            // todo: issue with data filtration
             filterData(data) {
                 let filterByType = this.filters.length
                     ? data.filter(chamber => this.filters.some(filter => chamber.type.match(filter)))
