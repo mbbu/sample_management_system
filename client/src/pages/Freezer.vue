@@ -13,37 +13,56 @@
                         </summary>
                         <mdb-card-body>
                             <mdb-row>
-                                <mdb-col class="d-flex align-items-start" md="5">
-                                    <ul>
-                                        <li><em>By Lab</em>
-                                            <hr>
-                                        </li>
-                                        <li :key="filter" v-for="filter in labFilters">
-                                            <label>
-                                                <input :checked="filters.includes(filter)"
-                                                       @change="toggleFilter(filter)"
-                                                       type="checkbox">
-                                                <span> {{ filter }}</span>
-                                            </label>
-                                        </li>
-                                    </ul>
-                                </mdb-col>
 
-                                <mdb-col class="d-flex align-items-start" md="5">
-                                    <ul>
-                                        <li><em>By Room</em>
-                                            <hr>
-                                        </li>
-                                        <li :key="filter" v-for="filter in roomFilters">
-                                            <label>
-                                                <input :checked="filters.includes(filter)"
-                                                       @change="toggleFilter(filter)"
-                                                       type="checkbox">
-                                                <span> {{ filter }}</span>
-                                            </label>
-                                        </li>
-                                    </ul>
-                                </mdb-col>
+                                <div :key="possibleFilter" v-for="possibleFilter in allFilters">
+                                    <mdb-col :md="` ${(12 / allFilters.length) }`" class="d-flex align-items-start">
+                                        <ul :key="title" v-for="(values, title) in possibleFilter">
+                                            <li><em>{{title}}</em>
+                                                <hr>
+                                            </li>
+                                            <li :key="filter" v-for="filter in values">
+                                                <label>
+                                                    <input :checked="filters.includes(filter)"
+                                                           @change="toggleFilter(filter)"
+                                                           type="checkbox">
+                                                    <span> {{ filter }}</span>
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </mdb-col>
+                                </div>
+
+                                <!--                                <mdb-col class="d-flex align-items-start" md="12">-->
+                                <!--                                    <ul>-->
+                                <!--                                        <li><em>By Lab</em>-->
+                                <!--                                            <hr>-->
+                                <!--                                        </li>-->
+                                <!--                                        <li :key="filter" v-for="filter in allFilters">-->
+                                <!--                                            <label>-->
+                                <!--                                                <input :checked="filters.includes(filter)"-->
+                                <!--                                                       @change="toggleFilter(filter)"-->
+                                <!--                                                       type="checkbox">-->
+                                <!--                                                <span> {{ filter }}</span>-->
+                                <!--                                            </label>-->
+                                <!--                                        </li>-->
+                                <!--                                    </ul>-->
+                                <!--                                </mdb-col>-->
+
+                                <!--                                <mdb-col class="d-flex align-items-start" md="4">-->
+                                <!--                                    <ul>-->
+                                <!--                                        <li><em>By Room</em>-->
+                                <!--                                            <hr>-->
+                                <!--                                        </li>-->
+                                <!--                                        <li :key="filter" v-for="filter in roomFilters">-->
+                                <!--                                            <label>-->
+                                <!--                                                <input :checked="filters.includes(filter)"-->
+                                <!--                                                       @change="toggleFilter(filter)"-->
+                                <!--                                                       type="checkbox">-->
+                                <!--                                                <span> {{ filter }}</span>-->
+                                <!--                                            </label>-->
+                                <!--                                        </li>-->
+                                <!--                                    </ul>-->
+                                <!--                                </mdb-col>-->
                             </mdb-row>
                         </mdb-card-body>
                     </details>
@@ -227,16 +246,16 @@
         data() {
             return {
                 page_title: "Freezer",
+                filters: [],
                 response: [],
                 freezerList: [],
-                laboratory: null,
-                number: null,
-                code: null,
-                room: null,
                 labDataList: [],
-                fields: {text: '', value: ''},
+                code: null,
                 search: '',
-                filters: [],
+                room: null,
+                number: null,
+                laboratory: null,
+                fields: {text: '', value: ''},
 
                 // values for data modification
                 old_code: null,
@@ -253,6 +272,21 @@
         },
 
         computed: {
+            allFilters: function () {
+                return [
+                    {
+                        'By Lab': this.response
+                            .map(({['lab.name']: lab}) => lab)
+                            .filter((value, index, self) => self.indexOf(value) === index),
+                    },
+                    {
+                        'By Room': this.response
+                            .map(({room}) => room)
+                            .filter((value, index, self) => self.indexOf(value) === index)
+                    },
+                ]
+            },
+
             labFilters() {
                 return this.response
                     .map(({['lab.name']: lab}) => lab)
