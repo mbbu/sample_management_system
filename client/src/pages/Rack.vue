@@ -60,11 +60,11 @@
                         ok-title="Save"
                 >
                     <form @submit.prevent="createRack">
-                        <b-form-group id="form-lab-group" label="Chamber Type:" label-for="form-lab-input">
+                        <b-form-group id="form-chamber-group" label="Chamber Type:" label-for="form-chamber-input">
                             <ejs-dropdownlist
                                     :dataSource='chamberDataList'
                                     :fields="fields"
-                                    :v-model="freezer"
+                                    :v-model="chamber"
                                     id='dropdownlist'
                                     placeholder='Select a chamber'
                             ></ejs-dropdownlist>
@@ -106,12 +106,12 @@
                         ok-title="Update"
                 >
                     <form>
-                        <b-form-group id="form-freezer-group-edit" label="Freezer Number:"
-                                      label-for="form-freezer-input">
+                        <b-form-group id="form-chamber-group-edit" label="Freezer Number:"
+                                      label-for="form-chamber-input">
                             <ejs-dropdownlist
                                     :dataSource='chamberDataList'
                                     :fields="fields"
-                                    :v-model="freezer"
+                                    :v-model="chamber"
                                     id='dropdownlist'
                                     placeholder='Select a chamber'
                             ></ejs-dropdownlist>
@@ -213,7 +213,7 @@
                 return [
                     {
                         'By Chamber': this.response
-                            .map(({['chamber.type']: lab}) => lab)
+                            .map(({['chamber.type']: chamber}) => chamber)
                             .filter((value, index, self) => self.indexOf(value) === index),
                     },
                     {
