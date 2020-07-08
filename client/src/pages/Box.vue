@@ -212,7 +212,6 @@
 
             EventBus.$on('filters', (payload) => {
                 this.filters = payload
-                this.matchFiltersAndSearch()
                 if (this.filters.length === 0) {
                     this.boxList = this.response
                 }
@@ -279,42 +278,27 @@
                 if (searchList !== null) {
                     return searchList
                 } else if (this.filters.length > 1) {
-                    // todo: Possibly, multiple filters have been applied. Return the array with the least elements
-                    console.log("Multiple filters")
-                    console.log('lab: ', filterByLab)
-                    console.log('freezer: ', filterByFreezer)
-                    console.log('chamber: ', filterByChamber)
-                    console.log('rack: ', filterByRack)
-                    console.log('tray: ', filterByTray)
-
-                    let a = filterByFreezer.length < filterByLab.length ?
+                    let freezerFiltered = filterByFreezer.length < filterByLab.length ?
                         filterByFreezer : filterByLab
 
-                    let b = filterByChamber.length < filterByFreezer.length ?
+                    let chamberFiltered = filterByChamber.length < filterByFreezer.length ?
                         filterByChamber : filterByFreezer
 
-                    let c = filterByRack.length < filterByChamber.length ?
+                    let rackFiltered = filterByRack.length < filterByChamber.length ?
                         filterByRack : null
 
-                    let d = filterByTray.length < filterByRack.length ?
+                    let trayFiltered = filterByTray.length < filterByRack.length ?
                         filterByTray : null
 
-                    let e = filterByLabel.length < filterByTray.length ?
+                    let labelFiltered = filterByLabel.length < filterByTray.length ?
                         filterByLabel : null
 
-                    console.log("a: ", a)
-                    console.log("b: ", b)
-                    console.log("c: ", c)
-                    console.log("d: ", d)
-                    console.log("e: ", e)
 
-                    this.boxList = e != null && e.length !== 0 && e < d ? e // eslint-disable-line
-                        : d != null && d.length !== 0 && d < c ? d
-                            : c != null && c.length !== 0 && c < b ? c
-                                : b != null && b.length !== 0 && b < a ? b
-                                    : a // eslint-disable-line
-
-                    console.log("original box list: ", this.boxList)
+                    this.boxList = labelFiltered != null && labelFiltered.length !== 0 && labelFiltered < trayFiltered ? labelFiltered // eslint-disable-line
+                        : trayFiltered != null && trayFiltered.length !== 0 && trayFiltered < rackFiltered ? trayFiltered
+                            : rackFiltered != null && rackFiltered.length !== 0 && rackFiltered < chamberFiltered ? rackFiltered
+                                : chamberFiltered != null && chamberFiltered.length !== 0 && chamberFiltered < freezerFiltered ? chamberFiltered
+                                    : freezerFiltered // eslint-disable-line
 
                     return this.boxList
 
