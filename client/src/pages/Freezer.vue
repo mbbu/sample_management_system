@@ -2,23 +2,29 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12">
-                <top-nav :page_title="page_title"></top-nav>
+                <top-nav :page_title="page_title" v-bind:search_query.sync="search"></top-nav>
 
+                <!-- FLASH MESSAGES -->
                 <FlashMessage :position="'center bottom'"></FlashMessage>
-                <br> <br>
+
+                <br>
+                <!-- FILTER CARD SECTION -->
+                <filter-card :all-filters="allFilters"></filter-card>
+                <br>
+
                 <table class=" table table-hover">
                     <thead>
                     <tr>
-                        <th scope="col"> Id</th>
-                        <th scope="col"> Lab Located</th>
-                        <th scope="col"> Room</th>
-                        <th scope="col"> Freezer Number</th>
-                        <th scope="col"> Code</th>
-                        <th scope="col"> Actions</th>
+                        <th class="table-header-style" scope="col"> Id</th>
+                        <th class="table-header-style" scope="col"> Lab Located</th>
+                        <th class="table-header-style" scope="col"> Room</th>
+                        <th class="table-header-style" scope="col"> Freezer Number</th>
+                        <th class="table-header-style" scope="col"> Code</th>
+                        <th class="table-header-style" scope="col"> Actions</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="freezer.id" v-for="(freezer, index) in response.message">
+                    <tr :key="freezer.id" v-for="(freezer, index) in matchFiltersAndSearch">
                         <td> {{ index + 1 }}</td>
                         <td> {{ freezer['lab.name'] }}</td>
                         <td> {{ freezer.room }}</td>
@@ -27,18 +33,19 @@
 
                         <td>
                             <b-icon
-                                    icon="pencil" font-scale="2.0"
-                                    class="border border-info rounded" variant="info"
-                                    v-b-tooltip.hover :title="`Update freezer ${ freezer.number }`"
-                                    v-b-modal.modal-freezer-edit
+                                    :title="`Update freezer ${ freezer.number }`"
                                     @mouseover="fillFormForUpdate(freezer.number, freezer.code, freezer.room, freezer['lab.name'])"
+                                    class="border border-info rounded" font-scale="2.0"
+                                    icon="pencil" v-b-modal.modal-freezer-edit
+                                    v-b-tooltip.hover
+                                    variant="info"
                             ></b-icon>
                             &nbsp;
                             <b-icon
-                                    icon="trash" font-scale="1.85"
-                                    class="border rounded bg-danger p-1" variant="light"
-                                    v-b-tooltip.hover :title="`Delete freezer ${freezer.number}!`"
-                                    @click="deleteFreezer(freezer.code)"
+                                    :title="`Delete freezer ${freezer.number}!`" @click="deleteFreezer(freezer.code)"
+                                    class="border rounded bg-danger p-1" font-scale="1.85"
+                                    icon="trash" v-b-tooltip.hover
+                                    variant="light"
                             ></b-icon>
                         </td>
                     </tr>
@@ -48,22 +55,22 @@
 
             <div v-if="!isEditing">
                 <b-modal
-                        title="Add Freezer"
-                        id="modal-freezer"
-                        ok-title="Save"
-                        cancel-variant="danger"
+                        @hidden="clearForm"
                         @ok="createFreezer"
                         @submit="clearForm"
-                        @hidden="clearForm"
+                        cancel-variant="danger"
+                        id="modal-freezer"
+                        ok-title="Save"
+                        title="Add Freezer"
                 >
                     <form @submit.prevent="createFreezer">
                         <b-form-group id="form-lab-group" label="Lab:" label-for="form-lab-input">
                             <ejs-dropdownlist
-                                    id='dropdownlist'
                                     :dataSource='labDataList'
                                     :fields="fields"
-                                    placeholder='Select a lab'
                                     :v-model="laboratory"
+                                    id='dropdownlist'
+                                    placeholder='Select a lab'
                             ></ejs-dropdownlist>
                         </b-form-group>
 
@@ -103,23 +110,23 @@
 
             <div v-else-if="isEditing">
                 <b-modal
-                        title="Edit Freezer"
+                        @hidden="clearForm"
                         @ok="updateFreezer(old_code)"
+                        @shown="selectLabItemForUpdate(laboratory)"
                         @submit="showModal = false"
+                        cancel-variant="danger"
                         id="modal-freezer-edit"
                         ok-title="Update"
-                        cancel-variant="danger"
-                        @shown="selectLabItemForUpdate(laboratory)"
-                        @hidden="clearForm"
+                        title="Edit Freezer"
                 >
                     <form>
                         <b-form-group id="form-lab-group-edit" label="Lab:" label-for="form-lab-input">
                             <ejs-dropdownlist
-                                    id='dropdownlist'
                                     :dataSource='labDataList'
                                     :fields="fields"
-                                    placeholder='Select a lab'
                                     :v-model="laboratory"
+                                    id='dropdownlist'
+                                    placeholder='Select a lab'
                             ></ejs-dropdownlist>
                         </b-form-group>
 
@@ -155,9 +162,8 @@
                     </form>
                 </b-modal>
             </div>
-            <b-button class="float_btn"
-                      v-b-modal.modal-freezer variant="primary"
-            >Add Freezer
+            <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-freezer variant="primary">
+                <span>Add Freezer</span> <i class="fas fa-plus-circle menu_icon"></i>
             </b-button>
         </div>
     </div>
@@ -175,18 +181,25 @@
         secureStoreGetString,
         showFlashMessage
     } from "../utils/util_functions";
+    import EventBus from '../components/EventBus';
+    import FilterCard from "../components/FilterCard";
 
     export default {
         name: 'Freezer',
+        components: {TopNav, FilterCard},
+
         data() {
             return {
                 page_title: "Freezer",
+                filters: [],
                 response: [],
-                laboratory: null,
-                number: null,
-                code: null,
-                room: null,
+                freezerList: [],
                 labDataList: [],
+                code: null,
+                search: '',
+                room: null,
+                number: null,
+                laboratory: null,
                 fields: {text: '', value: ''},
 
                 // values for data modification
@@ -195,6 +208,77 @@
                 isEditing: false,
             };
         },
+
+        created() {
+            this.getFreezer();
+        },
+
+        mounted() {
+            EventBus.$on('searchQuery', (payload) => {
+                this.search = payload
+                this.searchData()
+            })
+
+            EventBus.$on('filters', (payload) => {
+                this.filters = payload
+                if (this.filters.length === 0) {
+                    this.freezerList = this.response
+                }
+            })
+        },
+
+        computed: {
+            /**
+             * return a list of dictionaries containing the filters required
+             */
+            allFilters: function () {
+                return [
+                    {
+                        'By Lab': this.response
+                            .map(({['lab.name']: lab}) => lab)
+                            .filter((value, index, self) => self.indexOf(value) === index),
+                    },
+                    {
+                        'By Room': this.response
+                            .map(({room}) => room)
+                            .filter((value, index, self) => self.indexOf(value) === index)
+                    },
+                ]
+            },
+
+            /**
+             * function checks for any filters or searches applied to the data and returns filtered/searched list.
+             * @returns {null|[]|*}
+             */
+            matchFiltersAndSearch: function () {
+                let searchList = this.search ? this.searchData() : null
+                /* freezerList,which is a copy of response, is passed as the data here instead of response to avoid
+                mutating response data.*/
+                let filteredData = this.filterData(this.freezerList)
+
+                let filterByLab = filteredData.lab
+                let filterByRoom = filteredData.room
+
+
+                if (searchList !== null) {
+                    return searchList
+                } else if (this.filters.length > 1) {
+                    // Possibly, multiple filters have been applied. Return the array with the least elements
+                    return filterByLab.length < filterByRoom.length ?
+                        filterByLab : filterByRoom
+                } else if (filterByLab !== null && filterByLab.length > 0) {
+                    this.freezerList = filterByLab // eslint-disable-line
+                    this.filterData(filterByLab)
+                    return filterByLab
+                } else if (filterByRoom !== null && filterByRoom.length > 0) {
+                    this.freezerList = filterByRoom // eslint-disable-line
+                    this.filterData(filterByRoom)
+                    return filterByRoom
+                }
+                return this.freezerList
+            },
+        },
+
         methods: {
             // Util Functions
             clearForm() {
@@ -220,7 +304,6 @@
             onLoadPage() {
                 getItemDataList(lab_resource).then(data => {
                     let labList = extractApiData(data);
-                    this.$log.info("Role list json: ", JSON.stringify(labList));
 
                     // update local variables with data from API
                     this.fields = labList['fields'];
@@ -230,8 +313,6 @@
                             'Name': labList.items[i].Name,
                         });
                     }
-                    this.$log.info("Extracted data as json fields: ", this.fields);
-                    this.$log.info("Extracted labDataList items: ", this.labDataList)
                 })
             },
 
@@ -240,14 +321,15 @@
                 var element = document.getElementById("dropdownlist");
                 element.value = laboratory;
             },
+            // end of Util functions
 
             // Functions to interact with api
             getFreezer() {
                 this.clearForm();
                 axios.get(freezer_resource)
                     .then((res) => {
-                        this.$log.info("Response: " + res.status + " " + res.data['message']);
-                        this.response = res.data;
+                        this.response = res.data['message'];
+                        this.freezerList = this.response
                     })
                     .catch((error) => {
                         // eslint-disable-next-line
@@ -358,10 +440,42 @@
                         }
                     });
             },
+            //end of methods for api interaction
+
+            /* Methods associated with searching and filtering of data in the page */
+            filterData(data) {
+                let filterByRoom = this.filters.length
+                    ? data.filter(freezer => this.filters.some(filter => freezer.room.match(filter)))
+                    : null
+
+                let filterByLab = this.filters.length
+                    ? data.filter(freezer => this.filters.some(filter => freezer['lab.name'].match(filter)))
+                    : null
+
+                return {'lab': filterByLab, 'room': filterByRoom}
+            },
+
+            searchData() {
+                return this.response.filter(freezer => {
+                    for (let count = 0; count <= this.response.length; count++) {
+                        let byRoom = freezer.room.toString().toLowerCase().includes(this.search.toLowerCase())
+                        let byCode = freezer.code.toString().toLowerCase().includes(this.search.toLowerCase())
+                        let byNumber = freezer.number.toString().toLowerCase().includes(this.search.toLowerCase())
+                        let byLabName = freezer['lab.name'].toString().toLowerCase().includes(this.search.toLowerCase())
+
+                        if (byNumber === true) {
+                            return byNumber
+                        } else if (byRoom) {
+                            return byRoom
+                        } else if (byCode) {
+                            return byCode
+                        } else if (byLabName) {
+                            return byLabName
+                        }
+                    }
+                })
+            },
+            // end-of methods for search and filter
         },
-        created() {
-            this.getFreezer();
-        },
-        components: {TopNav}
     };
 </script>

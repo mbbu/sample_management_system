@@ -1,7 +1,11 @@
 from api.models.database import BaseModel
+from api.search.searchable_mixin import SearchableMixin
 
 
-class Theme(BaseModel.db.Model):
+class Theme(BaseModel.db.Model, SearchableMixin):
+    __tablename__ = 'theme'
+    __searchable__ = ['code', 'name']
+
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
     code = AppDb.Column(AppDb.String(10), nullable=True, unique=True)
@@ -18,6 +22,10 @@ class Theme(BaseModel.db.Model):
         ).first():
             return True
         return False
+
+    def __init__(self, code, name):
+        self.name = name
+        self.code = code
 
     def __repr__(self):
         return '<< Theme: (code={0} || name={1}) >>'.format(self.code, self.name)

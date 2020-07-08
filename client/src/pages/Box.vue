@@ -3,7 +3,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12">
-                <top-nav :page_title="page_title"></top-nav>
+                <top-nav :page_title="page_title" v-bind:search_query.sync="search"></top-nav>
 
                 <FlashMessage :position="'center bottom'"></FlashMessage>
                 <br> <br>
@@ -23,7 +23,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="box.id" v-for="(box, index) in response.message">
+                    <tr :key="box.id" v-for="(box, index) in filteredList">
                         <td> {{index + 1}}</td>
                         <td> {{box.label}}</td>
                         <td> {{box['tray.number']}}</td>
@@ -38,7 +38,7 @@
                                     :title="`Update box ${ box.label }`"
                                     @mouseover="fillFormForUpdate(box['tray.number'], box.label, box.code)"
                                     class="border border-info rounded" font-scale="2.0"
-                                    icon="pencil" v-b-modal.modal-freezer-edit
+                                    icon="pencil" v-b-modal.modal-box-edit
                                     v-b-tooltip.hover
                                     variant="info"
                             ></b-icon>
@@ -62,7 +62,7 @@
                         @ok="createBox"
                         @submit="clearForm"
                         cancel-variant="danger"
-                        id="modal-freezer"
+                        id="modal-box"
                         ok-title="Save"
                 >
                     <form @submit.prevent="createBox">
@@ -108,7 +108,7 @@
                         @shown="selectItemForUpdate(box.tray)"
                         @submit="showModal = false"
                         cancel-variant="danger"
-                        id="modal-freezer-edit"
+                        id="modal-box-edit"
                         ok-title="Update"
                 >
                     <form>
@@ -144,10 +144,8 @@
                     </form>
                 </b-modal>
             </div>
-
-            <b-button class="float_btn"
-                      v-b-modal.modal-freezer variant="primary"
-            >Add Box
+            <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-box variant="primary">
+                <span>Add Box</span> <i class="fas fa-plus-circle menu_icon"></i>
             </b-button>
         </div>
     </div>
@@ -166,6 +164,7 @@
         showFlashMessage
     } from "../utils/util_functions";
     import {box_resource, tray_resource} from "../utils/api_paths";
+    import EventBus from '../components/EventBus';
 
     export default {
         name: 'Box',
@@ -173,6 +172,7 @@
             return {
                 response: [],
                 page_title: 'Boxes',
+                search: '',
 
                 box: {
                     tray: null,
@@ -189,6 +189,21 @@
                 isEditing: false,
 
             };
+        },
+
+        mounted() {
+            EventBus.$on('searchQuery', (payload) => {
+                this.search = payload
+                this.filteredList()
+            })
+        },
+
+        computed: {
+            filteredList() {
+                return this.response.filter(box => {
+                    return box.label.toLowerCase().includes(this.search.toLowerCase())
+                })
+            }
         },
 
         methods: {
@@ -235,7 +250,7 @@
                 this.clearForm();
                 axios.get('http://localhost:5000/box')
                     .then((res) => {
-                        this.response = res.data;
+                        this.response = res.data['message'];
                         console.log(this.response)
                     })
                     .catch((error) => {

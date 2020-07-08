@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from urllib.parse import urlparse, parse_qs
 
 from flask import current_app, request
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jti, get_jwt_identity
@@ -222,3 +223,17 @@ def confirm_token(token):
         return known_var
     except Exception as e:
         current_app.logger.error(e)
+
+
+def get_query_params():
+    """
+    function gets the current url of the request object and parses it to get the query string. It is returned here as a
+    dictionary, so the function gets the value of the key i.e. q which is the query passed in the url
+    :return:
+    """
+    url = request.url
+
+    parsed_url = urlparse(url)
+    query = parse_qs(parsed_url.query)
+
+    return query.get('q')

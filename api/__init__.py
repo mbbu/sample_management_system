@@ -3,6 +3,7 @@ import os
 from logging.handlers import RotatingFileHandler
 from logging.handlers import SMTPHandler
 
+from elasticsearch import Elasticsearch
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
@@ -186,6 +187,9 @@ def create_app(test_config=None):
     # Extensions SetUp
     ext = extensions_set_up(app)
     jwt = ext.get('jwt')
+
+    app.elasticsearch = Elasticsearch([BaseConfig.ELASTICSEARCH_URL]) \
+        if BaseConfig.ELASTICSEARCH_URL else None
 
     @jwt.token_in_blacklist_loader
     def check_if_token_is_revoked(decrypted_token):

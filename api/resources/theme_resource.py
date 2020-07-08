@@ -7,7 +7,7 @@ from api.models.theme import Theme
 from api.resources.base_resource import BaseResource
 from api.resources.decorators.user_role_decorators import is_sys_admin
 from api.utils import log_duplicate, log_304, format_and_lower_str, has_required_request_params, log_create, log_update, \
-    standard_non_empty_string, non_empty_string
+    standard_non_empty_string, non_empty_string, get_query_params
 
 
 class ThemeResource(BaseResource):
@@ -17,14 +17,15 @@ class ThemeResource(BaseResource):
     }
 
     def get(self):
-        if request.headers.get('code') is not None:
-            code = format_and_lower_str(request.headers['code'])
-            theme = ThemeResource.get_theme(code)
-            if theme is None:
-                return BaseResource.send_json_message("Theme not found", 404)
-            else:
-                data = marshal(theme, self.fields)
+        query_strings = get_query_params()
+        if query_strings is not None:
+            for query_string in query_strings:
+                query, total = Theme.search(query_string, 1, 15)
+                themes = query.all()
+
+                data = marshal(themes, self.fields)
                 return BaseResource.send_json_message(data, 200)
+
         else:
             themes = Theme.query.all()
             if themes is None:

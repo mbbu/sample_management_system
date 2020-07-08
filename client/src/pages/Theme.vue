@@ -2,10 +2,10 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12">
-                <top-nav :page_title="page_title"></top-nav>
+                <top-nav :page_title="page_title" v-bind:search_query.sync="search"></top-nav>
 
                 <FlashMessage :position="'center bottom'"></FlashMessage>
-                <br> <br>
+                <br>
                 <table class=" table table-hover">
                     <thead>
                     <tr>
@@ -16,25 +16,26 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="theme.id" v-for="(theme, index) in response.message">
+                    <tr :key="theme.id" v-for="(theme, index) in filteredList">
                         <td> {{ index + 1 }}</td>
                         <td> {{ theme.name }}</td>
                         <td> {{ theme.code }}</td>
 
                         <td>
                             <b-icon
-                                    icon="pencil" font-scale="2.0"
-                                    class="border border-info rounded" variant="info"
-                                    v-b-tooltip.hover :title="`Update ${ theme.name }`"
-                                    v-b-modal.modal-theme-edit
+                                    :title="`Update ${ theme.name }`"
                                     @mouseover="fillFormForUpdate(theme.name, theme.code)"
+                                    class="border border-info rounded" font-scale="2.0"
+                                    icon="pencil" v-b-modal.modal-theme-edit
+                                    v-b-tooltip.hover
+                                    variant="info"
                             ></b-icon>
                             &nbsp;
                             <b-icon
-                                    icon="trash" font-scale="1.85"
-                                    class="border rounded bg-danger p-1" variant="light"
-                                    v-b-tooltip.hover :title="`Delete ${theme.name}!`"
-                                    @click="deleteTheme(theme.code)"
+                                    :title="`Delete ${theme.name}!`" @click="deleteTheme(theme.code)"
+                                    class="border rounded bg-danger p-1" font-scale="1.85"
+                                    icon="trash" v-b-tooltip.hover
+                                    variant="light"
                             ></b-icon>
                         </td>
                     </tr>
@@ -44,13 +45,13 @@
 
             <div v-if="!isEditing">
                 <b-modal
-                        title="Add Theme"
-                        id="modal-theme"
-                        ok-title="Save"
-                        cancel-variant="danger"
+                        @hidden="clearForm"
                         @ok="createTheme"
                         @submit="showModal = false"
-                        @hidden="clearForm"
+                        cancel-variant="danger"
+                        id="modal-theme"
+                        ok-title="Save"
+                        title="Add Theme"
                 >
                     <form @submit.prevent="createTheme">
 
@@ -78,13 +79,13 @@
 
             <div v-else-if="isEditing">
                 <b-modal
-                        title="Edit Theme"
+                        @hidden="clearForm"
                         @ok="updateTheme(old_code)"
                         @submit="showModal = false"
+                        cancel-variant="danger"
                         id="modal-theme-edit"
                         ok-title="Update"
-                        cancel-variant="danger"
-                        @hidden="clearForm"
+                        title="Edit Theme"
                 >
                     <form>
 
@@ -109,9 +110,8 @@
                     </form>
                 </b-modal>
             </div>
-            <b-button class="float_btn"
-                      v-b-modal.modal-theme variant="primary"
-            >Add Theme
+            <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-theme variant="primary">
+                <span>Add Theme</span> <i class="fas fa-plus-circle menu_icon"></i>
             </b-button>
         </div>
     </div>
@@ -122,6 +122,7 @@
     import {theme_resource} from '../utils/api_paths'
     import TopNav from "../components/TopNav";
     import {respondTo401, secureStoreGetString, showFlashMessage} from '../utils/util_functions'
+    import EventBus from '../components/EventBus';
 
     export default {
         name: 'Theme',
@@ -131,6 +132,8 @@
                 response: [],
                 name: null,
                 code: null,
+                search: '',
+                themeList: [],
 
                 // values for data modification
                 old_code: null,
@@ -138,6 +141,22 @@
                 isEditing: false,
             };
         },
+
+        mounted() {
+            EventBus.$on('searchQuery', (payload) => {
+                this.search = payload
+                this.filteredList()
+            })
+        },
+
+        computed: {
+            filteredList() {
+                return this.themeList.filter(theme => {
+                    return theme.name.toLowerCase().includes(this.search.toLowerCase())
+                })
+            }
+        },
+
         methods: {
             clearForm() {
                 this.name = null;
@@ -158,6 +177,7 @@
                     .then((res) => {
                         this.$log.info("Response: " + res.status + " " + res.data['message']);
                         this.response = res.data;
+                        this.themeList = this.response.message
                     })
                     .catch((error) => {
                         // eslint-disable-next-line

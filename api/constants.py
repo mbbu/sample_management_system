@@ -1,4 +1,5 @@
 # App Info
+import os
 from datetime import timedelta
 
 import redis
@@ -59,3 +60,5 @@ DECLINED_STATUS = 'DECLINED'
 # Other non-sensitive token expiration
 TOKEN_EXPIRATION = 36000  # approximately 10 days
 TOKEN_EXPIRATION_AS_DAYS = int(TOKEN_EXPIRATION / (60 * 60))
+
+basedir = os.path.abspath(os.path.dirname(__file__))

@@ -189,10 +189,11 @@
                     </form>
                 </b-modal>
             </div>
-            <b-button class="float_btn"
-                      v-b-modal.modal-project variant="primary"
-            >Add Project
+
+            <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-project variant="primary">
+                <span>Add Project</span> <i class="fas fa-plus-circle menu_icon"></i>
             </b-button>
+
         </div>
     </div>
 </template>
