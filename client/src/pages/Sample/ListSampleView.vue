@@ -2,7 +2,8 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12">
-                <top-nav :page_title="page_title"></top-nav>
+                <!--                <top-nav :page_title="page_title"></top-nav>-->
+                <top-nav :page_title="page_title" v-bind:search_query="search"></top-nav>
 
                 <FlashMessage :position="'center bottom'"></FlashMessage>
                 <br> <br>
@@ -21,7 +22,7 @@
                     </thead>
 
                     <tbody>
-                    <tr :key="sample.id" v-for="(sample, index) in response.message">
+                    <tr :key="sample.id" v-for="(sample, index) in filteredList">
                         <td> {{ index + 1 }}</td>
                         <td> {{ sample['theme.name'] }}</td>
                         <td> {{ sample.project }}</td>
@@ -44,7 +45,9 @@
                 </table>
             </div>
             <a href="/addsample">
-                <b-button class="float_btn" variant="primary">Add Sample</b-button>
+                <b-button class="float_btn" style="border-radius: 50%" variant="primary">
+                    <span>Add Sample</span> <i class="fas fa-plus-circle menu_icon"></i>
+                </b-button>
             </a>
         </div>
     </div>
@@ -55,6 +58,7 @@
     import {sample_resource} from "../../utils/api_paths";
     import TopNav from "../../components/TopNav";
     import {countDownTimer, setSampleCode} from "../../utils/util_functions";
+    import EventBus from "../../components/EventBus";
 
     export default {
         name: "Sample",
@@ -62,8 +66,26 @@
             return {
                 page_title: "Samples",
                 response: [],
+                sampleList: [],
+                search: ''
             };
         },
+
+        mounted() {
+            EventBus.$on('searchQuery', (payload) => {
+                this.search = payload
+                this.filteredList()
+            })
+        },
+
+        computed: {
+            filteredList() {
+                return this.sampleList.filter(sample => {
+                    return sample.status.toLowerCase().includes(this.search.toLowerCase())
+                })
+            }
+        },
+
         methods: {
             // methods to interact with api
             getSamples() {
@@ -72,6 +94,8 @@
                     .then((res) => {
                         this.$log.info("Response: " + res.status + " " + res.data['message']);
                         this.response = res.data;
+                        this.sampleList = this.response.message
+                        this.$log.info(this.sampleList)
                     })
                     .catch((error) => {
                         // eslint-disable-next-line
