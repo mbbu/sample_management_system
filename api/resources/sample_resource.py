@@ -4,7 +4,6 @@ from flask import current_app, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restful import fields, marshal, reqparse
 
-from api.constants import SAMPLE_IN_LAB
 from api.models.database import BaseModel
 from api.models.sample import Sample
 from api.resources.base_resource import BaseResource
@@ -62,7 +61,7 @@ class SampleResource(BaseResource):
             return BaseResource.send_json_message(data, 200)
 
         else:
-            samples = SampleResource.get_samples_in_lab()
+            samples = SampleResource.get_samples()
             if samples is None:
                 return BaseResource.send_json_message("Samples not found", 404)
             data = marshal(samples, self.fields)
@@ -227,5 +226,5 @@ class SampleResource(BaseResource):
         return BaseModel.db.session.query(Sample).filter_by(code=sample_code).first()
 
     @staticmethod
-    def get_samples_in_lab():
-        return BaseModel.db.session.query(Sample).filter_by(status=SAMPLE_IN_LAB).all()
+    def get_samples():
+        return BaseModel.db.session.query(Sample).all()
