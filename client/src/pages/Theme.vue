@@ -4,7 +4,7 @@
             <div class="col-sm-12">
                 <top-nav :page_title="page_title" v-bind:search_query.sync="search"></top-nav>
 
-                <FlashMessage :position="'center bottom'"></FlashMessage>
+                <FlashMessage :position="'right bottom'"></FlashMessage>
                 <br>
                 <table class=" table table-hover">
                     <thead>
@@ -198,7 +198,7 @@
                     .then((response) => {
                         this.getTheme();
                         this.clearForm();
-                        showFlashMessage(self, 'success', response.data['message'], '')
+                        showFlashMessage(self, 'success', 'Success', response.data['message'])
                     })
                     .catch((error) => {
                         this.$log.error(error);
@@ -231,7 +231,7 @@
                 })
                     .then((response) => {
                         this.getTheme();
-                        showFlashMessage(self, 'success', response.data['message'], '')
+                        showFlashMessage(self, 'success', 'Success', response.data['message'])
                     })
                     .catch((error) => {
                         this.$log.error(error);
@@ -260,7 +260,7 @@
                 })
                     .then((response) => {
                         this.getTheme();
-                        showFlashMessage(self, 'success', response.data['message'], '')
+                        showFlashMessage(self, 'success', 'Success', response.data['message'])
                     })
                     .catch((error) => {
                         this.$log.error(error);
@@ -274,6 +274,7 @@
                             }
                         }
                     });
+                this.clearForm();
             },
         },
         created() {

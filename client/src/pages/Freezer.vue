@@ -5,7 +5,7 @@
                 <top-nav :page_title="page_title" v-bind:search_query.sync="search"></top-nav>
 
                 <!-- FLASH MESSAGES -->
-                <FlashMessage :position="'center bottom'"></FlashMessage>
+                <FlashMessage :position="'right bottom'"></FlashMessage>
 
                 <br>
                 <!-- FILTER CARD SECTION -->

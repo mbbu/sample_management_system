@@ -8,7 +8,8 @@
                     <mdb-row>
                         <mdb-col md="12">
                             <mdb-card>
-                                <FlashMessage :position="'center bottom'"></FlashMessage>
+                                <!-- FLASH MESSAGES -->
+                                <FlashMessage :position="'right bottom'"></FlashMessage>
                                 <div class="header pt-3 blue-gradient">
                                     <mdb-row class="d-flex justify-content-center">
                                         <h3 class="white-text mb-3 pt-3"><i class="fas fa-fill"></i> Fetch Samples:</h3>

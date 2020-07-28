@@ -3,7 +3,8 @@
         <top-nav :page_title="page_title"></top-nav>
         <br>
         <mdb-card>
-            <FlashMessage :position="'center bottom'"></FlashMessage>
+            <!-- FLASH MESSAGES -->
+            <FlashMessage :position="'right bottom'"></FlashMessage>
             <div class="header pt-3 blue-gradient">
                 <mdb-card-header :data-background-color="dataBackgroundColor">
                     <mdb-row class="d-flex justify-content-center">

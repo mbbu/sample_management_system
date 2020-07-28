@@ -6,6 +6,7 @@
                 <mdb-row>
                     <mdb-col md="12">
                         <mdb-card>
+                            <!-- FLASH MESSAGES -->
                             <FlashMessage :position="'right bottom'"></FlashMessage>
                             <div class="header pt-3 blue-gradient">
                                 <mdb-row class="d-flex justify-content-center">

@@ -1,7 +1,8 @@
 <template>
 <div class="vue-world-map">
   <top-nav :page_title="page_title"></top-nav>
-  <FlashMessage :position="'center bottom'"></FlashMessage>
+  <!-- FLASH MESSAGES -->
+  <FlashMessage :position="'right bottom'"></FlashMessage>
   <Map/>
 </div>
 </template>

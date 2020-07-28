@@ -1,6 +1,9 @@
 <template>
     <div>
         <top-nav :page_title="page_title"></top-nav>
+
+        <!-- FLASH MESSAGES -->
+        <FlashMessage :position="'right bottom'"></FlashMessage>
         <br>
         <!-- Card -->
         <div class="card card-cascade">
