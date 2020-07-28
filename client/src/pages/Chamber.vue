@@ -5,7 +5,10 @@
                 <top-nav :page_title="page_title" v-bind:search_query.sync="search"></top-nav>
 
                 <FlashMessage :position="'center bottom'"></FlashMessage>
-                <br> <br>
+                <br>
+                <!-- FILTER CARD SECTION -->
+                <filter-card :all-filters="allFilters"></filter-card>
+                <br>
                 <table class=" table table-hover">
                     <thead>
                     <tr>
@@ -18,7 +21,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="chamber.id" v-for="(chamber, index) in filteredList">
+                    <tr :key="chamber.id" v-for="(chamber, index) in matchFiltersAndSearch">
                         <td> {{ index + 1 }}</td>
                         <td> {{chamber.type}}</td>
                         <td> {{chamber.code}}</td>
@@ -30,7 +33,7 @@
                                     :title="`Update chamber ${ chamber.code }`"
                                     @mouseover="fillFormForUpdate(chamber['freezer.number'], chamber.type, chamber.code)"
                                     class="border border-info rounded" font-scale="2.0"
-                                    icon="pencil" v-b-modal.modal-freezer-edit
+                                    icon="pencil" v-b-modal.modal-chamber-edit
                                     v-b-tooltip.hover
                                     variant="info"
                             ></b-icon>
@@ -54,7 +57,7 @@
                         @ok="createChamber"
                         @submit="clearForm"
                         cancel-variant="danger"
-                        id="modal-freezer"
+                        id="modal-chamber"
                         ok-title="Save"
                 >
                     <form @submit.prevent="createChamber">
@@ -100,7 +103,7 @@
                         @shown="selectItemForUpdate(freezer)"
                         @submit="showModal = false"
                         cancel-variant="danger"
-                        id="modal-freezer-edit"
+                        id="modal-chamber-edit"
                         ok-title="Update"
                 >
                     <form>
@@ -137,9 +140,8 @@
                     </form>
                 </b-modal>
             </div>
-            <b-button class="float_btn"
-                      v-b-modal.modal-freezer variant="primary"
-            >Add Chamber
+            <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-chamber variant="primary">
+                <span>Add Chamber</span> <i class="fas fa-plus-circle menu_icon"></i>
             </b-button>
         </div>
     </div>
@@ -159,18 +161,23 @@
         showFlashMessage
     } from "../utils/util_functions";
     import EventBus from '../components/EventBus';
+    import FilterCard from "../components/FilterCard";
 
     export default {
         name: 'Chamber',
+        components: {TopNav, FilterCard},
+
         data() {
             return {
                 page_title: "Chambers",
+                filters: [],
                 response: [],
-                freezer: null,
+                chamberList: [],
+                freezerDataList: [],
                 code: null,
                 type: null,
                 search: '',
-                freezerDataList: [],
+                freezer: null,
                 fields: {text: '', value: ''},
 
                 // values for data modification
@@ -180,19 +187,74 @@
             };
         },
 
+        created() {
+            this.getChamber();
+        },
+
         mounted() {
             EventBus.$on('searchQuery', (payload) => {
                 this.search = payload
-                this.filteredList()
+                this.searchData()
+            })
+
+            EventBus.$on('filters', (payload) => {
+                this.filters = payload
+                if (this.filters.length === 0) {
+                    this.chamberList = this.response
+                }
             })
         },
 
         computed: {
-            filteredList() {
-                return this.response.filter(chamber => {
-                    return chamber.type.toLowerCase().includes(this.search.toLowerCase())
-                })
-            }
+            /**
+             * return a list of dictionaries containing the filters required
+             */
+            allFilters: function () {
+                return [
+                    {
+                        'By Type': this.chamberList
+                            .map(({type}) => type)
+                            .filter((value, index, self) => self.indexOf(value) === index)
+                    },
+                    {
+                        'By Freezer Number': this.chamberList
+                            .map(({['freezer.number']: lab}) => lab)
+                            .filter((value, index, self) => self.indexOf(value) === index),
+                    },
+                ]
+            },
+
+            /**
+             * function checks for any filters or searches applied to the data and returns filtered/searched list.
+             * @returns {null|[]|*}
+             */
+            matchFiltersAndSearch: function () {
+                let searchList = this.search ? this.searchData() : null
+
+                /* freezerList,which is a copy of response, is passed as the data here instead of response to avoid
+                mutating response data.*/
+                let filteredData = this.filterData(this.chamberList)
+
+                let filterByType = filteredData.type
+                let filterByFreezer = filteredData.freezer
+
+                if (searchList !== null) {
+                    return searchList
+                } else if (this.filters.length > 1) {
+                    // Possibly, multiple filters have been applied. Return the array with the least elements
+                    return filterByType.length < filterByFreezer.length ?
+                        filterByType : filterByFreezer
+                } else if (filterByType !== null && filterByType.length > 0) {
+                    this.freezerList = filterByType // eslint-disable-line
+                    this.filterData(filterByType)
+                    return filterByType
+                } else if (filterByFreezer !== null && filterByFreezer.length > 0) {
+                    this.freezerList = filterByFreezer // eslint-disable-line
+                    this.filterData(filterByFreezer)
+                    return filterByFreezer
+                }
+                return this.chamberList
+            },
         },
 
         methods: {
@@ -219,7 +281,6 @@
             onLoadPage() {
                 getItemDataList(freezer_resource).then(data => {
                     let freezerList = extractFreezerData(data);
-                    this.$log.info("Freezer list json: ", JSON.stringify(freezerList));
 
                     // update local variables with data from API
                     this.fields = freezerList['fields'];
@@ -229,18 +290,17 @@
                             'Name': freezerList.items[i].Name,
                         });
                     }
-                    this.$log.info("Extracted data as json fields: ", this.fields);
-                    this.$log.info("Extracted freezerDataList items: ", this.freezerDataList)
                 })
             },
+            // end of Util functions
 
             // Functions to interact with api
             getChamber() {
                 this.clearForm();
                 axios.get(chamber_resource)
                     .then((res) => {
-                        this.$log.info("Response: " + res.status + " " + res.data['message']);
                         this.response = res.data['message'];
+                        this.chamberList = this.response
                     })
                     .catch((error) => {
                         // eslint-disable-next-line
@@ -349,10 +409,40 @@
                         }
                     });
             },
+            //end of methods for api interaction
+
+            /* Methods associated with searching and filtering of data in the page */
+            // todo: issue with data filtration
+            filterData(data) {
+                let filterByType = this.filters.length
+                    ? data.filter(chamber => this.filters.some(filter => chamber.type.match(filter)))
+                    : null
+
+                let filterByFreezerNum = this.filters.length
+                    ? data.filter(chamber => this.filters.some(filter => chamber['freezer.number'].match(filter)))
+                    : null
+
+                return {'type': filterByType, 'freezer': filterByFreezerNum}
+            },
+
+            searchData() {
+                return this.chamberList.filter(chamber => {
+                    for (let count = 0; count <= this.chamberList.length; count++) {
+                        let byType = chamber.type.toString().toLowerCase().includes(this.search.toLowerCase())
+                        let byCode = chamber.code.toString().toLowerCase().includes(this.search.toLowerCase())
+                        let byFreezerNum = chamber['freezer.number'].toString().toLowerCase().includes(this.search.toLowerCase())
+
+                        if (byType) {
+                            return byType
+                        } else if (byCode) {
+                            return byCode
+                        } else if (byFreezerNum) {
+                            return byFreezerNum
+                        }
+                    }
+                })
+            },
+            // end of search methods
         },
-        created() {
-            this.getChamber();
-        },
-        components: {TopNav}
     };
 </script>

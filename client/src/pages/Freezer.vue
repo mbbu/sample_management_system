@@ -4,61 +4,27 @@
             <div class="col-sm-12">
                 <top-nav :page_title="page_title" v-bind:search_query.sync="search"></top-nav>
 
+                <!-- FLASH MESSAGES -->
                 <FlashMessage :position="'center bottom'"></FlashMessage>
 
                 <br>
-                <mdb-card>
-                    <details>
-                        <summary class="pt-3 blue-gradient d-flex justify-content-center white-text"><h5>Filters</h5>
-                        </summary>
-                        <mdb-card-body>
-                            <mdb-row>
-                                <mdb-col class="d-flex align-items-start" md="5">
-                                    <ul>
-                                        <p> By code</p>
-                                        <li :key="filter" v-for="filter in codeFilters">
-                                            <label>
-                                                <input :checked="filters.includes(filter)"
-                                                       @change="toggleFilter(filter)"
-                                                       type="checkbox">
-                                                <span>{{ filter }}</span>
-                                            </label>
-                                        </li>
-                                    </ul>
-                                </mdb-col>
-
-                                <mdb-col class="d-flex align-items-start" md="5">
-                                    <ul>
-                                        <p> By Room</p>
-                                        <li :key="filter" v-for="filter in roomFilters">
-                                            <label>
-                                                <input :checked="filters.includes(filter)"
-                                                       @change="toggleFilter(filter)"
-                                                       type="checkbox">
-                                                <span>{{ filter }}</span>
-                                            </label>
-                                        </li>
-                                    </ul>
-                                </mdb-col>
-                            </mdb-row>
-                        </mdb-card-body>
-                    </details>
-                </mdb-card>
+                <!-- FILTER CARD SECTION -->
+                <filter-card :all-filters="allFilters"></filter-card>
                 <br>
 
                 <table class=" table table-hover">
                     <thead>
                     <tr>
-                        <th scope="col"> Id</th>
-                        <th scope="col"> Lab Located</th>
-                        <th scope="col"> Room</th>
-                        <th scope="col"> Freezer Number</th>
-                        <th scope="col"> Code</th>
-                        <th scope="col"> Actions</th>
+                        <th class="table-header-style" scope="col"> Id</th>
+                        <th class="table-header-style" scope="col"> Lab Located</th>
+                        <th class="table-header-style" scope="col"> Room</th>
+                        <th class="table-header-style" scope="col"> Freezer Number</th>
+                        <th class="table-header-style" scope="col"> Code</th>
+                        <th class="table-header-style" scope="col"> Actions</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="freezer.id" v-for="(freezer, index) in matchedFilteredAndSearch">
+                    <tr :key="freezer.id" v-for="(freezer, index) in matchFiltersAndSearch">
                         <td> {{ index + 1 }}</td>
                         <td> {{ freezer['lab.name'] }}</td>
                         <td> {{ freezer.room }}</td>
@@ -216,22 +182,25 @@
         showFlashMessage
     } from "../utils/util_functions";
     import EventBus from '../components/EventBus';
-    import {mdbCard, mdbCardBody, mdbCol, mdbRow} from "mdbvue";
+    import FilterCard from "../components/FilterCard";
 
     export default {
         name: 'Freezer',
+        components: {TopNav, FilterCard},
+
         data() {
             return {
                 page_title: "Freezer",
-                response: [],
-                laboratory: null,
-                number: null,
-                code: null,
-                room: null,
-                labDataList: [],
-                fields: {text: '', value: ''},
-                search: '',
                 filters: [],
+                response: [],
+                freezerList: [],
+                labDataList: [],
+                code: null,
+                search: '',
+                room: null,
+                number: null,
+                laboratory: null,
+                fields: {text: '', value: ''},
 
                 // values for data modification
                 old_code: null,
@@ -240,95 +209,77 @@
             };
         },
 
+        created() {
+            this.getFreezer();
+        },
+
         mounted() {
             EventBus.$on('searchQuery', (payload) => {
                 this.search = payload
-                this.matchedFilteredAndSearch()
+                this.searchData()
+            })
+
+            EventBus.$on('filters', (payload) => {
+                this.filters = payload
+                if (this.filters.length === 0) {
+                    this.freezerList = this.response
+                }
             })
         },
 
         computed: {
-            possibleFilters() {
-                let possibleLiters = []
-
-                let room = this.response
-                    .map(({room}) => room)
-                    .filter((value, index, self) => self.indexOf(value) === index);
-
-                let code = this.response
-                    .map(({code}) => code)
-                    .filter((value, index, self) => self.indexOf(value) === index);
-
-                possibleLiters.push(room, code)
-
-                return possibleLiters
+            /**
+             * return a list of dictionaries containing the filters required
+             */
+            allFilters: function () {
+                return [
+                    {
+                        'By Lab': this.response
+                            .map(({['lab.name']: lab}) => lab)
+                            .filter((value, index, self) => self.indexOf(value) === index),
+                    },
+                    {
+                        'By Room': this.response
+                            .map(({room}) => room)
+                            .filter((value, index, self) => self.indexOf(value) === index)
+                    },
+                ]
             },
 
-            codeFilters() {
-                return this.response
-                    .map(({code}) => code)
-                    .filter((value, index, self) => self.indexOf(value) === index);
-            },
+            /**
+             * function checks for any filters or searches applied to the data and returns filtered/searched list.
+             * @returns {null|[]|*}
+             */
+            matchFiltersAndSearch: function () {
+                let searchList = this.search ? this.searchData() : null
+                /* freezerList,which is a copy of response, is passed as the data here instead of response to avoid
+                mutating response data.*/
+                let filteredData = this.filterData(this.freezerList)
 
-            roomFilters() {
-                return this.response
-                    .map(({room}) => room)
-                    .filter((value, index, self) => self.indexOf(value) === index);
-            },
-
-            matchedProducts() {
-                return this.filters.length
-                    ? this.response.filter(freezer => this.filters.some(filter => freezer.room.match(filter)))
-                    : this.response
-            },
-
-            matchedFilteredAndSearch() {
-                let filterRoom = this.filters.length
-                    ? this.response.filter(freezer => this.filters.some(filter => freezer.room.match(filter)))
-                    : this.response
-
-                let filterCode = this.filters.length
-                    ? this.response.filter(freezer => this.filters.some(filter => freezer.code.match(filter)))
-                    : this.response
-
-                let searchList = this.response.filter(freezer => {
-                    return freezer.number.toString().toLowerCase().includes(this.search.toLowerCase())
-                })
-
-                console.log("filter room", filterRoom)
-                console.log("filter code", filterCode)
-                console.log("search", searchList)
+                let filterByLab = filteredData.lab
+                let filterByRoom = filteredData.room
 
 
-                if ((filterRoom.length !== this.response.length) && (filterRoom.length > searchList.length)) {
-                    console.log("Search filter called")
+                if (searchList !== null) {
                     return searchList
-                } else if (searchList.length !== this.response.length) {
-                    return searchList
-                } else if (filterRoom.length !== this.response.length) {
-                    return filterRoom
-                } else if (filterCode.length !== this.response.length) {
-                    return filterCode
+                } else if (this.filters.length > 1) {
+                    // Possibly, multiple filters have been applied. Return the array with the least elements
+                    return filterByLab.length < filterByRoom.length ?
+                        filterByLab : filterByRoom
+                } else if (filterByLab !== null && filterByLab.length > 0) {
+                    this.freezerList = filterByLab // eslint-disable-line
+                    this.filterData(filterByLab)
+                    return filterByLab
+                } else if (filterByRoom !== null && filterByRoom.length > 0) {
+                    this.freezerList = filterByRoom // eslint-disable-line
+                    this.filterData(filterByRoom)
+                    return filterByRoom
                 }
-                return this.response
+                return this.freezerList
             },
-
-            filteredList() {
-                console.log("FILTERED LIST")
-                return this.response.filter(freezer => {
-                    return freezer.number.toString().toLowerCase().includes(this.search.toLowerCase())
-                })
-            }
         },
 
         methods: {
-
-            toggleFilter: function (newFilter) {
-                console.log("Toggle filter", newFilter)
-                this.filters = !this.filters.includes(newFilter)
-                    ? [...this.filters, newFilter]
-                    : this.filters.filter(filter => filter !== newFilter)
-            },
             // Util Functions
             clearForm() {
                 this.laboratory = null;
@@ -353,7 +304,6 @@
             onLoadPage() {
                 getItemDataList(lab_resource).then(data => {
                     let labList = extractApiData(data);
-                    this.$log.info("Role list json: ", JSON.stringify(labList));
 
                     // update local variables with data from API
                     this.fields = labList['fields'];
@@ -371,14 +321,15 @@
                 var element = document.getElementById("dropdownlist");
                 element.value = laboratory;
             },
+            // end of Util functions
 
             // Functions to interact with api
             getFreezer() {
                 this.clearForm();
                 axios.get(freezer_resource)
                     .then((res) => {
-                        this.$log.info("Response: " + res.status + " ", res.data['message']);
                         this.response = res.data['message'];
+                        this.freezerList = this.response
                     })
                     .catch((error) => {
                         // eslint-disable-next-line
@@ -489,10 +440,42 @@
                         }
                     });
             },
+            //end of methods for api interaction
+
+            /* Methods associated with searching and filtering of data in the page */
+            filterData(data) {
+                let filterByRoom = this.filters.length
+                    ? data.filter(freezer => this.filters.some(filter => freezer.room.match(filter)))
+                    : null
+
+                let filterByLab = this.filters.length
+                    ? data.filter(freezer => this.filters.some(filter => freezer['lab.name'].match(filter)))
+                    : null
+
+                return {'lab': filterByLab, 'room': filterByRoom}
+            },
+
+            searchData() {
+                return this.response.filter(freezer => {
+                    for (let count = 0; count <= this.response.length; count++) {
+                        let byRoom = freezer.room.toString().toLowerCase().includes(this.search.toLowerCase())
+                        let byCode = freezer.code.toString().toLowerCase().includes(this.search.toLowerCase())
+                        let byNumber = freezer.number.toString().toLowerCase().includes(this.search.toLowerCase())
+                        let byLabName = freezer['lab.name'].toString().toLowerCase().includes(this.search.toLowerCase())
+
+                        if (byNumber === true) {
+                            return byNumber
+                        } else if (byRoom) {
+                            return byRoom
+                        } else if (byCode) {
+                            return byCode
+                        } else if (byLabName) {
+                            return byLabName
+                        }
+                    }
+                })
+            },
+            // end-of methods for search and filter
         },
-        created() {
-            this.getFreezer();
-        },
-        components: {TopNav, mdbCard, mdbCardBody, mdbRow, mdbCol}
     };
 </script>
