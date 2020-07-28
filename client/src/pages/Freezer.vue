@@ -374,6 +374,7 @@
                             }
                         }
                     });
+                this.clearForm();
             },
 
             updateFreezer: function (code) {
@@ -412,6 +413,7 @@
                             }
                         }
                     });
+                this.clearForm();
             },
 
             deleteFreezer: function (code) {
@@ -439,6 +441,7 @@
                             }
                         }
                     });
+                this.clearForm();
             },
             //end of methods for api interaction
 

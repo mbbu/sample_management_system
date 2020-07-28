@@ -365,6 +365,7 @@
                             }
                         }
                     });
+                this.clearForm();
             },
 
             updatePublication: function (title) {
@@ -401,7 +402,7 @@
                             }
                         }
                     });
-
+                this.clearForm();
             },
 
             deletePublication: function (title) {
@@ -430,6 +431,7 @@
                             }
                         }
                     });
+                this.clearForm();
             },
         },
         components: {TopNav},

@@ -303,6 +303,7 @@
                             showFlashMessage(self, 'error', "Error", error.response.data['message'])
                         }
                     })
+                this.clearForm();
             }
         },
         created() {

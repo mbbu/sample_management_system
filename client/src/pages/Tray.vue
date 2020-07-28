@@ -344,6 +344,7 @@
                             }
                         }
                     });
+                this.clearForm();
             },
 
             updateTray: function (code) {
@@ -381,6 +382,7 @@
                             }
                         }
                     });
+                this.clearForm();
             },
 
             deleteTray: function (code) {
@@ -408,6 +410,7 @@
                             }
                         }
                     });
+                this.clearForm();
             },
             //end of methods for api interaction
 

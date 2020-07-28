@@ -421,6 +421,7 @@
                             }
                         }
                     });
+                this.clearForm();
             },
 
             updateBox: function (code) {
@@ -458,6 +459,7 @@
                             }
                         }
                     });
+                this.clearForm();
             },
 
             deleteBox: function (code) {
@@ -485,6 +487,7 @@
                             }
                         }
                     });
+                this.clearForm();
             },
             //end of methods for api interaction
 

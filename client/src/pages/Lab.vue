@@ -303,6 +303,7 @@
                             }
                         }
                     });
+                this.clearForm();
             },
         },
         created() {

@@ -345,6 +345,7 @@
                             }
                         }
                     });
+                this.clearForm();
             },
 
             updateRack: function (code) {
@@ -382,6 +383,7 @@
                             }
                         }
                     });
+                this.clearForm();
             },
 
             deleteRack: function (code) {
@@ -409,6 +411,7 @@
                             }
                         }
                     });
+                this.clearForm();
             },
             //end of methods for api interaction
 

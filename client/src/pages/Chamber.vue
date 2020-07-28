@@ -345,6 +345,7 @@
                             }
                         }
                     });
+                this.clearForm();
             },
 
             updateChamber: function (code) {
@@ -382,6 +383,7 @@
                             }
                         }
                     });
+                this.clearForm();
             },
 
             deleteChamber: function (code) {
@@ -409,6 +411,7 @@
                             }
                         }
                     });
+                this.clearForm();
             },
             //end of methods for api interaction
 
