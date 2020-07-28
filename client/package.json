@@ -26,6 +26,7 @@
     "secure-ls": "^1.2.6",
     "vee-validate": "^3.2.2",
     "vue": "^2.6.10",
+    "vue-axios": "^2.1.5",
     "vue-form-wizard": "^0.8.4",
     "vue-functional-calendar": "^2.8.82",
     "vue-loading-overlay": "^3.3.2",

@@ -9,6 +9,7 @@ import Vuelidate from "vuelidate";
 import VueLogger from 'vuejs-logger';
 import FlashMessage from "@smartweb/vue-flash-message";
 import axios from 'axios';
+import VueAxios from 'vue-axios';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome'
 import Loading from 'vue-loading-overlay';
 
@@ -33,7 +34,7 @@ const flash_config = {
 Vue.use(BootstrapVue);
 Vue.use(BootstrapVueIcons);
 Vue.use(DropDownListPlugin);
-Vue.use(axios);
+Vue.use(VueAxios, axios);
 Vue.use(Vuelidate);
 Vue.use(VueLogger, options);
 Vue.use(FlashMessage, flash_config);
