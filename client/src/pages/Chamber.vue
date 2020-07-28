@@ -76,7 +76,7 @@
                             <b-form-input
                                     id="form-room-input"
                                     placeholder="Enter Freezer Type"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="type"
                             ></b-form-input>
@@ -86,7 +86,7 @@
                             <b-form-input
                                     id="form-code-input"
                                     placeholder="Enter Code"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="code">
                             </b-form-input>
@@ -123,7 +123,7 @@
                             <b-form-input
                                     id="form-type-input"
                                     placeholder="Enter chamber type"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="type"
                             ></b-form-input>
@@ -133,7 +133,7 @@
                             <b-form-input
                                     id="form-code-input"
                                     placeholder="Enter Code"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="code">
                             </b-form-input>

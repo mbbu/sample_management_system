@@ -95,7 +95,7 @@
                                     disabled="disabled"
                                     id="form-user-input"
                                     placeholder="Enter author's name"
-                                    required="true"
+                                    required
                                     type="text"
                             ></b-form-input>
                         </b-form-group>
@@ -104,7 +104,7 @@
                             <b-form-input
                                     id="form-pub-title-input"
                                     placeholder="Enter co-authors separated by a comma"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="publication.co_authors"
                             ></b-form-input>
@@ -115,7 +115,7 @@
                             <b-form-input
                                     id="form-pub-title-input"
                                     placeholder="Enter a title"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="publication.title"
                             ></b-form-input>
@@ -126,7 +126,7 @@
                             <b-form-textarea
                                     id="form-sample-results-input"
                                     placeholder="Enter sample results"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="publication.sample_results">
                             </b-form-textarea>
@@ -161,7 +161,7 @@
                                     disabled="disabled"
                                     id="form-user-input"
                                     placeholder="Enter author's name"
-                                    required="true"
+                                    required
                                     type="text"
                             ></b-form-input>
                         </b-form-group>
@@ -171,7 +171,7 @@
                             <b-form-input
                                     id="form-pub-title-input"
                                     placeholder="Enter co-authors separated by a comma"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="publication.co_authors"
                             ></b-form-input>
@@ -182,7 +182,7 @@
                             <b-form-input
                                     id="form-pub-title-input"
                                     placeholder="Enter a title"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="publication.title"
                             ></b-form-input>
@@ -194,7 +194,7 @@
                             <b-form-textarea
                                     id="form-sample-results-input"
                                     placeholder="Enter sample results"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="publication.sample_results">
                             </b-form-textarea>

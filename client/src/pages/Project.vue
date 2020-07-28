@@ -96,7 +96,7 @@
                             <b-form-input
                                     id="form-code-input"
                                     placeholder="Enter Code"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="project.code"
                             ></b-form-input>
@@ -106,7 +106,7 @@
                             <b-form-input
                                     id="form-name-input"
                                     placeholder="Enter Project Name"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="project.name">
                             </b-form-input>
@@ -116,7 +116,7 @@
                             <b-form-textarea
                                     id="form-desc-input"
                                     placeholder="Enter Description"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="project.description">
                             </b-form-textarea>
@@ -162,7 +162,7 @@
                             <b-form-input
                                     id="form-code-input"
                                     placeholder="Enter Code"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="project.code"
                             ></b-form-input>
@@ -172,7 +172,7 @@
                             <b-form-input
                                     id="form-name-input"
                                     placeholder="Enter Project Name"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="project.name">
                             </b-form-input>
@@ -182,7 +182,7 @@
                             <b-form-textarea
                                     id="form-desc-input"
                                     placeholder="Enter Description"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="project.description">
                             </b-form-textarea>

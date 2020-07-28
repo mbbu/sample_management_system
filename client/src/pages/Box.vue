@@ -84,7 +84,7 @@
                             <b-form-input
                                     id="form-label-input"
                                     placeholder="Enter box label"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="box.label"
                             ></b-form-input>
@@ -94,7 +94,7 @@
                             <b-form-input
                                     id="form-code-input"
                                     placeholder="Enter Code"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="box.code">
                             </b-form-input>
@@ -130,7 +130,7 @@
                             <b-form-input
                                     id="form-label-input"
                                     placeholder="Enter box label"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="box.label"
                             ></b-form-input>
@@ -140,7 +140,7 @@
                             <b-form-input
                                     id="form-code-input"
                                     placeholder="Enter Code"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="box.code">
                             </b-form-input>

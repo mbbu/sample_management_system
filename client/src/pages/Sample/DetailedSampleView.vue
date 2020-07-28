@@ -188,7 +188,7 @@
                                     id="form-amount-input"
                                     min=1
                                     placeholder="Enter Amount"
-                                    required="true"
+                                    required
                                     type="number"
                                     v-model="sampleRequest.amount"
                             ></b-form-input>

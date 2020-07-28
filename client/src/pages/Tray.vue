@@ -74,7 +74,7 @@
                             <b-form-input
                                     id="form-number-input"
                                     placeholder="Enter Tray Number"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="number"
                             ></b-form-input>
@@ -84,7 +84,7 @@
                             <b-form-input
                                     id="form-code-input"
                                     placeholder="Enter Code"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="code">
                             </b-form-input>
@@ -121,7 +121,7 @@
                             <b-form-input
                                     id="form-type-input"
                                     placeholder="Enter Tray Number"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="number"
                             ></b-form-input>
@@ -131,7 +131,7 @@
                             <b-form-input
                                     id="form-code-input"
                                     placeholder="Enter Code"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="code">
                             </b-form-input>

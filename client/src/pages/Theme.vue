@@ -59,7 +59,7 @@
                             <b-form-input
                                     id="form-name-input"
                                     placeholder="Enter Name"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="name"
                             ></b-form-input>
@@ -69,7 +69,7 @@
                             <b-form-input
                                     id="form-code-input"
                                     placeholder="Enter Code"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="code"></b-form-input>
                         </b-form-group>
@@ -93,7 +93,7 @@
                             <b-form-input
                                     id="form-name-input"
                                     placeholder="Enter Name"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="name"
                             ></b-form-input>
@@ -103,7 +103,7 @@
                             <b-form-input
                                     id="form-code-input"
                                     placeholder="Enter Code"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="code"></b-form-input>
                         </b-form-group>

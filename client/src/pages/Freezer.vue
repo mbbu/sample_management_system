@@ -78,7 +78,7 @@
                             <b-form-input
                                     id="form-room-input"
                                     placeholder="Enter Room Number"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="room"
                             ></b-form-input>
@@ -88,7 +88,7 @@
                             <b-form-input
                                     id="form-num-input"
                                     placeholder="Enter Freezer Number"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="number">
                             </b-form-input>
@@ -98,7 +98,7 @@
                             <b-form-input
                                     id="form-code-input"
                                     placeholder="Enter Code"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="code">
                             </b-form-input>
@@ -134,7 +134,7 @@
                             <b-form-input
                                     id="form-room-input"
                                     placeholder="Enter Room Number"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="room"
                             ></b-form-input>
@@ -144,7 +144,7 @@
                             <b-form-input
                                     id="form-num-input"
                                     placeholder="Enter Freezer Number"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="number">
                             </b-form-input>
@@ -154,7 +154,7 @@
                             <b-form-input
                                     id="form-code-input"
                                     placeholder="Enter Code"
-                                    required="true"
+                                    required
                                     type="text"
                                     v-model="code">
                             </b-form-input>
