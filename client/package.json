@@ -40,7 +40,7 @@
     "vuex-persistedstate": "^3.0.1"
   },
   "devDependencies": {
-    "@smartweb/vue-flash-message": "^0.6.2",
+    "@smartweb/vue-flash-message": "^0.6.4",
     "@vue/cli-plugin-babel": "^4.1.0",
     "@vue/cli-plugin-eslint": "^4.1.0",
     "@vue/cli-service": "^4.1.0",

@@ -5,8 +5,11 @@ import Vue from "vue";
 import axios from "axios";
 import {logout_resource} from "./api_paths";
 
+self.flashMessage = undefined;
+
 export function showFlashMessage(self, status, title, message) {
     self.flashMessage.show({
+        icon: "../assets/logo.png",
         status: status,
         title: title, message: message
     });
