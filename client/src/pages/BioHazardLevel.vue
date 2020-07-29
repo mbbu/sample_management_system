@@ -169,7 +169,7 @@
         mounted() {
             EventBus.$on('searchQuery', (payload) => {
                 this.search = payload
-                this.filteredList()
+                this.searchData()
             })
         },
 
@@ -304,6 +304,12 @@
                         }
                     })
                 this.clearForm();
+            },
+
+            searchData() {
+                return this.bioHazardList.filter(bioHazard => {
+                    return bioHazard.name.toLowerCase().includes(this.search.toLowerCase())
+                })
             }
         },
         created() {

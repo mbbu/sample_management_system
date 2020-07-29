@@ -169,15 +169,18 @@
         mounted() {
             EventBus.$on('searchQuery', (payload) => {
                 this.search = payload
-                this.filteredList()
+                this.searchData()
             })
         },
 
         computed: {
             filteredList() {
-                return this.labList.filter(lab => {
-                    return lab.name.toLowerCase().includes(this.search.toLowerCase())
-                })
+                let searchList = this.search ? this.searchData() : null
+
+                if (searchList !== null) {
+                    return searchList
+                }
+                return this.labList
             }
         },
 
@@ -202,8 +205,7 @@
                 axios.get(lab_resource)
                     .then((res) => {
                         this.$log.info("Response: " + res.status + " " + res.data['message']);
-                        this.response = res.data;
-                        this.labList = res.data['message']
+                        this.labList = this.response = res.data['message'];
                     })
                     .catch((error) => {
                         // eslint-disable-next-line
@@ -305,6 +307,24 @@
                     });
                 this.clearForm();
             },
+
+            searchData() {
+                return this.response.filter(lab => {
+                    for (let count = 0; count <= this.response.length; count++) {
+                        let byName = lab.name.toString().toLowerCase().includes(this.search.toLowerCase())
+                        let byCode = lab.code.toString().toLowerCase().includes(this.search.toLowerCase())
+                        let byRoom = lab.room.toString().toLowerCase().includes(this.search.toLowerCase())
+
+                        if (byName) {
+                            return byName
+                        } else if (byCode) {
+                            return byCode
+                        } else if (byRoom) {
+                            return byRoom
+                        }
+                    }
+                })
+            }
         },
         created() {
             this.getLab();

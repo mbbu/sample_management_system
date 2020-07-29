@@ -193,7 +193,7 @@
         mounted() {
             EventBus.$on('searchQuery', (payload) => {
                 this.search = payload
-                this.filteredList()
+                this.searchData()
             })
 
             EventBus.$on('filters', (payload) => {

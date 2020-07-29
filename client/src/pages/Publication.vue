@@ -242,6 +242,7 @@
                 fields: {text: '', value: ''},
                 sampleDataList: [],
                 authorDataList: [],
+                publicationList: [],
 
                 // values for data modification
                 old_title: null,
@@ -253,15 +254,18 @@
         mounted() {
             EventBus.$on('searchQuery', (payload) => {
                 this.search = payload
-                this.filteredList()
+                this.searchData()
             })
         },
 
         computed: {
             filteredList() {
-                return this.response.filter(publication => {
-                    return publication.publication_title.toLowerCase().includes(this.search.toLowerCase())
-                })
+                let searchList = this.search ? this.searchData() : null
+
+                if (searchList !== null) {
+                    return searchList
+                }
+                return this.publicationList
             }
         },
 
@@ -315,7 +319,7 @@
                 axios.get(publication_resource)
                     .then((res) => {
                         this.$log.info("Response: " + res.status + " ", res.data['message']);
-                        this.response = res.data['message'];
+                        this.publicationList = this.response = res.data['message'];
                     })
                     .catch((error) => {
                         // eslint-disable-next-line
@@ -433,6 +437,28 @@
                     });
                 this.clearForm();
             },
+
+            searchData() {
+                return this.response.filter(pub => {
+                    let byTitle = pub.publication_title.toLowerCase().includes(this.search.toLowerCase())
+                    let byTheme = pub['sample.theme.name'].toLowerCase().includes(this.search.toLowerCase())
+                    let byProject = pub['sample.project'].toLowerCase().includes(this.search.toLowerCase())
+                    let byAuthor = pub['user.first_name'].toLowerCase().includes(this.search.toLowerCase())
+                    let byCoAuthor = pub['co_authors'].toLowerCase().includes(this.search.toLowerCase())
+
+                    if (byTitle) {
+                        return byTitle
+                    } else if (byTheme) {
+                        return byTheme
+                    } else if (byProject) {
+                        return byProject
+                    } else if (byAuthor) {
+                        return byAuthor
+                    } else if (byCoAuthor) {
+                        return byCoAuthor
+                    }
+                })
+            }
         },
         components: {TopNav},
         created() {

@@ -145,7 +145,7 @@
         mounted() {
             EventBus.$on('searchQuery', (payload) => {
                 this.search = payload
-                this.filteredList()
+                this.searchData()
             })
         },
 
@@ -276,6 +276,12 @@
                     });
                 this.clearForm();
             },
+
+            searchData() {
+                return this.themeList.filter(theme => {
+                    return theme.name.toLowerCase().includes(this.search.toLowerCase())
+                })
+            }
         },
         created() {
             this.getTheme();

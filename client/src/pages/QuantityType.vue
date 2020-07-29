@@ -169,15 +169,18 @@
         mounted() {
             EventBus.$on('searchQuery', (payload) => {
                 this.search = payload
-                this.filteredList()
+                this.searchData()
             })
         },
 
         computed: {
             filteredList() {
-                return this.QTList.filter(qt => {
-                    return qt.name.toLowerCase().includes(this.search.toLowerCase())
-                })
+                let searchList = this.search ? this.searchData() : null
+
+                if (searchList !== null) {
+                    return searchList
+                }
+                return this.QTList
             }
         },
 
@@ -202,8 +205,7 @@
                 axios.get(quantity_type_resource)
                     .then((res) => {
                         this.$log.info("Response: " + res.status + " " + res.data['message']);
-                        this.response = res.data;
-                        this.QTList = this.response.message
+                        this.QTList = this.response = res.data['message'];
                     })
                     .catch((error) => {
                         // eslint-disable-next-line
@@ -305,6 +307,24 @@
                     });
                 this.clearForm();
             },
+
+            searchData() {
+                return this.response.filter(qt => {
+                    for (let count = 0; count <= this.response.length; count++) {
+                        let byName = qt.name.toString().toLowerCase().includes(this.search.toLowerCase())
+                        let byCode = qt.id.toString().toLowerCase().includes(this.search.toLowerCase())
+                        let byDesc = qt.description.toString().toLowerCase().includes(this.search.toLowerCase())
+
+                        if (byName === true) {
+                            return byName
+                        } else if (byCode) {
+                            return byCode
+                        } else if (byDesc) {
+                            return byDesc
+                        }
+                    }
+                })
+            }
         },
         created() {
             this.getQuantityType();
