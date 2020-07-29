@@ -12,9 +12,9 @@
             <mdb-navbar-toggler>
                 <mdb-navbar-nav></mdb-navbar-nav>
                 <mdb-form-inline>
-                    <mdb-input @change="getSearchQuery()" aria-label="Search" class="mr-sm-2" id="search"
+                    <mdb-input aria-label="Search" class="mr-sm-2" id="search"
                                placeholder="Search"
-                               type="text" v-model="search_query"/>
+                               type="text" v-bind:value="search_query" v-on:input="getSearchQuery"/>
                     <mdb-btn class="my-0" outline="white" size="sm" type="submit">Search
                         <i aria-hidden="true" class="fas fa-search"></i></mdb-btn>
                 </mdb-form-inline>
