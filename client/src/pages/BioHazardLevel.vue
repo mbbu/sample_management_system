@@ -49,7 +49,7 @@
             <div v-if="!isEditing">
                 <b-modal
                         @hidden="clearForm"
-                        @ok="createBioHazardLevel"
+                        @ok="onSubmit"
                         @submit="showModal = false"
                         cancel-variant="danger"
                         id="modal-bio-level"
@@ -58,33 +58,55 @@
                 >
                     <form @submit.prevent="createBioHazardLevel">
 
-                        <b-form-group id="form-name-group" label="Name:" label-for="form-name-input">
+
+                        <!-- NAME -->
+                        <b-form-group :class="{ 'form-group--error': $v.level.name.$error }"
+                                      id="form-name-group" label="Name:" label-for="form-name-input">
                             <b-form-input
                                     id="form-name-input"
                                     placeholder="Enter Name"
                                     required
                                     type="text"
-                                    v-model="name"
+                                    v-model.trim="$v.level.name.$model"
                             ></b-form-input>
+                            <div v-if="$v.level.name.$dirty">
+                                <div class="error" v-if="!$v.level.name.required">Field is
+                                    required
+                                </div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-code-group" label="Code:" label-for="form-code-input">
+                        <!--CODE-->
+                        <b-form-group :class="{ 'form-group--error': $v.level.code.$error }"
+                                      id="form-code-group" label="Code:" label-for="form-code-input">
                             <b-form-input
                                     id="form-code-input"
                                     placeholder="Enter Code"
                                     required
                                     type="text"
-                                    v-model="code"></b-form-input>
+                                    v-model.trim="$v.level.code.$model"></b-form-input>
+                            <div v-if="$v.level.code.$dirty">
+                                <div class="error" v-if="!$v.level.code.required">Field is
+                                    required
+                                </div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-desc-group" label="Description:" label-for="form-desc-input">
+                        <!--DESCRIPTION-->
+                        <b-form-group :class="{ 'form-group--error': $v.level.desc.$error }"
+                                      id="form-desc-group" label="Description:" label-for="form-desc-input">
                             <b-form-textarea
                                     id="form-desc-input"
                                     placeholder="Enter Description"
                                     required
                                     type="text"
-                                    v-model="desc"
+                                    v-model.trim="$v.level.desc.$model"
                             ></b-form-textarea>
+                            <div v-if="$v.level.desc.$dirty">
+                                <div class="error" v-if="!$v.level.desc.required">Field is
+                                    required
+                                </div>
+                            </div>
                         </b-form-group>
                     </form>
                 </b-modal>
@@ -93,7 +115,7 @@
             <div v-else-if="isEditing">
                 <b-modal
                         @hidden="clearForm"
-                        @ok="updateBioHazardLevel(old_code)"
+                        @ok="updateBioHazardLevel"
                         @submit="showModal = false"
                         cancel-variant="danger"
                         id="modal-bio-level-edit"
@@ -102,33 +124,53 @@
                 >
                     <form>
 
-                        <b-form-group id="form-name-group-edit" label="Name:" label-for="form-name-input">
+                        <b-form-group :class="{ 'form-group--error': $v.level.name.$error }"
+                                      id="form-name-group-edit" label="Name:" label-for="form-name-input">
                             <b-form-input
                                     id="form-name-input"
                                     placeholder="Enter Name"
                                     required
                                     type="text"
-                                    v-model="name"
+                                    v-model.trim="$v.level.name.$model"
                             ></b-form-input>
+                            <div v-if="$v.level.name.$dirty">
+                                <div class="error" v-if="!$v.level.name.required">Field is
+                                    required
+                                </div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-code-group-edit" label="Code:" label-for="form-code-input">
+                        <!--CODE-->
+                        <b-form-group :class="{ 'form-group--error': $v.level.code.$error }"
+                                      id="form-code-group-edit" label="Code:" label-for="form-code-input">
                             <b-form-input
                                     id="form-code-input"
                                     placeholder="Enter Code"
                                     required
                                     type="text"
-                                    v-model="code"></b-form-input>
+                                    v-model.trim="$v.level.code.$model"></b-form-input>
+                            <div v-if="$v.level.code.$dirty">
+                                <div class="error" v-if="!$v.level.code.required">Field is
+                                    required
+                                </div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-desc-group-edit" label="Description:" label-for="form-desc-input">
+                        <!--DESCRIPTION-->
+                        <b-form-group :class="{ 'form-group--error': $v.level.desc.$error }"
+                                      id="form-desc-group-edit" label="Description:" label-for="form-desc-input">
                             <b-form-textarea
                                     id="form-desc-input"
                                     placeholder="Enter Description"
                                     required
                                     type="text"
-                                    v-model="desc"
+                                    v-model.trim="$v.level.desc.$model"
                             ></b-form-textarea>
+                            <div v-if="$v.level.desc.$dirty">
+                                <div class="error" v-if="!$v.level.desc.required">Field is
+                                    required
+                                </div>
+                            </div>
                         </b-form-group>
                     </form>
                 </b-modal>
@@ -146,6 +188,7 @@
     import EventBus from '../components/EventBus';
     import {bio_hazard_level_resource} from '../utils/api_paths'
     import {respondTo401, secureStoreGetString, showFlashMessage} from "../utils/util_functions";
+    import {required} from "vuelidate/lib/validators";
 
     export default {
         name: 'BioHazardLevel',
@@ -155,15 +198,25 @@
                 response: [],
                 bioHazardList: [],
                 search: '',
-                name: null,
-                code: null,
-                desc: null,
+                level: {
+                    name: '',
+                    code: '',
+                    desc: '',
+                },
 
                 // values for data modification
                 old_code: null,
                 showModal: true,
                 isEditing: false,
             };
+        },
+
+        validations: {
+            level: {
+                name: {required},
+                code: {required},
+                desc: {required},
+            }
         },
 
         mounted() {
@@ -182,6 +235,16 @@
         },
 
         methods: {
+            onSubmit(evt) {
+                this.$v.$touch();
+                if (this.$v.$invalid) {
+                    // stop here if form is invalid
+                    evt.preventDefault()
+                    return;
+                }
+                this.createBioHazardLevel();
+            },
+
             clearForm() {
                 this.name = null;
                 this.code = null;
@@ -214,9 +277,9 @@
             createBioHazardLevel: function () {
                 let self = this;
                 axios.post(bio_hazard_level_resource, {
-                    name: this.name,
-                    code: this.code,
-                    description: this.desc,
+                    name: this.level.name,
+                    code: this.level.code,
+                    description: this.level.desc,
                 }, {
                     headers: {
                         Authorization: secureStoreGetString()
@@ -244,39 +307,44 @@
                 this.clearForm();
             },
 
-            updateBioHazardLevel: function (code) {
-                let self = this;
+            updateBioHazardLevel: function (evt) {
+                this.$v.$touch();
+                if (this.$v.$invalid) {
+                    evt.preventDefault()
+                } else {
+                    let self = this;
 
-                axios.put(bio_hazard_level_resource, {
-                    name: this.name,
-                    code: this.code,
-                    description: this.desc,
-                }, {
-                    headers:
-                        {
-                            code: code,
-                            Authorization: secureStoreGetString()
-                        }
-                })
-                    .then((response) => {
-                        this.getBioHazardLevel();
-                        showFlashMessage(self, 'success', response.data['message'], "")
-                    })
-                    .catch((error) => {
-                        this.$log.error(error);
-                        if (error.response) {
-                            if (error.response.status === 304) {
-                                showFlashMessage(self, 'info', "Record not modified!", "")
-                            } else if (error.response.status === 401) {
-                                respondTo401(self)
-                            } else if (error.response.status === 403) {
-                                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
-                            } else {
-                                showFlashMessage(self, 'error', "Error", error.response.data['message'])
+                    axios.put(bio_hazard_level_resource, {
+                        name: this.level.name,
+                        code: this.level.code,
+                        description: this.level.desc,
+                    }, {
+                        headers:
+                            {
+                                code: this.old_code,
+                                Authorization: secureStoreGetString()
                             }
-                        }
-                    });
-                this.clearForm();
+                    })
+                        .then((response) => {
+                            this.getBioHazardLevel();
+                            showFlashMessage(self, 'success', response.data['message'], "")
+                        })
+                        .catch((error) => {
+                            this.$log.error(error);
+                            if (error.response) {
+                                if (error.response.status === 304) {
+                                    showFlashMessage(self, 'info', "Record not modified!", "")
+                                } else if (error.response.status === 401) {
+                                    respondTo401(self)
+                                } else if (error.response.status === 403) {
+                                    showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
+                                } else {
+                                    showFlashMessage(self, 'error', "Error", error.response.data['message'])
+                                }
+                            }
+                        });
+                    this.clearForm();
+                }
             },
 
             deleteBioHazardLevel: function (code) {
