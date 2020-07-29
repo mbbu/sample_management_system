@@ -137,7 +137,7 @@
                 <b-modal
                         @hidden="clearForm"
                         @ok="updateFreezer"
-                        @shown="selectLabItemForUpdate(freezer.laboratory)"
+                        @shown="selectItemForUpdate(freezer.laboratory)"
                         @submit="showModal = false"
                         cancel-variant="danger"
                         id="modal-freezer-edit"
@@ -230,6 +230,7 @@
         getSelectedItem,
         respondTo401,
         secureStoreGetString,
+        selectItemForUpdate,
         showFlashMessage
     } from "../utils/util_functions";
     import EventBus from '../components/EventBus';
@@ -345,13 +346,12 @@
         },
 
         methods: {
-            getSelectedItem,
+            selectItemForUpdate,
             onSubmit(evt) {
                 this.$v.$touch();
                 if (this.$v.$invalid) {
                     // stop here if form is invalid
                     evt.preventDefault()
-                    console.log(this.$v.freezer)
                     return;
                 }
                 this.createFreezer();
@@ -363,9 +363,7 @@
                 this.freezer.code = null;
                 this.freezer.room = null;
                 this.isEditing = false;
-                // this.labDataList = [];
                 this.$v.$reset();
-                // this.onLoadPage();
             },
 
             fillFormForUpdate(number, code, room, laboratory) {
@@ -392,12 +390,6 @@
                     }
                 })
                 this.getFreezer()
-            },
-
-            selectLabItemForUpdate(laboratory) {
-                // set dropdownitem to the selected item
-                var element = document.getElementById("dropdownlist");
-                element.value = laboratory;
             },
             // end of Util functions
 
