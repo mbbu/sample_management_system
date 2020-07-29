@@ -53,43 +53,56 @@
                 <b-modal
                         :title="`Add ${page_title}`"
                         @hidden="clearForm"
-                        @ok="createTray"
-                        @submit="clearForm"
+                        @ok="onSubmit"
+                        @submit="showModal=false"
                         cancel-variant="danger"
                         id="modal-tray"
                         ok-title="Save"
                 >
                     <form @submit.prevent="createTray">
+                        <!--RACK-->
                         <b-form-group id="form-lab-group" label="Rack Number:" label-for="form-lab-input">
                             <ejs-dropdownlist
                                     :dataSource='rackDataList'
                                     :fields="fields"
-                                    :v-model="rack"
                                     id='dropdownlist'
                                     placeholder='Select a rack'
+                                    v-model.trim="$v.tray.rack.$model"
                             ></ejs-dropdownlist>
+                            <div v-if="$v.tray.rack.$dirty">
+                                <div class="error" v-if="!$v.tray.rack.required">Field is required</div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-number-group" label="Number:" label-for="form-number-input">
+                        <!-- NUMBER -->
+                        <b-form-group :class="{ 'form-group--error': $v.tray.number.$error }"
+                                      id="form-number-group" label="Number:" label-for="form-number-input">
                             <b-form-input
                                     id="form-number-input"
                                     placeholder="Enter Tray Number"
                                     required
                                     type="text"
-                                    v-model="number"
+                                    v-model.trim="$v.tray.number.$model"
                             ></b-form-input>
+                            <div v-if="$v.tray.number.$dirty">
+                                <div class="error" v-if="!$v.tray.number.required">Field is required</div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-code-group" label="Code:" label-for="form-code-input">
+                        <!--CODE-->
+                        <b-form-group :class="{ 'form-group--error': $v.tray.code.$error }"
+                                      id="form-code-group" label="Code:" label-for="form-code-input">
                             <b-form-input
                                     id="form-code-input"
                                     placeholder="Enter Code"
                                     required
                                     type="text"
-                                    v-model="code">
+                                    v-model.trim="$v.tray.code.$model">
                             </b-form-input>
+                            <div v-if="$v.tray.code.$dirty">
+                                <div class="error" v-if="!$v.tray.code.required">Field is required</div>
+                            </div>
                         </b-form-group>
-
                     </form>
                 </b-modal>
             </div>
@@ -98,43 +111,56 @@
                 <b-modal
                         :title="`Edit ${page_title}`"
                         @hidden="clearForm"
-                        @ok="updateTray(old_code)"
-                        @shown="selectItemForUpdate(rack)"
+                        @ok="updateTray"
+                        @shown="selectItemForUpdate(tray.rack)"
                         @submit="showModal = false"
                         cancel-variant="danger"
                         id="modal-tray-edit"
                         ok-title="Update"
                 >
                     <form>
-                        <b-form-group id="form-rack-group-edit" label="Rack Number:"
-                                      label-for="form-rack-input">
+                        <!--RACK-->
+                        <b-form-group id="form-lab-group-edit" label="Rack Number:" label-for="form-lab-input">
                             <ejs-dropdownlist
                                     :dataSource='rackDataList'
                                     :fields="fields"
-                                    :v-model="rack"
                                     id='dropdownlist'
                                     placeholder='Select a rack'
+                                    v-model.trim="$v.tray.rack.$model"
                             ></ejs-dropdownlist>
+                            <div v-if="$v.tray.rack.$dirty">
+                                <div class="error" v-if="!$v.tray.rack.required">Field is required</div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-type-group-edit" label="Number:" label-for="form-type-input">
+                        <!-- NUMBER -->
+                        <b-form-group :class="{ 'form-group--error': $v.tray.number.$error }"
+                                      id="form-number-group-edit" label="Number:" label-for="form-number-input">
                             <b-form-input
-                                    id="form-type-input"
+                                    id="form-number-input"
                                     placeholder="Enter Tray Number"
                                     required
                                     type="text"
-                                    v-model="number"
+                                    v-model.trim="$v.tray.number.$model"
                             ></b-form-input>
+                            <div v-if="$v.tray.number.$dirty">
+                                <div class="error" v-if="!$v.tray.number.required">Field is required</div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-code-group-edit" label="Code:" label-for="form-code-input">
+                        <!--CODE-->
+                        <b-form-group :class="{ 'form-group--error': $v.tray.code.$error }"
+                                      id="form-code-group-edit" label="Code:" label-for="form-code-input">
                             <b-form-input
                                     id="form-code-input"
                                     placeholder="Enter Code"
                                     required
                                     type="text"
-                                    v-model="code">
+                                    v-model.trim="$v.tray.code.$model">
                             </b-form-input>
+                            <div v-if="$v.tray.code.$dirty">
+                                <div class="error" v-if="!$v.tray.code.required">Field is required</div>
+                            </div>
                         </b-form-group>
                     </form>
                 </b-modal>
@@ -153,7 +179,6 @@
     import {
         extractRackData,
         getItemDataList,
-        getSelectedItem,
         respondTo401,
         secureStoreGetString,
         selectItemForUpdate,
@@ -161,6 +186,7 @@
     } from "../utils/util_functions";
     import EventBus from '../components/EventBus';
     import FilterCard from "../components/FilterCard";
+    import {required} from "vuelidate/lib/validators";
 
     export default {
         name: 'Tray',
@@ -173,9 +199,12 @@
                 response: [],
                 trayList: [],
                 search: '',
-                rack: null,
-                code: null,
-                number: null,
+                tray: {
+                    rack: '',
+                    code: '',
+                    number: '',
+                },
+
                 rackDataList: [],
                 fields: {text: '', value: ''},
 
@@ -186,8 +215,16 @@
             };
         },
 
+        validations: {
+            tray: {
+                rack: {required},
+                code: {required},
+                number: {required},
+            }
+        },
+
         created() {
-            this.getTray();
+            this.onLoadPage();
         },
 
         mounted() {
@@ -257,21 +294,30 @@
         },
 
         methods: {
-            selectItemForUpdate,
             // Util Functions
+            selectItemForUpdate,
+            onSubmit(evt) {
+                this.$v.$touch();
+                if (this.$v.$invalid) {
+                    // stop here if form is invalid
+                    evt.preventDefault()
+                    return;
+                }
+                this.createTray();
+            },
+
             clearForm() {
-                this.rack = null;
-                this.code = null;
-                this.number = null;
+                this.tray.rack = null;
+                this.tray.code = null;
+                this.tray.number = null;
                 this.isEditing = false;
-                this.rackDataList = [];
-                this.onLoadPage();
+                this.$v.$reset();
             },
 
             fillFormForUpdate(rack, number, code) {
-                this.rack = rack;
-                this.code = code;
-                this.number = number;
+                this.tray.rack = rack;
+                this.tray.code = code;
+                this.tray.number = number;
                 this.old_code = code;
                 this.isEditing = true;
                 this.showModal = true;
@@ -279,8 +325,8 @@
 
             onLoadPage() {
                 getItemDataList(rack_resource).then(data => {
+                    console.log(data)
                     let rackList = extractRackData(data);
-                    this.$log.info("Rack list json: ", JSON.stringify(rackList));
 
                     // update local variables with data from API
                     this.fields = rackList['fields'];
@@ -291,6 +337,7 @@
                         });
                     }
                 })
+                this.getTray()
             },
             // end of util functions
 
@@ -310,12 +357,11 @@
 
             createTray: function () {
                 let self = this;
-                this.rack = getSelectedItem(this.rackDataList, this.rack);
 
                 axios.post(tray_resource, {
-                    rack: this.rack,
-                    number: this.number,
-                    code: this.code,
+                    rack: this.tray.rack,
+                    number: this.tray.number,
+                    code: this.tray.code,
                 }, {
                     headers:
                         {
@@ -347,42 +393,46 @@
                 this.clearForm();
             },
 
-            updateTray: function (code) {
-                let self = this;
-                this.rack = getSelectedItem(this.rackDataList, this.rack);
+            updateTray: function (evt) {
+                this.$v.$touch();
+                if (this.$v.$invalid) {
+                    evt.preventDefault()
+                } else {
+                    let self = this;
 
-                axios.put(tray_resource, {
-                    rack: this.rack,
-                    number: this.number,
-                    code: this.code,
-                }, {
-                    headers:
-                        {
-                            code: code,
-                            Authorization: secureStoreGetString()
-                        }
-                })
-                    .then((response) => {
-                        this.getTray();
-                        showFlashMessage(self, 'success', response.data['message'], '');
-                        this.clearForm();
-                    })
-                    .catch((error) => {
-                        this.clearForm();
-                        this.$log.error(error);
-                        if (error.response) {
-                            if (error.response.status === 304) {
-                                showFlashMessage(self, 'info', 'Record not modified!', '');
-                            } else if (error.response.status === 401) {
-                                respondTo401(self)
-                            } else if (error.response.status === 403) {
-                                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
-                            } else {
-                                showFlashMessage(self, 'error', error.response.data['message'], '');
+                    axios.put(tray_resource, {
+                        rack: this.tray.rack,
+                        number: this.tray.number,
+                        code: this.tray.code,
+                    }, {
+                        headers:
+                            {
+                                code: this.old_code,
+                                Authorization: secureStoreGetString()
                             }
-                        }
-                    });
-                this.clearForm();
+                    })
+                        .then((response) => {
+                            this.getTray();
+                            showFlashMessage(self, 'success', response.data['message'], '');
+                            this.clearForm();
+                        })
+                        .catch((error) => {
+                            this.clearForm();
+                            this.$log.error(error);
+                            if (error.response) {
+                                if (error.response.status === 304) {
+                                    showFlashMessage(self, 'info', 'Record not modified!', '');
+                                } else if (error.response.status === 401) {
+                                    respondTo401(self)
+                                } else if (error.response.status === 403) {
+                                    showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
+                                } else {
+                                    showFlashMessage(self, 'error', error.response.data['message'], '');
+                                }
+                            }
+                        });
+                    this.clearForm();
+                }
             },
 
             deleteTray: function (code) {
