@@ -253,9 +253,9 @@
             },
 
             fillFormForUpdate(name, code, desc) {
-                this.name = name;
-                this.code = code;
-                this.desc = desc;
+                this.level.name = name;
+                this.level.code = code;
+                this.level.desc = desc;
                 this.old_code = code;
                 this.isEditing = true;
                 this.showModal = true;
