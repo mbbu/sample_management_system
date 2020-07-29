@@ -250,6 +250,7 @@
                 this.level.code = null;
                 this.level.desc = null;
                 this.isEditing = false;
+                this.$v.$reset();
             },
 
             fillFormForUpdate(name, code, desc) {
