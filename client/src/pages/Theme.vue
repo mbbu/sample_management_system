@@ -46,7 +46,7 @@
             <div v-if="!isEditing">
                 <b-modal
                         @hidden="clearForm"
-                        @ok="createTheme"
+                        @ok="onSubmit"
                         @submit="showModal = false"
                         cancel-variant="danger"
                         id="modal-theme"
@@ -55,23 +55,37 @@
                 >
                     <form @submit.prevent="createTheme">
 
-                        <b-form-group id="form-name-group" label="Name:" label-for="form-name-input">
+                        <!-- NAME -->
+                        <b-form-group :class="{ 'form-group--error': $v.theme.name.$error }"
+                                      id="form-name-group" label="Name:" label-for="form-name-input">
                             <b-form-input
                                     id="form-name-input"
                                     placeholder="Enter Name"
                                     required
                                     type="text"
-                                    v-model="name"
+                                    v-model.trim="$v.theme.name.$model"
                             ></b-form-input>
+                            <div v-if="$v.theme.name.$dirty">
+                                <div class="error" v-if="!$v.theme.name.required">Field is
+                                    required
+                                </div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-code-group" label="Code:" label-for="form-code-input">
+                        <!-- CODE -->
+                        <b-form-group :class="{ 'form-group--error': $v.theme.code.$error }"
+                                      id="form-code-group" label="Code:" label-for="form-code-input">
                             <b-form-input
                                     id="form-code-input"
                                     placeholder="Enter Code"
                                     required
                                     type="text"
-                                    v-model="code"></b-form-input>
+                                    v-model.trim="$v.theme.code.$model"></b-form-input>
+                            <div v-if="$v.theme.code.$dirty">
+                                <div class="error" v-if="!$v.theme.code.required">Field is
+                                    required
+                                </div>
+                            </div>
                         </b-form-group>
                     </form>
                 </b-modal>
@@ -80,32 +94,46 @@
             <div v-else-if="isEditing">
                 <b-modal
                         @hidden="clearForm"
-                        @ok="updateTheme(old_code)"
+                        @ok="updateTheme"
                         @submit="showModal = false"
                         cancel-variant="danger"
                         id="modal-theme-edit"
                         ok-title="Update"
                         title="Edit Theme"
                 >
-                    <form>
+                    <form @submit.prevent="updateTheme">
 
-                        <b-form-group id="form-name-group-edit" label="Name:" label-for="form-name-input">
+                        <!-- NAME -->
+                        <b-form-group :class="{ 'form-group--error': $v.theme.name.$error }"
+                                      id="form-name-group-edit" label="Name:" label-for="form-name-input">
                             <b-form-input
                                     id="form-name-input"
                                     placeholder="Enter Name"
                                     required
                                     type="text"
-                                    v-model="name"
+                                    v-model.trim="$v.theme.name.$model"
                             ></b-form-input>
+                            <div v-if="$v.theme.name.$dirty">
+                                <div class="error" v-if="!$v.theme.name.required">Field is
+                                    required
+                                </div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-code-group-edit" label="Code:" label-for="form-code-input">
+                        <!-- CODE -->
+                        <b-form-group :class="{ 'form-group--error': $v.theme.code.$error }"
+                                      id="form-code-group-edit" label="Code:" label-for="form-code-input">
                             <b-form-input
                                     id="form-code-input"
                                     placeholder="Enter Code"
                                     required
                                     type="text"
-                                    v-model="code"></b-form-input>
+                                    v-model.trim="$v.theme.code.$model"></b-form-input>
+                            <div v-if="$v.theme.code.$dirty">
+                                <div class="error" v-if="!$v.theme.code.required">Field is
+                                    required
+                                </div>
+                            </div>
                         </b-form-group>
                     </form>
                 </b-modal>
@@ -123,6 +151,7 @@
     import TopNav from "../components/TopNav";
     import {respondTo401, secureStoreGetString, showFlashMessage} from '../utils/util_functions'
     import EventBus from '../components/EventBus';
+    import {required} from "vuelidate/lib/validators";
 
     export default {
         name: 'Theme',
@@ -130,16 +159,26 @@
             return {
                 page_title: "Themes",
                 response: [],
-                name: null,
-                code: null,
                 search: '',
                 themeList: [],
+
+                theme: {
+                    name: '',
+                    code: ''
+                },
 
                 // values for data modification
                 old_code: null,
                 showModal: true,
                 isEditing: false,
             };
+        },
+
+        validations: {
+            theme: {
+                name: {required},
+                code: {required},
+            }
         },
 
         mounted() {
@@ -158,15 +197,26 @@
         },
 
         methods: {
+            onSubmit(evt) {
+                this.$v.$touch();
+                if (this.$v.$invalid) {
+                    // stop here if form is invalid
+                    evt.preventDefault()
+                    return;
+                }
+                this.createTheme();
+            },
+
             clearForm() {
                 this.name = null;
                 this.code = null;
                 this.isEditing = false;
+                this.$v.$reset();
             },
 
             fillFormForUpdate(name, code) {
-                this.name = name;
-                this.code = code;
+                this.theme.name = name;
+                this.theme.code = code;
                 this.old_code = code;
                 this.isEditing = true;
                 this.showModal = true;
@@ -188,8 +238,8 @@
             createTheme: function () {
                 let self = this;
                 axios.post(theme_resource, {
-                    name: this.name,
-                    code: this.code,
+                    name: this.theme.name,
+                    code: this.theme.code,
                 }, {
                     headers: {
                         Authorization: secureStoreGetString()
@@ -217,37 +267,42 @@
                 this.clearForm();
             },
 
-            updateTheme: function (code) {
-                let self = this;
-                axios.put(theme_resource, {
-                    name: this.name,
-                    code: this.code,
-                }, {
-                    headers:
-                        {
-                            code: code,
-                            Authorization: secureStoreGetString()
-                        }
-                })
-                    .then((response) => {
-                        this.getTheme();
-                        showFlashMessage(self, 'success', 'Success', response.data['message'])
-                    })
-                    .catch((error) => {
-                        this.$log.error(error);
-                        if (error.response) {
-                            if (error.response.status === 304) {
-                                showFlashMessage(self, 'info', 'Info', 'Record not modified!')
-                            } else if (error.response.status === 401) {
-                                respondTo401(self);
-                            } else if (error.response.status === 403) {
-                                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
-                            } else {
-                                showFlashMessage(self, 'error', 'Error', error.response.data['message'])
+            updateTheme: function (evt) {
+                this.$v.$touch();
+                if (this.$v.$invalid) {
+                    evt.preventDefault()
+                } else {
+                    let self = this;
+                    axios.put(theme_resource, {
+                        name: this.theme.name,
+                        code: this.theme.code,
+                    }, {
+                        headers:
+                            {
+                                code: this.old_code,
+                                Authorization: secureStoreGetString()
                             }
-                        }
-                    });
-                this.clearForm();
+                    })
+                        .then((response) => {
+                            this.getTheme();
+                            showFlashMessage(self, 'success', 'Success', response.data['message'])
+                        })
+                        .catch((error) => {
+                            this.$log.error(error);
+                            if (error.response) {
+                                if (error.response.status === 304) {
+                                    showFlashMessage(self, 'info', 'Info', 'Record not modified!')
+                                } else if (error.response.status === 401) {
+                                    respondTo401(self);
+                                } else if (error.response.status === 403) {
+                                    showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
+                                } else {
+                                    showFlashMessage(self, 'error', 'Error', error.response.data['message'])
+                                }
+                            }
+                        });
+                    this.clearForm();
+                }
             },
 
             deleteTheme: function (code) {
