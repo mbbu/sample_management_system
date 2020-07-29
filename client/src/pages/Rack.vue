@@ -53,8 +53,8 @@
                 <b-modal
                         :title="`Add ${page_title}`"
                         @hidden="clearForm"
-                        @ok="createRack"
-                        @submit="clearForm"
+                        @ok="onSubmit"
+                        @submit="showModal=false"
                         cancel-variant="danger"
                         id="modal-rack"
                         ok-title="Save"
@@ -64,32 +64,44 @@
                             <ejs-dropdownlist
                                     :dataSource='chamberDataList'
                                     :fields="fields"
-                                    :v-model="chamber"
                                     id='dropdownlist'
                                     placeholder='Select a chamber'
+                                    v-model.trim="$v.rack.chamber.$model"
                             ></ejs-dropdownlist>
+                            <div v-if="$v.rack.chamber.$dirty">
+                                <div class="error" v-if="!$v.rack.chamber.required">Field is required</div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-number-group" label="Number:" label-for="form-number-input">
+                        <!--NUMBER-->
+                        <b-form-group :class="{ 'form-group--error': $v.rack.number.$error }"
+                                      id="form-number-group" label="Number:" label-for="form-number-input">
                             <b-form-input
                                     id="form-number-input"
                                     placeholder="Enter Rack Number"
                                     required
                                     type="text"
-                                    v-model="number"
+                                    v-model.trim="$v.rack.number.$model"
                             ></b-form-input>
+                            <div v-if="$v.rack.number.$dirty">
+                                <div class="error" v-if="!$v.rack.number.required">Field is required</div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-code-group" label="Code:" label-for="form-code-input">
+                        <!--CODE-->
+                        <b-form-group :class="{ 'form-group--error': $v.rack.code.$error }"
+                                      id="form-code-group" label="Code:" label-for="form-code-input">
                             <b-form-input
                                     id="form-code-input"
                                     placeholder="Enter Code"
                                     required
                                     type="text"
-                                    v-model="code">
+                                    v-model.trim="$v.rack.code.$model">
                             </b-form-input>
+                            <div v-if="$v.rack.code.$dirty">
+                                <div class="error" v-if="!$v.rack.code.required">Field is required</div>
+                            </div>
                         </b-form-group>
-
                     </form>
                 </b-modal>
             </div>
@@ -98,43 +110,55 @@
                 <b-modal
                         :title="`Edit ${page_title}`"
                         @hidden="clearForm"
-                        @ok="updateRack(old_code)"
-                        @shown="selectItemForUpdate(chamber)"
+                        @ok="updateRack"
+                        @shown="selectItemForUpdate(rack.chamber)"
                         @submit="showModal = false"
                         cancel-variant="danger"
                         id="modal-rack-edit"
                         ok-title="Update"
                 >
                     <form>
-                        <b-form-group id="form-chamber-group-edit" label="Freezer Number:"
-                                      label-for="form-chamber-input">
+                        <b-form-group id="form-chamber-group-edit" label="Chamber Type:" label-for="form-chamber-input">
                             <ejs-dropdownlist
                                     :dataSource='chamberDataList'
                                     :fields="fields"
-                                    :v-model="chamber"
                                     id='dropdownlist'
                                     placeholder='Select a chamber'
+                                    v-model.trim="$v.rack.chamber.$model"
                             ></ejs-dropdownlist>
+                            <div v-if="$v.rack.chamber.$dirty">
+                                <div class="error" v-if="!$v.rack.chamber.required">Field is required</div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-type-group-edit" label="Number:" label-for="form-type-input">
+                        <!--NUMBER-->
+                        <b-form-group :class="{ 'form-group--error': $v.rack.number.$error }"
+                                      id="form-number-group-edit" label="Number:" label-for="form-number-input">
                             <b-form-input
-                                    id="form-type-input"
+                                    id="form-number-input"
                                     placeholder="Enter Rack Number"
                                     required
                                     type="text"
-                                    v-model="number"
+                                    v-model.trim="$v.rack.number.$model"
                             ></b-form-input>
+                            <div v-if="$v.rack.number.$dirty">
+                                <div class="error" v-if="!$v.rack.number.required">Field is required</div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-code-group-edit" label="Code:" label-for="form-code-input">
+                        <!--CODE-->
+                        <b-form-group :class="{ 'form-group--error': $v.rack.code.$error }"
+                                      id="form-code-group-edit" label="Code:" label-for="form-code-input">
                             <b-form-input
                                     id="form-code-input"
                                     placeholder="Enter Code"
                                     required
                                     type="text"
-                                    v-model="code">
+                                    v-model.trim="$v.rack.code.$model">
                             </b-form-input>
+                            <div v-if="$v.rack.code.$dirty">
+                                <div class="error" v-if="!$v.rack.code.required">Field is required</div>
+                            </div>
                         </b-form-group>
                     </form>
                 </b-modal>
@@ -153,7 +177,6 @@
     import {
         extractChamberData,
         getItemDataList,
-        getSelectedItem,
         respondTo401,
         secureStoreGetString,
         selectItemForUpdate,
@@ -161,6 +184,7 @@
     } from "../utils/util_functions";
     import EventBus from '../components/EventBus';
     import FilterCard from "../components/FilterCard";
+    import {required} from "vuelidate/lib/validators";
 
     export default {
         name: 'Rack',
@@ -173,9 +197,12 @@
                 response: [],
                 rackList: [],
                 search: '',
-                code: null,
-                number: null,
-                chamber: null,
+                rack: {
+                    code: '',
+                    number: '',
+                    chamber: '',
+
+                },
 
                 chamberDataList: [],
                 fields: {text: '', value: ''},
@@ -186,9 +213,16 @@
                 isEditing: false,
             };
         },
+        validations: {
+            rack: {
+                chamber: {required},
+                code: {required},
+                number: {required},
+            }
+        },
 
         created() {
-            this.getRack();
+            this.onLoadPage();
         },
 
         mounted() {
@@ -258,21 +292,30 @@
         },
 
         methods: {
-            selectItemForUpdate,
             // Util Functions
+            selectItemForUpdate,
+            onSubmit(evt) {
+                this.$v.$touch();
+                if (this.$v.$invalid) {
+                    // stop here if form is invalid
+                    evt.preventDefault()
+                    return;
+                }
+                this.createRack();
+            },
+
             clearForm() {
-                this.chamber = null;
-                this.code = null;
-                this.number = null;
+                this.rack.chamber = null;
+                this.rack.code = null;
+                this.rack.number = null;
                 this.isEditing = false;
-                this.chamberDataList = [];
-                this.onLoadPage();
+                this.$v.$reset();
             },
 
             fillFormForUpdate(chamber, number, code) {
-                this.chamber = chamber;
-                this.code = code;
-                this.number = number;
+                this.rack.chamber = chamber;
+                this.rack.code = code;
+                this.rack.number = number;
                 this.old_code = code;
                 this.isEditing = true;
                 this.showModal = true;
@@ -292,6 +335,7 @@
                         });
                     }
                 })
+                this.getRack()
             },
             // end of Util functions
 
@@ -311,12 +355,12 @@
 
             createRack: function () {
                 let self = this;
-                this.chamber = getSelectedItem(this.chamberDataList, this.chamber);
+                // this.chamber = getSelectedItem(this.chamberDataList, this.chamber);
 
                 axios.post(rack_resource, {
-                    chamber: this.chamber,
-                    number: this.number,
-                    code: this.code,
+                    chamber: this.rack.chamber,
+                    number: this.rack.number,
+                    code: this.rack.code,
                 }, {
                     headers:
                         {
@@ -348,42 +392,47 @@
                 this.clearForm();
             },
 
-            updateRack: function (code) {
-                let self = this;
-                this.chamber = getSelectedItem(this.chamberDataList, this.chamber);
+            updateRack: function (evt) {
+                this.$v.$touch();
+                if (this.$v.$invalid) {
+                    evt.preventDefault()
+                } else {
+                    let self = this;
+                    // this.chamber = getSelectedItem(this.chamberDataList, this.chamber);
 
-                axios.put(rack_resource, {
-                    chamber: this.chamber,
-                    number: this.number,
-                    code: this.code,
-                }, {
-                    headers:
-                        {
-                            code: code,
-                            Authorization: secureStoreGetString()
-                        }
-                })
-                    .then((response) => {
-                        this.getRack();
-                        showFlashMessage(self, 'success', response.data['message'], '');
-                        this.clearForm();
-                    })
-                    .catch((error) => {
-                        this.clearForm();
-                        this.$log.error(error);
-                        if (error.response) {
-                            if (error.response.status === 304) {
-                                showFlashMessage(self, 'info', 'Record not modified!', '');
-                            } else if (error.response.status === 401) {
-                                respondTo401(self)
-                            } else if (error.response.status === 403) {
-                                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
-                            } else {
-                                showFlashMessage(self, 'error', error.response.data['message'], '');
+                    axios.put(rack_resource, {
+                        chamber: this.rack.chamber,
+                        number: this.rack.number,
+                        code: this.rack.code,
+                    }, {
+                        headers:
+                            {
+                                code: this.old_code,
+                                Authorization: secureStoreGetString()
                             }
-                        }
-                    });
-                this.clearForm();
+                    })
+                        .then((response) => {
+                            this.getRack();
+                            showFlashMessage(self, 'success', response.data['message'], '');
+                            this.clearForm();
+                        })
+                        .catch((error) => {
+                            this.clearForm();
+                            this.$log.error(error);
+                            if (error.response) {
+                                if (error.response.status === 304) {
+                                    showFlashMessage(self, 'info', 'Record not modified!', '');
+                                } else if (error.response.status === 401) {
+                                    respondTo401(self)
+                                } else if (error.response.status === 403) {
+                                    showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
+                                } else {
+                                    showFlashMessage(self, 'error', error.response.data['message'], '');
+                                }
+                            }
+                        });
+                    this.clearForm();
+                }
             },
 
             deleteRack: function (code) {
