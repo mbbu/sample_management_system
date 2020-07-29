@@ -15,8 +15,9 @@
                                 </div>
 
                                 <mdb-card-body class="mx-4 mt-4">
-                                    <div class="justify-content-center">
-                                        <h2>Sorry we could not find what you were looking for!</h2>
+                                    <div class="d-flex justify-content-center">
+                                        <h3><i class="fas fa-sad-tear menu_icon_large_danger"></i>
+                                            Sorry we could not find what you were looking for!</h3>
                                     </div>
                                 </mdb-card-body>
                             </mdb-card>
@@ -36,16 +37,16 @@
         name: "PageNotFound",
         data() {
             return {
-                page_title: "PageNotFound",
+                page_title: "Page Not Found!",
                 search: '',
             }
         },
-        components: [
+        components: {
             mdbCard,
             mdbCardBody,
             mdbCol,
             mdbRow,
             TopNav
-        ]
+        }
     }
 </script>
