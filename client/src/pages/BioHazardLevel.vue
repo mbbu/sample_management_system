@@ -246,9 +246,9 @@
             },
 
             clearForm() {
-                this.name = null;
-                this.code = null;
-                this.desc = null;
+                this.level.name = null;
+                this.level.code = null;
+                this.level.desc = null;
                 this.isEditing = false;
             },
 

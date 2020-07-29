@@ -208,8 +208,8 @@
             },
 
             clearForm() {
-                this.name = null;
-                this.code = null;
+                this.theme.name = null;
+                this.theme.code = null;
                 this.isEditing = false;
                 this.$v.$reset();
             },
