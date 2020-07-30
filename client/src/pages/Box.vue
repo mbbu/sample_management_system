@@ -4,7 +4,6 @@
         <div class="row">
             <div class="col-sm-12">
                 <top-nav :page_title="page_title" v-bind:search_query.sync="search"></top-nav>
-
                 <!-- FLASH MESSAGES -->
                 <FlashMessage :position="'right bottom'"></FlashMessage>
                 <br>
@@ -12,6 +11,10 @@
                 <filter-card :all-filters="allFilters"></filter-card>
                 <br>
 
+                <!--TOP-PAGINATION-->
+                <v-page :total-row="page_length" @page-change="pageInfo" align="center"
+                        v-model="current"></v-page>
+                <br>
                 <table class=" table table-hover">
                     <thead>
                     <tr>
@@ -57,6 +60,10 @@
                     </tr>
                     </tbody>
                 </table>
+                <!--TOP-PAGINATION-->
+                <v-page :total-row="page_length" @page-change="pageInfo" align="center"
+                        v-model="current"></v-page>
+                <br>
             </div>
 
             <div v-if="!isEditing">
@@ -225,6 +232,11 @@
                 showModal: true,
                 isEditing: false,
 
+                // data for pagination
+                current: 1,
+                page_length: null,
+                page_array: [],
+                page_info: {},
             };
         },
 
@@ -312,7 +324,7 @@
 
 
                 if (searchList !== null) {
-                    return searchList
+                    return this.paginate(searchList)
                 } else if (this.filters.length > 1) {
                     let freezerFiltered = filterByFreezer.length < filterByLab.length ?
                         filterByFreezer : filterByLab
@@ -336,35 +348,34 @@
                                 : chamberFiltered != null && chamberFiltered.length !== 0 && chamberFiltered < freezerFiltered ? chamberFiltered
                                     : freezerFiltered // eslint-disable-line
 
-                    return this.boxList
+                    return this.paginate(this.boxList)
 
                 } else if (filterByLabel !== null && filterByLabel.length > 0) {
                     this.boxList = filterByLabel // eslint-disable-line
                     this.filterData(filterByLabel)
-                    return filterByLabel
+                    return this.paginate(filterByLabel)
                 } else if (filterByTray !== null && filterByTray.length > 0) {
                     this.rackList = filterByTray // eslint-disable-line
                     this.filterData(filterByTray)
-                    return filterByTray
+                    return this.paginate(filterByTray)
                 } else if (filterByRack !== null && filterByRack.length > 0) {
                     this.rackList = filterByRack // eslint-disable-line
                     this.filterData(filterByRack)
-                    return filterByRack
+                    return this.paginate(filterByRack)
                 } else if (filterByChamber !== null && filterByChamber.length > 0) {
                     this.rackList = filterByChamber // eslint-disable-line
                     this.filterData(filterByChamber)
-                    return filterByChamber
+                    return this.paginate(filterByChamber)
                 } else if (filterByFreezer !== null && filterByFreezer.length > 0) {
                     this.rackList = filterByFreezer // eslint-disable-line
                     this.filterData(filterByFreezer)
-                    return filterByFreezer
+                    return this.paginate(filterByFreezer)
                 } else if (filterByLab !== null && filterByLab.length > 0) {
                     this.rackList = filterByLab // eslint-disable-line
                     this.filterData(filterByLab)
-                    return filterByLab
+                    return this.paginate(filterByLab)
                 }
-
-                return this.boxList
+                return this.paginate(this.boxList)
             },
         },
 
@@ -380,6 +391,7 @@
                 }
                 this.createBox();
             },
+
             clearForm() {
                 this.box.tray = null;
                 this.box.code = null;
@@ -395,6 +407,28 @@
                 this.old_code = code;
                 this.isEditing = true;
                 this.showModal = true;
+            },
+
+            pageInfo(info) {
+                this.page_info = info
+            },
+
+            paginate(data) {
+                let start = 0, end = 0;
+
+                start = this.page_info.pageSize * (this.page_info.pageNumber - 1)
+                end = start + this.page_info.pageSize
+
+                this.page_array.splice(0, this.page_array.length);
+
+                if (end > data.length) end = data.length;
+
+                for (let i = start; i < end; i++) {
+                    this.page_array.push(data[i])
+                }
+
+                this.page_length = data.length
+                return this.page_array
             },
 
             onLoadPage() {
