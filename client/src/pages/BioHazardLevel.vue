@@ -7,6 +7,10 @@
                 <!-- FLASH MESSAGES -->
                 <FlashMessage :position="'right bottom'"></FlashMessage>
                 <br> <br>
+                <!--TOP-PAGINATION-->
+                <v-page :total-row="filteredList.pg_len" @page-change="pageInfo" align="center"
+                        v-model="current"></v-page>
+                <br>
                 <table class=" table table-hover">
                     <thead>
                     <tr>
@@ -18,7 +22,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="bio_hazard.id" v-for="(bio_hazard, index) in filteredList">
+                    <tr :key="bio_hazard.id" v-for="(bio_hazard, index) in filteredList.arr">
                         <td> {{ index + 1 }}</td>
                         <td> {{ bio_hazard.name }}</td>
                         <td> {{ bio_hazard.code }}</td>
@@ -44,6 +48,10 @@
                     </tr>
                     </tbody>
                 </table>
+                <!--BOTTOM-PAGINATION-->
+                <v-page :total-row="filteredList.pg_len" @page-change="pageInfo" align="center"
+                        v-model="current"></v-page>
+                <br>
             </div>
 
             <div v-if="!isEditing">
@@ -187,7 +195,7 @@
     import TopNav from "../components/TopNav";
     import EventBus from '../components/EventBus';
     import {bio_hazard_level_resource} from '../utils/api_paths'
-    import {respondTo401, secureStoreGetString, showFlashMessage} from "../utils/util_functions";
+    import {paginate, respondTo401, secureStoreGetString, showFlashMessage} from "../utils/util_functions";
     import {required} from "vuelidate/lib/validators";
 
     export default {
@@ -208,6 +216,9 @@
                 old_code: null,
                 showModal: true,
                 isEditing: false,
+
+                // data for pagination
+                current: 1,
             };
         },
 
@@ -228,13 +239,17 @@
 
         computed: {
             filteredList() {
-                return this.bioHazardList.filter(bioHazard => {
+                return paginate(this.bioHazardList.filter(bioHazard => {
                     return bioHazard.name.toLowerCase().includes(this.search.toLowerCase())
-                })
+                }))
             }
         },
 
         methods: {
+
+            pageInfo(info) {
+                EventBus.$emit('page-info', {'pgInfo': info, 'pgData': this.bioHazardList})
+            },
             onSubmit(evt) {
                 this.$v.$touch();
                 if (this.$v.$invalid) {
