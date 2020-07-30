@@ -224,7 +224,6 @@
 
                 // data for pagination
                 current: 1,
-                filteredData: null,
             };
         },
 
@@ -288,24 +287,20 @@
 
 
                 if (searchList !== null) {
-                    this.filteredData = searchList // eslint-disable-line
                     return paginate(searchList)
                 } else if (this.filters.length > 1) {
                     // Possibly, multiple filters have been applied. Return the array with the least elements
                     return filterByNumber.length < filterByRack.length ?
-                        filterByNumber : filterByRack
+                        paginate(filterByNumber) : paginate(filterByRack)
                 } else if (filterByNumber !== null && filterByNumber.length > 0) {
                     this.trayList = filterByNumber // eslint-disable-line
                     this.filterData(filterByNumber)
-                    this.filteredData = filterByNumber // eslint-disable-line
                     return paginate(filterByNumber)
                 } else if (filterByRack !== null && filterByRack.length > 0) {
-                    this.rackList = filterByRack // eslint-disable-line
+                    this.trayList = filterByRack // eslint-disable-line
                     this.filterData(filterByRack)
-                    this.filteredData = filterByRack // eslint-disable-line
                     return paginate(filterByRack)
                 }
-                this.filteredData = this.trayList // eslint-disable-line
                 return paginate(this.trayList)
             },
         },
@@ -315,7 +310,7 @@
             selectItemForUpdate,
 
             pageInfo(info) {
-                EventBus.$emit('page-info', {'pgInfo': info, 'pgData': this.filteredData})
+                EventBus.$emit('page-info', {'pgInfo': info, 'pgData': this.trayList})
             },
 
             onSubmit(evt) {

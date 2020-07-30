@@ -224,7 +224,6 @@
 
                 // data for pagination
                 current: 1,
-                filteredData: null,
             };
         },
         validations: {
