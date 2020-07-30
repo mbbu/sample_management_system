@@ -24,6 +24,7 @@
     "mdbootstrap": "^4.14.1",
     "mdbvue": "^6.5.1",
     "secure-ls": "^1.2.6",
+    "v-page": "^2.0.9",
     "vee-validate": "^3.2.2",
     "vue": "^2.6.10",
     "vue-axios": "^2.1.5",
