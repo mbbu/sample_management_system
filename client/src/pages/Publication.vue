@@ -6,7 +6,12 @@
 
                 <!-- FLASH MESSAGES -->
                 <FlashMessage :position="'right bottom'"></FlashMessage>
-                <br> <br>
+                <br>
+
+                <!--TOP-PAGINATION-->
+                <v-page :total-row="filteredList.pg_len" @page-change="pageInfo" align="center"
+                        v-model="current"></v-page>
+                <br>
                 <table class=" table table-hover">
                     <thead>
                     <tr>
@@ -20,7 +25,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="publication.id" v-for="(publication, index) in filteredList">
+                    <tr :key="publication.id" v-for="(publication, index) in filteredList.arr">
                         <td> {{ index + 1 }}</td>
                         <td> {{publication.publication_title}}</td>
                         <td> {{publication['sample.theme.name']}}</td>
@@ -66,6 +71,10 @@
                     </tr>
                     </tbody>
                 </table>
+                <!--TOP-PAGINATION-->
+                <v-page :total-row="filteredList.pg_len" @page-change="pageInfo" align="center"
+                        v-model="current"></v-page>
+                <br>
             </div>
 
             <div v-if="!isEditing">
@@ -252,6 +261,7 @@
         extractApiDataForPub,
         getItemDataList,
         getSelectedItemSetTextFieldValue,
+        paginate,
         respondTo401,
         secureStoreGetString,
         showFlashMessage
@@ -284,6 +294,10 @@
                 old_title: null,
                 showModal: true,
                 isEditing: false,
+
+                // data for pagination
+                current: 1,
+                filteredData: null,
             }
         },
 
@@ -309,14 +323,20 @@
                 let searchList = this.search ? this.searchData() : null
 
                 if (searchList !== null) {
-                    return searchList
+                    this.filteredData = searchList // eslint-disable-line
+                    return paginate(searchList)
                 }
-                return this.publicationList
-            }
+                this.filteredData = this.publicationList // eslint-disable-line
+                return paginate(this.publicationList)
+            },
         },
 
         methods: {
             //UTIL Fn
+            pageInfo(info) {
+                EventBus.$emit('page-info', {'pgInfo': info, 'pgData': this.filteredData})
+            },
+
             onSubmit(evt) {
                 this.$v.$touch();
                 if (this.$v.$invalid) {
@@ -326,6 +346,7 @@
                 }
                 this.createPublication();
             },
+
             clearForm() {
                 this.isEditing = false;
                 this.old_title = null;
@@ -365,7 +386,6 @@
                 this.getPublication()
             },
 
-
             // methods to interact with api
             getPublication() {
                 this.clearForm();
@@ -386,7 +406,6 @@
                 this.publication.sample = dropdownSelection.sampleCode
                 document.getElementById("form-user-input").value = dropdownSelection.authorText;
             },
-
 
             createPublication() {
                 let self = this;
