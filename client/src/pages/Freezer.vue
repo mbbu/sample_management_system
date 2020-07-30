@@ -12,6 +12,10 @@
                 <filter-card :all-filters="allFilters"></filter-card>
                 <br>
 
+                <!--TOP-PAGINATION-->
+                <v-page :total-row="matchFiltersAndSearch.pg_len" @page-change="pageInfo" align="center"
+                        v-model="current"></v-page>
+                <br>
                 <table class=" table table-hover">
                     <thead>
                     <tr>
@@ -24,7 +28,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="freezer.id" v-for="(freezer, index) in matchFiltersAndSearch">
+                    <tr :key="freezer.id" v-for="(freezer, index) in matchFiltersAndSearch.arr">
                         <td> {{ index + 1 }}</td>
                         <td> {{ freezer['lab.name'] }}</td>
                         <td> {{ freezer.room }}</td>
@@ -51,6 +55,10 @@
                     </tr>
                     </tbody>
                 </table>
+                <!--BOTTOM-PAGINATION-->
+                <v-page :total-row="matchFiltersAndSearch.pg_len" @page-change="pageInfo" align="center"
+                        v-model="current"></v-page>
+                <br>
             </div>
 
             <div v-if="!isEditing">
@@ -228,6 +236,7 @@
         extractApiData,
         getItemDataList,
         getSelectedItem,
+        paginate,
         respondTo401,
         secureStoreGetString,
         selectItemForUpdate,
@@ -263,6 +272,9 @@
                 old_code: null,
                 showModal: true,
                 isEditing: false,
+
+                // data for pagination
+                current: 1,
             };
         },
 
@@ -327,26 +339,31 @@
 
 
                 if (searchList !== null) {
-                    return searchList
+                    return paginate(searchList)
                 } else if (this.filters.length > 1) {
                     // Possibly, multiple filters have been applied. Return the array with the least elements
                     return filterByLab.length < filterByRoom.length ?
-                        filterByLab : filterByRoom
+                        paginate(filterByLab) : paginate(filterByRoom)
                 } else if (filterByLab !== null && filterByLab.length > 0) {
                     this.freezerList = filterByLab // eslint-disable-line
                     this.filterData(filterByLab)
-                    return filterByLab
+                    return paginate(filterByLab)
                 } else if (filterByRoom !== null && filterByRoom.length > 0) {
                     this.freezerList = filterByRoom // eslint-disable-line
                     this.filterData(filterByRoom)
-                    return filterByRoom
+                    return paginate(filterByRoom)
                 }
-                return this.freezerList
+                return paginate(this.freezerList)
             },
         },
 
         methods: {
             selectItemForUpdate,
+
+            pageInfo(info) {
+                EventBus.$emit('page-info', {'pgInfo': info, 'pgData': this.freezerList})
+            },
+
             onSubmit(evt) {
                 this.$v.$touch();
                 if (this.$v.$invalid) {
