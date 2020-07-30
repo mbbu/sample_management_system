@@ -10,6 +10,12 @@
                 <!-- FILTER CARD SECTION -->
                 <filter-card :all-filters="allFilters"></filter-card>
                 <br>
+
+                <!--TOP-PAGINATION-->
+                <v-page :total-row="matchFiltersAndSearch.pg_len" @page-change="pageInfo" align="center"
+                        v-model="current"></v-page>
+                <br>
+
                 <table class=" table table-hover">
                     <thead>
                     <tr>
@@ -22,7 +28,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="chamber.id" v-for="(chamber, index) in matchFiltersAndSearch">
+                    <tr :key="chamber.id" v-for="(chamber, index) in matchFiltersAndSearch.arr">
                         <td> {{ index + 1 }}</td>
                         <td> {{chamber.type}}</td>
                         <td> {{chamber.code}}</td>
@@ -49,6 +55,10 @@
                     </tr>
                     </tbody>
                 </table>
+                <!--BOTTOM-PAGINATION-->
+                <v-page :total-row="matchFiltersAndSearch.pg_len" @page-change="pageInfo" align="center"
+                        v-model="current"></v-page>
+                <br>
             </div>
 
             <div v-if="!isEditing">
@@ -183,6 +193,7 @@
     import {
         extractFreezerData,
         getItemDataList,
+        paginate,
         respondTo401,
         secureStoreGetString,
         selectItemForUpdate,
@@ -215,6 +226,9 @@
                 old_code: null,
                 showModal: true,
                 isEditing: false,
+
+                // data for pagination
+                current: 1,
             };
         },
 
@@ -278,25 +292,31 @@
                 let filterByFreezer = filteredData.freezer
 
                 if (searchList !== null) {
-                    return searchList
+                    return paginate(searchList)
                 } else if (this.filters.length > 1) {
                     // Possibly, multiple filters have been applied. Return the array with the least elements
                     return filterByType.length < filterByFreezer.length ?
-                        filterByType : filterByFreezer
+                        paginate(filterByType) : paginate(filterByFreezer)
                 } else if (filterByType !== null && filterByType.length > 0) {
                     this.freezerList = filterByType // eslint-disable-line
                     this.filterData(filterByType)
-                    return filterByType
+                    return paginate(filterByType)
                 } else if (filterByFreezer !== null && filterByFreezer.length > 0) {
                     this.freezerList = filterByFreezer // eslint-disable-line
                     this.filterData(filterByFreezer)
-                    return filterByFreezer
+                    return paginate(filterByFreezer)
                 }
-                return this.chamberList
+                return paginate(this.chamberList)
             },
         },
 
         methods: {
+            //Util Functions
+
+            pageInfo(info) {
+                EventBus.$emit('page-info', {'pgInfo': info, 'pgData': this.chamberList})
+            },
+
             onSubmit(evt) {
                 this.$v.$touch();
                 if (this.$v.$invalid) {
