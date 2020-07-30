@@ -10,6 +10,11 @@
                 <!-- FILTER CARD SECTION -->
                 <filter-card :all-filters="allFilters"></filter-card>
                 <br>
+
+                <!--TOP-PAGINATION-->
+                <v-page :total-row="matchFiltersAndSearch.pg_len" @page-change="pageInfo" align="center"
+                        v-model="current"></v-page>
+                <br>
                 <table class="table table-hover">
                     <thead>
                     <tr>
@@ -25,7 +30,7 @@
                     </thead>
 
                     <tbody>
-                    <tr :key="sample.id" v-for="(sample, index) in matchFiltersAndSearch">
+                    <tr :key="sample.id" v-for="(sample, index) in matchFiltersAndSearch.arr">
                         <td> {{ index + 1 }}</td>
                         <td> {{ sample['theme.name'] }}</td>
                         <td> {{ sample.project }}</td>
@@ -46,6 +51,10 @@
                     </tr>
                     </tbody>
                 </table>
+                <!--BOTTOM-PAGINATION-->
+                <v-page :total-row="matchFiltersAndSearch.pg_len" @page-change="pageInfo" align="center"
+                        v-model="current"></v-page>
+                <br>
             </div>
             <a href="/addsample">
                 <b-button class="float_btn" style="border-radius: 50%" variant="primary">
@@ -60,7 +69,7 @@
     import axios from 'axios';
     import {sample_resource} from "../../utils/api_paths";
     import TopNav from "../../components/TopNav";
-    import {countDownTimer, setSampleCode} from "../../utils/util_functions";
+    import {countDownTimer, paginate, setSampleCode} from "../../utils/util_functions";
     import EventBus from "../../components/EventBus";
     import FilterCard from "../../components/FilterCard";
 
@@ -75,7 +84,10 @@
                 filters: [],
                 response: [],
                 sampleList: [],
-                search: ''
+                search: '',
+
+                // data for pagination
+                current: 1,
             };
         },
 
@@ -86,7 +98,7 @@
         mounted() {
             EventBus.$on('searchQuery', (payload) => {
                 this.search = payload
-                // this.searchData() // todo: not a function
+                this.searchData()
             })
 
             EventBus.$on('filters', (payload) => {
@@ -171,12 +183,8 @@
                 let filterByLocInLab = filteredData.loc_in_lab
                 let filterByLocCollected = filteredData.loc_collected
 
-
-                console.log("search string: ", this.search, " \nsearch data set: ", this.sampleList, " \nsearch data result: ", searchList)
-                console.log("filter data returned: ", filteredData)
-
                 if (searchList !== null) {
-                    return searchList
+                    return paginate(searchList)
                 } else if (this.filters.length > 1) {
 
                     let lowest = 0;
@@ -184,52 +192,54 @@
                         console.log("Item  " + i + " ", filteredData[i])
                         if ((filteredData[i] < filteredData[lowest]) && filteredData[i].length > 0) lowest = i;
                     }
-
-                    console.log("LOWEST: ", lowest)
-                    return filteredData[lowest];
+                    return paginate(filteredData[lowest]);
 
                 } else if (filterByPI !== null && filterByPI.length > 0) {
                     this.sampleList = filterByPI // eslint-disable-line
                     this.filterData(filterByPI)
-                    return filterByPI
+                    return paginate(filterByPI)
                 } else if (filterByType !== null && filterByType.length > 0) {
                     this.sampleList = filterByType // eslint-disable-line
                     this.filterData(filterByType)
-                    return filterByType
+                    return paginate(filterByType)
                 } else if (filterByTheme !== null && filterByTheme.length > 0) {
                     this.sampleList = filterByTheme // eslint-disable-line
                     this.filterData(filterByTheme)
-                    return filterByTheme
+                    return paginate(filterByTheme)
                 } else if (filterByStatus !== null && filterByStatus.length > 0) {
                     this.sampleList = filterByStatus // eslint-disable-line
                     this.filterData(filterByStatus)
-                    return filterByStatus
+                    return paginate(filterByStatus)
                 } else if (filterByProject !== null && filterByProject.length > 0) {
                     this.sampleList = filterByProject // eslint-disable-line
                     this.filterData(filterByProject)
-                    return filterByProject
+                    return paginate(filterByProject)
                 } else if (filterBySpecies !== null && filterBySpecies.length > 0) {
                     this.sampleList = filterBySpecies // eslint-disable-line
                     this.filterData(filterBySpecies)
-                    return filterBySpecies
+                    return paginate(filterBySpecies)
                 } else if (filterByRetention !== null && filterByRetention.length > 0) {
                     this.sampleList = filterByRetention // eslint-disable-line
                     this.filterData(filterByRetention)
-                    return filterByRetention
+                    return paginate(filterByRetention)
                 } else if (filterByLocInLab !== null && filterByLocInLab.length > 0) {
                     this.sampleList = filterByLocInLab // eslint-disable-line
                     this.filterData(filterByLocInLab)
-                    return filterByLocInLab
+                    return paginate(filterByLocInLab)
                 } else if (filterByLocCollected !== null && filterByLocCollected.length > 0) {
                     this.sampleList = filterByLocCollected // eslint-disable-line
                     this.filterData(filterByLocCollected)
-                    return filterByLocCollected
+                    return paginate(filterByLocCollected)
                 }
-                return this.sampleList
+                return paginate(this.sampleList)
             },
         },
 
         methods: {
+            pageInfo(info) {
+                EventBus.$emit('page-info', {'pgInfo': info, 'pgData': this.sampleList})
+            },
+
             // methods to interact with api
             getSamples() {
                 // this.clearForm();
