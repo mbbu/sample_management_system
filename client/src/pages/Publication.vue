@@ -297,7 +297,6 @@
 
                 // data for pagination
                 current: 1,
-                filteredData: null,
             }
         },
 
@@ -323,10 +322,9 @@
                 let searchList = this.search ? this.searchData() : null
 
                 if (searchList !== null) {
-                    this.filteredData = searchList // eslint-disable-line
+                    this.publicationList = searchList // eslint-disable-line
                     return paginate(searchList)
                 }
-                this.filteredData = this.publicationList // eslint-disable-line
                 return paginate(this.publicationList)
             },
         },
@@ -334,7 +332,7 @@
         methods: {
             //UTIL Fn
             pageInfo(info) {
-                EventBus.$emit('page-info', {'pgInfo': info, 'pgData': this.filteredData})
+                EventBus.$emit('page-info', {'pgInfo': info, 'pgData': this.publicationList})
             },
 
             onSubmit(evt) {
