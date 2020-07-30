@@ -10,6 +10,11 @@
                 <!-- FILTER CARD SECTION -->
                 <filter-card :all-filters="allFilters"></filter-card>
                 <br>
+
+                <!--TOP-PAGINATION-->
+                <v-page :total-row="matchFiltersAndSearch.pg_len" @page-change="pageInfo" align="center"
+                        v-model="current"></v-page>
+                <br>
                 <table class=" table table-hover">
                     <thead>
                     <tr>
@@ -21,7 +26,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="rack.id" v-for="(rack, index) in matchFiltersAndSearch">
+                    <tr :key="rack.id" v-for="(rack, index) in matchFiltersAndSearch.arr">
                         <td> {{ index + 1 }}</td>
                         <td> {{rack.number}}</td>
                         <td> {{rack.code}}</td>
@@ -47,6 +52,10 @@
                     </tr>
                     </tbody>
                 </table>
+                <!--TOP-PAGINATION-->
+                <v-page :total-row="matchFiltersAndSearch.pg_len" @page-change="pageInfo" align="center"
+                        v-model="current"></v-page>
+                <br>
             </div>
 
             <div v-if="!isEditing">
@@ -177,6 +186,7 @@
     import {
         extractChamberData,
         getItemDataList,
+        paginate,
         respondTo401,
         secureStoreGetString,
         selectItemForUpdate,
@@ -211,6 +221,10 @@
                 old_code: null,
                 showModal: true,
                 isEditing: false,
+
+                // data for pagination
+                current: 1,
+                filteredData: null,
             };
         },
         validations: {
@@ -273,27 +287,33 @@
 
 
                 if (searchList !== null) {
-                    return searchList
+                    this.rackList = searchList // eslint-disable-line
+                    return paginate(searchList)
                 } else if (this.filters.length > 1) {
                     // Possibly, multiple filters have been applied. Return the array with the least elements
                     return filterByNumber.length < filterByChamber.length ?
-                        filterByNumber : filterByChamber
+                        paginate(filterByNumber) : paginate(filterByChamber)
                 } else if (filterByNumber !== null && filterByNumber.length > 0) {
                     this.rackList = filterByNumber // eslint-disable-line
                     this.filterData(filterByNumber)
-                    return filterByNumber
+                    return paginate(filterByNumber)
                 } else if (filterByChamber !== null && filterByChamber.length > 0) {
                     this.rackList = filterByChamber // eslint-disable-line
                     this.filterData(filterByChamber)
-                    return filterByChamber
+                    return paginate(filterByChamber)
                 }
-                return this.rackList
+                return paginate(this.rackList)
             },
         },
 
         methods: {
             // Util Functions
             selectItemForUpdate,
+
+            pageInfo(info) {
+                EventBus.$emit('page-info', {'pgInfo': info, 'pgData': this.rackList})
+            },
+
             onSubmit(evt) {
                 this.$v.$touch();
                 if (this.$v.$invalid) {
