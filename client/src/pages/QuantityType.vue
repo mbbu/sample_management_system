@@ -7,6 +7,11 @@
                 <!-- FLASH MESSAGES -->
                 <FlashMessage :position="'right bottom'"></FlashMessage>
                 <br> <br>
+
+                <!--TOP-PAGINATION-->
+                <v-page :total-row="filteredList.pg_len" @page-change="pageInfo" align="center"
+                        v-model="current"></v-page>
+                <br>
                 <table class=" table table-hover">
                     <thead>
                     <tr>
@@ -18,7 +23,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="qt.id" v-for="(qt, index) in filteredList">
+                    <tr :key="qt.id" v-for="(qt, index) in filteredList.arr">
                         <td> {{ index + 1 }}</td>
                         <td> {{ qt.name }}</td>
                         <td> {{ qt.id }}</td>
@@ -44,6 +49,10 @@
                     </tr>
                     </tbody>
                 </table>
+                <!--BOTTOM-PAGINATION-->
+                <v-page :total-row="filteredList.pg_len" @page-change="pageInfo" align="center"
+                        v-model="current"></v-page>
+                <br>
             </div>
 
             <div v-if="!isEditing">
@@ -186,7 +195,7 @@
     import axios from 'axios';
     import {quantity_type_resource} from '../utils/api_paths'
     import TopNav from "../components/TopNav";
-    import {respondTo401, secureStoreGetString, showFlashMessage} from "../utils/util_functions";
+    import {paginate, respondTo401, secureStoreGetString, showFlashMessage} from "../utils/util_functions";
     import EventBus from '../components/EventBus';
     import {required} from "vuelidate/lib/validators";
 
@@ -208,6 +217,9 @@
                 old_code: null,
                 showModal: true,
                 isEditing: false,
+
+                // data for pagination
+                current: 1,
             };
         },
 
@@ -231,13 +243,18 @@
                 let searchList = this.search ? this.searchData() : null
 
                 if (searchList !== null) {
-                    return searchList
+                    this.QTList = searchList // eslint-disable-line
+                    return paginate(searchList)
                 }
-                return this.QTList
+                return paginate(this.QTList)
             }
         },
 
         methods: {
+            pageInfo(info) {
+                EventBus.$emit('page-info', {'pgInfo': info, 'pgData': this.QTList})
+            },
+
             onSubmit(evt) {
                 this.$v.$touch();
                 if (this.$v.$invalid) {
