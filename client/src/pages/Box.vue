@@ -4,13 +4,17 @@
         <div class="row">
             <div class="col-sm-12">
                 <top-nav :page_title="page_title" v-bind:search_query.sync="search"></top-nav>
-
-                <FlashMessage :position="'center bottom'"></FlashMessage>
+                <!-- FLASH MESSAGES -->
+                <FlashMessage :position="'right bottom'"></FlashMessage>
                 <br>
                 <!-- FILTER CARD SECTION -->
                 <filter-card :all-filters="allFilters"></filter-card>
                 <br>
 
+                <!--TOP-PAGINATION-->
+                <v-page :total-row="page_length" @page-change="pageInfo" align="center"
+                        v-model="current"></v-page>
+                <br>
                 <table class=" table table-hover">
                     <thead>
                     <tr>
@@ -56,49 +60,66 @@
                     </tr>
                     </tbody>
                 </table>
+                <!--TOP-PAGINATION-->
+                <v-page :total-row="page_length" @page-change="pageInfo" align="center"
+                        v-model="current"></v-page>
+                <br>
             </div>
 
             <div v-if="!isEditing">
                 <b-modal
                         :title="`Add ${page_title}`"
                         @hidden="clearForm"
-                        @ok="createBox"
-                        @submit="clearForm"
+                        @ok="onSubmit"
+                        @submit="showModal=false"
                         cancel-variant="danger"
                         id="modal-box"
                         ok-title="Save"
                 >
                     <form @submit.prevent="createBox">
+                        <!--TRAY-->
                         <b-form-group id="form-tray-group" label="Tray Number:" label-for="form-tray-input">
                             <ejs-dropdownlist
                                     :dataSource='trayDataList'
                                     :fields="fields"
-                                    :v-model="box.tray"
                                     id='dropdownlist'
                                     placeholder='Select a tray'
+                                    v-model.trim="$v.box.tray.$model"
                             ></ejs-dropdownlist>
+                            <div v-if="$v.box.tray.$dirty">
+                                <div class="error" v-if="!$v.box.tray.required">Field is required</div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-label-group" label="Box Label:" label-for="form-label-input">
+                        <!--LABEL-->
+                        <b-form-group :class="{ 'form-group--error': $v.box.label.$error }"
+                                      id="form-label-group" label="Box Label:" label-for="form-label-input">
                             <b-form-input
                                     id="form-label-input"
                                     placeholder="Enter box label"
-                                    required="true"
+                                    required
                                     type="text"
-                                    v-model="box.label"
+                                    v-model.trim="$v.box.label.$model"
                             ></b-form-input>
+                            <div v-if="$v.box.label.$dirty">
+                                <div class="error" v-if="!$v.box.label.required">Field is required</div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-code-group" label="Code:" label-for="form-code-input">
+                        <!--CODE-->
+                        <b-form-group :class="{ 'form-group--error': $v.box.code.$error }"
+                                      code-for="form-code-input" id="form-code-group" label="Code:">
                             <b-form-input
                                     id="form-code-input"
                                     placeholder="Enter Code"
-                                    required="true"
+                                    required
                                     type="text"
-                                    v-model="box.code">
+                                    v-model.trim="$v.box.code.$model">
                             </b-form-input>
+                            <div v-if="$v.box.code.$dirty">
+                                <div class="error" v-if="!$v.box.code.required">Field is required</div>
+                            </div>
                         </b-form-group>
-
                     </form>
                 </b-modal>
             </div>
@@ -107,7 +128,7 @@
                 <b-modal
                         :title="`Edit ${page_title}`"
                         @hidden="clearForm"
-                        @ok="updateBox(old_code)"
+                        @ok="updateBox"
                         @shown="selectItemForUpdate(box.tray)"
                         @submit="showModal = false"
                         cancel-variant="danger"
@@ -115,34 +136,48 @@
                         ok-title="Update"
                 >
                     <form>
+                        <!--TRAY-->
                         <b-form-group id="form-tray-group-edit" label="Tray Number:" label-for="form-tray-input">
                             <ejs-dropdownlist
                                     :dataSource='trayDataList'
                                     :fields="fields"
-                                    :v-model="box.tray"
                                     id='dropdownlist'
                                     placeholder='Select a tray'
+                                    v-model.trim="$v.box.tray.$model"
                             ></ejs-dropdownlist>
+                            <div v-if="$v.box.tray.$dirty">
+                                <div class="error" v-if="!$v.box.tray.required">Field is required</div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-label-group-edit" label="Box Label:" label-for="form-label-input">
+                        <!--LABEL-->
+                        <b-form-group :class="{ 'form-group--error': $v.box.label.$error }"
+                                      id="form-label-group-edit" label="Box Label:" label-for="form-label-input">
                             <b-form-input
                                     id="form-label-input"
                                     placeholder="Enter box label"
-                                    required="true"
+                                    required
                                     type="text"
-                                    v-model="box.label"
+                                    v-model.trim="$v.box.label.$model"
                             ></b-form-input>
+                            <div v-if="$v.box.label.$dirty">
+                                <div class="error" v-if="!$v.box.label.required">Field is required</div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-code-group-edit" label="Code:" label-for="form-code-input">
+                        <!--CODE-->
+                        <b-form-group :class="{ 'form-group--error': $v.box.code.$error }"
+                                      code-for="form-code-input" id="form-code-group-edit" label="Code:">
                             <b-form-input
                                     id="form-code-input"
                                     placeholder="Enter Code"
-                                    required="true"
+                                    required
                                     type="text"
-                                    v-model="box.code">
+                                    v-model.trim="$v.box.code.$model">
                             </b-form-input>
+                            <div v-if="$v.box.code.$dirty">
+                                <div class="error" v-if="!$v.box.code.required">Field is required</div>
+                            </div>
                         </b-form-group>
                     </form>
                 </b-modal>
@@ -160,7 +195,6 @@
     import {
         extractTrayData,
         getItemDataList,
-        getSelectedItem,
         respondTo401,
         secureStoreGetString,
         selectItemForUpdate,
@@ -169,6 +203,7 @@
     import {box_resource, tray_resource} from "../utils/api_paths";
     import EventBus from '../components/EventBus';
     import FilterCard from "../components/FilterCard";
+    import {required} from "vuelidate/lib/validators";
 
     export default {
         name: 'Box',
@@ -184,9 +219,9 @@
                 search: '',
 
                 box: {
-                    tray: null,
-                    label: null,
-                    code: null
+                    tray: '',
+                    label: '',
+                    code: ''
                 },
 
                 trayDataList: [],
@@ -197,22 +232,34 @@
                 showModal: true,
                 isEditing: false,
 
+                // data for pagination
+                current: 1,
+                page_length: null,
+                page_array: [],
+                page_info: {},
             };
         },
 
+        validations: {
+            box: {
+                tray: {required},
+                code: {required},
+                label: {required},
+            }
+        },
+
         created() {
-            this.getBox();
+            this.onLoadPage();
         },
 
         mounted() {
             EventBus.$on('searchQuery', (payload) => {
                 this.search = payload
-                this.filteredList()
+                this.searchData()
             })
 
             EventBus.$on('filters', (payload) => {
                 this.filters = payload
-                this.matchFiltersAndSearch()
                 if (this.filters.length === 0) {
                     this.boxList = this.response
                 }
@@ -277,87 +324,80 @@
 
 
                 if (searchList !== null) {
-                    return searchList
+                    return this.paginate(searchList)
                 } else if (this.filters.length > 1) {
-                    // todo: Possibly, multiple filters have been applied. Return the array with the least elements
-                    console.log("Multiple filters")
-                    console.log('lab: ', filterByLab)
-                    console.log('freezer: ', filterByFreezer)
-                    console.log('chamber: ', filterByChamber)
-                    console.log('rack: ', filterByRack)
-                    console.log('tray: ', filterByTray)
-
-                    let a = filterByFreezer.length < filterByLab.length ?
+                    let freezerFiltered = filterByFreezer.length < filterByLab.length ?
                         filterByFreezer : filterByLab
 
-                    let b = filterByChamber.length < filterByFreezer.length ?
+                    let chamberFiltered = filterByChamber.length < filterByFreezer.length ?
                         filterByChamber : filterByFreezer
 
-                    let c = filterByRack.length < filterByChamber.length ?
+                    let rackFiltered = filterByRack.length < filterByChamber.length ?
                         filterByRack : null
 
-                    let d = filterByTray.length < filterByRack.length ?
+                    let trayFiltered = filterByTray.length < filterByRack.length ?
                         filterByTray : null
 
-                    let e = filterByLabel.length < filterByTray.length ?
+                    let labelFiltered = filterByLabel.length < filterByTray.length ?
                         filterByLabel : null
 
-                    console.log("a: ", a)
-                    console.log("b: ", b)
-                    console.log("c: ", c)
-                    console.log("d: ", d)
-                    console.log("e: ", e)
 
-                    this.boxList = e != null && e.length !== 0 && e < d ? e // eslint-disable-line
-                        : d != null && d.length !== 0 && d < c ? d
-                            : c != null && c.length !== 0 && c < b ? c
-                                : b != null && b.length !== 0 && b < a ? b
-                                    : a // eslint-disable-line
+                    this.boxList = labelFiltered != null && labelFiltered.length !== 0 && labelFiltered < trayFiltered ? labelFiltered // eslint-disable-line
+                        : trayFiltered != null && trayFiltered.length !== 0 && trayFiltered < rackFiltered ? trayFiltered
+                            : rackFiltered != null && rackFiltered.length !== 0 && rackFiltered < chamberFiltered ? rackFiltered
+                                : chamberFiltered != null && chamberFiltered.length !== 0 && chamberFiltered < freezerFiltered ? chamberFiltered
+                                    : freezerFiltered // eslint-disable-line
 
-                    console.log("original box list: ", this.boxList)
-
-                    return this.boxList
+                    return this.paginate(this.boxList)
 
                 } else if (filterByLabel !== null && filterByLabel.length > 0) {
                     this.boxList = filterByLabel // eslint-disable-line
                     this.filterData(filterByLabel)
-                    return filterByLabel
+                    return this.paginate(filterByLabel)
                 } else if (filterByTray !== null && filterByTray.length > 0) {
                     this.rackList = filterByTray // eslint-disable-line
                     this.filterData(filterByTray)
-                    return filterByTray
+                    return this.paginate(filterByTray)
                 } else if (filterByRack !== null && filterByRack.length > 0) {
                     this.rackList = filterByRack // eslint-disable-line
                     this.filterData(filterByRack)
-                    return filterByRack
+                    return this.paginate(filterByRack)
                 } else if (filterByChamber !== null && filterByChamber.length > 0) {
                     this.rackList = filterByChamber // eslint-disable-line
                     this.filterData(filterByChamber)
-                    return filterByChamber
+                    return this.paginate(filterByChamber)
                 } else if (filterByFreezer !== null && filterByFreezer.length > 0) {
                     this.rackList = filterByFreezer // eslint-disable-line
                     this.filterData(filterByFreezer)
-                    return filterByFreezer
+                    return this.paginate(filterByFreezer)
                 } else if (filterByLab !== null && filterByLab.length > 0) {
                     this.rackList = filterByLab // eslint-disable-line
                     this.filterData(filterByLab)
-                    return filterByLab
+                    return this.paginate(filterByLab)
                 }
-
-                return this.boxList
+                return this.paginate(this.boxList)
             },
         },
 
         methods: {
             // component util functions
             selectItemForUpdate,
+            onSubmit(evt) {
+                this.$v.$touch();
+                if (this.$v.$invalid) {
+                    // stop here if form is invalid
+                    evt.preventDefault()
+                    return;
+                }
+                this.createBox();
+            },
+
             clearForm() {
                 this.box.tray = null;
                 this.box.code = null;
                 this.box.label = null;
                 this.isEditing = false;
-                this.trayDataList = [];
-                this.onLoadPage();
+                this.$v.$reset();
             },
 
             fillFormForUpdate(tray, label, code) {
@@ -369,10 +409,31 @@
                 this.showModal = true;
             },
 
+            pageInfo(info) {
+                this.page_info = info
+            },
+
+            paginate(data) {
+                let start = 0, end = 0;
+
+                start = this.page_info.pageSize * (this.page_info.pageNumber - 1)
+                end = start + this.page_info.pageSize
+
+                this.page_array.splice(0, this.page_array.length);
+
+                if (end > data.length) end = data.length;
+
+                for (let i = start; i < end; i++) {
+                    this.page_array.push(data[i])
+                }
+
+                this.page_length = data.length
+                return this.page_array
+            },
+
             onLoadPage() {
                 getItemDataList(tray_resource).then(data => {
                     let trayList = extractTrayData(data);
-                    this.$log.info("Tray list json: ", JSON.stringify(trayList));
 
                     // update local variables with data from API
                     this.fields = trayList['fields'];
@@ -382,9 +443,8 @@
                             'Name': trayList.items[i].Name,
                         });
                     }
-                    this.$log.info("FIELDS: ", this.fields);
-                    this.$log.info("Data: ", this.fields);
                 })
+                this.getBox()
             },
 
             // functions to interact with API
@@ -393,7 +453,6 @@
                 axios.get(box_resource)
                     .then((res) => {
                         this.boxList = this.response = res.data['message'];
-                        console.log('box list: ', this.boxList)
                     })
                     .catch((error) => {
                         console.error(error);
@@ -402,7 +461,6 @@
 
             createBox: function () {
                 let self = this;
-                this.box.tray = getSelectedItem(this.trayDataList, this.tray);
 
                 axios.post(box_resource, {
                     tray: this.box.tray,
@@ -436,43 +494,49 @@
                             }
                         }
                     });
+                this.clearForm();
             },
 
-            updateBox: function (code) {
-                let self = this;
-                this.box.tray = getSelectedItem(this.trayDataList, this.box.tray);
+            updateBox: function (evt) {
+                this.$v.$touch();
+                if (this.$v.$invalid) {
+                    evt.preventDefault()
+                } else {
+                    let self = this;
 
-                axios.put(box_resource, {
-                    tray: this.box.tray,
-                    label: this.box.label,
-                    code: this.box.code,
-                }, {
-                    headers:
-                        {
-                            code: code,
-                            Authorization: secureStoreGetString()
-                        }
-                })
-                    .then((response) => {
-                        this.getBox();
-                        showFlashMessage(self, 'success', response.data['message'], '');
-                        this.clearForm();
-                    })
-                    .catch((error) => {
-                        this.clearForm();
-                        this.$log.error(error);
-                        if (error.response) {
-                            if (error.response.status === 304) {
-                                showFlashMessage(self, 'info', 'Record not modified!', '');
-                            } else if (error.response.status === 401) {
-                                respondTo401(self);
-                            } else if (error.response.status === 403) {
-                                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
-                            } else {
-                                showFlashMessage(self, 'error', error.response.data['message'], '');
+                    axios.put(box_resource, {
+                        tray: this.box.tray,
+                        label: this.box.label,
+                        code: this.box.code,
+                    }, {
+                        headers:
+                            {
+                                code: this.old_code,
+                                Authorization: secureStoreGetString()
                             }
-                        }
-                    });
+                    })
+                        .then((response) => {
+                            this.getBox();
+                            showFlashMessage(self, 'success', response.data['message'], '');
+                            this.clearForm();
+                        })
+                        .catch((error) => {
+                            this.clearForm();
+                            this.$log.error(error);
+                            if (error.response) {
+                                if (error.response.status === 304) {
+                                    showFlashMessage(self, 'info', 'Record not modified!', '');
+                                } else if (error.response.status === 401) {
+                                    respondTo401(self);
+                                } else if (error.response.status === 403) {
+                                    showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
+                                } else {
+                                    showFlashMessage(self, 'error', error.response.data['message'], '');
+                                }
+                            }
+                        });
+                    this.clearForm();
+                }
             },
 
             deleteBox: function (code) {
@@ -500,6 +564,7 @@
                             }
                         }
                     });
+                this.clearForm();
             },
             //end of methods for api interaction
 

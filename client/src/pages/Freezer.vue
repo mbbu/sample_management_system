@@ -5,13 +5,17 @@
                 <top-nav :page_title="page_title" v-bind:search_query.sync="search"></top-nav>
 
                 <!-- FLASH MESSAGES -->
-                <FlashMessage :position="'center bottom'"></FlashMessage>
+                <FlashMessage :position="'right bottom'"></FlashMessage>
 
                 <br>
                 <!-- FILTER CARD SECTION -->
                 <filter-card :all-filters="allFilters"></filter-card>
                 <br>
 
+                <!--TOP-PAGINATION-->
+                <v-page :total-row="matchFiltersAndSearch.pg_len" @page-change="pageInfo" align="center"
+                        v-model="current"></v-page>
+                <br>
                 <table class=" table table-hover">
                     <thead>
                     <tr>
@@ -24,7 +28,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="freezer.id" v-for="(freezer, index) in matchFiltersAndSearch">
+                    <tr :key="freezer.id" v-for="(freezer, index) in matchFiltersAndSearch.arr">
                         <td> {{ index + 1 }}</td>
                         <td> {{ freezer['lab.name'] }}</td>
                         <td> {{ freezer.room }}</td>
@@ -51,59 +55,88 @@
                     </tr>
                     </tbody>
                 </table>
+                <!--BOTTOM-PAGINATION-->
+                <v-page :total-row="matchFiltersAndSearch.pg_len" @page-change="pageInfo" align="center"
+                        v-model="current"></v-page>
+                <br>
             </div>
 
             <div v-if="!isEditing">
                 <b-modal
                         @hidden="clearForm"
-                        @ok="createFreezer"
-                        @submit="clearForm"
+                        @ok="onSubmit"
+                        @submit="showModal=false"
                         cancel-variant="danger"
                         id="modal-freezer"
                         ok-title="Save"
                         title="Add Freezer"
                 >
                     <form @submit.prevent="createFreezer">
+                        <!--LABORATORY-->
                         <b-form-group id="form-lab-group" label="Lab:" label-for="form-lab-input">
                             <ejs-dropdownlist
                                     :dataSource='labDataList'
                                     :fields="fields"
-                                    :v-model="laboratory"
+                                    v-model.trim="$v.freezer.laboratory.$model"
                                     id='dropdownlist'
                                     placeholder='Select a lab'
                             ></ejs-dropdownlist>
+                            <div v-if="$v.freezer.laboratory.$dirty">
+                                <div class="error" v-if="!$v.freezer.laboratory.required">Field is
+                                    required
+                                </div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-room-group" label="Room:" label-for="form-room-input">
+                        <!-- ROOM -->
+                        <b-form-group :class="{ 'form-group--error': $v.freezer.room.$error }"
+                                      id="form-room-group" label="Room:" label-for="form-room-input">
                             <b-form-input
                                     id="form-room-input"
                                     placeholder="Enter Room Number"
-                                    required="true"
+                                    required
                                     type="text"
-                                    v-model="room"
+                                    v-model.trim="$v.freezer.room.$model"
                             ></b-form-input>
+                            <div v-if="$v.freezer.room.$dirty">
+                                <div class="error" v-if="!$v.freezer.room.required">Field is
+                                    required
+                                </div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-num-group" label="Num:" label-for="form-num-input">
+                        <!--NUMBER-->
+                        <b-form-group :class="{ 'form-group--error': $v.freezer.number.$error }"
+                                      id="form-num-group" label="Num:" label-for="form-num-input">
                             <b-form-input
                                     id="form-num-input"
                                     placeholder="Enter Freezer Number"
-                                    required="true"
+                                    required
                                     type="text"
-                                    v-model="number">
+                                    v-model.trim="$v.freezer.number.$model">
                             </b-form-input>
+                            <div v-if="$v.freezer.number.$dirty">
+                                <div class="error" v-if="!$v.freezer.number.required">Field is
+                                    required
+                                </div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-code-group" label="Code:" label-for="form-code-input">
+                        <b-form-group :class="{ 'form-group--error': $v.freezer.code.$error }"
+                                      id="form-code-group" label="Code:" label-for="form-code-input">
                             <b-form-input
                                     id="form-code-input"
                                     placeholder="Enter Code"
-                                    required="true"
+                                    required
                                     type="text"
-                                    v-model="code">
+                                    v-model.trim="$v.freezer.code.$model">
                             </b-form-input>
+                            <div v-if="$v.freezer.code.$dirty">
+                                <div class="error" v-if="!$v.freezer.code.required">Field is
+                                    required
+                                </div>
+                            </div>
                         </b-form-group>
-
                     </form>
                 </b-modal>
             </div>
@@ -111,8 +144,8 @@
             <div v-else-if="isEditing">
                 <b-modal
                         @hidden="clearForm"
-                        @ok="updateFreezer(old_code)"
-                        @shown="selectLabItemForUpdate(laboratory)"
+                        @ok="updateFreezer"
+                        @shown="selectItemForUpdate(freezer.laboratory)"
                         @submit="showModal = false"
                         cancel-variant="danger"
                         id="modal-freezer-edit"
@@ -120,44 +153,70 @@
                         title="Edit Freezer"
                 >
                     <form>
+                        <!--LABORATORY-->
                         <b-form-group id="form-lab-group-edit" label="Lab:" label-for="form-lab-input">
                             <ejs-dropdownlist
                                     :dataSource='labDataList'
                                     :fields="fields"
-                                    :v-model="laboratory"
+                                    v-model.trim="$v.freezer.laboratory.$model"
                                     id='dropdownlist'
                                     placeholder='Select a lab'
                             ></ejs-dropdownlist>
+                            <div v-if="$v.freezer.laboratory.$dirty">
+                                <div class="error" v-if="!$v.freezer.laboratory.required">Field is
+                                    required
+                                </div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-room-group-edit" label="Room:" label-for="form-room-input">
+                        <!-- ROOM -->
+                        <b-form-group :class="{ 'form-group--error': $v.freezer.room.$error }"
+                                      id="form-room-group-edit" label="Room:" label-for="form-room-input">
                             <b-form-input
                                     id="form-room-input"
                                     placeholder="Enter Room Number"
-                                    required="true"
+                                    required
                                     type="text"
-                                    v-model="room"
+                                    v-model.trim="$v.freezer.room.$model"
                             ></b-form-input>
+                            <div v-if="$v.freezer.room.$dirty">
+                                <div class="error" v-if="!$v.freezer.room.required">Field is
+                                    required
+                                </div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-num-group-edit" label="Num:" label-for="form-num-input">
+                        <!--NUMBER-->
+                        <b-form-group :class="{ 'form-group--error': $v.freezer.number.$error }"
+                                      id="form-num-group-edit" label="Num:" label-for="form-num-input">
                             <b-form-input
                                     id="form-num-input"
                                     placeholder="Enter Freezer Number"
-                                    required="true"
+                                    required
                                     type="text"
-                                    v-model="number">
+                                    v-model.trim="$v.freezer.number.$model">
                             </b-form-input>
+                            <div v-if="$v.freezer.number.$dirty">
+                                <div class="error" v-if="!$v.freezer.number.required">Field is
+                                    required
+                                </div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-code-group-edit" label="Code:" label-for="form-code-input">
+                        <b-form-group :class="{ 'form-group--error': $v.freezer.code.$error }"
+                                      id="form-code-group-edit" label="Code:" label-for="form-code-input">
                             <b-form-input
                                     id="form-code-input"
                                     placeholder="Enter Code"
-                                    required="true"
+                                    required
                                     type="text"
-                                    v-model="code">
+                                    v-model.trim="$v.freezer.code.$model">
                             </b-form-input>
+                            <div v-if="$v.freezer.code.$dirty">
+                                <div class="error" v-if="!$v.freezer.code.required">Field is
+                                    required
+                                </div>
+                            </div>
                         </b-form-group>
                     </form>
                 </b-modal>
@@ -177,12 +236,15 @@
         extractApiData,
         getItemDataList,
         getSelectedItem,
+        paginate,
         respondTo401,
         secureStoreGetString,
+        selectItemForUpdate,
         showFlashMessage
     } from "../utils/util_functions";
     import EventBus from '../components/EventBus';
     import FilterCard from "../components/FilterCard";
+    import {required} from "vuelidate/lib/validators";
 
     export default {
         name: 'Freezer',
@@ -195,22 +257,38 @@
                 response: [],
                 freezerList: [],
                 labDataList: [],
-                code: null,
+
+                freezer: {
+                    code: '',
+                    room: '',
+                    number: '',
+                    laboratory: null,
+                },
+
                 search: '',
-                room: null,
-                number: null,
-                laboratory: null,
                 fields: {text: '', value: ''},
 
                 // values for data modification
                 old_code: null,
                 showModal: true,
                 isEditing: false,
+
+                // data for pagination
+                current: 1,
             };
         },
 
+        validations: {
+            freezer: {
+                room: {required},
+                code: {required},
+                number: {required},
+                laboratory: {required},
+            }
+        },
+
         created() {
-            this.getFreezer();
+            this.onLoadPage();
         },
 
         mounted() {
@@ -261,41 +339,55 @@
 
 
                 if (searchList !== null) {
-                    return searchList
+                    return paginate(searchList)
                 } else if (this.filters.length > 1) {
                     // Possibly, multiple filters have been applied. Return the array with the least elements
                     return filterByLab.length < filterByRoom.length ?
-                        filterByLab : filterByRoom
+                        paginate(filterByLab) : paginate(filterByRoom)
                 } else if (filterByLab !== null && filterByLab.length > 0) {
                     this.freezerList = filterByLab // eslint-disable-line
                     this.filterData(filterByLab)
-                    return filterByLab
+                    return paginate(filterByLab)
                 } else if (filterByRoom !== null && filterByRoom.length > 0) {
                     this.freezerList = filterByRoom // eslint-disable-line
                     this.filterData(filterByRoom)
-                    return filterByRoom
+                    return paginate(filterByRoom)
                 }
-                return this.freezerList
+                return paginate(this.freezerList)
             },
         },
 
         methods: {
+            selectItemForUpdate,
+
+            pageInfo(info) {
+                EventBus.$emit('page-info', {'pgInfo': info, 'pgData': this.freezerList})
+            },
+
+            onSubmit(evt) {
+                this.$v.$touch();
+                if (this.$v.$invalid) {
+                    // stop here if form is invalid
+                    evt.preventDefault()
+                    return;
+                }
+                this.createFreezer();
+            },
             // Util Functions
             clearForm() {
-                this.laboratory = null;
-                this.number = null;
-                this.code = null;
-                this.room = null;
+                this.freezer.laboratory = null;
+                this.freezer.number = null;
+                this.freezer.code = null;
+                this.freezer.room = null;
                 this.isEditing = false;
-                this.labDataList = [];
-                this.onLoadPage();
+                this.$v.$reset();
             },
 
             fillFormForUpdate(number, code, room, laboratory) {
-                this.laboratory = laboratory;
-                this.number = number;
-                this.code = code;
-                this.room = room;
+                this.freezer.laboratory = laboratory;
+                this.freezer.number = number;
+                this.freezer.code = code;
+                this.freezer.room = room;
                 this.old_code = code;
                 this.isEditing = true;
                 this.showModal = true;
@@ -314,12 +406,7 @@
                         });
                     }
                 })
-            },
-
-            selectLabItemForUpdate(laboratory) {
-                // set dropdownitem to the selected item
-                var element = document.getElementById("dropdownlist");
-                element.value = laboratory;
+                this.getFreezer()
             },
             // end of Util functions
 
@@ -328,8 +415,7 @@
                 this.clearForm();
                 axios.get(freezer_resource)
                     .then((res) => {
-                        this.response = res.data['message'];
-                        this.freezerList = this.response
+                        this.freezerList = this.response = res.data['message'];
                     })
                     .catch((error) => {
                         // eslint-disable-next-line
@@ -339,13 +425,13 @@
 
             createFreezer: function () {
                 let self = this;
-                this.laboratory = getSelectedItem(this.labDataList, this.laboratory);
+                this.freezer.laboratory = getSelectedItem(this.labDataList, this.freezer.laboratory);
 
                 axios.post(freezer_resource, {
-                    laboratory: this.laboratory,
-                    number: this.number,
-                    code: this.code,
-                    room: this.room,
+                    laboratory: this.freezer.laboratory,
+                    number: this.freezer.number,
+                    code: this.freezer.code,
+                    room: this.freezer.room,
                 }, {
                     headers:
                         {
@@ -374,44 +460,51 @@
                             }
                         }
                     });
+                this.clearForm();
             },
 
-            updateFreezer: function (code) {
-                let self = this;
-                this.laboratory = getSelectedItem(this.labDataList, this.laboratory);
+            updateFreezer: function (evt) {
+                this.$v.$touch();
+                if (this.$v.$invalid) {
+                    evt.preventDefault()
+                } else {
+                    let self = this;
+                    this.freezer.laboratory = getSelectedItem(this.labDataList, this.laboratory);
 
-                axios.put(freezer_resource, {
-                    laboratory: this.laboratory,
-                    number: this.number,
-                    code: this.code,
-                    room: this.room,
-                }, {
-                    headers:
-                        {
-                            code: code,
-                            Authorization: secureStoreGetString()
-                        }
-                })
-                    .then((response) => {
-                        this.getFreezer();
-                        showFlashMessage(self, 'success', response.data['message'], '');
-                        this.clearForm();
-                    })
-                    .catch((error) => {
-                        this.clearForm();
-                        this.$log.error(error);
-                        if (error.response) {
-                            if (error.response.status === 304) {
-                                showFlashMessage(self, 'info', 'Record not modified!', '');
-                            } else if (error.response.status === 401) {
-                                respondTo401(self);
-                            } else if (error.response.status === 403) {
-                                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
-                            } else {
-                                showFlashMessage(self, 'error', error.response.data['message'], '');
+                    axios.put(freezer_resource, {
+                        laboratory: this.freezer.laboratory,
+                        number: this.freezer.number,
+                        code: this.freezer.code,
+                        room: this.freezer.room,
+                    }, {
+                        headers:
+                            {
+                                code: this.old_code,
+                                Authorization: secureStoreGetString()
                             }
-                        }
-                    });
+                    })
+                        .then((response) => {
+                            this.getFreezer();
+                            showFlashMessage(self, 'success', response.data['message'], '');
+                            this.clearForm();
+                        })
+                        .catch((error) => {
+                            this.clearForm();
+                            this.$log.error(error);
+                            if (error.response) {
+                                if (error.response.status === 304) {
+                                    showFlashMessage(self, 'info', 'Record not modified!', '');
+                                } else if (error.response.status === 401) {
+                                    respondTo401(self);
+                                } else if (error.response.status === 403) {
+                                    showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
+                                } else {
+                                    showFlashMessage(self, 'error', error.response.data['message'], '');
+                                }
+                            }
+                        });
+                    this.clearForm();
+                }
             },
 
             deleteFreezer: function (code) {
@@ -439,6 +532,7 @@
                             }
                         }
                     });
+                this.clearForm();
             },
             //end of methods for api interaction
 

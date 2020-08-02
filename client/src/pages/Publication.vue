@@ -4,8 +4,14 @@
             <div class="col-sm-12">
                 <top-nav :page_title="page_title" v-bind:search_query.sync="search"></top-nav>
 
-                <FlashMessage :position="'center bottom'"></FlashMessage>
-                <br> <br>
+                <!-- FLASH MESSAGES -->
+                <FlashMessage :position="'right bottom'"></FlashMessage>
+                <br>
+
+                <!--TOP-PAGINATION-->
+                <v-page :total-row="filteredList.pg_len" @page-change="pageInfo" align="center"
+                        v-model="current"></v-page>
+                <br>
                 <table class=" table table-hover">
                     <thead>
                     <tr>
@@ -19,7 +25,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="publication.id" v-for="(publication, index) in filteredList">
+                    <tr :key="publication.id" v-for="(publication, index) in filteredList.arr">
                         <td> {{ index + 1 }}</td>
                         <td> {{publication.publication_title}}</td>
                         <td> {{publication['sample.theme.name']}}</td>
@@ -65,70 +71,92 @@
                     </tr>
                     </tbody>
                 </table>
+                <!--TOP-PAGINATION-->
+                <v-page :total-row="filteredList.pg_len" @page-change="pageInfo" align="center"
+                        v-model="current"></v-page>
+                <br>
             </div>
 
             <div v-if="!isEditing">
                 <b-modal
                         :title="`Add ${page_title}`"
                         @hidden="clearForm"
-                        @ok="createPublication"
-                        @submit="clearForm"
+                        @ok="onSubmit"
+                        @submit="showModal=false"
                         cancel-variant="danger"
                         id="modal-publication"
                         ok-title="Save"
                 >
                     <form @submit.prevent="createPublication">
+                        <!--SAMPLE-->
                         <b-form-group id="form-sample-group" label="Sample:" label-for="form-sample-input">
                             <ejs-dropdownlist
                                     :dataSource='sampleDataList'
                                     :fields="fields"
-                                    :v-model="publication.sample"
                                     @change="prepareCreate"
                                     id='dropdownlist'
                                     placeholder='Select a sample'
+                                    v-model.trim="$v.publication.sample.$model"
                             ></ejs-dropdownlist>
+                            <div v-if="$v.publication.sample.$dirty">
+                                <div class="error" v-if="!$v.publication.sample.required">Field is required</div>
+                            </div>
                         </b-form-group>
 
+                        <!--AUTHOR-->
                         <b-form-group id="form-user-group" label="Authors:" label-for="form-user-input">
                             <b-form-input
                                     disabled="disabled"
                                     id="form-user-input"
                                     placeholder="Enter author's name"
-                                    required="true"
+                                    required
                                     type="text"
                             ></b-form-input>
                         </b-form-group>
 
-                        <b-form-group id="form-coauthors-group" label="Add CoAuthors:" label-for="form-coauthors-input">
+                        <b-form-group :class="{ 'form-group--error': $v.publication.co_authors.$error }"
+                                      id="form-coauthors-group" label="Add CoAuthors:" label-for="form-coauthors-input">
                             <b-form-input
                                     id="form-pub-title-input"
                                     placeholder="Enter co-authors separated by a comma"
-                                    required="true"
+                                    required
                                     type="text"
-                                    v-model="publication.co_authors"
+                                    v-model.trim="$v.publication.co_authors.$model"
                             ></b-form-input>
+                            <div v-if="$v.publication.co_authors.$dirty">
+                                <div class="error" v-if="!$v.publication.co_authors.required">Field is required</div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-pub-title-group" label="Publication Title:"
+                        <b-form-group :class="{ 'form-group--error': $v.publication.title.$error }"
+                                      id="form-pub-title-group" label="Publication Title:"
                                       label-for="form-pub-title-input">
                             <b-form-input
                                     id="form-pub-title-input"
                                     placeholder="Enter a title"
-                                    required="true"
+                                    required
                                     type="text"
-                                    v-model="publication.title"
+                                    v-model.trim="$v.publication.title.$model"
                             ></b-form-input>
+                            <div v-if="$v.publication.title.$dirty">
+                                <div class="error" v-if="!$v.publication.title.required">Field is required</div>
+                            </div>
                         </b-form-group>
                         <!-- todo: sample_results? can be changed to publication summary-->
-                        <b-form-group id="form-sample-results-group" label="Sample Results:"
+                        <b-form-group :class="{ 'form-group--error': $v.publication.title.$error }"
+                                      id="form-sample-results-group" label="Sample Results:"
                                       label-for="form-sample-results-input">
                             <b-form-textarea
                                     id="form-sample-results-input"
                                     placeholder="Enter sample results"
-                                    required="true"
+                                    required
                                     type="text"
-                                    v-model="publication.sample_results">
+                                    v-model.trim="$v.publication.sample_results.$model">
                             </b-form-textarea>
+                            <div v-if="$v.publication.sample_results.$dirty">
+                                <div class="error" v-if="!$v.publication.sample_results.required">Field is required
+                                </div>
+                            </div>
                         </b-form-group>
                     </form>
                 </b-modal>
@@ -137,66 +165,83 @@
                 <b-modal
                         :title="`Edit ${page_title}`"
                         @hidden="clearForm"
-                        @ok="updatePublication(old_title)"
+                        @ok="updatePublication"
                         @submit="showModal = false"
                         cancel-variant="danger"
                         id="modal-publication-edit"
                         ok-title="Update"
                 >
-                    <form @submit.prevent="updatePublication">
+                    <form>
+                        <!--SAMPLE-->
                         <b-form-group id="form-sample-group-edit" label="Sample:" label-for="form-sample-input">
                             <ejs-dropdownlist
                                     :dataSource='sampleDataList'
                                     :fields="fields"
-                                    :v-model="publication.sample"
                                     @change="prepareCreate"
                                     id='dropdownlist'
                                     placeholder='Select a sample'
+                                    v-model.trim="$v.publication.sample.$model"
                             ></ejs-dropdownlist>
+                            <div v-if="$v.publication.sample.$dirty">
+                                <div class="error" v-if="!$v.publication.sample.required">Field is required</div>
+                            </div>
                         </b-form-group>
 
+                        <!--AUTHOR-->
                         <b-form-group id="form-user-group-edit" label="Authors:" label-for="form-user-input">
                             <b-form-input
                                     disabled="disabled"
                                     id="form-user-input"
                                     placeholder="Enter author's name"
-                                    required="true"
+                                    required
                                     type="text"
                             ></b-form-input>
                         </b-form-group>
 
-                        <b-form-group id="form-coauthors-group-edit" label="Add CoAuthors:"
+                        <b-form-group :class="{ 'form-group--error': $v.publication.co_authors.$error }"
+                                      id="form-coauthors-group-edit" label="Add CoAuthors:"
                                       label-for="form-coauthors-input">
                             <b-form-input
                                     id="form-pub-title-input"
                                     placeholder="Enter co-authors separated by a comma"
-                                    required="true"
+                                    required
                                     type="text"
-                                    v-model="publication.co_authors"
+                                    v-model.trim="$v.publication.co_authors.$model"
                             ></b-form-input>
+                            <div v-if="$v.publication.co_authors.$dirty">
+                                <div class="error" v-if="!$v.publication.co_authors.required">Field is required</div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-pub-title-group-edit" label="Publication Title:"
+                        <b-form-group :class="{ 'form-group--error': $v.publication.title.$error }"
+                                      id="form-pub-title-group-edit" label="Publication Title:"
                                       label-for="form-pub-title-input">
                             <b-form-input
                                     id="form-pub-title-input"
                                     placeholder="Enter a title"
-                                    required="true"
+                                    required
                                     type="text"
-                                    v-model="publication.title"
+                                    v-model.trim="$v.publication.title.$model"
                             ></b-form-input>
+                            <div v-if="$v.publication.title.$dirty">
+                                <div class="error" v-if="!$v.publication.title.required">Field is required</div>
+                            </div>
                         </b-form-group>
-
                         <!-- todo: sample_results? can be changed to publication summary-->
-                        <b-form-group id="form-sample-results-group-edit" label="Sample Results:"
+                        <b-form-group :class="{ 'form-group--error': $v.publication.title.$error }"
+                                      id="form-sample-results-group-edit" label="Sample Results:"
                                       label-for="form-sample-results-input">
                             <b-form-textarea
                                     id="form-sample-results-input"
                                     placeholder="Enter sample results"
-                                    required="true"
+                                    required
                                     type="text"
-                                    v-model="publication.sample_results">
+                                    v-model.trim="$v.publication.sample_results.$model">
                             </b-form-textarea>
+                            <div v-if="$v.publication.sample_results.$dirty">
+                                <div class="error" v-if="!$v.publication.sample_results.required">Field is required
+                                </div>
+                            </div>
                         </b-form-group>
                     </form>
                 </b-modal>
@@ -216,11 +261,13 @@
         extractApiDataForPub,
         getItemDataList,
         getSelectedItemSetTextFieldValue,
+        paginate,
         respondTo401,
         secureStoreGetString,
         showFlashMessage
     } from "../utils/util_functions";
     import EventBus from '../components/EventBus';
+    import {required} from "vuelidate/lib/validators";
 
     export default {
         name: "Publication",
@@ -241,31 +288,63 @@
                 fields: {text: '', value: ''},
                 sampleDataList: [],
                 authorDataList: [],
+                publicationList: [],
 
                 // values for data modification
                 old_title: null,
                 showModal: true,
                 isEditing: false,
+
+                // data for pagination
+                current: 1,
             }
+        },
+
+        validations: {
+            publication: {
+                title: {required},
+                sample: {required},
+                user: {required},
+                sample_results: {required},
+                co_authors: {required}
+            },
         },
 
         mounted() {
             EventBus.$on('searchQuery', (payload) => {
                 this.search = payload
-                this.filteredList()
+                this.searchData()
             })
         },
 
         computed: {
             filteredList() {
-                return this.response.filter(publication => {
-                    return publication.publication_title.toLowerCase().includes(this.search.toLowerCase())
-                })
-            }
+                let searchList = this.search ? this.searchData() : null
+
+                if (searchList !== null) {
+                    this.publicationList = searchList // eslint-disable-line
+                    return paginate(searchList)
+                }
+                return paginate(this.publicationList)
+            },
         },
 
         methods: {
             //UTIL Fn
+            pageInfo(info) {
+                EventBus.$emit('page-info', {'pgInfo': info, 'pgData': this.publicationList})
+            },
+
+            onSubmit(evt) {
+                this.$v.$touch();
+                if (this.$v.$invalid) {
+                    // stop here if form is invalid
+                    evt.preventDefault()
+                    return;
+                }
+                this.createPublication();
+            },
+
             clearForm() {
                 this.isEditing = false;
                 this.old_title = null;
@@ -274,9 +353,7 @@
                 this.publication.user = null;
                 this.publication.co_authors = null;
                 this.publication.sample_results = null;
-                this.sampleDataList = [];
-                this.authorDataList = [];
-                this.onLoadPage();
+                this.$v.$reset();
             },
 
             fillFormForUpdate(title, theme, first_name, last_name, co_authors, sample_results) {
@@ -292,7 +369,6 @@
             onLoadPage() {
                 getItemDataList(sample_resource).then(data => {
                     let sampleList = extractApiDataForPub(data);
-                    this.$log.info("Sample list json: ", JSON.stringify(sampleList));
 
                     // update local variables with data from API
                     this.fields = sampleList['fields'];
@@ -305,8 +381,8 @@
                         });
                     }
                 })
+                this.getPublication()
             },
-
 
             // methods to interact with api
             getPublication() {
@@ -314,7 +390,7 @@
                 axios.get(publication_resource)
                     .then((res) => {
                         this.$log.info("Response: " + res.status + " ", res.data['message']);
-                        this.response = res.data['message'];
+                        this.publicationList = this.response = res.data['message'];
                     })
                     .catch((error) => {
                         // eslint-disable-next-line
@@ -328,7 +404,6 @@
                 this.publication.sample = dropdownSelection.sampleCode
                 document.getElementById("form-user-input").value = dropdownSelection.authorText;
             },
-
 
             createPublication() {
                 let self = this;
@@ -364,43 +439,49 @@
                             }
                         }
                     });
+                this.clearForm();
             },
 
-            updatePublication: function (title) {
-                let self = this;
-                axios.put(publication_resource, {
-                    publication_title: this.publication.title,
-                    sample: this.publication.sample,
-                    user: this.publication.user,
-                    sample_results: this.publication.sample_results,
-                    co_authors: this.publication.co_authors
-                }, {
-                    headers: {
-                        title: title,
-                        Authorization: secureStoreGetString()
-                    }
-                })
-                    .then((response) => {
-                        this.getPublication();
-                        showFlashMessage(self, 'success', response.data['message'], '');
-                        this.clearForm();
-                    })
-                    .catch((error) => {
-                        this.clearForm();
-                        this.$log.error(error);
-                        if (error.response) {
-                            if (error.response.status === 304) {
-                                showFlashMessage(self, 'info', 'Record not modified!', '');
-                            } else if (error.response.status === 401) {
-                                respondTo401(self);
-                            } else if (error.response.status === 403) {
-                                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
-                            } else {
-                                showFlashMessage(self, 'error', error.response.data['message'], '');
-                            }
+            updatePublication: function (evt) {
+                this.$v.$touch();
+                if (this.$v.$invalid) {
+                    evt.preventDefault()
+                } else {
+                    let self = this;
+                    axios.put(publication_resource, {
+                        publication_title: this.publication.title,
+                        sample: this.publication.sample,
+                        user: this.publication.user,
+                        sample_results: this.publication.sample_results,
+                        co_authors: this.publication.co_authors
+                    }, {
+                        headers: {
+                            title: this.old_title,
+                            Authorization: secureStoreGetString()
                         }
-                    });
-
+                    })
+                        .then((response) => {
+                            this.getPublication();
+                            showFlashMessage(self, 'success', response.data['message'], '');
+                            this.clearForm();
+                        })
+                        .catch((error) => {
+                            this.clearForm();
+                            this.$log.error(error);
+                            if (error.response) {
+                                if (error.response.status === 304) {
+                                    showFlashMessage(self, 'info', 'Record not modified!', '');
+                                } else if (error.response.status === 401) {
+                                    respondTo401(self);
+                                } else if (error.response.status === 403) {
+                                    showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
+                                } else {
+                                    showFlashMessage(self, 'error', error.response.data['message'], '');
+                                }
+                            }
+                        });
+                    this.clearForm();
+                }
             },
 
             deletePublication: function (title) {
@@ -429,11 +510,34 @@
                             }
                         }
                     });
+                this.clearForm();
             },
+
+            searchData() {
+                return this.response.filter(pub => {
+                    let byTitle = pub.publication_title.toLowerCase().includes(this.search.toLowerCase())
+                    let byTheme = pub['sample.theme.name'].toLowerCase().includes(this.search.toLowerCase())
+                    let byProject = pub['sample.project'].toLowerCase().includes(this.search.toLowerCase())
+                    let byAuthor = pub['user.first_name'].toLowerCase().includes(this.search.toLowerCase())
+                    let byCoAuthor = pub['co_authors'].toLowerCase().includes(this.search.toLowerCase())
+
+                    if (byTitle) {
+                        return byTitle
+                    } else if (byTheme) {
+                        return byTheme
+                    } else if (byProject) {
+                        return byProject
+                    } else if (byAuthor) {
+                        return byAuthor
+                    } else if (byCoAuthor) {
+                        return byCoAuthor
+                    }
+                })
+            }
         },
         components: {TopNav},
         created() {
-            this.getPublication();
+            this.onLoadPage();
         },
     }
 </script>

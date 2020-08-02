@@ -4,8 +4,14 @@
             <div class="col-sm-12">
                 <top-nav :page_title="page_title" v-bind:search_query.sync="search"></top-nav>
 
-                <FlashMessage :position="'center bottom'"></FlashMessage>
+                <!-- FLASH MESSAGES -->
+                <FlashMessage :position="'right bottom'"></FlashMessage>
                 <br> <br>
+
+                <!--TOP-PAGINATION-->
+                <v-page :total-row="filteredList.pg_len" @page-change="pageInfo" align="center"
+                        v-model="current"></v-page>
+                <br>
                 <table class=" table table-hover">
                     <thead>
                     <tr>
@@ -17,7 +23,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="qt.id" v-for="(qt, index) in filteredList">
+                    <tr :key="qt.id" v-for="(qt, index) in filteredList.arr">
                         <td> {{ index + 1 }}</td>
                         <td> {{ qt.name }}</td>
                         <td> {{ qt.id }}</td>
@@ -43,12 +49,16 @@
                     </tr>
                     </tbody>
                 </table>
+                <!--BOTTOM-PAGINATION-->
+                <v-page :total-row="filteredList.pg_len" @page-change="pageInfo" align="center"
+                        v-model="current"></v-page>
+                <br>
             </div>
 
             <div v-if="!isEditing">
                 <b-modal
                         @hidden="clearForm"
-                        @ok="createQuantityType"
+                        @ok="onSubmit"
                         @submit="showModal = false"
                         cancel-variant="danger"
                         id="modal-quantity-type"
@@ -57,33 +67,54 @@
                 >
                     <form @submit.prevent="createQuantityType">
 
-                        <b-form-group id="form-name-group" label="Name:" label-for="form-name-input">
+                        <!-- NAME -->
+                        <b-form-group :class="{ 'form-group--error': $v.qt.name.$error }"
+                                      id="form-name-group" label="Name:" label-for="form-name-input">
                             <b-form-input
                                     id="form-name-input"
                                     placeholder="Enter Name"
-                                    required="true"
+                                    required
                                     type="text"
-                                    v-model="name"
+                                    v-model.trim="$v.qt.name.$model"
                             ></b-form-input>
+                            <div v-if="$v.qt.name.$dirty">
+                                <div class="error" v-if="!$v.qt.name.required">Field is
+                                    required
+                                </div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-code-group" label="Code:" label-for="form-code-input">
+                        <!--CODE-->
+                        <b-form-group :class="{ 'form-group--error': $v.qt.code.$error }"
+                                      id="form-code-group" label="Code:" label-for="form-code-input">
                             <b-form-input
                                     id="form-code-input"
                                     placeholder="Enter Code"
-                                    required="true"
+                                    required
                                     type="text"
-                                    v-model="code"></b-form-input>
+                                    v-model.trim="$v.qt.code.$model"></b-form-input>
+                            <div v-if="$v.qt.code.$dirty">
+                                <div class="error" v-if="!$v.qt.code.required">Field is
+                                    required
+                                </div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-desc-group" label="Description:" label-for="form-desc-input">
+                        <!--DESC-->
+                        <b-form-group :class="{ 'form-group--error': $v.qt.desc.$error }"
+                                      id="form-desc-group" label="Description:" label-for="form-desc-input">
                             <b-form-textarea
                                     id="form-desc-input"
                                     placeholder="Enter Description"
-                                    required="true"
+                                    required
                                     type="text"
-                                    v-model="desc"
+                                    v-model.trim="$v.qt.desc.$model"
                             ></b-form-textarea>
+                            <div v-if="$v.qt.desc.$dirty">
+                                <div class="error" v-if="!$v.qt.desc.required">Field is
+                                    required
+                                </div>
+                            </div>
                         </b-form-group>
                     </form>
                 </b-modal>
@@ -92,7 +123,7 @@
             <div v-else-if="isEditing">
                 <b-modal
                         @hidden="clearForm"
-                        @ok="updateQuantityType(old_code)"
+                        @ok="updateQuantityType"
                         @submit="showModal = false"
                         cancel-variant="danger"
                         id="modal-quantity-type-edit"
@@ -101,33 +132,54 @@
                 >
                     <form>
 
-                        <b-form-group id="form-name-group-edit" label="Name:" label-for="form-name-input">
+                        <!-- NAME -->
+                        <b-form-group :class="{ 'form-group--error': $v.qt.name.$error }"
+                                      id="form-name-group-edit" label="Name:" label-for="form-name-input">
                             <b-form-input
                                     id="form-name-input"
                                     placeholder="Enter Name"
-                                    required="true"
+                                    required
                                     type="text"
-                                    v-model="name"
+                                    v-model.trim="$v.qt.name.$model"
                             ></b-form-input>
+                            <div v-if="$v.qt.name.$dirty">
+                                <div class="error" v-if="!$v.qt.name.required">Field is
+                                    required
+                                </div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-code-group-edit" label="Code:" label-for="form-code-input">
+                        <!--CODE-->
+                        <b-form-group :class="{ 'form-group--error': $v.qt.code.$error }"
+                                      id="form-code-group-edit" label="Code:" label-for="form-code-input">
                             <b-form-input
                                     id="form-code-input"
                                     placeholder="Enter Code"
-                                    required="true"
+                                    required
                                     type="text"
-                                    v-model="code"></b-form-input>
+                                    v-model.trim="$v.qt.code.$model"></b-form-input>
+                            <div v-if="$v.qt.code.$dirty">
+                                <div class="error" v-if="!$v.qt.code.required">Field is
+                                    required
+                                </div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-desc-group-edit" label="Description:" label-for="form-desc-input">
+                        <!--DESC-->
+                        <b-form-group :class="{ 'form-group--error': $v.qt.desc.$error }"
+                                      id="form-desc-group-edit" label="Description:" label-for="form-desc-input">
                             <b-form-textarea
                                     id="form-desc-input"
                                     placeholder="Enter Description"
-                                    required="true"
+                                    required
                                     type="text"
-                                    v-model="desc"
+                                    v-model.trim="$v.qt.desc.$model"
                             ></b-form-textarea>
+                            <div v-if="$v.qt.desc.$dirty">
+                                <div class="error" v-if="!$v.qt.desc.required">Field is
+                                    required
+                                </div>
+                            </div>
                         </b-form-group>
                     </form>
                 </b-modal>
@@ -143,8 +195,9 @@
     import axios from 'axios';
     import {quantity_type_resource} from '../utils/api_paths'
     import TopNav from "../components/TopNav";
-    import {respondTo401, secureStoreGetString, showFlashMessage} from "../utils/util_functions";
+    import {paginate, respondTo401, secureStoreGetString, showFlashMessage} from "../utils/util_functions";
     import EventBus from '../components/EventBus';
+    import {required} from "vuelidate/lib/validators";
 
     export default {
         name: 'QuantityType',
@@ -152,9 +205,11 @@
             return {
                 page_title: "Quantity Type",
                 response: [],
-                name: null,
-                code: null,
-                desc: null,
+                qt: {
+                    name: '',
+                    code: '',
+                    desc: '',
+                },
                 search: '',
                 QTList: [],
 
@@ -162,36 +217,65 @@
                 old_code: null,
                 showModal: true,
                 isEditing: false,
+
+                // data for pagination
+                current: 1,
             };
+        },
+
+        validations: {
+            qt: {
+                name: {required},
+                code: {required},
+                desc: {required},
+            }
         },
 
         mounted() {
             EventBus.$on('searchQuery', (payload) => {
                 this.search = payload
-                this.filteredList()
+                this.searchData()
             })
         },
 
         computed: {
             filteredList() {
-                return this.QTList.filter(qt => {
-                    return qt.name.toLowerCase().includes(this.search.toLowerCase())
-                })
+                let searchList = this.search ? this.searchData() : null
+
+                if (searchList !== null) {
+                    this.QTList = searchList // eslint-disable-line
+                    return paginate(searchList)
+                }
+                return paginate(this.QTList)
             }
         },
 
         methods: {
+            pageInfo(info) {
+                EventBus.$emit('page-info', {'pgInfo': info, 'pgData': this.QTList})
+            },
+
+            onSubmit(evt) {
+                this.$v.$touch();
+                if (this.$v.$invalid) {
+                    // stop here if form is invalid
+                    evt.preventDefault()
+                    return;
+                }
+                this.createQuantityType();
+            },
             clearForm() {
-                this.name = null;
-                this.code = null;
-                this.desc = null;
+                this.qt.name = null;
+                this.qt.code = null;
+                this.qt.desc = null;
                 this.isEditing = false;
+                this.$v.$reset();
             },
 
             fillFormForUpdate(name, code, desc) {
-                this.name = name;
-                this.code = code;
-                this.desc = desc;
+                this.qt.name = name;
+                this.qt.code = code;
+                this.qt.desc = desc;
                 this.old_code = code;
                 this.isEditing = true;
                 this.showModal = true;
@@ -201,8 +285,7 @@
                 axios.get(quantity_type_resource)
                     .then((res) => {
                         this.$log.info("Response: " + res.status + " " + res.data['message']);
-                        this.response = res.data;
-                        this.QTList = this.response.message
+                        this.QTList = this.response = res.data['message'];
                     })
                     .catch((error) => {
                         // eslint-disable-next-line
@@ -213,9 +296,9 @@
             createQuantityType: function () {
                 let self = this;
                 axios.post(quantity_type_resource, {
-                    name: this.name,
-                    code: this.code,
-                    description: this.desc,
+                    name: this.qt.name,
+                    code: this.qt.code,
+                    description: this.qt.desc,
                 }, {
                     headers: {
                         Authorization: secureStoreGetString()
@@ -243,38 +326,43 @@
                 this.clearForm();
             },
 
-            updateQuantityType: function (code) {
-                let self = this;
-                axios.put(quantity_type_resource, {
-                    name: this.name,
-                    code: this.code,
-                    description: this.desc,
-                }, {
-                    headers:
-                        {
-                            code: code,
-                            Authorization: secureStoreGetString()
-                        }
-                })
-                    .then((response) => {
-                        this.getQuantityType();
-                        showFlashMessage(self, 'success', response.data['message'], '')
-                    })
-                    .catch((error) => {
-                        this.$log.error(error);
-                        if (error.response) {
-                            if (error.response.status === 304) {
-                                showFlashMessage(self, 'info', 'Info', 'Record not modified!')
-                            } else if (error.response.status === 401) {
-                                respondTo401(self)
-                            } else if (error.response.status === 403) {
-                                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
-                            } else {
-                                showFlashMessage(self, 'error', 'Error', error.response.data['message'])
+            updateQuantityType: function (evt) {
+                this.$v.$touch();
+                if (this.$v.$invalid) {
+                    evt.preventDefault()
+                } else {
+                    let self = this;
+                    axios.put(quantity_type_resource, {
+                        name: this.qt.name,
+                        code: this.qt.code,
+                        description: this.qt.desc,
+                    }, {
+                        headers:
+                            {
+                                code: this.old_code,
+                                Authorization: secureStoreGetString()
                             }
-                        }
-                    });
-                this.clearForm();
+                    })
+                        .then((response) => {
+                            this.getQuantityType();
+                            showFlashMessage(self, 'success', response.data['message'], '')
+                        })
+                        .catch((error) => {
+                            this.$log.error(error);
+                            if (error.response) {
+                                if (error.response.status === 304) {
+                                    showFlashMessage(self, 'info', 'Info', 'Record not modified!')
+                                } else if (error.response.status === 401) {
+                                    respondTo401(self)
+                                } else if (error.response.status === 403) {
+                                    showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
+                                } else {
+                                    showFlashMessage(self, 'error', 'Error', error.response.data['message'])
+                                }
+                            }
+                        });
+                    this.clearForm();
+                }
             },
 
             deleteQuantityType: function (code) {
@@ -302,7 +390,26 @@
                             }
                         }
                     });
+                this.clearForm();
             },
+
+            searchData() {
+                return this.response.filter(qt => {
+                    for (let count = 0; count <= this.response.length; count++) {
+                        let byName = qt.name.toString().toLowerCase().includes(this.search.toLowerCase())
+                        let byCode = qt.id.toString().toLowerCase().includes(this.search.toLowerCase())
+                        let byDesc = qt.description.toString().toLowerCase().includes(this.search.toLowerCase())
+
+                        if (byName === true) {
+                            return byName
+                        } else if (byCode) {
+                            return byCode
+                        } else if (byDesc) {
+                            return byDesc
+                        }
+                    }
+                })
+            }
         },
         created() {
             this.getQuantityType();

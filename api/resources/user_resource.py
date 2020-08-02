@@ -30,7 +30,7 @@ class UserResource(BaseResource):
 
         if email is not None:
             email = format_and_lower_str(email)
-            return UserResource.UserCombinedInfo(email)
+            return UserResource.user_combined_info(email)
         elif role is not None:
             users = get_users_by_role(role)
             return UserResource.get_response(users)
@@ -190,14 +190,14 @@ class UserResource(BaseResource):
     def get_response(user):
         if user is None:
             return BaseResource.send_json_message("User not found", 404)
-        elif type(user) is [] and len(user) >= 1:
+        elif type(user) is list and len(user) < 1:
             return BaseResource.send_json_message("Users not found", 404)
         else:
             data = marshal(user, UserResource.fields)
             return BaseResource.send_json_message(data, 200)
 
     @staticmethod
-    def UserCombinedInfo(email):
+    def user_combined_info(email):
         user = get_user_by_email(email)
         if user is None:
             return BaseResource.send_json_message("User not found", 404)

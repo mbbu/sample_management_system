@@ -14,11 +14,11 @@ from api.utils import confirm_token, get_user_by_email, \
     generate_confirmation_token
 
 
-def send_confirmation_email(email):
+def send_pwd_reset_email(email):
     email_token = generate_confirmation_token(email)
     pwd_url = PASSWORD_RESET_URI.format(email_token)
     html = render_template("password_reset.html", pwd_url=pwd_url, valid_time=EXPIRATION_AS_HR)
-    send_email(email, 'Confirm Your Email Address', template=html)
+    send_email(email, 'Reset Your Password', template=html)
 
 
 # handle request to reset password
@@ -33,7 +33,7 @@ class ForgotPasswordResource(BaseResource):
         user = get_user_by_email(email)
         if user is None:
             return BaseResource.send_json_message('Sorry no user with given email', 404)
-        send_confirmation_email(email)
+        send_pwd_reset_email(email)
         return BaseResource.send_json_message("Email sent", 200)
 
 

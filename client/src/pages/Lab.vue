@@ -4,8 +4,13 @@
             <div class="col-sm-12">
                 <top-nav :page_title="page_title" v-bind:search_query.sync="search"></top-nav>
 
-                <FlashMessage :position="'center bottom'"></FlashMessage>
+                <!-- FLASH MESSAGES -->
+                <FlashMessage :position="'right bottom'"></FlashMessage>
                 <br> <br>
+                <!--TOP-PAGINATION-->
+                <v-page :total-row="filteredList.pg_len" @page-change="pageInfo" align="center"
+                        v-model="current"></v-page>
+                <br>
                 <table class=" table table-hover">
                     <thead>
                     <tr>
@@ -17,7 +22,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="lab.id" v-for="(lab, index) in filteredList">
+                    <tr :key="lab.id" v-for="(lab, index) in filteredList.arr">
                         <td> {{ index + 1 }}</td>
                         <td> {{ lab.name }}</td>
                         <td> {{ lab.code }}</td>
@@ -43,12 +48,16 @@
                     </tr>
                     </tbody>
                 </table>
+                <!--TOP-PAGINATION-->
+                <v-page :total-row="filteredList.pg_len" @page-change="pageInfo" align="center"
+                        v-model="current"></v-page>
+                <br>
             </div>
 
             <div v-if="!isEditing">
                 <b-modal
                         @hidden="clearForm"
-                        @ok="createLab"
+                        @ok="onSubmit"
                         @submit="showModal = false"
                         cancel-variant="danger"
                         id="modal-lab"
@@ -56,34 +65,52 @@
                         title="Add Lab"
                 >
                     <form @submit.prevent="createLab">
-
-                        <b-form-group id="form-name-group" label="Name:" label-for="form-name-input">
+                        <!-- NAME -->
+                        <b-form-group :class="{ 'form-group--error': $v.lab.name.$error }"
+                                      id="form-name-group" label="Name:" label-for="form-name-input">
                             <b-form-input
                                     id="form-name-input"
                                     placeholder="Enter Name"
-                                    required="true"
+                                    required
                                     type="text"
-                                    v-model="name"
+                                    v-model.trim="$v.lab.name.$model"
                             ></b-form-input>
+                            <div v-if="$v.lab.name.$dirty">
+                                <div class="error" v-if="!$v.lab.name.required">Field is
+                                    required
+                                </div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-code-group" label="Code:" label-for="form-code-input">
+                        <b-form-group :class="{ 'form-group--error': $v.lab.code.$error }"
+                                      id="form-code-group" label="Code:" label-for="form-code-input">
                             <b-form-input
                                     id="form-code-input"
                                     placeholder="Enter Code"
-                                    required="true"
+                                    required
                                     type="text"
-                                    v-model="code"></b-form-input>
+                                    v-model.trim="$v.lab.code.$model"></b-form-input>
+                            <div v-if="$v.lab.code.$dirty">
+                                <div class="error" v-if="!$v.lab.code.required">Field is
+                                    required
+                                </div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-room-group" label="Room:" label-for="form-room-input">
+                        <b-form-group :class="{ 'form-group--error': $v.lab.room.$error }"
+                                      id="form-room-group" label="Room:" label-for="form-room-input">
                             <b-form-input
                                     id="form-room-input"
                                     placeholder="Enter Room Number"
-                                    required="true"
+                                    required
                                     type="text"
-                                    v-model="room"
+                                    v-model.trim="$v.lab.room.$model"
                             ></b-form-input>
+                            <div v-if="$v.lab.room.$dirty">
+                                <div class="error" v-if="!$v.lab.room.required">Field is
+                                    required
+                                </div>
+                            </div>
                         </b-form-group>
                     </form>
                 </b-modal>
@@ -92,42 +119,62 @@
             <div v-else-if="isEditing">
                 <b-modal
                         @hidden="clearForm"
-                        @ok="updateLab(old_code)"
+                        @ok="updateLab"
                         @submit="showModal = false"
                         cancel-variant="danger"
                         id="modal-lab-edit"
                         ok-title="Update"
                         title="Edit Lab"
                 >
-                    <form>
-
-                        <b-form-group id="form-name-group-edit" label="Name:" label-for="form-name-input">
+                    <form @submit.prevent="updateLab">
+                        <!-- NAME -->
+                        <b-form-group :class="{ 'form-group--error': $v.lab.name.$error }"
+                                      id="form-name-group-edit" label="Name:" label-for="form-name-input">
                             <b-form-input
                                     id="form-name-input"
                                     placeholder="Enter Name"
-                                    required="true"
+                                    required
                                     type="text"
-                                    v-model="name"
+                                    v-model.trim="$v.lab.name.$model"
                             ></b-form-input>
+                            <div v-if="$v.lab.name.$dirty">
+                                <div class="error" v-if="!$v.lab.name.required">Field is
+                                    required
+                                </div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-code-group-edit" label="Code:" label-for="form-code-input">
+                        <!--CODE-->
+                        <b-form-group :class="{ 'form-group--error': $v.lab.code.$error }"
+                                      id="form-code-group-edit" label="Code:" label-for="form-code-input">
                             <b-form-input
                                     id="form-code-input"
                                     placeholder="Enter Code"
-                                    required="true"
+                                    required
                                     type="text"
-                                    v-model="code"></b-form-input>
+                                    v-model.trim="$v.lab.code.$model"></b-form-input>
+                            <div v-if="$v.lab.code.$dirty">
+                                <div class="error" v-if="!$v.lab.code.required">Field is
+                                    required
+                                </div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-room-group-edit" label="Room:" label-for="form-room-input">
+                        <!--ROOM-->
+                        <b-form-group :class="{ 'form-group--error': $v.lab.room.$error }"
+                                      id="form-room-group-edit" label="Room:" label-for="form-room-input">
                             <b-form-input
                                     id="form-room-input"
-                                    placeholder="Enter Room"
-                                    required="true"
+                                    placeholder="Enter Room Number"
+                                    required
                                     type="text"
-                                    v-model="room"
+                                    v-model.trim="$v.lab.room.$model"
                             ></b-form-input>
+                            <div v-if="$v.lab.room.$dirty">
+                                <div class="error" v-if="!$v.lab.room.required">Field is
+                                    required
+                                </div>
+                            </div>
                         </b-form-group>
                     </form>
                 </b-modal>
@@ -143,8 +190,9 @@
     import axios from 'axios';
     import {lab_resource} from '../utils/api_paths'
     import TopNav from "../components/TopNav";
-    import {respondTo401, secureStoreGetString, showFlashMessage} from "../utils/util_functions";
+    import {paginate, respondTo401, secureStoreGetString, showFlashMessage} from "../utils/util_functions";
     import EventBus from '../components/EventBus';
+    import {required} from "vuelidate/lib/validators";
 
     export default {
         name: 'Lab',
@@ -152,9 +200,11 @@
             return {
                 page_title: "Labs",
                 response: [],
-                name: null,
-                code: null,
-                room: null,
+                lab: {
+                    name: '',
+                    code: '',
+                    room: '',
+                },
                 search: '',
                 labList: [],
 
@@ -162,36 +212,64 @@
                 old_code: null,
                 showModal: true,
                 isEditing: false,
+
+                // data for pagination
+                current: 1,
             };
+        },
+
+        validations: {
+            lab: {
+                name: {required},
+                code: {required},
+                room: {required},
+            }
         },
 
         mounted() {
             EventBus.$on('searchQuery', (payload) => {
                 this.search = payload
-                this.filteredList()
+                this.searchData()
             })
         },
 
         computed: {
             filteredList() {
-                return this.labList.filter(lab => {
-                    return lab.name.toLowerCase().includes(this.search.toLowerCase())
-                })
+                let searchList = this.search ? this.searchData() : null
+
+                if (searchList !== null) {
+                    this.labList = searchList // eslint-disable-line
+                    return paginate(searchList)
+                }
+                return paginate(this.labList)
             }
         },
 
         methods: {
+            pageInfo(info) {
+                EventBus.$emit('page-info', {'pgInfo': info, 'pgData': this.labList})
+            },
+            onSubmit(evt) {
+                this.$v.$touch();
+                if (this.$v.$invalid) {
+                    // stop here if form is invalid
+                    evt.preventDefault()
+                    return;
+                }
+                this.createLab();
+            },
             clearForm() {
-                this.name = null;
-                this.code = null;
-                this.room = null;
+                this.lab.name = null;
+                this.lab.code = null;
+                this.lab.room = null;
                 this.isEditing = false;
+                this.$v.$reset();
             },
 
             fillFormForUpdate(name, code, room) {
-                this.name = name;
-                this.code = code;
-                this.room = room;
+                this.lab.name = name;
+                this.lab.code = code;
+                this.lab.room = room;
                 this.old_code = code;
                 this.isEditing = true;
                 this.showModal = true;
@@ -201,8 +279,7 @@
                 axios.get(lab_resource)
                     .then((res) => {
                         this.$log.info("Response: " + res.status + " " + res.data['message']);
-                        this.response = res.data;
-                        this.labList = res.data['message']
+                        this.labList = this.response = res.data['message'];
                     })
                     .catch((error) => {
                         // eslint-disable-next-line
@@ -213,9 +290,9 @@
             createLab: function () {
                 let self = this;
                 axios.post(lab_resource, {
-                    name: this.name,
-                    code: this.code,
-                    room: this.room,
+                    name: this.lab.name,
+                    code: this.lab.code,
+                    room: this.lab.room,
                 }, {
                     headers: {
                         Authorization: secureStoreGetString()
@@ -243,38 +320,43 @@
                 this.clearForm();
             },
 
-            updateLab: function (code) {
-                let self = this;
-                axios.put(lab_resource, {
-                    name: this.name,
-                    code: this.code,
-                    room: this.room,
-                }, {
-                    headers:
-                        {
-                            code: code,
-                            Authorization: secureStoreGetString()
-                        }
-                })
-                    .then((response) => {
-                        this.getLab();
-                        showFlashMessage(self, 'success', response.data['message'], '')
-                    })
-                    .catch((error) => {
-                        this.$log.error(error);
-                        if (error.response) {
-                            if (error.response.status === 304) {
-                                showFlashMessage(self, 'info', 'Info', 'Record not modified!')
-                            } else if (error.response.status === 401) {
-                                respondTo401(self)
-                            } else if (error.response.status === 403) {
-                                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
-                            } else {
-                                showFlashMessage(self, 'error', 'Error', error.response.data['message'])
+            updateLab: function (evt) {
+                this.$v.$touch();
+                if (this.$v.$invalid) {
+                    evt.preventDefault()
+                } else {
+                    let self = this;
+                    axios.put(lab_resource, {
+                        name: this.lab.name,
+                        code: this.lab.code,
+                        room: this.lab.room,
+                    }, {
+                        headers:
+                            {
+                                code: this.old_code,
+                                Authorization: secureStoreGetString()
                             }
-                        }
-                    });
-                this.clearForm();
+                    })
+                        .then((response) => {
+                            this.getLab();
+                            showFlashMessage(self, 'success', response.data['message'], '')
+                        })
+                        .catch((error) => {
+                            this.$log.error(error);
+                            if (error.response) {
+                                if (error.response.status === 304) {
+                                    showFlashMessage(self, 'info', 'Info', 'Record not modified!')
+                                } else if (error.response.status === 401) {
+                                    respondTo401(self)
+                                } else if (error.response.status === 403) {
+                                    showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
+                                } else {
+                                    showFlashMessage(self, 'error', 'Error', error.response.data['message'])
+                                }
+                            }
+                        });
+                    this.clearForm();
+                }
             },
 
             deleteLab: function (code) {
@@ -302,7 +384,26 @@
                             }
                         }
                     });
+                this.clearForm();
             },
+
+            searchData() {
+                return this.response.filter(lab => {
+                    for (let count = 0; count <= this.response.length; count++) {
+                        let byName = lab.name.toString().toLowerCase().includes(this.search.toLowerCase())
+                        let byCode = lab.code.toString().toLowerCase().includes(this.search.toLowerCase())
+                        let byRoom = lab.room.toString().toLowerCase().includes(this.search.toLowerCase())
+
+                        if (byName) {
+                            return byName
+                        } else if (byCode) {
+                            return byCode
+                        } else if (byRoom) {
+                            return byRoom
+                        }
+                    }
+                })
+            }
         },
         created() {
             this.getLab();

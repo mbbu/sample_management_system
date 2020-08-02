@@ -5,7 +5,7 @@
 from flask import request
 from flask_jwt_extended import get_jwt_identity
 
-from api import BaseResource
+from api import BaseResource, BaseModel
 from api.constants import SYSADMIN, FORBIDDEN_FUNCTION_ACCESS_RESPONSE, FORBIDDEN_FUNCTION_ACCESS_RESPONSE_CODE, \
     THEMEADMIN
 from api.models import User, Sample, Role
@@ -20,8 +20,9 @@ def is_sys_admin(admin_restricted_func):
     """
 
     def wrapper(*args, **kwargs):
-        user_id = get_user_by_email(get_jwt_identity()).id
-        admin = User.query.join(Role).filter(User.id == user_id, Role.code == SYSADMIN).first()
+        user = get_user_by_email(get_jwt_identity())
+
+        admin = User.query.filter(User.id == user.id, user.role.code == SYSADMIN).first()
         if not admin:
             return BaseResource.send_json_message(FORBIDDEN_FUNCTION_ACCESS_RESPONSE,
                                                   FORBIDDEN_FUNCTION_ACCESS_RESPONSE_CODE)
@@ -38,9 +39,10 @@ def is_theme_admin(theme_admin_restricted_func):
     """
 
     def wrapper(*args, **kwargs):
-        user_id = get_user_by_email(get_jwt_identity()).id
-        theme_admin = User.query.join(Role).filter(User.id == user_id, Role.code == THEMEADMIN).first()
-        sys_admin = User.query.join(Role).filter(User.id == user_id, Role.code == SYSADMIN).first()
+        user = get_user_by_email(get_jwt_identity())
+
+        theme_admin = User.query.filter(User.id == user.id, user.role.code == THEMEADMIN).first()
+        sys_admin = User.query.filter(User.id == user.id, user.role.code == SYSADMIN).first()
         if not theme_admin and not sys_admin:
             return BaseResource.send_json_message(FORBIDDEN_FUNCTION_ACCESS_RESPONSE,
                                                   FORBIDDEN_FUNCTION_ACCESS_RESPONSE_CODE)

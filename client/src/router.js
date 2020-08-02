@@ -28,6 +28,7 @@ import PasswordResetConfirmation from "./pages/Auth/PasswordResetConfirmation";
 import Project from "./pages/Project";
 import FetchSample from "./pages/REDCapPages/FetchSample";
 import SampleRequestResponse from "./pages/SampleRequest/SampleRequestResponse";
+import PageNotFound from "./pages/PageNotFound";
 
 
 Vue.use(Router);
@@ -230,6 +231,8 @@ export default new Router({
             alias: ['/sample-request-response/*'],
             component: SampleRequestResponse,
         },
+
+        {path: "*", component: PageNotFound}
 
     ],
 });

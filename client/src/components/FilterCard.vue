@@ -5,7 +5,7 @@
             </summary>
             <mdb-card-body>
                 <mdb-row>
-                    <div :key="possibleFilter" v-for="possibleFilter in allFilters">
+                    <div :key="idx" v-for="(possibleFilter, idx) in allFilters">
                         <mdb-col :md="` ${(12 / allFilters.length) }`" class="d-flex align-items-start">
                             <ul :key="title" v-for="(values, title) in possibleFilter">
                                 <li><em>{{title}}</em>

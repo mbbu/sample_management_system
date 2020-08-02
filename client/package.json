@@ -14,7 +14,7 @@
     "@syncfusion/ej2-vue-dropdowns": "^17.4.51",
     "@syncfusion/ej2-vue-maps": "^17.4.43",
     "axios": "^0.18.1",
-    "bootstrap": "^4.3.1",
+    "bootstrap": "^4.5.0",
     "bootstrap-vue": "^2.2.1",
     "bulma": "^0.8.0",
     "bulma-steps-component": "^0.5.3",
@@ -24,8 +24,10 @@
     "mdbootstrap": "^4.14.1",
     "mdbvue": "^6.5.1",
     "secure-ls": "^1.2.6",
+    "v-page": "^2.0.9",
     "vee-validate": "^3.2.2",
     "vue": "^2.6.10",
+    "vue-axios": "^2.1.5",
     "vue-form-wizard": "^0.8.4",
     "vue-functional-calendar": "^2.8.82",
     "vue-loading-overlay": "^3.3.2",
@@ -40,7 +42,7 @@
     "vuex-persistedstate": "^3.0.1"
   },
   "devDependencies": {
-    "@smartweb/vue-flash-message": "^0.6.2",
+    "@smartweb/vue-flash-message": "^0.6.4",
     "@vue/cli-plugin-babel": "^4.1.0",
     "@vue/cli-plugin-eslint": "^4.1.0",
     "@vue/cli-service": "^4.1.0",

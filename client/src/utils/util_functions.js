@@ -4,9 +4,13 @@ import SecureLS from "secure-ls";
 import Vue from "vue";
 import axios from "axios";
 import {logout_resource} from "./api_paths";
+import EventBus from "../components/EventBus";
+
+self.flashMessage = undefined;
 
 export function showFlashMessage(self, status, title, message) {
     self.flashMessage.show({
+        icon: "../assets/logo.png",
         status: status,
         title: title, message: message
     });
@@ -534,3 +538,29 @@ export function startLoader(self) {
         zIndex: 999,
     })
 }
+
+
+// PAGINATION FUNCTIONS
+let page_info = {};
+let page_array = [];
+
+export function paginate(data) {
+    let start, end;
+
+    start = page_info.pageSize * (page_info.pageNumber - 1)
+    end = start + page_info.pageSize
+
+    page_array.splice(0, page_array.length);
+
+    if (end > data.length) end = data.length;
+    for (let i = start; i < end; i++) {
+        page_array.push(data[i])
+    }
+
+    return {'arr': page_array, 'pg_len': data.length}
+}
+
+EventBus.$on('page-info', (payload) => {
+    page_info = payload.pgInfo
+    paginate(payload.pgData)
+})

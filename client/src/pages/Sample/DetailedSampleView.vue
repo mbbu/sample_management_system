@@ -4,7 +4,8 @@
             <div class="col-sm-12">
                 <top-nav :page_title="page_title"></top-nav>
 
-                <FlashMessage :position="'center bottom'"></FlashMessage>
+                <!-- FLASH MESSAGES -->
+                <FlashMessage :position="'right bottom'"></FlashMessage>
                 <br> <br>
                 <em>About Sample</em>
                 <br> <br>
@@ -187,7 +188,7 @@
                                     id="form-amount-input"
                                     min=1
                                     placeholder="Enter Amount"
-                                    required="true"
+                                    required
                                     type="number"
                                     v-model="sampleRequest.amount"
                             ></b-form-input>

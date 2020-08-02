@@ -5,7 +5,8 @@
 
             <form-wizard @submit.prevent="formSubmit" ref="formContainer"
                          subtitle="Kindly input the correct information" title="Sample Data Form">
-                <FlashMessage :position="'center bottom'"></FlashMessage>
+                <!-- FLASH MESSAGES -->
+                <FlashMessage :position="'right bottom'"></FlashMessage>
 
                 <tab-content :before-change="handleSubmit"
                              title="Sample Details">
@@ -297,10 +298,10 @@
         showFlashMessage
     } from "../../utils/util_functions";
     import {
+        bio_hazard_level_resource,
         box_resource,
         quantity_type_resource,
         sample_resource,
-        bio_hazard_level_resource,
         theme_resource,
         user_resource
     } from "../../utils/api_paths";

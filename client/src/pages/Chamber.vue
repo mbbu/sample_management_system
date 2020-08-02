@@ -4,11 +4,18 @@
             <div class="col-sm-12">
                 <top-nav :page_title="page_title" v-bind:search_query.sync="search"></top-nav>
 
-                <FlashMessage :position="'center bottom'"></FlashMessage>
+                <!-- FLASH MESSAGES -->
+                <FlashMessage :position="'right bottom'"></FlashMessage>
                 <br>
                 <!-- FILTER CARD SECTION -->
                 <filter-card :all-filters="allFilters"></filter-card>
                 <br>
+
+                <!--TOP-PAGINATION-->
+                <v-page :total-row="matchFiltersAndSearch.pg_len" @page-change="pageInfo" align="center"
+                        v-model="current"></v-page>
+                <br>
+
                 <table class=" table table-hover">
                     <thead>
                     <tr>
@@ -21,7 +28,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="chamber.id" v-for="(chamber, index) in matchFiltersAndSearch">
+                    <tr :key="chamber.id" v-for="(chamber, index) in matchFiltersAndSearch.arr">
                         <td> {{ index + 1 }}</td>
                         <td> {{chamber.type}}</td>
                         <td> {{chamber.code}}</td>
@@ -48,47 +55,65 @@
                     </tr>
                     </tbody>
                 </table>
+                <!--BOTTOM-PAGINATION-->
+                <v-page :total-row="matchFiltersAndSearch.pg_len" @page-change="pageInfo" align="center"
+                        v-model="current"></v-page>
+                <br>
             </div>
 
             <div v-if="!isEditing">
                 <b-modal
                         :title="`Add ${page_title}`"
                         @hidden="clearForm"
-                        @ok="createChamber"
-                        @submit="clearForm"
+                        @ok="onSubmit"
+                        @submit="showModal=false"
                         cancel-variant="danger"
                         id="modal-chamber"
                         ok-title="Save"
                 >
                     <form @submit.prevent="createChamber">
-                        <b-form-group id="form-lab-group" label="Freezer Number:" label-for="form-lab-input">
+                        <!--FREEZER-->
+                        <b-form-group id="form-freezer-group" label="Freezer Number:" label-for="form-freezer-input">
                             <ejs-dropdownlist
                                     :dataSource='freezerDataList'
                                     :fields="fields"
-                                    :v-model="freezer"
                                     id='dropdownlist'
                                     placeholder='Select a freezer'
+                                    v-model.trim="$v.chamber.freezer.$model"
                             ></ejs-dropdownlist>
+                            <div v-if="$v.chamber.freezer.$dirty">
+                                <div class="error" v-if="!$v.chamber.freezer.required">Field is required</div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-room-group" label="Type:" label-for="form-room-input">
+                        <!-- TYPE -->
+                        <b-form-group :class="{ 'form-group--error': $v.chamber.type.$error }"
+                                      id="form-type-group" label="Type:" label-for="form-type-input">
                             <b-form-input
-                                    id="form-room-input"
+                                    id="form-type-input"
                                     placeholder="Enter Freezer Type"
-                                    required="true"
+                                    required
                                     type="text"
-                                    v-model="type"
+                                    v-model.trim="$v.chamber.type.$model"
                             ></b-form-input>
+                            <div v-if="$v.chamber.type.$dirty">
+                                <div class="error" v-if="!$v.chamber.type.required">Field is required</div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-code-group" label="Code:" label-for="form-code-input">
+                        <!--CODE-->
+                        <b-form-group :class="{ 'form-group--error': $v.chamber.code.$error }"
+                                      id="form-code-group" label="Code:" label-for="form-code-input">
                             <b-form-input
                                     id="form-code-input"
                                     placeholder="Enter Code"
-                                    required="true"
+                                    required
                                     type="text"
-                                    v-model="code">
+                                    v-model.trim="$v.chamber.code.$model">
                             </b-form-input>
+                            <div v-if="$v.chamber.code.$dirty">
+                                <div class="error" v-if="!$v.chamber.code.required">Field is required</div>
+                            </div>
                         </b-form-group>
 
                     </form>
@@ -99,43 +124,57 @@
                 <b-modal
                         :title="`Edit ${page_title}`"
                         @hidden="clearForm"
-                        @ok="updateChamber(old_code)"
-                        @shown="selectItemForUpdate(freezer)"
+                        @ok="updateChamber"
+                        @shown="selectItemForUpdate(chamber.freezer)"
                         @submit="showModal = false"
                         cancel-variant="danger"
                         id="modal-chamber-edit"
                         ok-title="Update"
                 >
                     <form>
+                        <!--FREEZER-->
                         <b-form-group id="form-freezer-group-edit" label="Freezer Number:"
                                       label-for="form-freezer-input">
                             <ejs-dropdownlist
                                     :dataSource='freezerDataList'
                                     :fields="fields"
-                                    :v-model="freezer"
                                     id='dropdownlist'
                                     placeholder='Select a freezer'
+                                    v-model.trim="$v.chamber.freezer.$model"
                             ></ejs-dropdownlist>
+                            <div v-if="$v.chamber.freezer.$dirty">
+                                <div class="error" v-if="!$v.chamber.freezer.required">Field is required</div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-type-group-edit" label="Type:" label-for="form-type-input">
+                        <!-- TYPE -->
+                        <b-form-group :class="{ 'form-group--error': $v.chamber.type.$error }"
+                                      id="form-type-group-edit" label="Type:" label-for="form-type-input">
                             <b-form-input
                                     id="form-type-input"
-                                    placeholder="Enter chamber type"
-                                    required="true"
+                                    placeholder="Enter Freezer Type"
+                                    required
                                     type="text"
-                                    v-model="type"
+                                    v-model.trim="$v.chamber.type.$model"
                             ></b-form-input>
+                            <div v-if="$v.chamber.type.$dirty">
+                                <div class="error" v-if="!$v.chamber.type.required">Field is required</div>
+                            </div>
                         </b-form-group>
 
-                        <b-form-group id="form-code-group-edit" label="Code:" label-for="form-code-input">
+                        <!--CODE-->
+                        <b-form-group :class="{ 'form-group--error': $v.chamber.code.$error }"
+                                      id="form-code-group-edit" label="Code:" label-for="form-code-input">
                             <b-form-input
                                     id="form-code-input"
                                     placeholder="Enter Code"
-                                    required="true"
+                                    required
                                     type="text"
-                                    v-model="code">
+                                    v-model.trim="$v.chamber.code.$model">
                             </b-form-input>
+                            <div v-if="$v.chamber.code.$dirty">
+                                <div class="error" v-if="!$v.chamber.code.required">Field is required</div>
+                            </div>
                         </b-form-group>
                     </form>
                 </b-modal>
@@ -154,7 +193,7 @@
     import {
         extractFreezerData,
         getItemDataList,
-        getSelectedItem,
+        paginate,
         respondTo401,
         secureStoreGetString,
         selectItemForUpdate,
@@ -162,6 +201,7 @@
     } from "../utils/util_functions";
     import EventBus from '../components/EventBus';
     import FilterCard from "../components/FilterCard";
+    import {required} from "vuelidate/lib/validators";
 
     export default {
         name: 'Chamber',
@@ -174,21 +214,34 @@
                 response: [],
                 chamberList: [],
                 freezerDataList: [],
-                code: null,
-                type: null,
+                chamber: {
+                    code: '',
+                    type: '',
+                    freezer: '',
+                },
                 search: '',
-                freezer: null,
                 fields: {text: '', value: ''},
 
                 // values for data modification
                 old_code: null,
                 showModal: true,
                 isEditing: false,
+
+                // data for pagination
+                current: 1,
             };
         },
 
+        validations: {
+            chamber: {
+                freezer: {required},
+                code: {required},
+                type: {required},
+            }
+        },
+
         created() {
-            this.getChamber();
+            this.onLoadPage();
         },
 
         mounted() {
@@ -239,40 +292,54 @@
                 let filterByFreezer = filteredData.freezer
 
                 if (searchList !== null) {
-                    return searchList
+                    return paginate(searchList)
                 } else if (this.filters.length > 1) {
                     // Possibly, multiple filters have been applied. Return the array with the least elements
                     return filterByType.length < filterByFreezer.length ?
-                        filterByType : filterByFreezer
+                        paginate(filterByType) : paginate(filterByFreezer)
                 } else if (filterByType !== null && filterByType.length > 0) {
                     this.freezerList = filterByType // eslint-disable-line
                     this.filterData(filterByType)
-                    return filterByType
+                    return paginate(filterByType)
                 } else if (filterByFreezer !== null && filterByFreezer.length > 0) {
                     this.freezerList = filterByFreezer // eslint-disable-line
                     this.filterData(filterByFreezer)
-                    return filterByFreezer
+                    return paginate(filterByFreezer)
                 }
-                return this.chamberList
+                return paginate(this.chamberList)
             },
         },
 
         methods: {
+            //Util Functions
+
+            pageInfo(info) {
+                EventBus.$emit('page-info', {'pgInfo': info, 'pgData': this.chamberList})
+            },
+
+            onSubmit(evt) {
+                this.$v.$touch();
+                if (this.$v.$invalid) {
+                    // stop here if form is invalid
+                    evt.preventDefault()
+                    return;
+                }
+                this.createChamber();
+            },
             selectItemForUpdate,
             // Util Functions
             clearForm() {
-                this.freezer = null;
-                this.code = null;
-                this.type = null;
+                this.chamber.freezer = null;
+                this.chamber.code = null;
+                this.chamber.type = null;
                 this.isEditing = false;
-                this.freezerDataList = [];
-                this.onLoadPage();
+                this.$v.$reset();
             },
 
             fillFormForUpdate(freezer, type, code) {
-                this.freezer = freezer;
-                this.code = code;
-                this.type = type;
+                this.chamber.freezer = freezer;
+                this.chamber.code = code;
+                this.chamber.type = type;
                 this.old_code = code;
                 this.isEditing = true;
                 this.showModal = true;
@@ -290,7 +357,9 @@
                             'Name': freezerList.items[i].Name,
                         });
                     }
+                    console.log(this.freezerDataList)
                 })
+                this.getChamber()
             },
             // end of Util functions
 
@@ -299,8 +368,7 @@
                 this.clearForm();
                 axios.get(chamber_resource)
                     .then((res) => {
-                        this.response = res.data['message'];
-                        this.chamberList = this.response
+                        this.chamberList = this.response = res.data['message'];
                     })
                     .catch((error) => {
                         // eslint-disable-next-line
@@ -310,12 +378,12 @@
 
             createChamber: function () {
                 let self = this;
-                this.freezer = getSelectedItem(this.freezerDataList, this.freezer);
+                // this.freezer = getSelectedItem(this.freezerDataList, this.freezer);
 
                 axios.post(chamber_resource, {
-                    freezer: this.freezer,
-                    type: this.type,
-                    code: this.code,
+                    freezer: this.chamber.freezer,
+                    type: this.chamber.type,
+                    code: this.chamber.code,
                 }, {
                     headers:
                         {
@@ -344,43 +412,50 @@
                             }
                         }
                     });
+                this.clearForm();
             },
 
-            updateChamber: function (code) {
-                let self = this;
-                this.freezer = getSelectedItem(this.freezerDataList, this.freezer);
+            updateChamber: function (evt) {
+                this.$v.$touch();
+                if (this.$v.$invalid) {
+                    evt.preventDefault()
+                } else {
+                    let self = this;
+                    // this.freezer = getSelectedItem(this.freezerDataList, this.freezer);
 
-                axios.put(chamber_resource, {
-                    freezer: this.freezer,
-                    type: this.type,
-                    code: this.code,
-                }, {
-                    headers:
-                        {
-                            code: code,
-                            Authorization: secureStoreGetString()
-                        }
-                })
-                    .then((response) => {
-                        this.getChamber();
-                        showFlashMessage(self, 'success', response.data['message'], '');
-                        this.clearForm();
-                    })
-                    .catch((error) => {
-                        this.clearForm();
-                        this.$log.error(error);
-                        if (error.response) {
-                            if (error.response.status === 304) {
-                                showFlashMessage(self, 'info', 'Record not modified!', '');
-                            } else if (error.response.status === 401) {
-                                respondTo401(self);
-                            } else if (error.response.status === 403) {
-                                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
-                            } else {
-                                showFlashMessage(self, 'error', error.response.data['message'], '');
+                    axios.put(chamber_resource, {
+                        freezer: this.chamber.freezer,
+                        type: this.chamber.type,
+                        code: this.chamber.code,
+                    }, {
+                        headers:
+                            {
+                                code: this.old_code,
+                                Authorization: secureStoreGetString()
                             }
-                        }
-                    });
+                    })
+                        .then((response) => {
+                            this.getChamber();
+                            showFlashMessage(self, 'success', response.data['message'], '');
+                            this.clearForm();
+                        })
+                        .catch((error) => {
+                            this.clearForm();
+                            this.$log.error(error);
+                            if (error.response) {
+                                if (error.response.status === 304) {
+                                    showFlashMessage(self, 'info', 'Record not modified!', '');
+                                } else if (error.response.status === 401) {
+                                    respondTo401(self);
+                                } else if (error.response.status === 403) {
+                                    showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
+                                } else {
+                                    showFlashMessage(self, 'error', error.response.data['message'], '');
+                                }
+                            }
+                        });
+                    this.clearForm();
+                }
             },
 
             deleteChamber: function (code) {
@@ -408,6 +483,7 @@
                             }
                         }
                     });
+                this.clearForm();
             },
             //end of methods for api interaction
 
