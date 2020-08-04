@@ -12,7 +12,7 @@
                         <th scope="col"> Id</th>
                         <th scope="col"> Name</th>
                         <th scope="col"> Code</th>
-                        <th scope="col"> Actions</th>
+                        <th scope="col" v-if="isAuth"> Actions</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -21,17 +21,17 @@
                         <td> {{ theme.name }}</td>
                         <td> {{ theme.code }}</td>
 
-                        <td>
-                            <b-icon
-                                    :title="`Update ${ theme.name }`"
-                                    @mouseover="fillFormForUpdate(theme.name, theme.code)"
-                                    class="border border-info rounded" font-scale="2.0"
-                                    icon="pencil" v-b-modal.modal-theme-edit
-                                    v-b-tooltip.hover
-                                    variant="info"
-                            ></b-icon>
-                            &nbsp;
-                            <b-icon
+                      <td v-if="isAuth">
+                        <b-icon
+                            :title="`Update ${ theme.name }`"
+                            @mouseover="fillFormForUpdate(theme.name, theme.code)"
+                            class="border border-info rounded" font-scale="2.0"
+                            icon="pencil" v-b-modal.modal-theme-edit
+                            v-b-tooltip.hover
+                            variant="info"
+                        ></b-icon>
+                        &nbsp;
+                        <b-icon
                                     :title="`Delete ${theme.name}!`" @click="deleteTheme(theme.code)"
                                     class="border rounded bg-danger p-1" font-scale="1.85"
                                     icon="trash" v-b-tooltip.hover
@@ -138,40 +138,45 @@
                     </form>
                 </b-modal>
             </div>
+          <div v-if="isAuth">
             <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-theme variant="primary">
-                <span>Add Theme</span> <i class="fas fa-plus-circle menu_icon"></i>
+              <span>Add Theme</span> <i class="fas fa-plus-circle menu_icon"></i>
             </b-button>
+          </div>
         </div>
     </div>
 </template>
 
 <script>
-    import axios from 'axios';
-    import {theme_resource} from '../utils/api_paths'
-    import TopNav from "../components/TopNav";
-    import {respondTo401, secureStoreGetString, showFlashMessage} from '../utils/util_functions'
-    import EventBus from '../components/EventBus';
-    import {required} from "vuelidate/lib/validators";
+import axios from 'axios';
+import {theme_resource} from '@/utils/api_paths'
+import TopNav from "../components/TopNav";
+import {isAdmin, respondTo401, secureStoreGetString, showFlashMessage} from '@/utils/util_functions'
+import EventBus from '../components/EventBus';
+import {required} from "vuelidate/lib/validators";
 
-    export default {
-        name: 'Theme',
-        data() {
-            return {
-                page_title: "Themes",
-                response: [],
-                search: '',
-                themeList: [],
+export default {
+  name: 'Theme',
+  data() {
+    return {
+      page_title: "Themes",
+      response: [],
+      search: '',
+      themeList: [],
 
-                theme: {
-                    name: '',
-                    code: ''
-                },
+      theme: {
+        name: '',
+        code: ''
+      },
 
-                // values for data modification
-                old_code: null,
-                showModal: true,
-                isEditing: false,
-            };
+      // variable to check user status and role
+      isAuth: null,
+
+      // values for data modification
+      old_code: null,
+      showModal: true,
+      isEditing: false,
+    };
         },
 
         validations: {
@@ -197,10 +202,10 @@
         },
 
         methods: {
+          // util functions
             onSubmit(evt) {
                 this.$v.$touch();
                 if (this.$v.$invalid) {
-                    // stop here if form is invalid
                     evt.preventDefault()
                     return;
                 }
@@ -222,17 +227,18 @@
                 this.showModal = true;
             },
 
+          // api interaction functions
             getTheme() {
-                axios.get(theme_resource)
-                    .then((res) => {
-                        this.$log.info("Response: " + res.status + " " + res.data['message']);
-                        this.response = res.data;
-                        this.themeList = this.response.message
-                    })
-                    .catch((error) => {
-                        // eslint-disable-next-line
-                        this.$log.error(error);
-                    });
+              this.isAuth = isAdmin()
+
+              axios.get(theme_resource)
+                  .then((res) => {
+                    this.themeList = this.response = res.data['message'];
+                  })
+                  .catch((error) => {
+                    // eslint-disable-next-line
+                    this.$log.error(error);
+                  });
             },
 
             createTheme: function () {
