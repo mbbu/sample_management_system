@@ -8,6 +8,10 @@ import EventBus from "../components/EventBus";
 
 self.flashMessage = undefined;
 
+
+export const ADMIN = "System Admin"
+export const RESEARCHER = "Researcher"
+
 export function showFlashMessage(self, status, title, message) {
     self.flashMessage.show({
         icon: "../assets/logo.png",
@@ -423,6 +427,13 @@ export function isUserLoggedIn() {
     return store.state.jwtString !== "" || getUserEmail() !== "";
 }
 
+export function getLoggedInUser() {
+    let loggedIn = isUserLoggedIn()
+    if (loggedIn === true) {
+        return getStoredUserDetails()
+    }
+}
+
 export function logOutUser(self) {
     let loader = startLoader(self)
     axios.get(logout_resource, {
@@ -449,6 +460,19 @@ export function logOutUser(self) {
                 showFlashMessage(self, 'error', error.response.data['message'], '');
             }
         })
+}
+
+
+// SYSTEM ADMIN FUNCTIONS
+export function isAdmin() {
+    let userStatus = getLoggedInUser()
+    return !!(userStatus && userStatus.role === ADMIN);
+}
+
+// THEME ADMIN FUNCTIONS
+export function isThemeAdmin() {
+    let userStatus = getLoggedInUser()
+    return !!(userStatus && (userStatus.role === ADMIN || userStatus.role === RESEARCHER));
 }
 
 // accessor for sample code; used when requesting to view detailed sample page
