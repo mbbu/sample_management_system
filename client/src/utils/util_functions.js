@@ -475,6 +475,20 @@ export function isThemeAdmin() {
     return !!(userStatus && (userStatus.role === ADMIN || userStatus.role === RESEARCHER));
 }
 
+// PUBLICATION OWNER FUNCTIONS
+export function isPublicationOwner(email) {
+    let userEmail = getUserEmail()
+
+    return !!(userEmail && userEmail === email);
+}
+
+// SAMPLE OWNER FUNCTIONS
+export function isSampleOwner(email) {
+    let userEmail = getUserEmail()
+
+    return !!(userEmail && (userEmail === email || isThemeAdmin()));
+}
+
 // accessor for sample code; used when requesting to view detailed sample page
 let sampleCode = ""
 let sample = []
