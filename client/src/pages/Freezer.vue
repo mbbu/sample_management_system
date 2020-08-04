@@ -24,7 +24,7 @@
                         <th class="table-header-style" scope="col"> Room</th>
                         <th class="table-header-style" scope="col"> Freezer Number</th>
                         <th class="table-header-style" scope="col"> Code</th>
-                        <th class="table-header-style" scope="col"> Actions</th>
+                        <th class="table-header-style" scope="col" v-if="isAuth"> Actions</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -35,17 +35,17 @@
                         <td> {{ freezer.number }}</td>
                         <td> {{ freezer.code }}</td>
 
-                        <td>
-                            <b-icon
-                                    :title="`Update freezer ${ freezer.number }`"
-                                    @mouseover="fillFormForUpdate(freezer.number, freezer.code, freezer.room, freezer['lab.name'])"
-                                    class="border border-info rounded" font-scale="2.0"
-                                    icon="pencil" v-b-modal.modal-freezer-edit
-                                    v-b-tooltip.hover
-                                    variant="info"
-                            ></b-icon>
-                            &nbsp;
-                            <b-icon
+                      <td v-if="isAuth">
+                        <b-icon
+                            :title="`Update freezer ${ freezer.number }`"
+                            @mouseover="fillFormForUpdate(freezer.number, freezer.code, freezer.room, freezer['lab.name'])"
+                            class="border border-info rounded" font-scale="2.0"
+                            icon="pencil" v-b-modal.modal-freezer-edit
+                            v-b-tooltip.hover
+                            variant="info"
+                        ></b-icon>
+                        &nbsp;
+                        <b-icon
                                     :title="`Delete freezer ${freezer.number}!`" @click="deleteFreezer(freezer.code)"
                                     class="border rounded bg-danger p-1" font-scale="1.85"
                                     icon="trash" v-b-tooltip.hover
@@ -221,59 +221,64 @@
                     </form>
                 </b-modal>
             </div>
-            <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-freezer variant="primary">
-                <span>Add Freezer</span> <i class="fas fa-plus-circle menu_icon"></i>
-            </b-button>
+          <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-freezer v-if="isAuth"
+                    variant="primary">
+            <span>Add Freezer</span> <i class="fas fa-plus-circle menu_icon"></i>
+          </b-button>
         </div>
     </div>
 </template>
 
 <script>
-    import axios from 'axios';
-    import {freezer_resource, lab_resource} from '../utils/api_paths'
-    import TopNav from "../components/TopNav";
-    import {
-        extractApiData,
-        getItemDataList,
-        getSelectedItem,
-        paginate,
-        respondTo401,
-        secureStoreGetString,
-        selectItemForUpdate,
-        showFlashMessage
-    } from "../utils/util_functions";
-    import EventBus from '../components/EventBus';
-    import FilterCard from "../components/FilterCard";
-    import {required} from "vuelidate/lib/validators";
+import axios from 'axios';
+import {freezer_resource, lab_resource} from '@/utils/api_paths'
+import TopNav from "../components/TopNav";
+import {
+  extractApiData,
+  getItemDataList,
+  getSelectedItem,
+  isThemeAdmin,
+  paginate,
+  respondTo401,
+  secureStoreGetString,
+  selectItemForUpdate,
+  showFlashMessage
+} from "@/utils/util_functions";
+import EventBus from '@/components/EventBus';
+import FilterCard from "@/components/FilterCard";
+import {required} from "vuelidate/lib/validators";
 
-    export default {
-        name: 'Freezer',
-        components: {TopNav, FilterCard},
+export default {
+  name: 'Freezer',
+  components: {TopNav, FilterCard},
 
-        data() {
-            return {
-                page_title: "Freezer",
-                filters: [],
-                response: [],
-                freezerList: [],
-                labDataList: [],
+  data() {
+    return {
+      page_title: "Freezer",
+      filters: [],
+      response: [],
+      freezerList: [],
+      labDataList: [],
 
-                freezer: {
-                    code: '',
-                    room: '',
-                    number: '',
-                    laboratory: null,
-                },
+      freezer: {
+        code: '',
+        room: '',
+        number: '',
+        laboratory: null,
+      },
 
-                search: '',
-                fields: {text: '', value: ''},
+      // variable to check user status and role
+      isAuth: null,
 
-                // values for data modification
-                old_code: null,
-                showModal: true,
-                isEditing: false,
+      search: '',
+      fields: {text: '', value: ''},
 
-                // data for pagination
+      // values for data modification
+      old_code: null,
+      showModal: true,
+      isEditing: false,
+
+      // data for pagination
                 current: 1,
             };
         },
@@ -412,15 +417,17 @@
 
             // Functions to interact with api
             getFreezer() {
-                this.clearForm();
-                axios.get(freezer_resource)
-                    .then((res) => {
-                        this.freezerList = this.response = res.data['message'];
-                    })
-                    .catch((error) => {
-                        // eslint-disable-next-line
-                        this.$log.error(error);
-                    });
+              this.isAuth = isThemeAdmin();
+
+              this.clearForm();
+              axios.get(freezer_resource)
+                  .then((res) => {
+                    this.freezerList = this.response = res.data['message'];
+                  })
+                  .catch((error) => {
+                    // eslint-disable-next-line
+                    this.$log.error(error);
+                  });
             },
 
             createFreezer: function () {
