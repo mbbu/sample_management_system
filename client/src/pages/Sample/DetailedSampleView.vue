@@ -235,16 +235,16 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="text-center">
-                            <button @click="requestUpdateSample" class="btn btn-outline-info btn-rounded"
-                                    type="button"> Update Sample
-                                <i class="fas fa-pencil-alt"></i></button>
+                        <div class="text-center" v-if="isSampleOwner(sample.userEmail)">
+                          <button @click="requestUpdateSample" class="btn btn-outline-info btn-rounded"
+                                  type="button"> Update Sample
+                            <i class="fas fa-pencil-alt"></i></button>
                         </div>
-                        <div class="text-center">
-                            <button @click="deleteSample(sample.code)" class="btn btn-outline-danger btn-rounded"
-                                    type="button"> Delete Sample
-                                <i class="far fa-trash-alt"></i></button>
-                        </div>
+                      <div class="text-center" v-if="isSampleOwner(sample.userEmail)">
+                        <button @click="deleteSample(sample.code)" class="btn btn-outline-danger btn-rounded"
+                                type="button"> Delete Sample
+                          <i class="far fa-trash-alt"></i></button>
+                      </div>
                     </mdb-col>
                 </mdb-row>
             </div>
@@ -253,35 +253,36 @@
 </template>
 
 <script>
-    import {mdbCol, mdbRow} from "mdbvue";
-    import TopNav from "../../components/TopNav";
-    import {sample_request_resource, sample_resource} from "../../utils/api_paths";
-    import {FunctionalCalendar} from 'vue-functional-calendar';
-    import axios from 'axios';
-    import {
-        countDownTimer,
-        getSampleCode,
-        isRetentionPeriodValid,
-        overDueRetentionPeriod,
-        respondTo401,
-        secureStoreGetString,
-        setSampleDetailsForEditing,
-        setUpdateSample,
-        showFlashMessage,
-        startLoader
-    } from "../../utils/util_functions";
+import {mdbCol, mdbRow} from "mdbvue";
+import TopNav from "@/components/TopNav";
+import {sample_request_resource, sample_resource} from "@/utils/api_paths";
+import {FunctionalCalendar} from 'vue-functional-calendar';
+import axios from 'axios';
+import {
+  countDownTimer,
+  getSampleCode,
+  isRetentionPeriodValid,
+  isSampleOwner,
+  overDueRetentionPeriod,
+  respondTo401,
+  secureStoreGetString,
+  setSampleDetailsForEditing,
+  setUpdateSample,
+  showFlashMessage,
+  startLoader
+} from "@/utils/util_functions";
 
-    export default {
-        name: "DetailedSampleView",
-        data() {
-            return {
-                page_title: "Sample MetaData",
-                response: [],
-                sample: {
-                    theme: "",
-                    user: "",
-                    userEmail: "",
-                    project: "",
+export default {
+  name: "DetailedSampleView",
+  data() {
+    return {
+      page_title: "Sample MetaData",
+      response: [],
+      sample: {
+        theme: "",
+        user: "",
+        userEmail: "",
+        project: "",
                     projectOwner: "",
                     sampleType: "",
                     species: "",
@@ -327,17 +328,17 @@
         },
 
         methods: {
-            isRetentionPeriodValid, overDueRetentionPeriod,
-            setSampleData(res) {
-                this.sample.theme = res['theme.name'];
-                this.sample.user = res['user.first_name'] + " " + res['user.last_name'];
-                this.sample.userEmail = res['user.email'];
-                this.sample.project = res['project'];
-                this.sample.projectOwner = res['project_owner'];
-                this.sample.sampleType = res['sample_type'];
-                this.sample.species = res['animal_species'];
-                this.sample.description = res['sample_description'];
-                this.sample.box = res['box.label'];
+          isRetentionPeriodValid, overDueRetentionPeriod, isSampleOwner,
+          setSampleData(res) {
+            this.sample.theme = res['theme.name'];
+            this.sample.user = res['user.first_name'] + " " + res['user.last_name'];
+            this.sample.userEmail = res['user.email'];
+            this.sample.project = res['project'];
+            this.sample.projectOwner = res['project_owner'];
+            this.sample.sampleType = res['sample_type'];
+            this.sample.species = res['animal_species'];
+            this.sample.description = res['sample_description'];
+            this.sample.box = res['box.label'];
                 this.sample.locationCollected = res['location_collected'];
                 this.sample.retention = res['retention_date'];
                 this.sample.barcode = res['barcode'];
