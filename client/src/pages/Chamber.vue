@@ -24,7 +24,7 @@
                         <th scope="col"> Code</th>
                         <th scope="col"> Freezer Room</th>
                         <th scope="col"> Freezer Number</th>
-                        <th scope="col"> Actions</th>
+                        <th scope="col" v-if="isAuth"> Actions</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -35,17 +35,17 @@
                         <td> {{chamber['freezer.room']}}</td>
                         <td> {{chamber['freezer.number']}}</td>
 
-                        <td>
-                            <b-icon
-                                    :title="`Update chamber ${ chamber.code }`"
-                                    @mouseover="fillFormForUpdate(chamber['freezer.number'], chamber.type, chamber.code)"
-                                    class="border border-info rounded" font-scale="2.0"
-                                    icon="pencil" v-b-modal.modal-chamber-edit
-                                    v-b-tooltip.hover
-                                    variant="info"
-                            ></b-icon>
-                            &nbsp;
-                            <b-icon
+                      <td v-if="isAuth">
+                        <b-icon
+                            :title="`Update chamber ${ chamber.code }`"
+                            @mouseover="fillFormForUpdate(chamber['freezer.number'], chamber.type, chamber.code)"
+                            class="border border-info rounded" font-scale="2.0"
+                            icon="pencil" v-b-modal.modal-chamber-edit
+                            v-b-tooltip.hover
+                            variant="info"
+                        ></b-icon>
+                        &nbsp;
+                        <b-icon
                                     :title="`Delete chamber ${chamber.code}!`" @click="deleteChamber(chamber.code)"
                                     class="border rounded bg-danger p-1" font-scale="1.85"
                                     icon="trash" v-b-tooltip.hover
@@ -179,55 +179,61 @@
                     </form>
                 </b-modal>
             </div>
-            <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-chamber variant="primary">
-                <span>Add Chamber</span> <i class="fas fa-plus-circle menu_icon"></i>
-            </b-button>
+          <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-chamber v-if="isAuth"
+                    variant="primary">
+            <span>Add Chamber</span> <i class="fas fa-plus-circle menu_icon"></i>
+          </b-button>
         </div>
     </div>
 </template>
 
 <script>
-    import axios from 'axios';
-    import {chamber_resource, freezer_resource} from '../utils/api_paths'
-    import TopNav from "../components/TopNav";
-    import {
-        extractFreezerData,
-        getItemDataList,
-        paginate,
-        respondTo401,
-        secureStoreGetString,
-        selectItemForUpdate,
-        showFlashMessage
-    } from "../utils/util_functions";
-    import EventBus from '../components/EventBus';
-    import FilterCard from "../components/FilterCard";
-    import {required} from "vuelidate/lib/validators";
+import axios from 'axios';
+import {chamber_resource, freezer_resource} from '@/utils/api_paths'
+import TopNav from "../components/TopNav";
+import {
+  extractFreezerData,
+  getItemDataList,
+  isThemeAdmin,
+  paginate,
+  respondTo401,
+  secureStoreGetString,
+  selectItemForUpdate,
+  showFlashMessage
+} from "@/utils/util_functions";
+import EventBus from '@/components/EventBus';
+import FilterCard from "@/components/FilterCard";
+import {required} from "vuelidate/lib/validators";
 
-    export default {
-        name: 'Chamber',
-        components: {TopNav, FilterCard},
+export default {
+  name: 'Chamber',
+  components: {TopNav, FilterCard},
 
-        data() {
-            return {
-                page_title: "Chambers",
-                filters: [],
-                response: [],
-                chamberList: [],
-                freezerDataList: [],
-                chamber: {
-                    code: '',
-                    type: '',
-                    freezer: '',
-                },
-                search: '',
-                fields: {text: '', value: ''},
+  data() {
+    return {
+      page_title: "Chambers",
+      filters: [],
+      response: [],
+      chamberList: [],
+      freezerDataList: [],
+      chamber: {
+        code: '',
+        type: '',
+        freezer: '',
+      },
 
-                // values for data modification
-                old_code: null,
-                showModal: true,
-                isEditing: false,
+      // variable to check user status and role
+      isAuth: null,
 
-                // data for pagination
+      search: '',
+      fields: {text: '', value: ''},
+
+      // values for data modification
+      old_code: null,
+      showModal: true,
+      isEditing: false,
+
+      // data for pagination
                 current: 1,
             };
         },
@@ -365,15 +371,17 @@
 
             // Functions to interact with api
             getChamber() {
-                this.clearForm();
-                axios.get(chamber_resource)
-                    .then((res) => {
-                        this.chamberList = this.response = res.data['message'];
-                    })
-                    .catch((error) => {
-                        // eslint-disable-next-line
-                        this.$log.error(error);
-                    });
+              this.isAuth = isThemeAdmin()
+
+              this.clearForm();
+              axios.get(chamber_resource)
+                  .then((res) => {
+                    this.chamberList = this.response = res.data['message'];
+                  })
+                  .catch((error) => {
+                    // eslint-disable-next-line
+                    this.$log.error(error);
+                  });
             },
 
             createChamber: function () {
