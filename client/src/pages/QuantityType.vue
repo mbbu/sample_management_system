@@ -19,33 +19,33 @@
                         <th scope="col"> Name</th>
                         <th scope="col"> Code</th>
                         <th scope="col"> Description</th>
-                        <th scope="col"> Actions</th>
+                        <th scope="col" v-if="isAuth"> Actions</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr :key="qt.id" v-for="(qt, index) in filteredList.arr">
-                        <td> {{ index + 1 }}</td>
-                        <td> {{ qt.name }}</td>
-                        <td> {{ qt.id }}</td>
-                        <td> {{ qt.description }}</td>
+                      <td> {{ index + 1 }}</td>
+                      <td> {{ qt.name }}</td>
+                      <td> {{ qt.id }}</td>
+                      <td> {{ qt.description }}</td>
 
-                        <td>
-                            <b-icon
-                                    :title="`Update ${ qt.name }`"
-                                    @mouseover="fillFormForUpdate(qt.name, qt.id, qt.description)"
-                                    class="border border-info rounded" font-scale="2.0"
-                                    icon="pencil" v-b-modal.modal-quantity-type-edit
-                                    v-b-tooltip.hover
-                                    variant="info"
-                            ></b-icon>
-                            &nbsp;
-                            <b-icon
-                                    :title="`Delete ${qt.name}!`" @click="deleteQuantityType(qt.id)"
-                                    class="border rounded bg-danger p-1" font-scale="1.85"
-                                    icon="trash" v-b-tooltip.hover
-                                    variant="light"
-                            ></b-icon>
-                        </td>
+                      <td v-if="isAuth">
+                        <b-icon
+                            :title="`Update ${ qt.name }`"
+                            @mouseover="fillFormForUpdate(qt.name, qt.id, qt.description)"
+                            class="border border-info rounded" font-scale="2.0"
+                            icon="pencil" v-b-modal.modal-quantity-type-edit
+                            v-b-tooltip.hover
+                            variant="info"
+                        ></b-icon>
+                        &nbsp;
+                        <b-icon
+                            :title="`Delete ${qt.name}!`" @click="deleteQuantityType(qt.id)"
+                            class="border rounded bg-danger p-1" font-scale="1.85"
+                            icon="trash" v-b-tooltip.hover
+                            variant="light"
+                        ></b-icon>
+                      </td>
                     </tr>
                     </tbody>
                 </table>
@@ -175,53 +175,58 @@
                                     type="text"
                                     v-model.trim="$v.qt.desc.$model"
                             ></b-form-textarea>
-                            <div v-if="$v.qt.desc.$dirty">
-                                <div class="error" v-if="!$v.qt.desc.required">Field is
-                                    required
-                                </div>
+                          <div v-if="$v.qt.desc.$dirty">
+                            <div class="error" v-if="!$v.qt.desc.required">Field is
+                              required
                             </div>
+                          </div>
                         </b-form-group>
                     </form>
                 </b-modal>
             </div>
-            <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-quantity-type variant="primary">
-                <span>Add Quantity Type</span> <i class="fas fa-plus-circle menu_icon"></i>
-            </b-button>
+          <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-quantity-type v-if="isAuth"
+                    variant="primary">
+            <span>Add Quantity Type</span> <i class="fas fa-plus-circle menu_icon"></i>
+          </b-button>
         </div>
     </div>
 </template>
 
 <script>
-    import axios from 'axios';
-    import {quantity_type_resource} from '../utils/api_paths'
-    import TopNav from "../components/TopNav";
-    import {paginate, respondTo401, secureStoreGetString, showFlashMessage} from "../utils/util_functions";
-    import EventBus from '../components/EventBus';
-    import {required} from "vuelidate/lib/validators";
+import axios from 'axios';
+import {quantity_type_resource} from '@/utils/api_paths'
+import TopNav from "../components/TopNav";
+import {isThemeAdmin, paginate, respondTo401, secureStoreGetString, showFlashMessage} from "@/utils/util_functions";
+import EventBus from '../components/EventBus';
+import {required} from "vuelidate/lib/validators";
 
-    export default {
-        name: 'QuantityType',
-        data() {
-            return {
-                page_title: "Quantity Type",
-                response: [],
-                qt: {
-                    name: '',
-                    code: '',
-                    desc: '',
-                },
-                search: '',
-                QTList: [],
+export default {
+  name: 'QuantityType',
+  data() {
+    return {
+      page_title: "Quantity Type",
+      response: [],
+      qt: {
+        name: '',
+        code: '',
+        desc: '',
+      },
 
-                // values for data modification
-                old_code: null,
-                showModal: true,
-                isEditing: false,
+      // variable to check user status and role
+      isAuth: null,
 
-                // data for pagination
-                current: 1,
-            };
-        },
+      search: '',
+      QTList: [],
+
+      // values for data modification
+      old_code: null,
+      showModal: true,
+      isEditing: false,
+
+      // data for pagination
+      current: 1,
+    };
+  },
 
         validations: {
             qt: {
@@ -282,15 +287,17 @@
             },
 
             getQuantityType() {
-                axios.get(quantity_type_resource)
-                    .then((res) => {
-                        this.$log.info("Response: " + res.status + " " + res.data['message']);
-                        this.QTList = this.response = res.data['message'];
-                    })
-                    .catch((error) => {
-                        // eslint-disable-next-line
-                        this.$log.error(error);
-                    });
+              this.isAuth = isThemeAdmin()
+
+              axios.get(quantity_type_resource)
+                  .then((res) => {
+                    this.$log.info("Response: " + res.status + " " + res.data['message']);
+                    this.QTList = this.response = res.data['message'];
+                  })
+                  .catch((error) => {
+                    // eslint-disable-next-line
+                    this.$log.error(error);
+                  });
             },
 
             createQuantityType: function () {
