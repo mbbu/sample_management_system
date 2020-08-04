@@ -22,7 +22,7 @@
                         <th scope="col"> Number</th>
                         <th scope="col"> Code</th>
                         <th scope="col"> Chamber Type</th>
-                        <th scope="col"> Actions</th>
+                        <th scope="col" v-if="isAuth"> Actions</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -32,17 +32,17 @@
                         <td> {{rack.code}}</td>
                         <td> {{rack['chamber.type']}}</td>
 
-                        <td>
-                            <b-icon
-                                    :title="`Update rack ${ rack.code }`"
-                                    @mouseover="fillFormForUpdate(rack['chamber.type'], rack.number, rack.code)"
-                                    class="border border-info rounded" font-scale="2.0"
-                                    icon="pencil" v-b-modal.modal-rack-edit
-                                    v-b-tooltip.hover
-                                    variant="info"
-                            ></b-icon>
-                            &nbsp;
-                            <b-icon
+                      <td v-if="isAuth">
+                        <b-icon
+                            :title="`Update rack ${ rack.code }`"
+                            @mouseover="fillFormForUpdate(rack['chamber.type'], rack.number, rack.code)"
+                            class="border border-info rounded" font-scale="2.0"
+                            icon="pencil" v-b-modal.modal-rack-edit
+                            v-b-tooltip.hover
+                            variant="info"
+                        ></b-icon>
+                        &nbsp;
+                        <b-icon
                                     :title="`Delete rack ${rack.code}!`" @click="deleteRack(rack.code)"
                                     class="border rounded bg-danger p-1" font-scale="1.85"
                                     icon="trash" v-b-tooltip.hover
@@ -172,57 +172,61 @@
                     </form>
                 </b-modal>
             </div>
-            <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-rack variant="primary">
-                <span>Add Rack</span> <i class="fas fa-plus-circle menu_icon"></i>
-            </b-button>
+          <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-rack v-if="isAuth" variant="primary">
+            <span>Add Rack</span> <i class="fas fa-plus-circle menu_icon"></i>
+          </b-button>
         </div>
     </div>
 </template>
 
 <script>
-    import axios from 'axios';
-    import {chamber_resource, rack_resource} from '../utils/api_paths'
-    import TopNav from "../components/TopNav";
-    import {
-        extractChamberData,
-        getItemDataList,
-        paginate,
-        respondTo401,
-        secureStoreGetString,
-        selectItemForUpdate,
-        showFlashMessage
-    } from "../utils/util_functions";
-    import EventBus from '../components/EventBus';
-    import FilterCard from "../components/FilterCard";
-    import {required} from "vuelidate/lib/validators";
+import axios from 'axios';
+import {chamber_resource, rack_resource} from '@/utils/api_paths'
+import TopNav from "@/components/TopNav";
+import {
+  extractChamberData,
+  getItemDataList,
+  isThemeAdmin,
+  paginate,
+  respondTo401,
+  secureStoreGetString,
+  selectItemForUpdate,
+  showFlashMessage
+} from "@/utils/util_functions";
+import EventBus from '@/components/EventBus';
+import FilterCard from "@/components/FilterCard";
+import {required} from "vuelidate/lib/validators";
 
-    export default {
-        name: 'Rack',
-        components: {TopNav, FilterCard},
+export default {
+  name: 'Rack',
+  components: {TopNav, FilterCard},
 
-        data() {
-            return {
-                page_title: "Rack",
-                filters: [],
-                response: [],
-                rackList: [],
-                search: '',
-                rack: {
-                    code: '',
-                    number: '',
-                    chamber: '',
+  data() {
+    return {
+      page_title: "Rack",
+      filters: [],
+      response: [],
+      rackList: [],
+      search: '',
+      rack: {
+        code: '',
+        number: '',
+        chamber: '',
 
-                },
+      },
 
-                chamberDataList: [],
-                fields: {text: '', value: ''},
+      // variable to check user status and role
+      isAuth: null,
 
-                // values for data modification
-                old_code: null,
-                showModal: true,
-                isEditing: false,
+      chamberDataList: [],
+      fields: {text: '', value: ''},
 
-                // data for pagination
+      // values for data modification
+      old_code: null,
+      showModal: true,
+      isEditing: false,
+
+      // data for pagination
                 current: 1,
             };
         },
@@ -360,15 +364,17 @@
 
             // Functions to interact with api
             getRack() {
-                this.clearForm();
-                axios.get(rack_resource)
-                    .then((res) => {
-                        this.$log.info("Response: " + res.status + " ", res.data['message']);
-                        this.rackList = this.response = res.data['message'];
-                    })
-                    .catch((error) => {
-                        // eslint-disable-next-line
-                        this.$log.error(error);
+              this.isAuth = isThemeAdmin()
+
+              this.clearForm();
+              axios.get(rack_resource)
+                  .then((res) => {
+                    this.$log.info("Response: " + res.status + " ", res.data['message']);
+                    this.rackList = this.response = res.data['message'];
+                  })
+                  .catch((error) => {
+                    // eslint-disable-next-line
+                    this.$log.error(error);
                     });
             },
 
