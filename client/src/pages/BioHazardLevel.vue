@@ -18,7 +18,7 @@
                         <th scope="col"> Name</th>
                         <th scope="col"> Code</th>
                         <th scope="col"> Description</th>
-                        <th scope="col"> Actions</th>
+                        <th scope="col" v-if="isAuth"> Actions</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -28,17 +28,17 @@
                         <td> {{ bio_hazard.code }}</td>
                         <td> {{ bio_hazard.description }}</td>
 
-                        <td>
-                            <b-icon
-                                    :title="`Update ${ bio_hazard.name }`"
-                                    @mouseover="fillFormForUpdate(bio_hazard.name, bio_hazard.code, bio_hazard.description)"
-                                    class="border border-info rounded" font-scale="2.0"
-                                    icon="pencil" v-b-modal.modal-bio-level-edit
-                                    v-b-tooltip.hover
-                                    variant="info"
-                            ></b-icon>
-                            &nbsp;
-                            <b-icon
+                      <td v-if="isAuth">
+                        <b-icon
+                            :title="`Update ${ bio_hazard.name }`"
+                            @mouseover="fillFormForUpdate(bio_hazard.name, bio_hazard.code, bio_hazard.description)"
+                            class="border border-info rounded" font-scale="2.0"
+                            icon="pencil" v-b-modal.modal-bio-level-edit
+                            v-b-tooltip.hover
+                            variant="info"
+                        ></b-icon>
+                        &nbsp;
+                        <b-icon
                                     :title="`Delete ${bio_hazard.name}!`" @click="deleteBioHazardLevel(bio_hazard.code)"
                                     class="border rounded bg-danger p-1" font-scale="1.85"
                                     icon="trash" v-b-tooltip.hover
@@ -183,43 +183,47 @@
                     </form>
                 </b-modal>
             </div>
-            <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-bio-level variant="primary">
-                <span>Add Bio Hazard Level</span> <i class="fas fa-plus-circle menu_icon"></i>
-            </b-button>
+          <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-bio-level v-if="isAuth"
+                    variant="primary">
+            <span>Add Bio Hazard Level</span> <i class="fas fa-plus-circle menu_icon"></i>
+          </b-button>
         </div>
     </div>
 </template>
 
 <script>
-    import axios from 'axios';
-    import TopNav from "../components/TopNav";
-    import EventBus from '../components/EventBus';
-    import {bio_hazard_level_resource} from '../utils/api_paths'
-    import {paginate, respondTo401, secureStoreGetString, showFlashMessage} from "../utils/util_functions";
-    import {required} from "vuelidate/lib/validators";
+import axios from 'axios';
+import TopNav from "../components/TopNav";
+import EventBus from '../components/EventBus';
+import {bio_hazard_level_resource} from '@/utils/api_paths'
+import {isThemeAdmin, paginate, respondTo401, secureStoreGetString, showFlashMessage} from "@/utils/util_functions";
+import {required} from "vuelidate/lib/validators";
 
-    export default {
-        name: 'BioHazardLevel',
-        data() {
-            return {
-                page_title: "Bio Hazard Level",
-                response: [],
-                bioHazardList: [],
-                search: '',
-                level: {
-                    name: '',
-                    code: '',
-                    desc: '',
-                },
+export default {
+  name: 'BioHazardLevel',
+  data() {
+    return {
+      page_title: "Bio Hazard Level",
+      response: [],
+      bioHazardList: [],
+      search: '',
+      level: {
+        name: '',
+        code: '',
+        desc: '',
+      },
 
-                // values for data modification
-                old_code: null,
-                showModal: true,
-                isEditing: false,
+      // variable to check user status and role
+      isAuth: null,
 
-                // data for pagination
-                current: 1,
-            };
+      // values for data modification
+      old_code: null,
+      showModal: true,
+      isEditing: false,
+
+      // data for pagination
+      current: 1,
+    };
         },
 
         validations: {
@@ -250,6 +254,7 @@
             pageInfo(info) {
                 EventBus.$emit('page-info', {'pgInfo': info, 'pgData': this.bioHazardList})
             },
+
             onSubmit(evt) {
                 this.$v.$touch();
                 if (this.$v.$invalid) {
@@ -278,16 +283,17 @@
             },
 
             getBioHazardLevel() {
-                axios.get(bio_hazard_level_resource)
-                    .then((res) => {
-                        this.$log.info("Response: " + res.status + " " + res.data['message']);
-                        this.response = res.data;
-                        this.bioHazardList = this.response.message
-                    })
-                    .catch((error) => {
-                        // eslint-disable-next-line
-                        this.$log.error(error);
-                    });
+              this.isAuth = isThemeAdmin()
+              axios.get(bio_hazard_level_resource)
+                  .then((res) => {
+                    this.$log.info("Response: " + res.status + " " + res.data['message']);
+                    this.response = res.data;
+                    this.bioHazardList = this.response.message
+                  })
+                  .catch((error) => {
+                    // eslint-disable-next-line
+                    this.$log.error(error);
+                  });
             },
 
             createBioHazardLevel: function () {
