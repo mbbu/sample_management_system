@@ -44,7 +44,7 @@
                         <td> {{publication['co_authors']}}</td>
 
                         <td>
-                            <b-icon
+                            <b-icon v-if="isPublicationOwner(publication['user.email'])"
                                     :title="`Update ${ publication.publication_title }`" @mouseover="fillFormForUpdate(publication.publication_title, publication['sample.theme.name'],
                                      publication['user.first_name'], publication['user.last_name'], publication['co_authors'], publication.sample_results)"
                                     class="border border-info rounded" font-scale="2.0"
@@ -53,13 +53,13 @@
                                     variant="info"
                             ></b-icon>
                             &nbsp;
-                            <b-icon
-                                    :title="`Delete ${ publication.publication_title }!`"
-                                    @click="deletePublication(publication.publication_title)"
-                                    class="border rounded bg-danger p-1" font-scale="1.85"
-                                    icon="trash" v-b-tooltip.hover
-                                    variant="light"
-                            ></b-icon>
+                          <b-icon v-if="isPublicationOwner(publication['user.email'])"
+                                  :title="`Delete ${ publication.publication_title }!`"
+                                  @click="deletePublication(publication.publication_title)"
+                                  class="border rounded bg-danger p-1" font-scale="1.85"
+                                  icon="trash" v-b-tooltip.hover
+                                  variant="light"
+                          ></b-icon>
                             &nbsp;
                             <b-icon
                                     @click="downloadPublication(publication.publication_title)"
@@ -246,54 +246,59 @@
                     </form>
                 </b-modal>
             </div>
-            <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-publication variant="primary">
-                <span>Add Publication</span> <i class="fas fa-plus-circle menu_icon"></i>
-            </b-button>
+          <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-publication v-if="isAuth"
+                    variant="primary">
+            <span>Add Publication</span> <i class="fas fa-plus-circle menu_icon"></i>
+          </b-button>
         </div>
     </div>
 </template>
 
 <script>
-    import TopNav from "../components/TopNav";
-    import axios from "axios";
-    import {publication_resource, sample_resource} from "../utils/api_paths";
-    import {
-        extractApiDataForPub,
-        getItemDataList,
-        getSelectedItemSetTextFieldValue,
-        paginate,
-        respondTo401,
-        secureStoreGetString,
-        showFlashMessage
-    } from "../utils/util_functions";
-    import EventBus from '../components/EventBus';
-    import {required} from "vuelidate/lib/validators";
+import TopNav from "@/components/TopNav";
+import axios from "axios";
+import {publication_resource, sample_resource} from "@/utils/api_paths";
+import {
+  extractApiDataForPub,
+  getItemDataList,
+  getLoggedInUser,
+  getSelectedItemSetTextFieldValue,
+  isPublicationOwner,
+  paginate,
+  respondTo401,
+  secureStoreGetString,
+  showFlashMessage
+} from "@/utils/util_functions";
+import EventBus from '@/components/EventBus';
+import {required} from "vuelidate/lib/validators";
 
-    export default {
-        name: "Publication",
-        data() {
-            return {
-                page_title: "Publications",
-                response: [],
-                search: '',
-                publication: {
-                    title: null,
-                    sample: null,
-                    user: null,
-                    sample_results: null,
-                    co_authors: null
-                },
+export default {
+  name: "Publication",
+  data() {
+    return {
+      page_title: "Publications",
+      response: [],
+      search: '',
+      publication: {
+        title: null,
+        sample: null,
+        user: null,
+        sample_results: null,
+        co_authors: null
+      },
 
-                //
-                fields: {text: '', value: ''},
-                sampleDataList: [],
-                authorDataList: [],
-                publicationList: [],
+      // variable to check user status and role
+      isAuth: null,
 
-                // values for data modification
-                old_title: null,
-                showModal: true,
-                isEditing: false,
+      fields: {text: '', value: ''},
+      sampleDataList: [],
+      authorDataList: [],
+      publicationList: [],
+
+      // values for data modification
+      old_title: null,
+      showModal: true,
+      isEditing: false,
 
                 // data for pagination
                 current: 1,
@@ -330,17 +335,18 @@
         },
 
         methods: {
-            //UTIL Fn
-            pageInfo(info) {
-                EventBus.$emit('page-info', {'pgInfo': info, 'pgData': this.publicationList})
-            },
+          //UTIL Fn
+          isPublicationOwner,
+          pageInfo(info) {
+            EventBus.$emit('page-info', {'pgInfo': info, 'pgData': this.publicationList})
+          },
 
-            onSubmit(evt) {
-                this.$v.$touch();
-                if (this.$v.$invalid) {
-                    // stop here if form is invalid
-                    evt.preventDefault()
-                    return;
+          onSubmit(evt) {
+            this.$v.$touch();
+            if (this.$v.$invalid) {
+              // stop here if form is invalid
+              evt.preventDefault()
+              return;
                 }
                 this.createPublication();
             },
@@ -386,15 +392,17 @@
 
             // methods to interact with api
             getPublication() {
-                this.clearForm();
-                axios.get(publication_resource)
-                    .then((res) => {
-                        this.$log.info("Response: " + res.status + " ", res.data['message']);
-                        this.publicationList = this.response = res.data['message'];
-                    })
-                    .catch((error) => {
-                        // eslint-disable-next-line
-                        this.$log.error(error);
+              this.isAuth = getLoggedInUser()
+
+              this.clearForm();
+              axios.get(publication_resource)
+                  .then((res) => {
+                    this.$log.info("Response: " + res.status + " ", res.data['message']);
+                    this.publicationList = this.response = res.data['message'];
+                  })
+                  .catch((error) => {
+                    // eslint-disable-next-line
+                    this.$log.error(error);
                     });
             },
 
