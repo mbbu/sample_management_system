@@ -4,7 +4,7 @@ from flask import current_app, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restful import fields, marshal, reqparse
 
-from api.models import Sample, Publication
+from api.models import Sample, Publication, SampleRequest
 from api.models.database import BaseModel
 from api.models.user import User
 from api.resources.base_resource import BaseResource
@@ -217,9 +217,11 @@ class UserResource(BaseResource):
                 species = sample.animal_species
                 _type = sample.sample_type
                 barcode = sample.barcode
+                code = sample.code
 
                 sample_details.update(
-                    {'theme': theme, 'project': project, 'species': species, 'type': _type, 'barcode': barcode})
+                    {'theme': theme, 'project': project, 'species': species, 'type': _type,
+                     'barcode': barcode, 'code': code})
                 user_sample_details.append(sample_details)
 
             user_publications = BaseModel.db.session.query(Publication).filter(Publication.user_id == user.id).all()
@@ -235,5 +237,29 @@ class UserResource(BaseResource):
                 publications.update({'theme': theme, 'project': project, 'title': title, 'co_authors': co_authors})
                 user_pub_details.append(publications)
 
-            user_details.update({'samples': user_sample_details, 'publications': user_pub_details})
+            # user_details.update({'samples': user_sample_details, 'publications': user_pub_details})
+
+            user_sample_requests = BaseModel.db.session.query(SampleRequest) \
+                .filter(SampleRequest.user == user.id).all()
+
+            user_sample_request_details = []
+            for sample_request in user_sample_requests:
+                sample_requests = {}
+                sample_owner = sample_request.requested_sample.project_owner
+                sample_project = sample_request.requested_sample.project
+                sample_type = sample_request.requested_sample.sample_type
+                sample_species = sample_request.requested_sample.animal_species
+                amount = sample_request.amount
+                request_date = sample_request.request_date.strftime("%d-%m-%Y %H:%M")
+                response_date = sample_request.response_date.strftime("%d-%m-%Y %H:%M")
+                status = sample_request.status
+
+                sample_requests.update({'type': sample_type, 'species': sample_species, 'amount': amount,
+                                        'request_date': request_date, 'response_date': response_date,
+                                        'status': status, 'owner': sample_owner, 'project': sample_project})
+                user_sample_request_details.append(sample_requests)
+
+            user_details.update({'samples': user_sample_details, 'publications': user_pub_details,
+                                 'sample_requests': user_sample_request_details})
+
             return BaseResource.send_json_message(user_details, 200)
