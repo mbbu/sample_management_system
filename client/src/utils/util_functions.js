@@ -518,6 +518,14 @@ export function isUpdate() {
     return updateSample;
 }
 
+export function viewSample(self, code) {
+    // 1st call the setter function to set the code
+    setSampleCode(code)
+    // redirect to sample view page
+    countDownTimer(self, 1, '/view-sample')
+}
+
+// end of sample util functions
 
 export function selectDropDownItemForUpdate(elementId, item, itemDataList) {
     // set dropdownItem to the selected item
