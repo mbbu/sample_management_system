@@ -97,7 +97,7 @@
                     <th scope="col"><em><b>ANIMAL SPECIES</b></em></th>
                     <th scope="col"><em><b>SAMPLE TYPE</b></em></th>
                     <th scope="col"><em><b>BARCODE</b></em></th>
-                    <th scope="col"><em><b>CODE</b></em></th>
+                    <th scope="col"><em><b>LOC COLLECTED</b></em></th>
                     <th scope="col"><em><b>ACTIONS</b></em></th>
                   </tr>
                   </thead>
@@ -114,22 +114,16 @@
                     <td v-else> N/A</td>
                     <td v-if="sample.barcode"> {{ sample.barcode }}</td>
                     <td v-else> N/A</td>
-                    <td v-if="sample.code"> {{ sample.code }}</td>
+                    <td v-if="sample.location"> {{ sample.location }}</td>
                     <td v-else> N/A</td>
                     <b-icon
-                        @click="viewSample(sample.code)"
+                        @click="viewMySample(sample.code)"
                         class="border border-info rounded"
                         font-scale="1.8" icon="eye-fill"
                         title="View"
                         v-b-tooltip.hover
                         variant="info"
-                    ></b-icon>
-                    &nbsp;
-                    <b-icon
-                        class="border rounded bg-danger p-1"
-                        font-scale="1.7" icon="trash"
-                        title="Delete" v-b-tooltip.hover
-                        variant="light"
+                        ref="delete"
                     ></b-icon>
                   </tr>
                   </tbody>
@@ -276,7 +270,6 @@ export default {
     };
   },
   methods: {
-    viewSample,
     getUserDetails(email) {
       let self = this;
       let loader = startLoader(this)
@@ -363,8 +356,13 @@ export default {
               }
             }
           })
-    }
+    },
+
+    viewMySample(code) {
+      viewSample(this, code)
+    },
   },
+
   created() {
     let email = getUserEmail()
     this.getUserDetails(email)
