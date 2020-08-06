@@ -218,10 +218,11 @@ class UserResource(BaseResource):
                 _type = sample.sample_type
                 barcode = sample.barcode
                 code = sample.code
+                location = sample.location_collected
 
                 sample_details.update(
                     {'theme': theme, 'project': project, 'species': species, 'type': _type,
-                     'barcode': barcode, 'code': code})
+                     'barcode': barcode, 'code': code, 'location': location})
                 user_sample_details.append(sample_details)
 
             user_publications = BaseModel.db.session.query(Publication).filter(Publication.user_id == user.id).all()
