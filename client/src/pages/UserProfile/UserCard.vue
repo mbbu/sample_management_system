@@ -86,147 +86,153 @@
 
             <!-- Card content -->
             <div class="card-body">
-              <em>Your Samples</em>
-              <table class="table table-hover">
-                <thead class="blue-gradient white-text">
-                <tr>
-                  <th scope="col"><em><b>ID</b></em></th>
-                  <th scope="col"><em><b>THEME</b></em></th>
-                  <th scope="col"><em><b>PROJECT</b></em></th>
-                  <th scope="col"><em><b>ANIMAL SPECIES</b></em></th>
-                  <th scope="col"><em><b>SAMPLE TYPE</b></em></th>
-                  <th scope="col"><em><b>BARCODE</b></em></th>
-                  <th scope="col"><em><b>CODE</b></em></th>
-                  <th scope="col"><em><b>ACTIONS</b></em></th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr :key="sample.id" v-for="(sample, index) in response.samples">
-                  <td> {{ index + 1 }}</td>
-                  <td v-if="sample.theme"> {{ sample.theme }}</td>
-                  <td v-else> N/A</td>
-                  <td v-if="sample.project"> {{ sample.project }}</td>
-                  <td v-else> N/A</td>
-                  <td v-if="sample.species"> {{ sample.species }}</td>
-                  <td v-else> N/A</td>
-                  <td v-if="sample.type"> {{ sample.type }}</td>
-                  <td v-else> N/A</td>
-                  <td v-if="sample.barcode"> {{ sample.barcode }}</td>
-                  <td v-else> N/A</td>
-                  <td v-if="sample.code"> {{ sample.code }}</td>
-                  <td v-else> N/A</td>
-                  <b-icon
-                      @click="viewSample(sample.code)"
-                      class="border border-info rounded"
-                      font-scale="1.8" icon="eye-fill"
-                      title="View"
-                      v-b-tooltip.hover
-                      variant="info"
-                  ></b-icon>
-                  &nbsp;
-                  <b-icon
-                      class="border rounded bg-danger p-1"
-                      font-scale="1.7" icon="trash"
-                      title="Delete" v-b-tooltip.hover
-                      variant="light"
-                  ></b-icon>
-                </tr>
-                </tbody>
-              </table>
+              <details>
+                <summary><em>Your Samples</em></summary>
+                <table class="table table-hover">
+                  <thead class="blue-gradient white-text">
+                  <tr>
+                    <th scope="col"><em><b>ID</b></em></th>
+                    <th scope="col"><em><b>THEME</b></em></th>
+                    <th scope="col"><em><b>PROJECT</b></em></th>
+                    <th scope="col"><em><b>ANIMAL SPECIES</b></em></th>
+                    <th scope="col"><em><b>SAMPLE TYPE</b></em></th>
+                    <th scope="col"><em><b>BARCODE</b></em></th>
+                    <th scope="col"><em><b>CODE</b></em></th>
+                    <th scope="col"><em><b>ACTIONS</b></em></th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr :key="sample.id" v-for="(sample, index) in response.samples">
+                    <td> {{ index + 1 }}</td>
+                    <td v-if="sample.theme"> {{ sample.theme }}</td>
+                    <td v-else> N/A</td>
+                    <td v-if="sample.project"> {{ sample.project }}</td>
+                    <td v-else> N/A</td>
+                    <td v-if="sample.species"> {{ sample.species }}</td>
+                    <td v-else> N/A</td>
+                    <td v-if="sample.type"> {{ sample.type }}</td>
+                    <td v-else> N/A</td>
+                    <td v-if="sample.barcode"> {{ sample.barcode }}</td>
+                    <td v-else> N/A</td>
+                    <td v-if="sample.code"> {{ sample.code }}</td>
+                    <td v-else> N/A</td>
+                    <b-icon
+                        @click="viewSample(sample.code)"
+                        class="border border-info rounded"
+                        font-scale="1.8" icon="eye-fill"
+                        title="View"
+                        v-b-tooltip.hover
+                        variant="info"
+                    ></b-icon>
+                    &nbsp;
+                    <b-icon
+                        class="border rounded bg-danger p-1"
+                        font-scale="1.7" icon="trash"
+                        title="Delete" v-b-tooltip.hover
+                        variant="light"
+                    ></b-icon>
+                  </tr>
+                  </tbody>
+                </table>
+              </details>
 
-              <em>Your Sample Requests</em>
-              <table class="table table-hover">
-                <thead class="blue-gradient white-text">
-                <tr>
-                  <th scope="col"><em><b>ID</b></em></th>
-                  <th scope="col"><em><b>PROJECT</b></em></th>
-                  <th scope="col"><em><b>PROJECT OWNER</b></em></th>
-                  <th scope="col"><em><b>SAMPLE SPECIES</b></em></th>
-                  <th scope="col"><em><b>SAMPLE TYPE</b></em></th>
-                  <th scope="col"><em><b>REQUESTED AMOUNT</b></em></th>
-                  <th scope="col"><em><b>REQUEST DATE</b></em></th>
-                  <th scope="col"><em><b>RESPONSE DATE</b></em></th>
-                  <th scope="col"><em><b>STATUS</b></em></th>
-                  <th scope="col"><em><b>ACTIONS</b></em></th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr :key="request.id" v-for="(request, index) in response.sample_requests">
-                  <td> {{ index + 1 }}</td>
-                  <td v-if="request.project"> {{ request.project }}</td>
-                  <td v-else> N/A</td>
-                  <td v-if="request.owner"> {{ request.owner }}</td>
-                  <td v-else> N/A</td>
-                  <td v-if="request.species"> {{ request.species }}</td>
-                  <td v-else> N/A</td>
-                  <td v-if="request.type"> {{ request.type }}</td>
-                  <td v-else> N/A</td>
-                  <td v-if="request.amount"> {{ request.amount }}</td>
-                  <td v-else> N/A</td>
-                  <td v-if="request.request_date"> {{ request.request_date }}</td>
-                  <td v-else> N/A</td>
-                  <td v-if="request.response_date"> {{ request.response_date }}</td>
-                  <td v-else> N/A</td>
-                  <td v-if="request.status"> {{ request.status }}</td>
-                  <td v-else> N/A</td>
-                  <b-icon
-                      class="border border-info rounded"
-                      font-scale="1.8" icon="eye-fill"
-                      title="View"
-                      v-b-tooltip.hover
-                      variant="info"
-                  ></b-icon>
-                  &nbsp;
-                  <b-icon
-                      class="border rounded bg-danger p-1"
-                      font-scale="1.7" icon="trash"
-                      title="Delete" v-b-tooltip.hover
-                      variant="light"
-                  ></b-icon>
-                </tr>
-                </tbody>
-              </table>
+              <details>
+                <summary><em>Your Sample Requests</em></summary>
+                <table class="table table-hover">
+                  <thead class="blue-gradient white-text">
+                  <tr>
+                    <th scope="col"><em><b>ID</b></em></th>
+                    <th scope="col"><em><b>PROJECT</b></em></th>
+                    <th scope="col"><em><b>PROJECT OWNER</b></em></th>
+                    <th scope="col"><em><b>SAMPLE SPECIES</b></em></th>
+                    <th scope="col"><em><b>SAMPLE TYPE</b></em></th>
+                    <th scope="col"><em><b>REQUESTED AMOUNT</b></em></th>
+                    <th scope="col"><em><b>REQUEST DATE</b></em></th>
+                    <th scope="col"><em><b>RESPONSE DATE</b></em></th>
+                    <th scope="col"><em><b>STATUS</b></em></th>
+                    <th scope="col"><em><b>ACTIONS</b></em></th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr :key="request.id" v-for="(request, index) in response.sample_requests">
+                    <td> {{ index + 1 }}</td>
+                    <td v-if="request.project"> {{ request.project }}</td>
+                    <td v-else> N/A</td>
+                    <td v-if="request.owner"> {{ request.owner }}</td>
+                    <td v-else> N/A</td>
+                    <td v-if="request.species"> {{ request.species }}</td>
+                    <td v-else> N/A</td>
+                    <td v-if="request.type"> {{ request.type }}</td>
+                    <td v-else> N/A</td>
+                    <td v-if="request.amount"> {{ request.amount }}</td>
+                    <td v-else> N/A</td>
+                    <td v-if="request.request_date"> {{ request.request_date }}</td>
+                    <td v-else> N/A</td>
+                    <td v-if="request.response_date"> {{ request.response_date }}</td>
+                    <td v-else> N/A</td>
+                    <td v-if="request.status"> {{ request.status }}</td>
+                    <td v-else> N/A</td>
+                    <b-icon
+                        class="border border-info rounded"
+                        font-scale="1.8" icon="eye-fill"
+                        title="View"
+                        v-b-tooltip.hover
+                        variant="info"
+                    ></b-icon>
+                    &nbsp;
+                    <b-icon
+                        class="border rounded bg-danger p-1"
+                        font-scale="1.7" icon="trash"
+                        title="Delete" v-b-tooltip.hover
+                        variant="light"
+                    ></b-icon>
+                  </tr>
+                  </tbody>
+                </table>
+              </details>
 
-              <em>Your Publications</em>
-              <table class="table table-hover">
-                <thead class="blue-gradient white-text">
-                <tr>
-                  <th scope="col"><em><b>ID</b></em></th>
-                  <th scope="col"><em><b>THEME</b></em></th>
-                  <th scope="col"><em><b>PROJECT</b></em></th>
-                  <th scope="col"><em><b>TITLE</b></em></th>
-                  <th scope="col"><em><b>CO AUTHORS</b></em></th>
-                  <th scope="col"><em><b>ACTIONS</b></em></th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr :key="publication.id" v-for="(publication, index) in response.publications">
-                  <td> {{ index + 1 }}</td>
-                  <td v-if="publication.theme"> {{ publication.theme }}</td>
-                  <td v-else> N/A</td>
-                  <td v-if="publication.project"> {{ publication.project }}</td>
-                  <td v-else> N/A</td>
-                  <td v-if="publication.title"> {{ publication.title }}</td>
-                  <td v-else> N/A</td>
-                  <td v-if="publication.co_authors"> {{ publication.co_authors }}</td>
-                  <td v-else> N/A</td>
-                  <b-icon
-                      class="border border-info rounded"
-                      font-scale="1.8" icon="eye-fill"
-                      title="View"
-                      v-b-tooltip.hover
-                      variant="info"
-                  ></b-icon>
-                  &nbsp;
-                  <b-icon
-                      @click="downloadPublication(publication.title)"
-                      class="border border-info rounded" font-scale="1.8"
-                      icon="download" title="Download"
-                      v-b-tooltip.hover variant="info"
-                  ></b-icon>
-                </tr>
-                </tbody>
-              </table>
+              <details>
+                <summary><em>Your Publications</em></summary>
+                <table class="table table-hover">
+                  <thead class="blue-gradient white-text">
+                  <tr>
+                    <th scope="col"><em><b>ID</b></em></th>
+                    <th scope="col"><em><b>THEME</b></em></th>
+                    <th scope="col"><em><b>PROJECT</b></em></th>
+                    <th scope="col"><em><b>TITLE</b></em></th>
+                    <th scope="col"><em><b>CO AUTHORS</b></em></th>
+                    <th scope="col"><em><b>ACTIONS</b></em></th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr :key="publication.id" v-for="(publication, index) in response.publications">
+                    <td> {{ index + 1 }}</td>
+                    <td v-if="publication.theme"> {{ publication.theme }}</td>
+                    <td v-else> N/A</td>
+                    <td v-if="publication.project"> {{ publication.project }}</td>
+                    <td v-else> N/A</td>
+                    <td v-if="publication.title"> {{ publication.title }}</td>
+                    <td v-else> N/A</td>
+                    <td v-if="publication.co_authors"> {{ publication.co_authors }}</td>
+                    <td v-else> N/A</td>
+                    <b-icon
+                        class="border border-info rounded"
+                        font-scale="1.8" icon="eye-fill"
+                        title="View"
+                        v-b-tooltip.hover
+                        variant="info"
+                    ></b-icon>
+                    &nbsp;
+                    <b-icon
+                        @click="downloadPublication(publication.title)"
+                        class="border border-info rounded" font-scale="1.8"
+                        icon="download" title="Download"
+                        v-b-tooltip.hover variant="info"
+                    ></b-icon>
+                  </tr>
+                  </tbody>
+                </table>
+              </details>
 
             </div>
             <!-- Card content -->
