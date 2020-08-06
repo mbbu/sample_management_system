@@ -64,7 +64,7 @@ def set_date_from_int(num_of_days):
 
     for day in range(num_of_days):
         date = date + timedelta(days=1)
-    return date.strftime('%d-%m-%Y %H:%M')
+    return date
 
 
 """
