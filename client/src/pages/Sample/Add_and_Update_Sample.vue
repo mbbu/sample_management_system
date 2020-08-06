@@ -277,56 +277,56 @@
 </template>
 
 <script>
-    import Vue from 'vue';
-    import VueFormWizard, {TabContent} from 'vue-form-wizard';
-    import 'vue-form-wizard/dist/vue-form-wizard.min.css';
-    import axios from 'axios';
-    import {
-        countDownTimer,
-        extractApiData,
-        extractBoxData,
-        extractQTData,
-        extractUserData,
-        getItemDataList,
-        getSampleDetailsForEditing,
-        getSelectedBoxSetTextFieldValue,
-        getSelectedItemCode,
-        isUpdate,
-        respondTo401,
-        secureStoreGetString,
-        selectDropDownItemForUpdate,
-        showFlashMessage
-    } from "../../utils/util_functions";
-    import {
-        bio_hazard_level_resource,
-        box_resource,
-        quantity_type_resource,
-        sample_resource,
-        theme_resource,
-        user_resource
-    } from "../../utils/api_paths";
-    import TopNav from "../../components/TopNav";
-    import ErrorsDisplay from "../../components/ErrorsDisplay";
+import Vue from 'vue';
+import VueFormWizard, {TabContent} from 'vue-form-wizard';
+import 'vue-form-wizard/dist/vue-form-wizard.min.css';
+import axios from 'axios';
+import {
+  countDownTimer,
+  extractApiData,
+  extractBoxData,
+  extractQTData,
+  extractUserData,
+  getItemDataList,
+  getSampleDetailsForEditing,
+  getSelectedBoxSetTextFieldValue,
+  getSelectedItemCode,
+  isUpdate,
+  respondTo401,
+  secureStoreGetString,
+  selectDropDownItemForUpdate,
+  showFlashMessage
+} from "../../utils/util_functions";
+import {
+  bio_hazard_level_resource,
+  box_resource,
+  quantity_type_resource,
+  sample_resource,
+  theme_resource,
+  user_resource
+} from "../../utils/api_paths";
+import TopNav from "../../components/TopNav";
+import ErrorsDisplay from "../../components/ErrorsDisplay";
 
-    Vue.use(VueFormWizard)
-    Vue.use(TabContent)
+Vue.use(VueFormWizard)
+Vue.use(TabContent)
 
-    export default {
-        name: "jumbotron",
+export default {
+  name: "jumbotron",
 
-        data() {
-            return {
-                response: [],
-                sample: {
-                    theme: "",
-                    user: "",
-                    project: "",
-                    projectOwner: "",
-                    sampleType: "",
-                    species: "",
-                    description: "",
-                    box: "",
-                    locationCollected: "",
+  data() {
+    return {
+      response: [],
+      sample: {
+        theme: "",
+        user: "",
+        project: "",
+        projectOwner: "",
+        sampleType: "",
+        species: "",
+        description: "",
+        box: "",
+        locationCollected: "",
                     retention: "",
                     convertedRetentionPeriod: "",
                     barcode: "",
@@ -623,23 +623,23 @@
                     });
 
                     axios.post(sample_resource, {
-                        theme: this.sample.theme,
-                        user: this.sample.user,
-                        box: this.sample.box,
-                        animal_species: this.sample.species,
-                        sample_type: this.sample.sampleType,
-                        sample_description: this.sample.description,
-                        project: this.sample.project,
-                        project_owner: this.sample.projectOwner,
-                        retention_period: this.sample.convertedRetentionPeriod,
-                        barcode: this.sample.barcode,
-                        analysis: this.sample.analysis,
-                        temperature: this.sample.temperature,
-                        amount: this.sample.amount,
-                        quantity_type: this.sample.quantity_type,
-                        security_level: this.sample.securityLevel,
-                        location_collected: this.sample.locationCollected,
-                        code: this.sample.code,
+                      theme: this.sample.theme,
+                      user: this.sample.user,
+                      box: this.sample.box,
+                      animal_species: this.sample.species,
+                      sample_type: this.sample.sampleType,
+                      sample_description: this.sample.description,
+                      project: this.sample.project,
+                      project_owner: this.sample.projectOwner,
+                      retention_period: this.sample.convertedRetentionPeriod,
+                      barcode: this.sample.barcode,
+                      analysis: this.sample.analysis,
+                      temperature: this.sample.temperature,
+                      amount: this.sample.amount,
+                      quantity_type: this.sample.quantity_type,
+                      bio_hazard_level: this.sample.securityLevel,
+                      location_collected: this.sample.locationCollected,
+                      code: this.sample.code,
                     }, {
                         headers:
                             {
@@ -733,23 +733,23 @@
                 })
 
                 axios.put(sample_resource, {
-                    theme: this.sample.theme,
-                    user: this.sample.user,
-                    box: this.sample.box,
-                    animal_species: this.sample.species,
-                    sample_type: this.sample.sampleType,
-                    sample_description: this.sample.description,
-                    project: this.sample.project,
-                    project_owner: this.sample.projectOwner,
-                    retention_period: this.sample.convertedRetentionPeriod,
-                    barcode: this.sample.barcode,
-                    analysis: this.sample.analysis,
-                    temperature: this.sample.temperature,
-                    amount: this.sample.amount,
-                    quantity_type: this.sample.quantity_type,
-                    security_level: this.sample.securityLevel,
-                    location_collected: this.sample.locationCollected,
-                    code: this.sample.code,
+                  theme: this.sample.theme,
+                  user: this.sample.user,
+                  box: this.sample.box,
+                  animal_species: this.sample.species,
+                  sample_type: this.sample.sampleType,
+                  sample_description: this.sample.description,
+                  project: this.sample.project,
+                  project_owner: this.sample.projectOwner,
+                  retention_period: this.sample.convertedRetentionPeriod,
+                  barcode: this.sample.barcode,
+                  analysis: this.sample.analysis,
+                  temperature: this.sample.temperature,
+                  amount: this.sample.amount,
+                  quantity_type: this.sample.quantity_type,
+                  bio_hazard_level: this.sample.securityLevel,
+                  location_collected: this.sample.locationCollected,
+                  code: this.sample.code,
                 }, {
                     headers:
                         {

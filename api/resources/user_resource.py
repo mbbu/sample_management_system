@@ -252,12 +252,16 @@ class UserResource(BaseResource):
                 sample_species = sample_request.requested_sample.animal_species
                 amount = sample_request.amount
                 request_date = sample_request.request_date.strftime("%d-%m-%Y %H:%M")
-                response_date = sample_request.response_date.strftime("%d-%m-%Y %H:%M")
+                response_date = None if AttributeError else sample_request.response_date.strftime("%d-%m-%Y %H:%M")
                 status = sample_request.status
+                code = sample_request.id
+                notes = sample_request.notes
+                approved = sample_request.approved_amount
 
                 sample_requests.update({'type': sample_type, 'species': sample_species, 'amount': amount,
-                                        'request_date': request_date, 'response_date': response_date,
-                                        'status': status, 'owner': sample_owner, 'project': sample_project})
+                                        'request_date': request_date, 'response_date': response_date, 'code': code,
+                                        'status': status, 'owner': sample_owner, 'project': sample_project,
+                                        'notes': notes, 'approved': approved})
                 user_sample_request_details.append(sample_requests)
 
             user_details.update({'samples': user_sample_details, 'publications': user_pub_details,
