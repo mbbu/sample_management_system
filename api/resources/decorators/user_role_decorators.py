@@ -5,7 +5,7 @@
 from flask import request
 from flask_jwt_extended import get_jwt_identity
 
-from api import BaseResource, BaseModel
+from api import BaseResource
 from api.constants import SYSADMIN, FORBIDDEN_FUNCTION_ACCESS_RESPONSE, FORBIDDEN_FUNCTION_ACCESS_RESPONSE_CODE, \
     THEMEADMIN
 from api.models import User, Sample, Role
@@ -59,10 +59,10 @@ def is_sample_owner(sample_restricted_func):
     """
 
     def wrapper(*args, **kwargs):
-        user_id = get_user_by_email(get_jwt_identity()).id
+        user = get_user_by_email(get_jwt_identity())
 
         # check if they are sample owners
-        user_samples = Sample.query.filter(Sample.user_id == user_id).all()
+        user_samples = Sample.query.filter(Sample.user_id == user.id).all()
         this_sample_code = request.headers['code']
         sample_owner = False
 
@@ -75,8 +75,8 @@ def is_sample_owner(sample_restricted_func):
                 break
 
         # check if they are either a system admin or theme admin
-        sys_admin = User.query.join(Role).filter(User.id == user_id, Role.code == SYSADMIN).first()
-        theme_admin = User.query.join(Role).filter(User.id == user_id, Role.code == THEMEADMIN).first()
+        sys_admin = User.query.filter(User.id == user.id, user.role.code == SYSADMIN).first()
+        theme_admin = User.query.filter(User.id == user.id, user.role.code == THEMEADMIN).first()
 
         if not sample_owner and theme_admin is None and sys_admin is None:
             return BaseResource.send_json_message("Cannot access this function, you are not the sample owner",
