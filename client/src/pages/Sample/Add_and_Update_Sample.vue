@@ -296,7 +296,7 @@ import {
   secureStoreGetString,
   selectDropDownItemForUpdate,
   showFlashMessage
-} from "../../utils/util_functions";
+} from "@/utils/util_functions";
 import {
   bio_hazard_level_resource,
   box_resource,
@@ -304,7 +304,7 @@ import {
   sample_resource,
   theme_resource,
   user_resource
-} from "../../utils/api_paths";
+} from "@/utils/api_paths";
 import TopNav from "../../components/TopNav";
 import ErrorsDisplay from "../../components/ErrorsDisplay";
 
