@@ -120,10 +120,10 @@
                         @click="viewMySample(sample.code)"
                         class="border border-info rounded"
                         font-scale="1.8" icon="eye-fill"
+                        ref="delete"
                         title="View"
                         v-b-tooltip.hover
                         variant="info"
-                        ref="delete"
                     ></b-icon>
                   </tr>
                   </tbody>
@@ -167,10 +167,22 @@
                     <td v-if="request.status"> {{ request.status }}</td>
                     <td v-else> N/A</td>
                     <b-icon
+                        @click="viewMyRequest(request)"
                         class="border border-info rounded"
                         font-scale="1.8" icon="eye-fill"
                         title="View"
-                        v-b-tooltip.hover
+                        v-b-modal.modal-sample-request
+                        v-b-tooltip.hover variant="info"
+                    ></b-icon>
+                    &nbsp;
+                    <b-icon
+                        @click="showModal = !showModal"
+                        @mouseover="fillFormForUpdate(request)"
+                        class="border border-info rounded"
+                        font-scale="1.8"
+                        icon="pencil" title="Update"
+                        v-b-modal.modal-sample-request-edit v-b-tooltip.hover
+                        v-if="request.status === 'PENDING'"
                         variant="info"
                     ></b-icon>
                     &nbsp;
@@ -183,6 +195,84 @@
                   </tr>
                   </tbody>
                 </table>
+
+                <!-- SAMPLE REQUEST MODALS -->
+                <b-modal
+                    id="modal-sample-request"
+                    title="About Sample Request"
+                    v-model="showModalView"
+                >
+                  <p><em>Project:</em> {{ request.project }}</p>
+                  <p><em>Owner:</em> {{ request.owner }}</p>
+                  <p><em>Sample Type:</em> {{ request.type }}</p>
+                  <p><em>Sample Species:</em> {{ request.species }}</p>
+                  <p><em>Requested Amount:</em> {{ request.amount }}</p>
+                  <p><em>Request Date:</em> {{ request.request_date }}</p>
+                  <p><em>Response Date:</em> {{ request.response_date }}</p>
+                  <p><em>Request Status:</em> {{ request.status }}</p>
+                  <p><em>Notes:</em> <br> {{ request.notes }}</p>
+
+                  <template v-slot:modal-footer="{ ok, cancel, hide }">
+                    <!-- Emulate built in modal footer ok and cancel button actions -->
+                    <b-button @click="cancel()" size="md" variant="danger">
+                      Cancel
+                    </b-button>
+                    <div v-if="request.status === 'PENDING'">
+                      <b-button @click="showModal = !showModal" size="md" variant="primary">
+                        Update
+                      </b-button>
+
+                      <b-button class="btn btn-outline-dark" size="md">
+                        Send Reminder
+                      </b-button>
+                    </div>
+
+                    <div v-else>
+                      <b-button disabled size="md" variant="primary">
+                        Update
+                      </b-button>
+                    </div>
+
+                  </template>
+                </b-modal>
+
+                <b-modal
+
+                    cancel-variant="danger"
+                    id="modal-sample-request"
+                    ok-title="Request"
+                    title="Request Sample"
+                    v-model="showModal"
+                >
+                  <!--                                        @hidden="clearForm"-->
+                  <!--                        @ok="requestSample(request.code)"-->
+                  <form>
+
+                    <b-form-group id="form-amount-group"
+                                  label="Amount:" label-for="form-amount-input">
+                      <b-form-input
+                          id="form-amount-input"
+                          min=1
+                          placeholder="Enter Amount"
+                          required
+                          type="number"
+                          v-model="sampleRequest.amount"
+                      ></b-form-input>
+                    </b-form-group>
+
+                    <!--                        <label title="Specify the date you would like to start using the sample">-->
+                    <!--                            Date (Specify the date you would like to start using the sample):-->
+                    <!--                        </label>-->
+                    <!--                        <functional-calendar-->
+                    <!--                                :change-month-function='true' :change-year-function='true'-->
+                    <!--                                :is-dark="true" :is-date-picker='true'-->
+                    <!--                                :is-layout-expandable="true"-->
+                    <!--                                :is-typeable="true"-->
+                    <!--                                :limits='{min: sampleRequest.today, max:getMaxRequestDate}'-->
+                    <!--                                v-model="sampleRequest.date"-->
+                    <!--                        ></functional-calendar>-->
+                  </form>
+                </b-modal>
               </details>
 
               <details>
@@ -267,6 +357,10 @@ export default {
     return {
       page_title: "Dashboard",
       response: null,
+      request: "",
+      sampleRequest: {},
+      showModal: false,
+      showModalView: false,
     };
   },
   methods: {
@@ -361,6 +455,17 @@ export default {
     viewMySample(code) {
       viewSample(this, code)
     },
+
+    // functions for sample requests
+    viewMyRequest(requestData) {
+      this.request = requestData
+      this.showModalView = !this.showModalView
+    },
+
+    fillFormForUpdate(request) {
+      this.sampleRequest = request;
+      console.log(request, "sample_request", this.sampleRequest)
+    },
   },
 
   created() {
@@ -370,4 +475,13 @@ export default {
   components: {mdbCard, mdbCardBody, mdbRow, mdbCol, TopNav}
 };
 </script>
-<style></style>
+<style>
+.modal:nth-of-type(even) {
+  z-index: 1052 !important;
+}
+
+.modal-backdrop.show:nth-of-type(even) {
+  z-index: 1051 !important;
+}
+
+</style>
