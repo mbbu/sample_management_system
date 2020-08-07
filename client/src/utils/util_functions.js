@@ -518,6 +518,7 @@ export function isUpdate() {
     return updateSample;
 }
 
+// todo: functions could be modularised
 export function viewSample(self, code) {
     // 1st call the setter function to set the code
     setSampleCode(code)
