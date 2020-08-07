@@ -1,14 +1,12 @@
 <template>
   <div>
     <top-nav :page_title="page_title"></top-nav>
-
-    <!-- FLASH MESSAGES -->
-    <FlashMessage :position="'right bottom'"></FlashMessage>
     <br>
     <!-- Card -->
     <div class="card card-cascade">
       <mdb-card class="md-card-profile">
         <mdb-card-body class="mx-4 mt-4">
+
           <!-- Card group -->
           <div class="card-group">
 
@@ -76,6 +74,9 @@
           <br><br>
           <!-- Activity Card-->
           <div class="card mb-4">
+            <!-- FLASH MESSAGES -->
+            <FlashMessage :position="'right bottom'"></FlashMessage>
+
             <!-- Title -->
             <div class="header pt-3 blue-gradient">
               <mdb-row class="d-flex justify-content-center">
@@ -218,38 +219,31 @@
                       Cancel
                     </b-button>
                     <div v-if="request.status === 'PENDING'">
-                      <b-button @click="showModal = !showModal" size="md" variant="primary">
+                      <b-button @click="fillFormForUpdate(request); showModal = !showModal" size="md" variant="primary">
                         Update
                       </b-button>
 
-                      <b-button class="btn btn-outline-dark" size="md">
-                        Send Reminder
+                      <b-button @click="sendReminder = true; updateSample(request.code)"
+                                class="btn btn-outline-dark" size="md"> Send Reminder
                       </b-button>
                     </div>
 
                     <div v-else>
-                      <b-button disabled size="md" variant="primary">
-                        Update
-                      </b-button>
+                      <b-button disabled size="md" variant="primary"> Update</b-button>
                     </div>
-
                   </template>
                 </b-modal>
 
                 <b-modal
-
+                    @ok="updateSample(sampleRequest.code)"
                     cancel-variant="danger"
                     id="modal-sample-request"
-                    ok-title="Request"
-                    title="Request Sample"
+                    ok-title="Update"
+                    title="Update Sample Request"
                     v-model="showModal"
                 >
-                  <!--                                        @hidden="clearForm"-->
-                  <!--                        @ok="requestSample(request.code)"-->
                   <form>
-
-                    <b-form-group id="form-amount-group"
-                                  label="Amount:" label-for="form-amount-input">
+                    <b-form-group id="form-amount-group" label="Amount:" label-for="form-amount-input">
                       <b-form-input
                           id="form-amount-input"
                           min=1
@@ -259,20 +253,12 @@
                           v-model="sampleRequest.amount"
                       ></b-form-input>
                     </b-form-group>
-
-                    <!--                        <label title="Specify the date you would like to start using the sample">-->
-                    <!--                            Date (Specify the date you would like to start using the sample):-->
-                    <!--                        </label>-->
-                    <!--                        <functional-calendar-->
-                    <!--                                :change-month-function='true' :change-year-function='true'-->
-                    <!--                                :is-dark="true" :is-date-picker='true'-->
-                    <!--                                :is-layout-expandable="true"-->
-                    <!--                                :is-typeable="true"-->
-                    <!--                                :limits='{min: sampleRequest.today, max:getMaxRequestDate}'-->
-                    <!--                                v-model="sampleRequest.date"-->
-                    <!--                        ></functional-calendar>-->
                   </form>
                 </b-modal>
+              </details>
+
+              <details>
+                <summary>Your Requested Samples</summary>
               </details>
 
               <details>
@@ -333,7 +319,7 @@
 import {mdbCard, mdbCardBody, mdbCol, mdbRow} from "mdbvue";
 import TopNav from "../../components/TopNav";
 import axios from "axios";
-import {user_resource} from "@/utils/api_paths";
+import {sample_request_resource, user_resource} from "@/utils/api_paths";
 import {
   countDownTimer,
   getUserEmail,
@@ -356,11 +342,12 @@ export default {
   data() {
     return {
       page_title: "Dashboard",
-      response: null,
-      request: "",
-      sampleRequest: {},
+      response: {},
+      request: {},
+      sampleRequest: {amount: null},
       showModal: false,
       showModalView: false,
+      sendReminder: false,
     };
   },
   methods: {
@@ -452,6 +439,7 @@ export default {
           })
     },
 
+    // functions for samples
     viewMySample(code) {
       viewSample(this, code)
     },
@@ -464,8 +452,66 @@ export default {
 
     fillFormForUpdate(request) {
       this.sampleRequest = request;
-      console.log(request, "sample_request", this.sampleRequest)
     },
+
+    updateSample(code) {
+      this.showModal = false
+      this.showModalView = false
+      console.log("1. Updating sample request: " + code + " is sending reminder ? " + this.sendReminder)
+      let header = '';
+      if (this.sendReminder === true) {
+        // set header 'resend' as resend and reset sendReminder variable
+        header = 'resend'
+        console.log("True: Updating sample request: " + code + " is sending reminder ? " + this.sendReminder + " headers " + header)
+        this.sendReminder = false;
+      } else {
+        // set header 'resend' as update
+        header = 'update'
+        console.log("False: Updating sample request: " + code + " is sending reminder ? " + this.sendReminder + " headers " + header)
+      }
+
+      let self = this;
+      let loader = startLoader(this)
+
+      axios.put(sample_request_resource, {
+        sample: code,
+        amount: this.sampleRequest.amount
+      }, {
+        headers: {
+          Authorization: secureStoreGetString(),
+          code: code,
+          resend: header,
+        }
+      })
+          .then((response) => {
+            setTimeout(() => {
+              loader.hide()
+              this.$log.info("Response: ", response);
+              showFlashMessage(self, 'success', response.data.message, '')
+            }, 2500)
+          })
+          .catch((error) => {
+            // eslint-disable-next-line
+            loader.hide()
+            this.$log.error(error);
+            if (error.response) {
+              if (error.response.status === 401) {
+                respondTo401(self);
+              } else if (error.response.status === 304) {
+                showFlashMessage(self, 'error', 'Info', error.response.message);
+              } else if (error.response.status === 404) {
+                showFlashMessage(self, 'error', 'Not Found!', error.response.message);
+              } else if (error.response.status === 304) {
+                showFlashMessage(self, 'error', 'Info', error.response.message);
+              } else if (error.response.status === 409) {
+                showFlashMessage(self, 'error', 'Error', error.response.message);
+              } else if (error.response.status === 500) {
+                showFlashMessage(self, 'error', 'Fatal', "Fatal error admin has been contacted!");
+              }
+            }
+          });
+
+    }
   },
 
   created() {
@@ -476,12 +522,4 @@ export default {
 };
 </script>
 <style>
-.modal:nth-of-type(even) {
-  z-index: 1052 !important;
-}
-
-.modal-backdrop.show:nth-of-type(even) {
-  z-index: 1051 !important;
-}
-
 </style>
