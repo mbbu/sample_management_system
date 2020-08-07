@@ -188,6 +188,7 @@
                     ></b-icon>
                     &nbsp;
                     <b-icon
+                        @click="deleteSampleRequest(request.code)"
                         class="border rounded bg-danger p-1"
                         font-scale="1.7" icon="trash"
                         title="Delete" v-b-tooltip.hover
@@ -348,6 +349,7 @@ export default {
       showModal: false,
       showModalView: false,
       sendReminder: false,
+      userEmail: '',
     };
   },
   methods: {
@@ -455,23 +457,15 @@ export default {
     },
 
     updateSample(code) {
+      let self = this;
+      let header = '';
       this.showModal = false
       this.showModalView = false
-      console.log("1. Updating sample request: " + code + " is sending reminder ? " + this.sendReminder)
-      let header = '';
-      if (this.sendReminder === true) {
-        // set header 'resend' as resend and reset sendReminder variable
-        header = 'resend'
-        console.log("True: Updating sample request: " + code + " is sending reminder ? " + this.sendReminder + " headers " + header)
-        this.sendReminder = false;
-      } else {
-        // set header 'resend' as update
-        header = 'update'
-        console.log("False: Updating sample request: " + code + " is sending reminder ? " + this.sendReminder + " headers " + header)
-      }
-
-      let self = this;
       let loader = startLoader(this)
+
+      // set headers depending on what the user is trying to do
+      header = this.sendReminder ? 'resend' : 'update'
+      this.sendReminder = false;
 
       axios.put(sample_request_resource, {
         sample: code,
@@ -501,8 +495,6 @@ export default {
                 showFlashMessage(self, 'error', 'Info', error.response.message);
               } else if (error.response.status === 404) {
                 showFlashMessage(self, 'error', 'Not Found!', error.response.message);
-              } else if (error.response.status === 304) {
-                showFlashMessage(self, 'error', 'Info', error.response.message);
               } else if (error.response.status === 409) {
                 showFlashMessage(self, 'error', 'Error', error.response.message);
               } else if (error.response.status === 500) {
@@ -510,13 +502,51 @@ export default {
               }
             }
           });
+    },
+
+    deleteSampleRequest(code) {
+      let self = this;
+      let loader = startLoader(this)
+
+      console.log(code)
+
+      axios.delete(sample_request_resource, {
+        headers: {
+          Authorization: secureStoreGetString(),
+          code: code
+        }
+      })
+
+          .then((response) => {
+            setTimeout(() => {
+              loader.hide()
+              this.$log.info("Response: ", response);
+              showFlashMessage(self, 'success', response.data.message, '')
+            }, 2500)
+          })
+          .catch((error) => {
+            // eslint-disable-next-line
+            loader.hide()
+            this.$log.error(error);
+            if (error.response) {
+              if (error.response.status === 401) {
+                respondTo401(self);
+              } else if (error.response.status === 404) {
+                showFlashMessage(self, 'error', 'Not Found!', error.response.message);
+              } else if (error.response.status === 500) {
+                showFlashMessage(self, 'error', 'Fatal', "Fatal error admin has been contacted!");
+              }
+            }
+          });
+
+      this.getUserDetails(this.userEmail)
 
     }
   },
 
   created() {
-    let email = getUserEmail()
-    this.getUserDetails(email)
+    this.userEmail = getUserEmail()
+    this.getUserDetails(this.userEmail)
   },
   components: {mdbCard, mdbCardBody, mdbRow, mdbCol, TopNav}
 };
