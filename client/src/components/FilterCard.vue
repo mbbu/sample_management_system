@@ -24,7 +24,7 @@
           </div>
         </mdb-row>
         <div class="d-flex justify-content-end">
-          <button @click="clearFilters" class="btn btn-outline-info btn-rounded">clear filters</button>
+          <button @click="clearFilters" class="btn btn-outline-dark btn-rounded">clear filters</button>
         </div>
       </mdb-card-body>
     </details>
