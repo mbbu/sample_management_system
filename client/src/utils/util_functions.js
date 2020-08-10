@@ -424,7 +424,7 @@ export function strongPassword(password1) {
 
 // user status
 export function isUserLoggedIn() {
-    return store.state.jwtString !== "" || getUserEmail() !== "";
+    return store.state.jwtString !== "";
 }
 
 export function getLoggedInUser() {
