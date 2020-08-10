@@ -92,30 +92,31 @@
 </template>
 
 <script>
-    import axios from 'axios';
-    import 'es6-promise/auto';
-    import TopNav from "../../components/TopNav";
-    import {auth_resource} from "../../utils/api_paths";
-    import {email, required} from "vuelidate/lib/validators";
-    import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
-    import {
-        countDownTimer,
-        secureStoreSetString,
-        showFlashMessage,
-        startLoader,
-        viewPassword
-    } from "../../utils/util_functions";
+import axios from 'axios';
+import 'es6-promise/auto';
+import TopNav from "../../components/TopNav";
+import {auth_resource} from "@/utils/api_paths";
+import {email, required} from "vuelidate/lib/validators";
+import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
+import {
+  countDownTimer,
+  isUserLoggedIn,
+  secureStoreSetString,
+  showFlashMessage,
+  startLoader,
+  viewPassword
+} from "@/utils/util_functions";
 
-    export default {
-        components: {
-            mdbInput,
-            mdbBtn,
-            mdbCard,
-            mdbCardBody,
-            mdbCol,
-            mdbRow,
-            TopNav
-        },
+export default {
+  components: {
+    mdbInput,
+    mdbBtn,
+    mdbCard,
+    mdbCardBody,
+    mdbCol,
+    mdbRow,
+    TopNav
+  },
 
         data() {
             return {
@@ -183,15 +184,18 @@
                             if (error.response.status === 403) {
                                 showFlashMessage(self, 'error', error.response.data['message'], '');
                             } else if (error.response.status === 404) {
-                                showFlashMessage(self, 'error', error.response.data['message'], 'Try to SignUp instead');
+                              showFlashMessage(self, 'error', error.response.data['message'], 'Try to SignUp instead');
                             } else if (error.response.status === 500) {
-                                showFlashMessage(self, 'error', "Fatal Error", 'Admin has been contacted.');
+                              showFlashMessage(self, 'error', "Fatal Error", 'Admin has been contacted.');
                             } else {
-                                showFlashMessage(self, 'error', error.response.data['message'], '');
+                              showFlashMessage(self, 'error', error.response.data['message'], '');
                             }
                         }
                     })
             },
-        }
-    }
+        },
+  created() {
+    if (isUserLoggedIn()) countDownTimer(this, 0, '/user');
+  }
+}
 </script>
