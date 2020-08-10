@@ -57,24 +57,24 @@
 </template>
 
 <script>
-    import axios from 'axios';
-    import TopNav from "../../components/TopNav";
-    import {email, required} from "vuelidate/lib/validators";
-    import {request_confirm_resource} from "../../utils/api_paths";
-    import {countDownTimer, showFlashMessage, startLoader} from "../../utils/util_functions";
-    import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
+import axios from 'axios';
+import TopNav from "../../components/TopNav";
+import {email, required} from "vuelidate/lib/validators";
+import {request_confirm_resource} from "@/utils/api_paths";
+import {redirectAfterCountDown, showFlashMessage, startLoader} from "@/utils/util_functions";
+import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
 
-    export default {
-        name: "ResendConfirmation",
-        data() {
-            return {
-                page_title: "Confirmation Request",
-                user: {
-                    email: ''
-                }
-            }
-        },
-        validations: {
+export default {
+  name: "ResendConfirmation",
+  data() {
+    return {
+      page_title: "Confirmation Request",
+      user: {
+        email: ''
+      }
+    }
+  },
+  validations: {
             user: {
                 email: {required, email},
             }
@@ -95,8 +95,8 @@
                         setTimeout(() => {
                             loader.hide()
                             if (response.status === 200) {
-                                showFlashMessage(self, 'success', 'Email resent', 'Check your email');
-                                countDownTimer(self, 5, '/home')
+                              showFlashMessage(self, 'success', 'Email resent', 'Check your email');
+                              redirectAfterCountDown(self, '/home')
                             }
                         }, 3000)
                     })

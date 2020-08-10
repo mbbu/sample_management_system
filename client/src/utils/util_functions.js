@@ -20,16 +20,19 @@ export function showFlashMessage(self, status, title, message) {
     });
 }
 
-export function countDownTimer(self, countDown, route) {
+export function redirectAfterCountDown(self, route, countDown = 5) {
     if (countDown > 0) {
+        console.log("countdown is: " + countDown)
         setTimeout(() => {
             countDown -= 1;
-            countDownTimer(self, countDown, route);
+            redirectAfterCountDown(self, route, countDown);
         }, 1000)
+        return countDown
     } else if (countDown === 0) {
+
         self.$log.info("**** Timer out ... ****");
         self.$log.info("ROUTE PASSED" + route)
-        self.$router.push({path: route});
+        self.$router.push({path: route}).then(r => console.log('Redirect response: ', r));
     }
     return countDown;
 }
@@ -38,7 +41,7 @@ export function countDownTimer(self, countDown, route) {
 * Combined responses for status codes */
 export function respondTo401(self) {
     showFlashMessage(self, 'error', "Session Expired", "You need to log in to perform this operation")
-    countDownTimer(self, 3, '/login')
+    redirectAfterCountDown(self, '/login')
 }
 
 /*
@@ -449,7 +452,7 @@ export function logOutUser(self) {
                     secureStoreDeleteString()
                     loader.hide()
                     showFlashMessage(self, 'success', 'Logged Out', 'Redirecting you to home page ' +
-                        countDownTimer(self, 3, '/home') + " seconds");
+                        redirectAfterCountDown(self, '/home') + " seconds");
                 }, 2500)
             }
         })
@@ -523,7 +526,7 @@ export function viewSample(self, code) {
     // 1st call the setter function to set the code
     setSampleCode(code)
     // redirect to sample view page
-    countDownTimer(self, 1, '/view-sample')
+    redirectAfterCountDown(self, '/view-sample')
 }
 
 // end of sample util functions
@@ -533,7 +536,7 @@ export function selectDropDownItemForUpdate(elementId, item, itemDataList) {
     let element = document.getElementById(elementId);
 
     // look up the datalist for a similar name as the value the holder has;
-    for (var i = 0; i < itemDataList.length; i++) {
+    for (let i = 0; i < itemDataList.length; i++) {
         if (item === itemDataList[i].Name || item === itemDataList[i].Code) {
             // -> assign the code to the itemCode
             item = itemDataList[i].Code

@@ -151,11 +151,11 @@ import TopNav from "../../components/TopNav";
 import {email, minLength, required, sameAs} from "vuelidate/lib/validators"
 import {role_resource, user_resource} from "@/utils/api_paths";
 import {
-  countDownTimer,
   extractApiData,
   getItemDataList,
   getSelectedItem,
   isUserLoggedIn,
+  redirectAfterCountDown,
   showFlashMessage,
   startLoader,
   viewPassword
@@ -267,8 +267,8 @@ export default {
                             loader.hide()
                             // redirect after successful signUp
                             if (response.status === 201) {
-                                showFlashMessage(self, 'success', response.data.message, '');
-                                countDownTimer(self, this.countDown, '/home')
+                              showFlashMessage(self, 'success', response.data.message, '');
+                              redirectAfterCountDown(self, '/home')
                             }
                         }, 3500)
                     })
@@ -291,7 +291,7 @@ export default {
             },
         },
         created() {
-          if (isUserLoggedIn()) countDownTimer(this, 0, '/user');
+          if (isUserLoggedIn()) redirectAfterCountDown(this, '/user');
           else this.onLoadPage();
         }
 

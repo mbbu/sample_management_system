@@ -322,8 +322,8 @@ import TopNav from "../../components/TopNav";
 import axios from "axios";
 import {sample_request_resource, user_resource} from "@/utils/api_paths";
 import {
-  countDownTimer,
   getUserEmail,
+  redirectAfterCountDown,
   respondTo401,
   secureStoreDeleteString,
   secureStoreGetString,
@@ -380,7 +380,7 @@ export default {
                 respondTo401(self);
               } else if (error.response.status === 404) {
                 showFlashMessage(self, 'error', 'Connection Error', 'Request was timed out');
-                countDownTimer(self, 3, '/home')
+                redirectAfterCountDown(self, '/home')
               }
             }
           });
@@ -392,7 +392,7 @@ export default {
 
       setTimeout(() => {
         loader.hide()
-        countDownTimer(self, 1, '/edit-user')
+        redirectAfterCountDown(self, '/edit-user')
       }, 1000)
     },
 
@@ -414,7 +414,7 @@ export default {
                 loader.hide()
                 showFlashMessage(self, 'success', 'Account Deleted', 'Your account has been successfully deleted.' +
                     '\nSorry to see you go.');
-                countDownTimer(self, 3, '/home')
+                redirectAfterCountDown(self, '/home')
               }, 2500)
             }
           })

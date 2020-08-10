@@ -28,7 +28,7 @@ const options = {
 };
 
 const flash_config = {
-    time: 5000,
+    time: 4500,
     icon: true
 };
 

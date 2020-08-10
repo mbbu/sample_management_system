@@ -259,11 +259,11 @@ import {sample_request_resource, sample_resource} from "@/utils/api_paths";
 import {FunctionalCalendar} from 'vue-functional-calendar';
 import axios from 'axios';
 import {
-  countDownTimer,
   getSampleCode,
   isRetentionPeriodValid,
   isSampleOwner,
   overDueRetentionPeriod,
+  redirectAfterCountDown,
   respondTo401,
   secureStoreGetString,
   setSampleDetailsForEditing,
@@ -389,8 +389,8 @@ export default {
                             if (error.response.status === 401) {
                                 respondTo401(self);
                             } else if (error.response.status === 404) {
-                                showFlashMessage(self, 'error', 'Connection Error', 'Request was timed out');
-                                countDownTimer(self, 3, '/sample')
+                              showFlashMessage(self, 'error', 'Connection Error', 'Request was timed out');
+                              redirectAfterCountDown(self, '/sample')
                             }
                         }
                     });
@@ -403,8 +403,8 @@ export default {
                 setTimeout(() => {
                     loader.hide()
                     setSampleDetailsForEditing(this.response)
-                    setUpdateSample(true)
-                    countDownTimer(self, 1, '/addsample')
+                  setUpdateSample(true)
+                  redirectAfterCountDown(self, '/addsample')
                 }, 1000)
             },
 
@@ -464,8 +464,8 @@ export default {
                     .then((response) => {
                         setTimeout(() => {
                             loader.hide()
-                            showFlashMessage(self, 'success', response.data['message'], '');
-                            countDownTimer(self, 1, '/sample')
+                          showFlashMessage(self, 'success', response.data['message'], '');
+                          redirectAfterCountDown(self, '/sample')
                         }, 1500)
                     })
                     .catch((error) => {

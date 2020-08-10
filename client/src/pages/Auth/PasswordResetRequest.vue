@@ -57,24 +57,24 @@
 </template>
 
 <script>
-    import {email, required} from "vuelidate/lib/validators";
-    import axios from "axios";
-    import {request_password_reset_resource} from "../../utils/api_paths";
-    import {countDownTimer, showFlashMessage, startLoader} from "../../utils/util_functions";
-    import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
-    import TopNav from "../../components/TopNav";
+import {email, required} from "vuelidate/lib/validators";
+import axios from "axios";
+import {request_password_reset_resource} from "@/utils/api_paths";
+import {redirectAfterCountDown, showFlashMessage, startLoader} from "@/utils/util_functions";
+import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
+import TopNav from "../../components/TopNav";
 
-    export default {
-        name: "PasswordResetRequest",
-        data() {
-            return {
-                page_title: "Password Reset",
-                user: {
-                    email: ''
-                }
-            }
-        },
-        validations: {
+export default {
+  name: "PasswordResetRequest",
+  data() {
+    return {
+      page_title: "Password Reset",
+      user: {
+        email: ''
+      }
+    }
+  },
+  validations: {
             user: {
                 email: {required, email},
             }
@@ -95,8 +95,8 @@
                         setTimeout(() => {
                             loader.hide()
                             if (response.status === 200) {
-                                showFlashMessage(self, 'success', 'Email sent', 'Check your email');
-                                countDownTimer(self, 5, '/home')
+                              showFlashMessage(self, 'success', 'Email sent', 'Check your email');
+                              redirectAfterCountDown(self, '/home')
                             }
                         }, 3000)
                     })

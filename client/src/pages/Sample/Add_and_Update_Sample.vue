@@ -282,7 +282,6 @@ import VueFormWizard, {TabContent} from 'vue-form-wizard';
 import 'vue-form-wizard/dist/vue-form-wizard.min.css';
 import axios from 'axios';
 import {
-  countDownTimer,
   extractApiData,
   extractBoxData,
   extractQTData,
@@ -292,6 +291,7 @@ import {
   getSelectedBoxSetTextFieldValue,
   getSelectedItemCode,
   isUpdate,
+  redirectAfterCountDown,
   respondTo401,
   secureStoreGetString,
   selectDropDownItemForUpdate,
@@ -651,7 +651,7 @@ export default {
                                 loader.hide()
                                 showFlashMessage(self, 'success', response.data['message'], '');
                                 // todo: redirect to sample view page
-                                countDownTimer(self, 2, '/sample')
+                              redirectAfterCountDown(self, '/sample')
                             }, 4000)
                         })
                         .catch((error) => {
@@ -763,7 +763,7 @@ export default {
                             loader.hide()
                             showFlashMessage(self, 'success', response.data['message'], '');
                             // todo: redirect to sample view page
-                            countDownTimer(self, 2, '/sample')
+                          redirectAfterCountDown(self, '/sample')
                         }, 4000)
                     })
                     .catch((error) => {

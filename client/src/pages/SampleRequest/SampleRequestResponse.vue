@@ -72,32 +72,32 @@
 </template>
 
 <script>
-    import axios from "axios";
-    import TopNav from "../../components/TopNav";
-    import {required} from "vuelidate/lib/validators"
-    import {sample_response_resource} from "../../utils/api_paths";
-    import {APPROVED_STATUS, DECLINED_STATUS} from "../../utils/constants";
-    import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
-    import {
-        countDownTimer,
-        getSelectedItemCode,
-        respondTo401,
-        secureStoreGetString,
-        showFlashMessage,
-        startLoader
-    } from "../../utils/util_functions";
+import axios from "axios";
+import TopNav from "../../components/TopNav";
+import {required} from "vuelidate/lib/validators"
+import {sample_response_resource} from "@/utils/api_paths";
+import {APPROVED_STATUS, DECLINED_STATUS} from "@/utils/constants";
+import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
+import {
+  getSelectedItemCode,
+  redirectAfterCountDown,
+  respondTo401,
+  secureStoreGetString,
+  showFlashMessage,
+  startLoader
+} from "../../utils/util_functions";
 
-    export default {
-        name: "SampleRequestResponse",
-        components: {
-            mdbInput,
-            mdbBtn,
-            mdbCard,
-            mdbCardBody,
-            mdbCol,
-            mdbRow,
-            TopNav
-        },
+export default {
+  name: "SampleRequestResponse",
+  components: {
+    mdbInput,
+    mdbBtn,
+    mdbCard,
+    mdbCardBody,
+    mdbCol,
+    mdbRow,
+    TopNav
+  },
         data() {
             return {
                 page_title: "Sample Request Response",
@@ -152,8 +152,8 @@
                         setTimeout(() => {
                             loader.hide()
                             if (response.status === 200) {
-                                showFlashMessage(self, 'success', response.data['message'], '')
-                                countDownTimer(self, 5, '/user')
+                              showFlashMessage(self, 'success', response.data['message'], '')
+                              redirectAfterCountDown(self, '/user')
                             }
                         }, 1000)
                     })

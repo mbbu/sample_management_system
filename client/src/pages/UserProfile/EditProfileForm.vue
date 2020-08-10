@@ -123,38 +123,38 @@
     </div>
 </template>
 <script>
-    import {mdbCard, mdbCardBody, mdbCardHeader, mdbCol, mdbInput, mdbRow} from "mdbvue";
-    import TopNav from "../../components/TopNav";
-    import {
-        countDownTimer,
-        extractApiData,
-        getItemDataList,
-        getSelectedItem,
-        getStoredUserDetails,
-        getUserEmail,
-        respondTo401,
-        secureStoreDeleteString,
-        secureStoreGetString,
-        selectDropDownItemForUpdate,
-        showFlashMessage,
-        startLoader,
-        viewPassword
-    } from '../../utils/util_functions';
-    import {email, minLength, required} from "vuelidate/lib/validators";
-    import {role_resource, user_resource} from "../../utils/api_paths";
-    import axios from "axios";
+import {mdbCard, mdbCardBody, mdbCardHeader, mdbCol, mdbInput, mdbRow} from "mdbvue";
+import TopNav from "../../components/TopNav";
+import {
+  extractApiData,
+  getItemDataList,
+  getSelectedItem,
+  getStoredUserDetails,
+  getUserEmail,
+  redirectAfterCountDown,
+  respondTo401,
+  secureStoreDeleteString,
+  secureStoreGetString,
+  selectDropDownItemForUpdate,
+  showFlashMessage,
+  startLoader,
+  viewPassword
+} from '@/utils/util_functions';
+import {email, minLength, required} from "vuelidate/lib/validators";
+import {role_resource, user_resource} from "@/utils/api_paths";
+import axios from "axios";
 
-    export default {
-        name: "edit-profile-form",
-        props: {
-            dataBackgroundColor: {
-                type: String,
-                default: ""
-            }
-        },
-        data() {
-            return {
-                page_title: "Edit Profile",
+export default {
+  name: "edit-profile-form",
+  props: {
+    dataBackgroundColor: {
+      type: String,
+      default: ""
+    }
+  },
+  data() {
+    return {
+      page_title: "Edit Profile",
                 roleDataList: [],
                 fields: {text: '', value: ''},
                 user: {
@@ -230,9 +230,9 @@
                         // redirect after successful signUp
                         if (response.status === 202) {
                             setTimeout(() => {
-                                loader.hide()
-                                showFlashMessage(self, 'success', 'User Updated', 'Redirecting you to your dashboard ' +
-                                    countDownTimer(self, 3, '/user') + " seconds");
+                              loader.hide()
+                              showFlashMessage(self, 'success', 'User Updated', 'Redirecting you to your dashboard ' +
+                                  redirectAfterCountDown(self, '/user') + " seconds");
                             }, 2500)
                         }
                     })
@@ -276,9 +276,9 @@
                             setTimeout(() => {
                                 secureStoreDeleteString()
                                 loader.hide()
-                                showFlashMessage(self, 'success', 'Account Deactivated', 'Your account has been successfully deactivated.' +
-                                    '\nSorry to see you go.');
-                                +countDownTimer(self, 3, '/home')
+                              showFlashMessage(self, 'success', 'Account Deactivated', 'Your account has been successfully deactivated.' +
+                                  '\nSorry to see you go.');
+                              +redirectAfterCountDown(self, '/home')
                             }, 2500)
                         }
                     })

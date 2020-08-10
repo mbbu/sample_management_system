@@ -67,9 +67,9 @@
 
 <script>
 import axios from 'axios';
-import {sample_resource} from "../../utils/api_paths";
+import {sample_resource} from "@/utils/api_paths";
 import TopNav from "../../components/TopNav";
-import {countDownTimer, paginate, setSampleCode} from "../../utils/util_functions";
+import {paginate, redirectAfterCountDown, setSampleCode} from "../../utils/util_functions";
 import EventBus from "../../components/EventBus";
 import FilterCard from "../../components/FilterCard";
 
@@ -268,7 +268,7 @@ export default {
                 // 1st call the setter function to set the code
                 setSampleCode(code)
                 // redirect to sample view page
-                countDownTimer(self, 1, '/view-sample')
+              redirectAfterCountDown(self, '/view-sample', 1)
             },
             //end of methods for api interaction
 
