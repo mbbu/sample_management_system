@@ -18,15 +18,15 @@
                 <table class=" table table-hover">
                     <thead>
                     <tr>
-                        <th scope="col"> Id</th>
-                        <th scope="col"> Label</th>
-                        <th scope="col"> Tray</th>
-                        <th scope="col"> Rack</th>
-                        <th scope="col"> Chamber</th>
-                        <th scope="col"> Freezer</th>
-                        <th scope="col"> Lab Name</th>
-                        <th scope="col"> Lab Room</th>
-                        <th scope="col" v-if="isAuth"> Actions</th>
+                      <th class="table-header-style" scope="col"> Id</th>
+                      <th class="table-header-style" scope="col"> Label</th>
+                      <th class="table-header-style" scope="col"> Tray</th>
+                      <th class="table-header-style" scope="col"> Rack</th>
+                      <th class="table-header-style" scope="col"> Chamber</th>
+                      <th class="table-header-style" scope="col"> Freezer</th>
+                      <th class="table-header-style" scope="col"> Lab Name</th>
+                      <th class="table-header-style" scope="col"> Lab Room</th>
+                      <th class="table-header-style" scope="col" v-if="isAuth"> Actions</th>
                     </tr>
                     </thead>
                     <tbody>

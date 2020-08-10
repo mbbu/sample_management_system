@@ -15,13 +15,13 @@
                 <table class=" table table-hover">
                     <thead>
                     <tr>
-                        <th scope="col"> Id</th>
-                        <th scope="col"> Title</th>
-                        <th scope="col"> Theme</th>
-                        <th scope="col"> Project</th>
-                        <th scope="col"> Author</th>
-                        <th scope="col"> Co-Authors</th>
-                        <th scope="col"> Actions</th>
+                      <th class="table-header-style" scope="col"> Id</th>
+                      <th class="table-header-style" scope="col"> Title</th>
+                      <th class="table-header-style" scope="col"> Theme</th>
+                      <th class="table-header-style" scope="col"> Project</th>
+                      <th class="table-header-style" scope="col"> Author</th>
+                      <th class="table-header-style" scope="col"> Co-Authors</th>
+                      <th class="table-header-style" scope="col"> Actions</th>
                     </tr>
                     </thead>
                     <tbody>

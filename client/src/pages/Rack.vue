@@ -18,11 +18,11 @@
                 <table class=" table table-hover">
                     <thead>
                     <tr>
-                        <th scope="col"> Id</th>
-                        <th scope="col"> Number</th>
-                        <th scope="col"> Code</th>
-                        <th scope="col"> Chamber Type</th>
-                        <th scope="col" v-if="isAuth"> Actions</th>
+                      <th class="table-header-style" scope="col"> Id</th>
+                      <th class="table-header-style" scope="col"> Number</th>
+                      <th class="table-header-style" scope="col"> Code</th>
+                      <th class="table-header-style" scope="col"> Chamber Type</th>
+                      <th class="table-header-style" scope="col" v-if="isAuth"> Actions</th>
                     </tr>
                     </thead>
                     <tbody>

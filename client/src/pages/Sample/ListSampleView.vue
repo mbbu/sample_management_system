@@ -18,14 +18,14 @@
                 <table class="table table-hover">
                     <thead>
                     <tr>
-                        <th scope="col"> Id</th>
-                        <th scope="col"> Theme</th>
-                        <th scope="col"> Project</th>
-                        <th scope="col"> Owner (P.I)</th>
-                        <th scope="col"> Location Collected</th>
-                        <th scope="col"> Animal Species</th>
-                        <th scope="col"> BarCode</th>
-                        <th scope="col"> Actions</th>
+                      <th class="table-header-style" scope="col"> Id</th>
+                      <th class="table-header-style" scope="col"> Theme</th>
+                      <th class="table-header-style" scope="col"> Project</th>
+                      <th class="table-header-style" scope="col"> Owner (P.I)</th>
+                      <th class="table-header-style" scope="col"> Location Collected</th>
+                      <th class="table-header-style" scope="col"> Animal Species</th>
+                      <th class="table-header-style" scope="col"> BarCode</th>
+                      <th class="table-header-style" scope="col"> Actions</th>
                     </tr>
                     </thead>
 
@@ -66,24 +66,24 @@
 </template>
 
 <script>
-    import axios from 'axios';
-    import {sample_resource} from "../../utils/api_paths";
-    import TopNav from "../../components/TopNav";
-    import {countDownTimer, paginate, setSampleCode} from "../../utils/util_functions";
-    import EventBus from "../../components/EventBus";
-    import FilterCard from "../../components/FilterCard";
+import axios from 'axios';
+import {sample_resource} from "../../utils/api_paths";
+import TopNav from "../../components/TopNav";
+import {countDownTimer, paginate, setSampleCode} from "../../utils/util_functions";
+import EventBus from "../../components/EventBus";
+import FilterCard from "../../components/FilterCard";
 
-    export default {
-        name: "Sample",
-        components: {TopNav, FilterCard},
+export default {
+  name: "Sample",
+  components: {TopNav, FilterCard},
 
-        data() {
-            return {
-                page_title: "Samples",
+  data() {
+    return {
+      page_title: "Samples",
 
-                filters: [],
-                response: [],
-                sampleList: [],
+      filters: [],
+      response: [],
+      sampleList: [],
                 search: '',
 
                 // data for pagination

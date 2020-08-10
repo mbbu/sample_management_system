@@ -7,7 +7,7 @@
                 <!-- FLASH MESSAGES -->
                 <FlashMessage :position="'right bottom'"></FlashMessage>
                 <br> <br>
-                <em>About Sample</em>
+                <em class="table-header-style">About Sample</em>
                 <br> <br>
                 <table class="table table-hover">
                     <thead class="blue-gradient white-text">
@@ -43,7 +43,7 @@
 
                 <hr>
                 <hr>
-                <em>Sample Details</em>
+              <em class="table-header-style">Sample Details</em>
                 <br> <br>
                 <table class="table table-hover">
                     <thead class="blue-gradient white-text">
@@ -89,7 +89,7 @@
 
                 <hr>
                 <hr>
-                <em>Sample Location at I.C.I.P.E</em>
+              <em class="table-header-style">Sample Location at I.C.I.P.E</em>
                 <br> <br>
                 <table class="table table-hover">
                     <thead class="blue-gradient white-text">
@@ -145,7 +145,7 @@
                     </tr>
                 </table>
 
-                <em>Other Important Details</em>
+              <em class="table-header-style">Other Important Details</em>
                 <br> <br>
                 <table class="table table-hover">
                     <thead class="blue-gradient white-text">
