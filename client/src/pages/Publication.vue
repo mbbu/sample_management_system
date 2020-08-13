@@ -287,6 +287,9 @@ export default {
         co_authors: null
       },
 
+      isRedirected: false,
+      item: null,
+
       // variable to check user status and role
       isAuth: null,
 
@@ -316,10 +319,31 @@ export default {
         },
 
         mounted() {
-            EventBus.$on('searchQuery', (payload) => {
-                this.search = payload
-                this.searchData()
-            })
+          EventBus.$on('searchQuery', (payload) => {
+            this.search = payload
+            this.searchData()
+          })
+
+          // todo: fix lifecycle issues
+          EventBus.$on('updatePublication', (payload) => {
+            this.isEditing = true
+            this.showModal = true
+            console.log("Update payload: ", payload)
+            // this.fillFormForUpdate()
+          })
+
+          EventBus.$on('delete-publication', (payload) => {
+            console.log("Deleted publication: ", payload)
+            this.methods.deletePublication(payload)
+            this.isRedirected = true
+          })
+
+
+          EventBus.$on('createPub', payload => {
+            this.item = payload
+            console.log("event bus create publication payload: " + payload + " item: " + this.item)
+            this.created()
+          })
         },
 
         computed: {
@@ -518,7 +542,7 @@ export default {
                             }
                         }
                     });
-                this.clearForm();
+              // this.clearForm();
             },
 
             searchData() {
@@ -545,7 +569,24 @@ export default {
         },
         components: {TopNav},
         created() {
-            this.onLoadPage();
+
+          // todo: fix lifecycle issues
+          // EventBus.$on('createPub', payload => {
+          //   item = payload
+          //   console.log("event bus create publication payload: " + payload + " item: " + item)
+          // })
+
+          if (this.item !== null) {
+            console.log("Publication created through reference!", this.item)
+            // this.mounted()
+          } else {
+            console.log("Publication created normally!")
+            this.onLoadPage()
+          }
+
+
+          // console.log("Publication created!")
+          // this.onLoadPage();
         },
     }
 </script>

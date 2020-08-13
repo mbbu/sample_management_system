@@ -287,11 +287,20 @@
                     <td v-if="publication.co_authors"> {{ publication.co_authors }}</td>
                     <td v-else> N/A</td>
                     <b-icon
+                        @click="viewMyPublication(publication)"
                         class="border border-info rounded"
                         font-scale="1.8" icon="eye-fill"
                         title="View"
-                        v-b-tooltip.hover
-                        variant="info"
+                        v-b-modal.modal-publication
+                        v-b-tooltip.hover variant="info"
+                    ></b-icon>
+                    &nbsp;
+                    <b-icon :title="`Update ${ publication.title }`"
+                            @click="updatePublication(publication)"
+                            class="border border-info rounded" font-scale="2.0"
+                            icon="pencil" v-b-modal.modal-publication-edit
+                            v-b-tooltip.hover
+                            variant="info"
                     ></b-icon>
                     &nbsp;
                     <b-icon
@@ -300,9 +309,41 @@
                         icon="download" title="Download"
                         v-b-tooltip.hover variant="info"
                     ></b-icon>
+                    &nbsp;
+                    <b-icon
+                        @click="deletePublication(publication.title)"
+                        class="border rounded bg-danger p-1"
+                        font-scale="1.7" icon="trash"
+                        title="Delete" v-b-tooltip.hover
+                        variant="light"
+                    ></b-icon>
                   </tr>
                   </tbody>
                 </table>
+
+                <!-- PUBLICATION MODALS -->
+                <b-modal
+                    id="modal-publication"
+                    title="About Publication"
+                    v-model="showPubModalView"
+                >
+                  <p><em>Title:</em> {{ publication.title }}</p>
+                  <p><em>Theme:</em> {{ publication.theme }}</p>
+                  <p><em>Project:</em> {{ publication.project }}</p>
+                  <p><em>Author:</em> {{ response.fullname }}</p>
+                  <p><em>Co-Authors:</em> {{ publication.co_authors }}</p>
+
+                  <template v-slot:modal-footer="{ ok, cancel, hide }">
+                    <!-- Emulate built in modal footer ok and cancel button actions -->
+                    <b-button @click="cancel()" size="md" variant="danger">
+                      Cancel
+                    </b-button>
+                    <b-button @click="updatePublication(publication)" size="md"
+                              variant="primary"> Update
+                    </b-button>
+                    <b-button disabled size="md" variant="primary"> Delete</b-button>
+                  </template>
+                </b-modal>
               </details>
 
             </div>
@@ -331,6 +372,8 @@ import {
   startLoader,
   viewSample,
 } from "@/utils/util_functions";
+import EventBus from '@/components/EventBus';
+import Publication from "@/pages/Publication";
 
 export default {
   name: "UserCard",
@@ -345,9 +388,11 @@ export default {
       page_title: "Dashboard",
       response: {},
       request: {},
+      publication: {},
       sampleRequest: {amount: null},
       showModal: false,
       showModalView: false,
+      showPubModalView: false,
       sendReminder: false,
       userEmail: '',
     };
@@ -443,6 +488,7 @@ export default {
 
     // functions for samples
     viewMySample(code) {
+      showFlashMessage(this, 'success', 'Redirecting in 5 seconds...', '')
       viewSample(this, code)
     },
 
@@ -541,12 +587,35 @@ export default {
 
       this.getUserDetails(this.userEmail)
 
-    }
+    },
+
+    // todo: fix lifecycle issues
+    // functions for publication
+    viewMyPublication(pubData) {
+      this.publication = pubData
+      this.showPubModalView = !this.showPubModalView
+    },
+
+    updatePublication(pub) {
+      console.log("updating pub from dashboard: ", pub)
+      EventBus.$emit('updatePublication', pub)
+      // redirect to publication page
+      // redirectAfterCountDown(this, '/publication')
+    },
+
+    deletePublication(title) {
+      console.log("deleting pub from dashboard: ", title)
+      EventBus.$emit('delete-publication', title)
+      // redirectAfterCountDown(this, '/publication', 2)
+    },
+
   },
 
   created() {
     this.userEmail = getUserEmail()
     this.getUserDetails(this.userEmail)
+    EventBus.$emit('createPub', 'userProfile')
+    Publication.created()
   },
   components: {mdbCard, mdbCardBody, mdbRow, mdbCol, TopNav}
 };
