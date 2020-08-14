@@ -304,12 +304,11 @@
                     ></b-icon>
                     &nbsp;
                     <b-icon
-                        @click="showModal = !showModal"
-                        @mouseover="fillFormForUpdate(requested)"
+                        @click="setRequestCode(requested.code)"
                         class="border border-info rounded"
                         font-scale="1.8"
                         icon="pencil" title="Update"
-                        v-b-modal.modal-sample-requested-edit v-b-tooltip.hover
+                        v-b-modal.modal-requested-sample v-b-tooltip.hover
                         v-if="requested.status === 'PENDING'"
                         variant="info"
                     ></b-icon>
@@ -324,6 +323,15 @@
                   </tr>
                   </tbody>
                 </table>
+                <b-modal
+                    cancel-variant="danger"
+                    id="modal-requested-sample"
+                    ok-disabled
+                    title="Approve Sample Request"
+                    v-model="showModalViewResponse"
+                >
+                  <SampleResponseForm></SampleResponseForm>
+                </b-modal>
               </details>
 
               <details>
@@ -438,6 +446,7 @@ import {
 } from "@/utils/util_functions";
 import EventBus from '@/components/EventBus';
 import Publication from "@/pages/Publication";
+import SampleResponseForm from "@/components/SampleResponseForm";
 
 export default {
   name: "UserCard",
@@ -457,9 +466,17 @@ export default {
       showModal: false,
       showModalView: false,
       showPubModalView: false,
+      showModalViewResponse: false,
       sendReminder: false,
       userEmail: '',
+      requestCode: null,
     };
+  },
+  mounted() {
+    EventBus.$on('close-modal', payload => {
+      this.showModalViewResponse = payload
+      EventBus.$emit('request-code', this.requestCode)
+    })
   },
   methods: {
     getUserDetails(email) {
@@ -653,6 +670,12 @@ export default {
 
     },
 
+    // functions for sample request response
+    setRequestCode(code) {
+      this.showModalViewResponse = !this.showModalViewResponse
+      this.requestCode = code
+    },
+
     // todo: fix lifecycle issues
     // functions for publication
     viewMyPublication(pubData) {
@@ -681,7 +704,7 @@ export default {
     EventBus.$emit('createPub', 'userProfile')
     Publication.created()
   },
-  components: {mdbCard, mdbCardBody, mdbRow, mdbCol, TopNav}
+  components: {SampleResponseForm, mdbCard, mdbCardBody, mdbRow, mdbCol, TopNav}
 };
 </script>
 <style>
