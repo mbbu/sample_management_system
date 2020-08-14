@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import current_app, render_template
+from flask import current_app, render_template, request
 from flask_jwt_extended import jwt_required
 from flask_restful import reqparse
 
@@ -26,7 +26,7 @@ class SampleRequestResponseResource(BaseResource):
     @jwt_required
     def put(self, token):
         try:
-            sample_request_id = confirm_token(token)
+            sample_request_id = request.headers.get('code') if not None else confirm_token(token)
             sample_request = SampleRequestResource.get_sample_request_with_pending_status(sample_request_id)
 
             if sample_request is None:
