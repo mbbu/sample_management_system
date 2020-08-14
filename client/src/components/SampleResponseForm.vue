@@ -6,10 +6,13 @@
       <ejs-dropdownlist
           :dataSource='statusDataList'
           :fields="fields"
-          :v-model="sampleResponse.status"
+          v-model.trim="$v.sampleResponse.status.$model"
           id='dropdownlist'
           placeholder='Select a response'
       ></ejs-dropdownlist>
+      <div v-if="$v.sampleResponse.status.$dirty">
+        <div class="error" v-if="!$v.sampleResponse.status.required">Status is required!</div>
+      </div>
     </b-form-group>
 
 
@@ -17,8 +20,8 @@
     <b-form-group>
       <mdb-input class="form_input_margin" icon="fas fa-balance-scale-right"
                  id="amount" label="Amount Approved"
-                 min=0 type="number"
-                 v-model.trim="$v.sampleResponse.amount.$model"/>
+                 :min=sampleResponse.amount type="number"
+                 v-model.number.trim="$v.sampleResponse.amount.$model"/>
 
       <div v-if="$v.sampleResponse.amount.$dirty">
         <div class="error" v-if="!$v.sampleResponse.amount.required">Amount is
@@ -75,33 +78,35 @@ export default {
       },
       sampleResponse: {
         status: null,
-        amount: null,
-        notes: null
+        amount: 0,
+        notes: "",
+        code: "",
       }
     }
   },
   validations: {
     sampleResponse: {
+      status: {required},
       amount: {required}
     }
   },
+
   mounted() {
-    EventBus.$on('set-path', payload => {
-      console.log("path requesting is: " + payload)
-      this.responsePath = payload
+    EventBus.$on('request-code', payload => {
+      console.log("request code is: " + payload)
+      this.sampleResponse.code = payload
     })
   },
+
   methods: {
     onSubmit() {
       this.$v.$touch();
       if (this.$v.$invalid) {
-        this.$log.info("FORM INVALID!");
         return;
       }
+
       // component is called in diff. places. Close component where it's rendered in a modal box
       EventBus.$emit('close-modal', false)
-
-      console.log("Response path: " + this.responsePath)
       this.responsePath = sample_response_resource.concat(this.$router.currentRoute.params.pathMatch)
       this.makeResponse(this.responsePath)
     },
@@ -111,14 +116,13 @@ export default {
       let loader = startLoader(this)
       this.sampleResponse.status = getSelectedItemCode('dropdownlist', this.statusDataList);
 
-      this.$log.info("data: ", this.sampleResponse.status, this.sampleResponse.amount, this.sampleResponse.notes)
-
       axios.put(path, {
         status: this.sampleResponse.status,
         approved_amount: this.sampleResponse.amount,
         notes: this.sampleResponse.notes
       }, {
         headers: {
+          code: this.sampleResponse.code,
           Authorization: secureStoreGetString()
         }
       })
