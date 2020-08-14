@@ -285,7 +285,8 @@ class UserResource(BaseResource):
             user_requested_samples_details = []
             for sample_request in user_requested_samples:
                 requested_samples = {}
-                sample_owner = sample_request.requested_sample.project_owner
+                requester = sample_request.requested_sample.user.first_name + \
+                            " " + sample_request.requested_sample.user.last_name
                 sample_project = sample_request.requested_sample.project
                 sample_type = sample_request.requested_sample.sample_type
                 sample_species = sample_request.requested_sample.animal_species
@@ -300,7 +301,7 @@ class UserResource(BaseResource):
 
                 requested_samples.update({'type': sample_type, 'species': sample_species, 'amount': amount,
                                           'request_date': request_date, 'response_date': response_date, 'code': code,
-                                          'status': status, 'owner': sample_owner, 'project': sample_project,
+                                          'status': status, 'requester': requester, 'project': sample_project,
                                           'notes': notes, 'approved': approved})
                 user_requested_samples_details.append(requested_samples)
 

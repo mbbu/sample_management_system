@@ -260,6 +260,70 @@
 
               <details>
                 <summary>Your Requested Samples</summary>
+                <table class="table table-hover">
+                  <thead class="blue-gradient white-text">
+                  <tr>
+                    <th scope="col"><em><b>ID</b></em></th>
+                    <th scope="col"><em><b>PROJECT</b></em></th>
+                    <th scope="col"><em><b>REQUESTER</b></em></th>
+                    <th scope="col"><em><b>SAMPLE SPECIES</b></em></th>
+                    <th scope="col"><em><b>SAMPLE TYPE</b></em></th>
+                    <th scope="col"><em><b>REQUESTED AMOUNT</b></em></th>
+                    <th scope="col"><em><b>REQUEST DATE</b></em></th>
+                    <th scope="col"><em><b>RESPONSE DATE</b></em></th>
+                    <th scope="col"><em><b>STATUS</b></em></th>
+                    <th scope="col"><em><b>ACTIONS</b></em></th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr :key="requested.id" v-for="(requested, index) in response.requested_samples">
+                    <td> {{ index + 1 }}</td>
+                    <td v-if="requested.project"> {{ requested.project }}</td>
+                    <td v-else> N/A</td>
+                    <td v-if="requested.requester"> {{ requested.requester }}</td>
+                    <td v-else> N/A</td>
+                    <td v-if="requested.species"> {{ requested.species }}</td>
+                    <td v-else> N/A</td>
+                    <td v-if="requested.type"> {{ requested.type }}</td>
+                    <td v-else> N/A</td>
+                    <td v-if="requested.amount"> {{ requested.amount }}</td>
+                    <td v-else> N/A</td>
+                    <td v-if="requested.request_date"> {{ requested.request_date }}</td>
+                    <td v-else> N/A</td>
+                    <td v-if="requested.response_date"> {{ requested.response_date }}</td>
+                    <td v-else> N/A</td>
+                    <td v-if="requested.status"> {{ requested.status }}</td>
+                    <td v-else> N/A</td>
+                    <b-icon
+                        @click="viewMyRequest(requested)"
+                        class="border border-info rounded"
+                        font-scale="1.8" icon="eye-fill"
+                        title="View"
+                        v-b-modal.modal-sample-requested
+                        v-b-tooltip.hover variant="info"
+                    ></b-icon>
+                    &nbsp;
+                    <b-icon
+                        @click="showModal = !showModal"
+                        @mouseover="fillFormForUpdate(requested)"
+                        class="border border-info rounded"
+                        font-scale="1.8"
+                        icon="pencil" title="Update"
+                        v-b-modal.modal-sample-requested-edit v-b-tooltip.hover
+                        v-if="requested.status === 'PENDING'"
+                        variant="info"
+                    ></b-icon>
+                    &nbsp;
+                    <b-icon
+                        @click="deleteSampleRequest(requested.code)"
+                        class="border rounded bg-danger p-1"
+                        font-scale="1.7" icon="trash"
+                        title="Delete" v-b-tooltip.hover
+                        variant="light"
+                    ></b-icon>
+                  </tr>
+                  </tbody>
+                </table>
               </details>
 
               <details>
