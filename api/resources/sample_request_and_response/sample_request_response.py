@@ -26,7 +26,7 @@ class SampleRequestResponseResource(BaseResource):
     @jwt_required
     def put(self, token):
         try:
-            sample_request_id = request.headers.get('code') if not None else confirm_token(token)
+            sample_request_id = request.headers.get('code') if request.headers.get('code') else confirm_token(token)
             sample_request = SampleRequestResource.get_sample_request_with_pending_status(sample_request_id)
 
             if sample_request is None:
