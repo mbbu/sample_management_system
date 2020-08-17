@@ -295,11 +295,11 @@
                     <td v-if="requested.status"> {{ requested.status }}</td>
                     <td v-else> N/A</td>
                     <b-icon
-                        @click="viewMyRequest(requested)"
+                        @click="viewMyRequestedSamples(requested)"
                         class="border border-info rounded"
                         font-scale="1.8" icon="eye-fill"
                         title="View"
-                        v-b-modal.modal-sample-requested
+                        v-b-modal.modal-requested-sample-view
                         v-b-tooltip.hover variant="info"
                     ></b-icon>
                     &nbsp;
@@ -323,12 +323,46 @@
                   </tr>
                   </tbody>
                 </table>
+
+                <!-- REQUEST VIEW -->
+                <b-modal
+                    id="modal-requested-sample-view"
+                    title="About Sample Request"
+                    v-model="showModalViewResponse"
+                >
+                  <p><em>Project:</em> {{ requested.project }}</p>
+                  <p><em>Requester:</em> {{ requested.requester }}</p>
+                  <p><em>Sample Type:</em> {{ requested.type }}</p>
+                  <p><em>Sample Species:</em> {{ requested.species }}</p>
+                  <p><em>Requested Amount:</em> {{ requested.amount }}</p>
+                  <p><em>Request Date:</em> {{ requested.request_date }}</p>
+                  <p><em>Response Date:</em> {{ requested.response_date }}</p>
+                  <p><em>Request Status:</em> {{ requested.status }}</p>
+
+                  <template v-slot:modal-footer="{ ok, cancel, hide }">
+                    <!-- Emulate built in modal footer ok and cancel button actions -->
+                    <b-button @click="cancel()" size="md" variant="danger">
+                      Cancel
+                    </b-button>
+                    <div v-if="requested.status === 'PENDING'">
+                      <b-button @click="showModalUpdateResponse = !showModalUpdateResponse" size="md" variant="primary">
+                        Update
+                      </b-button>
+                    </div>
+
+                    <div v-else>
+                      <b-button disabled size="md" variant="primary"> Update</b-button>
+                    </div>
+                  </template>
+                </b-modal>
+
+                <!-- REQUEST UPDATED -->
                 <b-modal
                     cancel-variant="danger"
                     id="modal-requested-sample"
-                    ok-disabled
-                    title="Approve Sample Request"
-                    v-model="showModalViewResponse"
+                    hide-footer
+                    title="Respond To Sample Request"
+                    v-model="showModalUpdateResponse"
                 >
                   <SampleResponseForm></SampleResponseForm>
                 </b-modal>
@@ -461,12 +495,14 @@ export default {
       page_title: "Dashboard",
       response: {},
       request: {},
+      requested: {},
       publication: {},
       sampleRequest: {amount: null},
       showModal: false,
       showModalView: false,
       showPubModalView: false,
       showModalViewResponse: false,
+      showModalUpdateResponse: false,
       sendReminder: false,
       userEmail: '',
       requestCode: null,
@@ -672,8 +708,13 @@ export default {
 
     // functions for sample request response
     setRequestCode(code) {
-      this.showModalViewResponse = !this.showModalViewResponse
+      this.showModalUpdateResponse = !this.showModalUpdateResponse
       this.requestCode = code
+    },
+
+    viewMyRequestedSamples(requested) {
+      this.showModalViewResponse = !this.showModalViewResponse
+      this.requested = requested
     },
 
     // todo: fix lifecycle issues
