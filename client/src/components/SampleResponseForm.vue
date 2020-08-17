@@ -39,7 +39,7 @@
     </div>
 
     <mdb-row class="d-flex align-items-center mb-4 mt-5">
-      <mdb-col class="d-flex align-items-start" md="12">
+      <mdb-col class="d-flex justify-content-end" md="12">
         <div class="text-center">
           <mdb-btn class="z-depth-1a" rounded type="submit">Respond</mdb-btn>
         </div>
