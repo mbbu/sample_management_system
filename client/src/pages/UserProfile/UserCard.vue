@@ -87,6 +87,7 @@
 
             <!-- Card content -->
             <div class="card-body">
+              <!-- SAMPLES YOU OWN -->
               <details>
                 <summary><em>Your Samples</em></summary>
                 <table class="table table-hover">
@@ -131,6 +132,7 @@
                 </table>
               </details>
 
+              <!-- YOUR SAMPLE REQUESTS -->
               <details>
                 <summary><em>Your Sample Requests</em></summary>
                 <table class="table table-hover">
@@ -258,6 +260,7 @@
                 </b-modal>
               </details>
 
+              <!-- YOUR REQUESTED SAMPLES -->
               <details>
                 <summary>Your Requested Samples</summary>
                 <table class="table table-hover">
@@ -359,8 +362,8 @@
                 <!-- REQUEST UPDATED -->
                 <b-modal
                     cancel-variant="danger"
-                    id="modal-requested-sample"
                     hide-footer
+                    id="modal-requested-sample"
                     title="Respond To Sample Request"
                     v-model="showModalUpdateResponse"
                 >
@@ -368,6 +371,7 @@
                 </b-modal>
               </details>
 
+              <!-- YOUR PUBLICATIONS -->
               <details>
                 <summary><em>Your Publications</em></summary>
                 <table class="table table-hover">
@@ -403,7 +407,7 @@
                     &nbsp;
                     <b-icon :title="`Update ${ publication.title }`"
                             @click="updatePublication(publication)"
-                            class="border border-info rounded" font-scale="2.0"
+                            class="border border-info rounded" font-scale="1.8"
                             icon="pencil" v-b-modal.modal-publication-edit
                             v-b-tooltip.hover
                             variant="info"
@@ -450,6 +454,9 @@
                     <b-button disabled size="md" variant="primary"> Delete</b-button>
                   </template>
                 </b-modal>
+
+                <!-- PUBLICATION MODAL FOR UPDATE -->
+                <PublicationModal></PublicationModal>
               </details>
 
             </div>
@@ -481,6 +488,7 @@ import {
 import EventBus from '@/components/EventBus';
 import Publication from "@/pages/Publication";
 import SampleResponseForm from "@/components/SampleResponseForm";
+import PublicationModal from "@/components/PublicationModal";
 
 export default {
   name: "UserCard",
@@ -501,6 +509,7 @@ export default {
       showModal: false,
       showModalView: false,
       showPubModalView: false,
+      showPubModalUpdate: false,
       showModalViewResponse: false,
       showModalUpdateResponse: false,
       sendReminder: false,
@@ -724,16 +733,17 @@ export default {
       this.showPubModalView = !this.showPubModalView
     },
 
-    updatePublication(pub) {
-      console.log("updating pub from dashboard: ", pub)
-      EventBus.$emit('updatePublication', pub)
-      // redirect to publication page
-      // redirectAfterCountDown(this, '/publication')
+    updatePublication(publication) {
+      publication.user = this.response.fullname
+      EventBus.$emit('update-publication', publication)
     },
 
+    //todo: refactor
     deletePublication(title) {
       console.log("deleting pub from dashboard: ", title)
       EventBus.$emit('delete-publication', title)
+
+      Publication.methods.deletePublication(title)
       // redirectAfterCountDown(this, '/publication', 2)
     },
 
@@ -745,7 +755,7 @@ export default {
     EventBus.$emit('createPub', 'userProfile')
     Publication.created()
   },
-  components: {SampleResponseForm, mdbCard, mdbCardBody, mdbRow, mdbCol, TopNav}
+  components: {PublicationModal, SampleResponseForm, mdbCard, mdbCardBody, mdbRow, mdbCol, TopNav}
 };
 </script>
 <style>
