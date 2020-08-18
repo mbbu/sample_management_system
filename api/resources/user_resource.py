@@ -244,8 +244,11 @@ class UserResource(BaseResource):
                 co_authors = publication.co_authors
                 project = publication.sample.project
                 theme = publication.sample.theme.name
+                sample = publication.sample.code
+                sample_results = publication.sample_results
 
-                publications.update({'theme': theme, 'project': project, 'title': title, 'co_authors': co_authors})
+                publications.update({'theme': theme, 'project': project, 'title': title, 'co_authors': co_authors,
+                                     'sample': sample, 'sample_results': sample_results})
                 user_pub_details.append(publications)
 
             ############################################################################################################
