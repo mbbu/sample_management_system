@@ -270,17 +270,19 @@ export function getSelectedItemCode(elementId, itemDataList) {
 }
 
 export function getSelectedItemSetTextFieldValue(itemDataList, itemVar) {
-    let item = document.getElementById("dropdownlist").value;
-    console.log("Item passed", itemDataList)
+    let element = document.getElementById("dropdownlist");
+    let item
 
-    for (var i = 0; i < itemDataList.length; i++) {
+    if (element !== null) {
+        item = element.value
+    }
+
+    for (let i = 0; i < itemDataList.length; i++) {
         if (item === itemDataList[i].Name) {
             itemVar = itemDataList[i].Code;
             let textValue = itemDataList[i].authorName;
             let textCode = itemDataList[i].authorCode
             return {'sampleCode': itemVar, 'authorText': textValue, 'authorCode': textCode}
-        } else {
-            console.log("NOT FOUND")
         }
     }
 }
