@@ -133,9 +133,10 @@ export default {
 
   mounted() {
     EventBus.$on('update-publication', payload => {
-      this.publication.title = payload.publication_title
-      this.publication.sample = payload['sample.code']
-      this.publication.user = payload['user.first_name'] + " " + payload['user.last_name']
+      this.publication.title = payload.publication_title !== undefined ? payload.publication_title : payload.title
+      this.publication.sample = payload['sample.code'] !== undefined ? payload['sample.code'] : payload.sample
+      this.publication.user = (payload['user.first_name'] + " " + payload['user.last_name']) !== undefined + " " + undefined
+          ? payload['user.first_name'] + " " + payload['user.last_name'] : payload.user
       this.publication.sample_results = payload.sample_results
       this.publication.co_authors = payload.co_authors
       this.showModalUpdate = !this.showModalUpdate
@@ -164,11 +165,10 @@ export default {
     onSubmit(evt) {
       this.$v.$touch();
       if (this.$v.$invalid) {
-        // stop here if form is invalid
         evt.preventDefault()
         return;
       }
-      this.showModal = !this.showModal
+      this.showModalUpdate = !this.showModalUpdate
       this.updatePublication();
     },
 
@@ -181,7 +181,6 @@ export default {
       this.publication.co_authors = null;
       this.publication.sample_results = null;
       this.$v.$reset();
-      this.showModal = false
       this.showModalUpdate = false
     },
 
