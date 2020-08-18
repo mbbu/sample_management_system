@@ -45,14 +45,16 @@
 
                         <td>
                             <b-icon v-if="isPublicationOwner(publication['user.email'])"
-                                    :title="`Update ${ publication.publication_title }`" @mouseover="fillFormForUpdate(publication.publication_title, publication['sample.theme.name'],
-                                     publication['user.first_name'], publication['user.last_name'], publication['co_authors'], publication.sample_results)"
+                                    :title="`Update ${ publication.publication_title }`"
+                                    @click="fillFormForUpdate(publication)"
                                     class="border border-info rounded" font-scale="2.0"
-                                    icon="pencil" v-b-modal.modal-publication-edit
+                                    icon="pencil"
                                     v-b-tooltip.hover
                                     variant="info"
                             ></b-icon>
-                            &nbsp;
+                          <!--                          v-b-modal.modal-publication-edit-->
+                          <!--                          @click="this.showModalUpdate = !this.showModalUpdate"-->
+                          &nbsp;
                           <b-icon v-if="isPublicationOwner(publication['user.email'])"
                                   :title="`Delete ${ publication.publication_title }!`"
                                   @click="deletePublication(publication.publication_title)"
@@ -147,105 +149,23 @@
                                       id="form-sample-results-group" label="Sample Results:"
                                       label-for="form-sample-results-input">
                             <b-form-textarea
-                                    id="form-sample-results-input"
-                                    placeholder="Enter sample results"
-                                    required
-                                    type="text"
-                                    v-model.trim="$v.publication.sample_results.$model">
+                                id="form-sample-results-input"
+                                placeholder="Enter sample results"
+                                required
+                                type="text"
+                                v-model.trim="$v.publication.sample_results.$model">
                             </b-form-textarea>
-                            <div v-if="$v.publication.sample_results.$dirty">
-                                <div class="error" v-if="!$v.publication.sample_results.required">Field is required
-                                </div>
+                          <div v-if="$v.publication.sample_results.$dirty">
+                            <div class="error" v-if="!$v.publication.sample_results.required">Field is required
                             </div>
+                          </div>
                         </b-form-group>
                     </form>
                 </b-modal>
             </div>
-            <div v-if="isEditing">
-                <b-modal
-                        :title="`Edit ${page_title}`"
-                        @hidden="clearForm"
-                        @ok="updatePublication"
-                        @submit="showModal = false"
-                        cancel-variant="danger"
-                        id="modal-publication-edit"
-                        ok-title="Update"
-                >
-                    <form>
-                        <!--SAMPLE-->
-                        <b-form-group id="form-sample-group-edit" label="Sample:" label-for="form-sample-input">
-                            <ejs-dropdownlist
-                                    :dataSource='sampleDataList'
-                                    :fields="fields"
-                                    @change="prepareCreate"
-                                    id='dropdownlist'
-                                    placeholder='Select a sample'
-                                    v-model.trim="$v.publication.sample.$model"
-                            ></ejs-dropdownlist>
-                            <div v-if="$v.publication.sample.$dirty">
-                                <div class="error" v-if="!$v.publication.sample.required">Field is required</div>
-                            </div>
-                        </b-form-group>
-
-                        <!--AUTHOR-->
-                        <b-form-group id="form-user-group-edit" label="Authors:" label-for="form-user-input">
-                            <b-form-input
-                                    disabled="disabled"
-                                    id="form-user-input"
-                                    placeholder="Enter author's name"
-                                    required
-                                    type="text"
-                            ></b-form-input>
-                        </b-form-group>
-
-                        <b-form-group :class="{ 'form-group--error': $v.publication.co_authors.$error }"
-                                      id="form-coauthors-group-edit" label="Add CoAuthors:"
-                                      label-for="form-coauthors-input">
-                            <b-form-input
-                                    id="form-pub-title-input"
-                                    placeholder="Enter co-authors separated by a comma"
-                                    required
-                                    type="text"
-                                    v-model.trim="$v.publication.co_authors.$model"
-                            ></b-form-input>
-                            <div v-if="$v.publication.co_authors.$dirty">
-                                <div class="error" v-if="!$v.publication.co_authors.required">Field is required</div>
-                            </div>
-                        </b-form-group>
-
-                        <b-form-group :class="{ 'form-group--error': $v.publication.title.$error }"
-                                      id="form-pub-title-group-edit" label="Publication Title:"
-                                      label-for="form-pub-title-input">
-                            <b-form-input
-                                    id="form-pub-title-input"
-                                    placeholder="Enter a title"
-                                    required
-                                    type="text"
-                                    v-model.trim="$v.publication.title.$model"
-                            ></b-form-input>
-                            <div v-if="$v.publication.title.$dirty">
-                                <div class="error" v-if="!$v.publication.title.required">Field is required</div>
-                            </div>
-                        </b-form-group>
-                        <!-- todo: sample_results? can be changed to publication summary-->
-                        <b-form-group :class="{ 'form-group--error': $v.publication.title.$error }"
-                                      id="form-sample-results-group-edit" label="Sample Results:"
-                                      label-for="form-sample-results-input">
-                            <b-form-textarea
-                                    id="form-sample-results-input"
-                                    placeholder="Enter sample results"
-                                    required
-                                    type="text"
-                                    v-model.trim="$v.publication.sample_results.$model">
-                            </b-form-textarea>
-                            <div v-if="$v.publication.sample_results.$dirty">
-                                <div class="error" v-if="!$v.publication.sample_results.required">Field is required
-                                </div>
-                            </div>
-                        </b-form-group>
-                    </form>
-                </b-modal>
-            </div>
+          <div>
+            <PublicationModal></PublicationModal>
+          </div>
           <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-publication v-if="isAuth"
                     variant="primary">
             <span>Add Publication</span> <i class="fas fa-plus-circle menu_icon"></i>
@@ -271,6 +191,7 @@ import {
 } from "@/utils/util_functions";
 import EventBus from '@/components/EventBus';
 import {required} from "vuelidate/lib/validators";
+import PublicationModal from "@/components/PublicationModal";
 
 export default {
   name: "Publication",
@@ -300,22 +221,23 @@ export default {
 
       // values for data modification
       old_title: null,
-      showModal: true,
+      showModal: false,
+      showModalUpdate: false,
       isEditing: false,
 
-                // data for pagination
-                current: 1,
-            }
+      // data for pagination
+      current: 1,
+    }
         },
 
         validations: {
-            publication: {
-                title: {required},
-                sample: {required},
-                user: {required},
-                sample_results: {required},
-                co_authors: {required}
-            },
+          publication: {
+            title: {required},
+            sample: {required},
+            user: {required},
+            sample_results: {required},
+            co_authors: {required}
+          },
         },
 
         mounted() {
@@ -324,25 +246,10 @@ export default {
             this.searchData()
           })
 
-          // todo: fix lifecycle issues
-          EventBus.$on('updatePublication', (payload) => {
-            this.isEditing = true
-            this.showModal = true
-            console.log("Update payload: ", payload)
-            // this.fillFormForUpdate()
-          })
-
           EventBus.$on('delete-publication', (payload) => {
             console.log("Deleted publication: ", payload)
             this.methods.deletePublication(payload)
             this.isRedirected = true
-          })
-
-
-          EventBus.$on('createPub', payload => {
-            this.item = payload
-            console.log("event bus create publication payload: " + payload + " item: " + this.item)
-            this.created()
           })
         },
 
@@ -376,34 +283,30 @@ export default {
             },
 
             clearForm() {
-                this.isEditing = false;
-                this.old_title = null;
-                this.publication.title = null;
-                this.publication.sample = null;
-                this.publication.user = null;
-                this.publication.co_authors = null;
-                this.publication.sample_results = null;
-                this.$v.$reset();
+              this.isEditing = false;
+              this.old_title = null;
+              this.publication.title = null;
+              this.publication.sample = null;
+              this.publication.user = null;
+              this.publication.co_authors = null;
+              this.publication.sample_results = null;
+              this.$v.$reset();
+              this.showModal = false
+              this.showModalUpdate = false
             },
 
-            fillFormForUpdate(title, theme, first_name, last_name, co_authors, sample_results) {
-                this.isEditing = true;
-                this.old_title = title;
-                this.publication.title = title;
-                this.publication.sample = theme;
-                this.publication.user = first_name + " " + last_name;
-                this.publication.co_authors = co_authors;
-                this.publication.sample_results = sample_results;
-            },
+          fillFormForUpdate(publication) {
+            EventBus.$emit('update-publication', publication)
+          },
 
-            onLoadPage() {
-                getItemDataList(sample_resource).then(data => {
-                    let sampleList = extractApiDataForPub(data);
+          onLoadPage() {
+            getItemDataList(sample_resource).then(data => {
+              let sampleList = extractApiDataForPub(data);
 
-                    // update local variables with data from API
-                    this.fields = sampleList['fields'];
-                    for (let i = 0; i < sampleList.items.length; i++) {
-                        this.sampleDataList.push({
+              // update local variables with data from API
+              this.fields = sampleList['fields'];
+              for (let i = 0; i < sampleList.items.length; i++) {
+                this.sampleDataList.push({
                             'Code': sampleList.items[i].sampleCode,
                             'Name': sampleList.items[i].sampleName,
                             'authorCode': sampleList.items[i].authorCode,
@@ -418,7 +321,7 @@ export default {
             getPublication() {
               this.isAuth = getLoggedInUser()
 
-              this.clearForm();
+              // this.clearForm();
               axios.get(publication_resource)
                   .then((res) => {
                     this.$log.info("Response: " + res.status + " ", res.data['message']);
@@ -474,48 +377,6 @@ export default {
                 this.clearForm();
             },
 
-            updatePublication: function (evt) {
-                this.$v.$touch();
-                if (this.$v.$invalid) {
-                    evt.preventDefault()
-                } else {
-                    let self = this;
-                    axios.put(publication_resource, {
-                        publication_title: this.publication.title,
-                        sample: this.publication.sample,
-                        user: this.publication.user,
-                        sample_results: this.publication.sample_results,
-                        co_authors: this.publication.co_authors
-                    }, {
-                        headers: {
-                            title: this.old_title,
-                            Authorization: secureStoreGetString()
-                        }
-                    })
-                        .then((response) => {
-                            this.getPublication();
-                            showFlashMessage(self, 'success', response.data['message'], '');
-                            this.clearForm();
-                        })
-                        .catch((error) => {
-                            this.clearForm();
-                            this.$log.error(error);
-                            if (error.response) {
-                                if (error.response.status === 304) {
-                                    showFlashMessage(self, 'info', 'Record not modified!', '');
-                                } else if (error.response.status === 401) {
-                                    respondTo401(self);
-                                } else if (error.response.status === 403) {
-                                    showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
-                                } else {
-                                    showFlashMessage(self, 'error', error.response.data['message'], '');
-                                }
-                            }
-                        });
-                    this.clearForm();
-                }
-            },
-
             deletePublication: function (title) {
                 let self = this;
                 axios.delete(publication_resource, {
@@ -558,37 +419,20 @@ export default {
                     } else if (byTheme) {
                         return byTheme
                     } else if (byProject) {
-                        return byProject
+                      return byProject
                     } else if (byAuthor) {
-                        return byAuthor
+                      return byAuthor
                     } else if (byCoAuthor) {
-                        return byCoAuthor
+                      return byCoAuthor
                     }
                 })
             }
         },
-        components: {TopNav},
-        created() {
-
-          // todo: fix lifecycle issues
-          // EventBus.$on('createPub', payload => {
-          //   item = payload
-          //   console.log("event bus create publication payload: " + payload + " item: " + item)
-          // })
-
-          if (this.item !== null) {
-            console.log("Publication created through reference!", this.item)
-            // this.mounted()
-          } else {
-            console.log("Publication created normally!")
-            this.onLoadPage()
-          }
-
-
-          // console.log("Publication created!")
-          // this.onLoadPage();
-        },
-    }
+  components: {PublicationModal, TopNav},
+  created() {
+    this.onLoadPage()
+  },
+}
 </script>
 
 <style scoped>
