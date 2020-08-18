@@ -752,8 +752,6 @@ export default {
   created() {
     this.userEmail = getUserEmail()
     this.getUserDetails(this.userEmail)
-    EventBus.$emit('createPub', 'userProfile')
-    Publication.created()
   },
   components: {PublicationModal, SampleResponseForm, mdbCard, mdbCardBody, mdbRow, mdbCol, TopNav}
 };
