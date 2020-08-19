@@ -4,10 +4,6 @@
             <div class="col-sm-12">
                 <top-nav :page_title="page_title" v-bind:search_query.sync="search"></top-nav>
 
-                <!-- FLASH MESSAGES -->
-                <FlashMessage :position="'right bottom'"></FlashMessage>
-                <br>
-
                 <!--TOP-PAGINATION-->
                 <v-page :total-row="filteredList.pg_len" @page-change="pageInfo" align="center"
                         v-model="current"></v-page>
@@ -168,6 +164,9 @@
                     variant="primary">
             <span>Add Publication</span> <i class="fas fa-plus-circle menu_icon"></i>
           </b-button>
+
+          <!-- FLASH MESSAGES -->
+          <FlashMessage :position="'right bottom'"></FlashMessage>
         </div>
     </div>
 </template>
@@ -249,6 +248,12 @@ export default {
             this.methods.deletePublication(payload)
             this.isRedirected = true
           })
+
+
+          // listen to publication update success event and get the new data
+          EventBus.$on('update-success', () => {
+            this.getPublication()
+          })
         },
 
         computed: {
@@ -294,6 +299,9 @@ export default {
             },
 
           fillFormForUpdate(publication) {
+            // updated data with required fields
+            publication.sampleDataList = this.sampleDataList
+            publication.fields = this.fields
             EventBus.$emit('update-publication', publication)
           },
 
@@ -319,7 +327,6 @@ export default {
             getPublication() {
               this.isAuth = getLoggedInUser()
 
-              // this.clearForm();
               axios.get(publication_resource)
                   .then((res) => {
                     this.$log.info("Response: " + res.status + " ", res.data['message']);
