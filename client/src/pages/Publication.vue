@@ -52,23 +52,21 @@
                                     v-b-tooltip.hover
                                     variant="info"
                             ></b-icon>
-                          <!--                          v-b-modal.modal-publication-edit-->
-                          <!--                          @click="this.showModalUpdate = !this.showModalUpdate"-->
                           &nbsp;
-                          <b-icon v-if="isPublicationOwner(publication['user.email'])"
-                                  :title="`Delete ${ publication.publication_title }!`"
+                          <b-icon
+                              @click="downloadPublication(publication.publication_title)"
+                              class="border border-info rounded" font-scale="2.0"
+                              icon="download" title="Download"
+                              v-b-tooltip.hover variant="info"
+                          ></b-icon>
+                          &nbsp;
+                          <b-icon :title="`Delete ${ publication.publication_title }!`"
                                   @click="deletePublication(publication.publication_title)"
-                                  class="border rounded bg-danger p-1" font-scale="1.85"
-                                  icon="trash" v-b-tooltip.hover
+                                  class="border rounded bg-danger p-1"
+                                  font-scale="1.85" icon="trash"
+                                  v-b-tooltip.hover v-if="isPublicationOwner(publication['user.email'])"
                                   variant="light"
                           ></b-icon>
-                            &nbsp;
-                            <b-icon
-                                    @click="downloadPublication(publication.publication_title)"
-                                    class="border border-info rounded" font-scale="2.0"
-                                    icon="download" title="Download"
-                                    v-b-tooltip.hover variant="info"
-                            ></b-icon>
                         </td>
                     </tr>
                     </tbody>
