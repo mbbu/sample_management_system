@@ -72,7 +72,7 @@ def is_sample_owner(sample_restricted_func):
                 break
             else:
                 sample_owner = False
-                break
+                continue
 
         # check if they are either a system admin or theme admin
         sys_admin = User.query.filter(User.id == user.id, user.role.code == SYSADMIN).first()
