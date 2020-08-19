@@ -88,14 +88,12 @@
 <script>
 import {required} from "vuelidate/lib/validators";
 import {
-  extractApiDataForPub,
-  getItemDataList,
   getSelectedItemSetTextFieldValue,
   respondTo401,
   secureStoreGetString,
   showFlashMessage
 } from "@/utils/util_functions";
-import {publication_resource, sample_resource} from "@/utils/api_paths";
+import {publication_resource} from "@/utils/api_paths";
 import axios from "axios";
 import EventBus from "@/components/EventBus";
 
@@ -133,35 +131,23 @@ export default {
 
   mounted() {
     EventBus.$on('update-publication', payload => {
-      this.publication.title = payload.publication_title !== undefined ? payload.publication_title : payload.title
+      this.publication.title = this.old_title = payload.publication_title !== undefined ? payload.publication_title : payload.title
       this.publication.sample = payload['sample.code'] !== undefined ? payload['sample.code'] : payload.sample
       this.publication.user = (payload['user.first_name'] + " " + payload['user.last_name']) !== undefined + " " + undefined
           ? payload['user.first_name'] + " " + payload['user.last_name'] : payload.user
       this.publication.sample_results = payload.sample_results
       this.publication.co_authors = payload.co_authors
+
+      // additional data for modal form
       this.showModalUpdate = !this.showModalUpdate
+      this.sampleDataList = payload.sampleDataList
+      this.fields = payload.fields
+
       this.prepareCreate()
     })
 
   },
   methods: {
-    getSampleData: function () {
-      getItemDataList(sample_resource).then(data => {
-        let sampleList = extractApiDataForPub(data);
-
-        // update local variables with data from API
-        this.fields = sampleList['fields'];
-        for (let i = 0; i < sampleList.items.length; i++) {
-          this.sampleDataList.push({
-            'Code': sampleList.items[i].sampleCode,
-            'Name': sampleList.items[i].sampleName,
-            'authorCode': sampleList.items[i].authorCode,
-            'authorName': sampleList.items[i].authorName
-          });
-        }
-      })
-    },
-
     onSubmit(evt) {
       this.$v.$touch();
       if (this.$v.$invalid) {
@@ -194,50 +180,45 @@ export default {
       }
     },
 
-    updatePublication: function (evt) {
-      this.$v.$touch();
-      if (this.$v.$invalid) {
-        evt.preventDefault()
-      } else {
-        let self = this;
-        axios.put(publication_resource, {
-          publication_title: this.publication.title,
-          sample: this.publication.sample,
-          user: this.publication.user,
-          sample_results: this.publication.sample_results,
-          co_authors: this.publication.co_authors
-        }, {
-          headers: {
-            title: this.old_title,
-            Authorization: secureStoreGetString()
-          }
-        })
-            .then((response) => {
-              this.getPublication();
-              showFlashMessage(self, 'success', response.data['message'], '');
-              this.clearForm();
-            })
-            .catch((error) => {
-              this.clearForm();
-              this.$log.error(error);
-              if (error.response) {
-                if (error.response.status === 304) {
-                  showFlashMessage(self, 'info', 'Record not modified!', '');
-                } else if (error.response.status === 401) {
-                  respondTo401(self);
-                } else if (error.response.status === 403) {
-                  showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
-                } else {
-                  showFlashMessage(self, 'error', error.response.data['message'], '');
-                }
+    updatePublication: function () {
+      let self = this;
+
+      axios.put(publication_resource, {
+        publication_title: this.publication.title,
+        sample: this.publication.sample,
+        user: this.publication.user,
+        sample_results: this.publication.sample_results,
+        co_authors: this.publication.co_authors
+      }, {
+        headers: {
+          title: this.old_title,
+          Authorization: secureStoreGetString()
+        }
+      })
+          .then((response) => {
+            showFlashMessage(self, 'success', response.data['message'], '');
+            this.clearForm();
+
+            // notify parent in order to update data
+            EventBus.$emit('update-success')
+          })
+          .catch((error) => {
+            this.clearForm();
+            this.$log.error(error);
+            if (error.response) {
+              if (error.response.status === 304) {
+                showFlashMessage(self, 'info', 'Record not modified!', '');
+              } else if (error.response.status === 401) {
+                respondTo401(self);
+              } else if (error.response.status === 403) {
+                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
+              } else {
+                showFlashMessage(self, 'error', error.response.data['message'], '');
               }
-            });
-        this.clearForm();
-      }
-    },
+            }
+          });
+      this.clearForm();
+    }
   },
-  created() {
-    this.getSampleData()
-  }
 }
 </script>
