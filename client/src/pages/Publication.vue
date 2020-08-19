@@ -382,33 +382,32 @@ export default {
                 this.clearForm();
             },
 
-            deletePublication: function (title) {
-                let self = this;
-                axios.delete(publication_resource, {
-                    headers:
-                        {
-                            title: title,
-                            Authorization: secureStoreGetString()
-                        }
-                })
-                    .then((response) => {
-                        this.getPublication();
-                        showFlashMessage(self, 'success', response.data['message'], '');
+            deletePublication: function (title, self = this) {
+              axios.delete(publication_resource, {
+                headers:
+                    {
+                      title: title,
+                      Authorization: secureStoreGetString()
+                    }
+              })
+                  .then((response) => {
+                    this.getPublication();
+                    showFlashMessage(self, 'success', response.data['message'], '');
                         this.clearForm();
                     })
                     .catch((error) => {
                         this.$log.error(error);
-                        if (error.response) {
-                            if (error.response.status === 401) {
-                                respondTo401(self);
-                            } else if (error.response.status === 403) {
-                                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
-                            } else {
-                                showFlashMessage(self, 'error', error.response.data['message'], '');
-                            }
+                      if (error.response) {
+                        if (error.response.status === 401) {
+                          respondTo401(self);
+                        } else if (error.response.status === 403) {
+                          showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
+                        } else {
+                          showFlashMessage(self, 'error', error.response.data['message'], '');
                         }
+                      }
                     });
-              // this.clearForm();
+              this.getPublication();
             },
 
             searchData() {
