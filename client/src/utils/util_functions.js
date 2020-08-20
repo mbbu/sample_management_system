@@ -3,7 +3,7 @@ import createPersistedState from "vuex-persistedstate";
 import SecureLS from "secure-ls";
 import Vue from "vue";
 import axios from "axios";
-import {logout_resource} from "./api_paths";
+import {logout_resource, sample_resource} from "./api_paths";
 import EventBus from "../components/EventBus";
 
 self.flashMessage = undefined;
@@ -529,6 +529,31 @@ export function viewSample(self, code) {
     setSampleCode(code)
     // redirect to sample view page
     redirectAfterCountDown(self, '/view-sample')
+}
+
+let fields = null;
+let sampleDataList = []
+let payload = {}
+
+export function setSampleDataList() {
+    getItemDataList(sample_resource).then(data => {
+        let sampleList = extractApiDataForPub(data);
+        console.log('sample data list extracted', sampleList)
+
+        // update local variables with data from API
+        fields = sampleList['fields'];
+        for (let i = 0; i < sampleList.items.length; i++) {
+            sampleDataList.push({
+                'Code': sampleList.items[i].sampleCode,
+                'Name': sampleList.items[i].sampleName,
+                'authorCode': sampleList.items[i].authorCode,
+                'authorName': sampleList.items[i].authorName
+            });
+        }
+        payload.fields = fields
+        payload.sampleData = sampleDataList
+        EventBus.$emit('sample-data-list', payload)
+    })
 }
 
 // end of sample util functions
