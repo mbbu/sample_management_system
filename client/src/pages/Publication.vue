@@ -174,16 +174,15 @@
 <script>
 import TopNav from "@/components/TopNav";
 import axios from "axios";
-import {publication_resource, sample_resource} from "@/utils/api_paths";
+import {publication_resource} from "@/utils/api_paths";
 import {
-  extractApiDataForPub,
-  getItemDataList,
   getLoggedInUser,
   getSelectedItemSetTextFieldValue,
   isPublicationOwner,
   paginate,
   respondTo401,
   secureStoreGetString,
+  setSampleDataList,
   showFlashMessage
 } from "@/utils/util_functions";
 import EventBus from '@/components/EventBus';
@@ -227,218 +226,205 @@ export default {
     }
         },
 
-        validations: {
-          publication: {
-            title: {required},
-            sample: {required},
-            user: {required},
-            sample_results: {required},
-            co_authors: {required}
-          },
-        },
+  validations: {
+    publication: {
+      title: {required},
+      sample: {required},
+      user: {required},
+      sample_results: {required},
+      co_authors: {required}
+    },
+  },
 
-        mounted() {
-          EventBus.$on('searchQuery', (payload) => {
-            this.search = payload
-            this.searchData()
+  mounted() {
+    EventBus.$on('searchQuery', (payload) => {
+      this.search = payload
+      this.searchData()
+    })
+
+    EventBus.$on('delete-publication', (payload) => {
+      console.log("Deleted publication: ", payload)
+      this.methods.deletePublication(payload)
+      this.isRedirected = true
+    })
+
+    // listen to publication update success event and get the new data
+    EventBus.$on('update-success', () => {
+      this.getPublication()
+    })
+
+    //  check for sample data list event
+    EventBus.$on('sample-data-list', (payload) => {
+      this.fields = payload.fields
+      this.sampleDataList = payload.sampleData
+    })
+  },
+
+  computed: {
+    filteredList() {
+      let searchList = this.search ? this.searchData() : null
+
+      if (searchList !== null) {
+        this.publicationList = searchList // eslint-disable-line
+        return paginate(searchList)
+      }
+      return paginate(this.publicationList)
+    },
+  },
+
+  methods: {
+    //UTIL Fn
+    isPublicationOwner,
+    pageInfo(info) {
+      EventBus.$emit('page-info', {'pgInfo': info, 'pgData': this.publicationList})
+    },
+
+    onSubmit(evt) {
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        // stop here if form is invalid
+        evt.preventDefault()
+        return;
+      }
+      this.createPublication();
+    },
+
+    clearForm() {
+      this.isEditing = false;
+      this.old_title = null;
+      this.publication.title = null;
+      this.publication.sample = null;
+      this.publication.user = null;
+      this.publication.co_authors = null;
+      this.publication.sample_results = null;
+      this.$v.$reset();
+      this.showModal = false
+      this.showModalUpdate = false
+    },
+
+    fillFormForUpdate(publication) {
+      // updated data with required fields
+      publication.sampleDataList = this.sampleDataList
+      publication.fields = this.fields
+      EventBus.$emit('update-publication', publication)
+    },
+
+    onLoadPage() {
+      setSampleDataList()
+      this.getPublication()
+    },
+
+    // methods to interact with api
+    getPublication() {
+      this.isAuth = getLoggedInUser()
+
+      axios.get(publication_resource)
+          .then((res) => {
+            this.publicationList = this.response = res.data['message'];
           })
+          .catch((error) => {
+            // eslint-disable-next-line
+            this.$log.error(error);
+          });
+    },
 
-          EventBus.$on('delete-publication', (payload) => {
-            console.log("Deleted publication: ", payload)
-            this.methods.deletePublication(payload)
-            this.isRedirected = true
+    prepareCreate() {
+      let dropdownSelection = getSelectedItemSetTextFieldValue(this.sampleDataList, this.publication.sample);
+      this.publication.user = dropdownSelection.authorCode
+      this.publication.sample = dropdownSelection.sampleCode
+      document.getElementById("form-user-input").value = dropdownSelection.authorText;
+    },
+
+    createPublication() {
+      let self = this;
+
+      axios.post(publication_resource, {
+        publication_title: this.publication.title,
+        sample: this.publication.sample,
+        user: this.publication.user,
+        sample_results: this.publication.sample_results,
+        co_authors: this.publication.co_authors
+      }, {
+        headers: {
+          Authorization: secureStoreGetString()
+        }
+      })
+          .then((response) => {
+            this.getPublication();
+            showFlashMessage(self, 'success', response.data['message'], '');
+            this.clearForm();
           })
-
-
-          // listen to publication update success event and get the new data
-          EventBus.$on('update-success', () => {
-            this.getPublication()
-          })
-        },
-
-        computed: {
-            filteredList() {
-                let searchList = this.search ? this.searchData() : null
-
-                if (searchList !== null) {
-                    this.publicationList = searchList // eslint-disable-line
-                    return paginate(searchList)
-                }
-                return paginate(this.publicationList)
-            },
-        },
-
-        methods: {
-          //UTIL Fn
-          isPublicationOwner,
-          pageInfo(info) {
-            EventBus.$emit('page-info', {'pgInfo': info, 'pgData': this.publicationList})
-          },
-
-          onSubmit(evt) {
-            this.$v.$touch();
-            if (this.$v.$invalid) {
-              // stop here if form is invalid
-              evt.preventDefault()
-              return;
-                }
-                this.createPublication();
-            },
-
-            clearForm() {
-              this.isEditing = false;
-              this.old_title = null;
-              this.publication.title = null;
-              this.publication.sample = null;
-              this.publication.user = null;
-              this.publication.co_authors = null;
-              this.publication.sample_results = null;
-              this.$v.$reset();
-              this.showModal = false
-              this.showModalUpdate = false
-            },
-
-          fillFormForUpdate(publication) {
-            // updated data with required fields
-            publication.sampleDataList = this.sampleDataList
-            publication.fields = this.fields
-            EventBus.$emit('update-publication', publication)
-          },
-
-          onLoadPage() {
-            getItemDataList(sample_resource).then(data => {
-              let sampleList = extractApiDataForPub(data);
-
-              // update local variables with data from API
-              this.fields = sampleList['fields'];
-              for (let i = 0; i < sampleList.items.length; i++) {
-                this.sampleDataList.push({
-                            'Code': sampleList.items[i].sampleCode,
-                            'Name': sampleList.items[i].sampleName,
-                            'authorCode': sampleList.items[i].authorCode,
-                            'authorName': sampleList.items[i].authorName
-                        });
-                    }
-                })
-                this.getPublication()
-            },
-
-            // methods to interact with api
-            getPublication() {
-              this.isAuth = getLoggedInUser()
-
-              axios.get(publication_resource)
-                  .then((res) => {
-                    this.$log.info("Response: " + res.status + " ", res.data['message']);
-                    this.publicationList = this.response = res.data['message'];
-                  })
-                  .catch((error) => {
-                    // eslint-disable-next-line
-                    this.$log.error(error);
-                    });
-            },
-
-            prepareCreate() {
-                let dropdownSelection = getSelectedItemSetTextFieldValue(this.sampleDataList, this.publication.sample);
-                this.publication.user = dropdownSelection.authorCode
-                this.publication.sample = dropdownSelection.sampleCode
-                document.getElementById("form-user-input").value = dropdownSelection.authorText;
-            },
-
-            createPublication() {
-                let self = this;
-
-                axios.post(publication_resource, {
-                    publication_title: this.publication.title,
-                    sample: this.publication.sample,
-                    user: this.publication.user,
-                    sample_results: this.publication.sample_results,
-                    co_authors: this.publication.co_authors
-                }, {
-                    headers: {
-                        Authorization: secureStoreGetString()
-                    }
-                })
-                    .then((response) => {
-                        this.getPublication();
-                        showFlashMessage(self, 'success', response.data['message'], '');
-                        this.clearForm();
-                    })
-                    .catch((error) => {
-                        this.clearForm();
-                        this.$log.error(error);
-                        if (error.response) {
-                            if (error.response.status === 409) {
-                                showFlashMessage(self, 'error', error.response.data['message'], '');
-                            } else if (error.response.status === 400) {
-                                showFlashMessage(self, 'error', error.response.data['message'], 'Kindly refill the form');
-                            } else if (error.response.status === 401) {
-                                respondTo401(self);
-                            } else {
-                                showFlashMessage(self, 'error', error.response.data['message'], '');
-                            }
-                        }
-                    });
-                this.clearForm();
-            },
-
-            deletePublication: function (title, self = this) {
-              axios.delete(publication_resource, {
-                headers:
-                    {
-                      title: title,
-                      Authorization: secureStoreGetString()
-                    }
-              })
-                  .then((response) => {
-                    this.getPublication();
-                    showFlashMessage(self, 'success', response.data['message'], '');
-                        this.clearForm();
-                    })
-                    .catch((error) => {
-                        this.$log.error(error);
-                      if (error.response) {
-                        if (error.response.status === 401) {
-                          respondTo401(self);
-                        } else if (error.response.status === 403) {
-                          showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
-                        } else {
-                          showFlashMessage(self, 'error', error.response.data['message'], '');
-                        }
-                      }
-                    });
-              this.getPublication();
-            },
-
-            searchData() {
-                return this.response.filter(pub => {
-                    let byTitle = pub.publication_title.toLowerCase().includes(this.search.toLowerCase())
-                    let byTheme = pub['sample.theme.name'].toLowerCase().includes(this.search.toLowerCase())
-                    let byProject = pub['sample.project'].toLowerCase().includes(this.search.toLowerCase())
-                    let byAuthor = pub['user.first_name'].toLowerCase().includes(this.search.toLowerCase())
-                    let byCoAuthor = pub['co_authors'].toLowerCase().includes(this.search.toLowerCase())
-
-                    if (byTitle) {
-                        return byTitle
-                    } else if (byTheme) {
-                        return byTheme
-                    } else if (byProject) {
-                      return byProject
-                    } else if (byAuthor) {
-                      return byAuthor
-                    } else if (byCoAuthor) {
-                      return byCoAuthor
-                    }
-                })
+          .catch((error) => {
+            this.clearForm();
+            this.$log.error(error);
+            if (error.response) {
+              if (error.response.status === 409) {
+                showFlashMessage(self, 'error', error.response.data['message'], '');
+              } else if (error.response.status === 400) {
+                showFlashMessage(self, 'error', error.response.data['message'], 'Kindly refill the form');
+              } else if (error.response.status === 401) {
+                respondTo401(self);
+              } else {
+                showFlashMessage(self, 'error', error.response.data['message'], '');
+              }
             }
-        },
+          });
+      this.clearForm();
+    },
+
+    deletePublication: function (title, self = this) {
+      axios.delete(publication_resource, {
+        headers:
+            {
+              title: title,
+              Authorization: secureStoreGetString()
+            }
+      })
+          .then((response) => {
+            this.getPublication();
+            showFlashMessage(self, 'success', response.data['message'], '');
+            this.clearForm();
+          })
+          .catch((error) => {
+            this.$log.error(error);
+            if (error.response) {
+              if (error.response.status === 401) {
+                respondTo401(self);
+              } else if (error.response.status === 403) {
+                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
+              } else {
+                showFlashMessage(self, 'error', error.response.data['message'], '');
+              }
+            }
+          });
+      this.getPublication();
+    },
+
+    searchData() {
+      return this.response.filter(pub => {
+        let byTitle = pub.publication_title.toLowerCase().includes(this.search.toLowerCase())
+        let byTheme = pub['sample.theme.name'].toLowerCase().includes(this.search.toLowerCase())
+        let byProject = pub['sample.project'].toLowerCase().includes(this.search.toLowerCase())
+        let byAuthor = pub['user.first_name'].toLowerCase().includes(this.search.toLowerCase())
+        let byCoAuthor = pub['co_authors'].toLowerCase().includes(this.search.toLowerCase())
+
+        if (byTitle) {
+          return byTitle
+        } else if (byTheme) {
+          return byTheme
+        } else if (byProject) {
+          return byProject
+        } else if (byAuthor) {
+          return byAuthor
+        } else if (byCoAuthor) {
+          return byCoAuthor
+        }
+      })
+    }
+  },
   components: {PublicationModal, TopNav},
   created() {
     this.onLoadPage()
   },
 }
 </script>
-
-<style scoped>
-
-</style>
