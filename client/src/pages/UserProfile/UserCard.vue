@@ -481,6 +481,7 @@ import {
   respondTo401,
   secureStoreDeleteString,
   secureStoreGetString,
+  setSampleDataList,
   showFlashMessage,
   startLoader,
   viewSample,
@@ -515,12 +516,20 @@ export default {
       sendReminder: false,
       userEmail: '',
       requestCode: null,
+      fields: null,
+      sampleDataList: []
     };
   },
   mounted() {
     EventBus.$on('close-modal', payload => {
       this.showModalViewResponse = payload
       EventBus.$emit('request-code', this.requestCode)
+    })
+
+    //  check for sample data list event
+    EventBus.$on('sample-data-list', (payload) => {
+      this.fields = payload.fields
+      this.sampleDataList = payload.sampleData
     })
   },
   methods: {
@@ -734,6 +743,9 @@ export default {
     },
 
     updatePublication(publication) {
+      // updated data with required fields
+      publication.sampleDataList = this.sampleDataList
+      publication.fields = this.fields
       publication.user = this.response.fullname
       EventBus.$emit('update-publication', publication)
     },
@@ -750,6 +762,7 @@ export default {
   },
 
   created() {
+    setSampleDataList()
     this.userEmail = getUserEmail()
     this.getUserDetails(this.userEmail)
   },
