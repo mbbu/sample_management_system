@@ -538,7 +538,6 @@ let payload = {}
 export function setSampleDataList() {
     getItemDataList(sample_resource).then(data => {
         let sampleList = extractApiDataForPub(data);
-        console.log('sample data list extracted', sampleList)
 
         // update local variables with data from API
         fields = sampleList['fields'];
