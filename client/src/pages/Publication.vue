@@ -242,12 +242,6 @@ export default {
       this.searchData()
     })
 
-    EventBus.$on('delete-publication', (payload) => {
-      console.log("Deleted publication: ", payload)
-      this.methods.deletePublication(payload)
-      this.isRedirected = true
-    })
-
     // listen to publication update success event and get the new data
     EventBus.$on('update-success', () => {
       this.getPublication()
