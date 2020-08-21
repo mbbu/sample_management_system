@@ -41,6 +41,7 @@ export function redirectAfterCountDown(self, route, countDown = 5) {
 * Combined responses for status codes */
 export function respondTo401(self) {
     showFlashMessage(self, 'error', "Session Expired", "You need to log in to perform this operation")
+    secureStoreDeleteString()
     redirectAfterCountDown(self, '/login')
 }
 
