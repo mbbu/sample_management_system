@@ -480,7 +480,7 @@ import {
   redirectAfterCountDown,
   respondTo401,
   secureStoreDeleteUserInfo,
-  secureStoreGetString,
+  secureStoreGetAuthString,
   setSampleDataList,
   showFlashMessage,
   startLoader,
@@ -583,7 +583,7 @@ export default {
       axios.delete(user_resource, {
         headers:
             {
-              Authorization: secureStoreGetString()
+              Authorization: secureStoreGetAuthString()
             }
       })
           .then((response) => {
@@ -653,7 +653,7 @@ export default {
         amount: this.sampleRequest.amount
       }, {
         headers: {
-          Authorization: secureStoreGetString(),
+          Authorization: secureStoreGetAuthString(),
           code: code,
           resend: header,
         }
@@ -693,7 +693,7 @@ export default {
 
       axios.delete(sample_request_resource, {
         headers: {
-          Authorization: secureStoreGetString(),
+          Authorization: secureStoreGetAuthString(),
           code: code
         }
       })

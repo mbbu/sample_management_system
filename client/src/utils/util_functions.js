@@ -375,7 +375,7 @@ const store = new Vuex.Store({
 
 /*
 * User Authentication and Identification functions */
-export function secureStoreGetString() {
+export function secureStoreGetAuthString() {
     let jwtString = store.state.jwtString;
 
     if (jwtString != null) {
@@ -445,7 +445,7 @@ export function logOutUser(self) {
     axios.get(logout_resource, {
         headers:
             {
-                Authorization: secureStoreGetString()
+                Authorization: secureStoreGetAuthString()
             }
     })
         .then((response) => {

@@ -190,7 +190,7 @@
 import axios from 'axios';
 import {lab_resource} from '@/utils/api_paths'
 import TopNav from "../components/TopNav";
-import {isThemeAdmin, paginate, respondTo401, secureStoreGetString, showFlashMessage} from "@/utils/util_functions";
+import {isThemeAdmin, paginate, respondTo401, secureStoreGetAuthString, showFlashMessage} from "@/utils/util_functions";
 import EventBus from '@/components/EventBus';
 import {required} from "vuelidate/lib/validators";
 
@@ -301,7 +301,7 @@ export default {
                     room: this.lab.room,
                 }, {
                     headers: {
-                        Authorization: secureStoreGetString()
+                      Authorization: secureStoreGetAuthString()
                     }
                 })
                     .then((response) => {
@@ -340,7 +340,7 @@ export default {
                         headers:
                             {
                                 code: this.old_code,
-                                Authorization: secureStoreGetString()
+                              Authorization: secureStoreGetAuthString()
                             }
                     })
                         .then((response) => {
@@ -371,7 +371,7 @@ export default {
                     headers:
                         {
                             code: code,
-                            Authorization: secureStoreGetString()
+                          Authorization: secureStoreGetAuthString()
                         }
                 })
                     .then((response) => {

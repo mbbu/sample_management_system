@@ -265,7 +265,7 @@ import {
   overDueRetentionPeriod,
   redirectAfterCountDown,
   respondTo401,
-  secureStoreGetString,
+  secureStoreGetAuthString,
   setSampleDetailsForEditing,
   setUpdateSample,
   showFlashMessage,
@@ -418,7 +418,7 @@ export default {
                     date: this.sampleRequest.date.selectedDate
                 }, {
                     headers: {
-                        Authorization: secureStoreGetString()
+                      Authorization: secureStoreGetAuthString()
                     }
                 })
                     .then((response) => {
@@ -458,7 +458,7 @@ export default {
                     headers:
                         {
                             code: code,
-                            Authorization: secureStoreGetString()
+                          Authorization: secureStoreGetAuthString()
                         }
                 })
                     .then((response) => {

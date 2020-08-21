@@ -142,22 +142,22 @@
 </template>
 
 <script>
-    import axios from 'axios';
-    import {role_resource} from '../../utils/api_paths'
-    import TopNav from "../../components/TopNav";
-    import {respondTo401, secureStoreGetString, showFlashMessage} from "../../utils/util_functions";
+import axios from 'axios';
+import {role_resource} from '@/utils/api_paths'
+import TopNav from "../../components/TopNav";
+import {respondTo401, secureStoreGetAuthString, showFlashMessage} from "../../utils/util_functions";
 
-    export default {
-        name: "UserRole",
-        data() {
-            return {
-                page_title: "User Roles",
-                response: [],
-                name: null,
-                code: null,
-                desc: null,
+export default {
+  name: "UserRole",
+  data() {
+    return {
+      page_title: "User Roles",
+      response: [],
+      name: null,
+      code: null,
+      desc: null,
 
-                // values for data modification
+      // values for data modification
                 old_code: null,
                 showModal: true,
                 isEditing: false,
@@ -200,7 +200,7 @@
                     description: this.desc,
                 }, {
                     headers: {
-                        Authorization: secureStoreGetString()
+                      Authorization: secureStoreGetAuthString()
                     }
                 })
                     .then((response) => {
@@ -236,7 +236,7 @@
                     headers:
                         {
                             code: code,
-                            Authorization: secureStoreGetString()
+                          Authorization: secureStoreGetAuthString()
                         }
                 })
                     .then((response) => {
@@ -267,7 +267,7 @@
                     headers:
                         {
                             code: code,
-                            Authorization: secureStoreGetString()
+                          Authorization: secureStoreGetAuthString()
                         }
                 })
                     .then((response) => {

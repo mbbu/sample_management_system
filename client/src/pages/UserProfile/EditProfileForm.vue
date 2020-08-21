@@ -134,7 +134,7 @@ import {
   redirectAfterCountDown,
   respondTo401,
   secureStoreDeleteUserInfo,
-  secureStoreGetString,
+  secureStoreGetAuthString,
   selectDropDownItemForUpdate,
   showFlashMessage,
   startLoader,
@@ -223,7 +223,7 @@ export default {
                 }, {
                     headers:
                         {
-                            Authorization: secureStoreGetString()
+                          Authorization: secureStoreGetAuthString()
                         }
                 })
                     .then((response) => {
@@ -266,8 +266,8 @@ export default {
                 axios.delete(user_resource, {
                     headers:
                         {
-                            Authorization: secureStoreGetString(),
-                            deactivate: true
+                          Authorization: secureStoreGetAuthString(),
+                          deactivate: true
                         }
                 })
                     .then((response) => {

@@ -57,7 +57,7 @@ import {
   getSelectedItemCode,
   redirectAfterCountDown,
   respondTo401,
-  secureStoreGetString,
+  secureStoreGetAuthString,
   showFlashMessage,
   startLoader
 } from "@/utils/util_functions";
@@ -123,7 +123,7 @@ export default {
       }, {
         headers: {
           code: this.sampleResponse.code,
-          Authorization: secureStoreGetString()
+          Authorization: secureStoreGetAuthString()
         }
       })
           .then((response) => {

@@ -181,7 +181,7 @@ import {
   isPublicationOwner,
   paginate,
   respondTo401,
-  secureStoreGetString,
+  secureStoreGetAuthString,
   setSampleDataList,
   showFlashMessage
 } from "@/utils/util_functions";
@@ -346,7 +346,7 @@ export default {
         co_authors: this.publication.co_authors
       }, {
         headers: {
-          Authorization: secureStoreGetString()
+          Authorization: secureStoreGetAuthString()
         }
       })
           .then((response) => {
@@ -377,7 +377,7 @@ export default {
         headers:
             {
               title: title,
-              Authorization: secureStoreGetString()
+              Authorization: secureStoreGetAuthString()
             }
       })
           .then((response) => {

@@ -63,7 +63,7 @@ import TopNav from "../../components/TopNav";
 import {
   redirectAfterCountDown,
   respondTo401,
-  secureStoreGetString,
+  secureStoreGetAuthString,
   showFlashMessage,
   startLoader
 } from "@/utils/util_functions";
@@ -135,7 +135,7 @@ export default {
                     {
                         headers:
                             {
-                                Authorization: secureStoreGetString()
+                              Authorization: secureStoreGetAuthString()
                             }
                     })
                     .then((response) => {

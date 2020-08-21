@@ -209,7 +209,7 @@ import {
   getSelectedItemCode,
   isThemeAdmin,
   respondTo401,
-  secureStoreGetString,
+  secureStoreGetAuthString,
   showFlashMessage
 } from "@/utils/util_functions";
 import {project_resource, theme_resource, user_resource} from "@/utils/api_paths";
@@ -338,7 +338,7 @@ export default {
                 }, {
                     headers:
                         {
-                            Authorization: secureStoreGetString()
+                          Authorization: secureStoreGetAuthString()
                         }
                 })
                     .then((response) => {
@@ -380,7 +380,7 @@ export default {
                     headers:
                         {
                             code: code,
-                            Authorization: secureStoreGetString()
+                          Authorization: secureStoreGetAuthString()
                         }
                 })
                     .then((response) => {
@@ -411,7 +411,7 @@ export default {
                     headers:
                         {
                             code: code,
-                            Authorization: secureStoreGetString()
+                          Authorization: secureStoreGetAuthString()
                         }
                 })
                     .then((response) => {

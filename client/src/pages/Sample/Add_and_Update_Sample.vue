@@ -293,7 +293,7 @@ import {
   isUpdate,
   redirectAfterCountDown,
   respondTo401,
-  secureStoreGetString,
+  secureStoreGetAuthString,
   selectDropDownItemForUpdate,
   showFlashMessage
 } from "@/utils/util_functions";
@@ -643,7 +643,7 @@ export default {
                     }, {
                         headers:
                             {
-                                Authorization: secureStoreGetString()
+                              Authorization: secureStoreGetAuthString()
                             }
                     })
                         .then((response) => {
@@ -754,7 +754,7 @@ export default {
                     headers:
                         {
                             code: this.sample.code,
-                            Authorization: secureStoreGetString()
+                          Authorization: secureStoreGetAuthString()
                         }
                 })
                     .then((response) => {

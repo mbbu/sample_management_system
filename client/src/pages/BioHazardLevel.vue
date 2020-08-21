@@ -196,7 +196,7 @@ import axios from 'axios';
 import TopNav from "../components/TopNav";
 import EventBus from '../components/EventBus';
 import {bio_hazard_level_resource} from '@/utils/api_paths'
-import {isThemeAdmin, paginate, respondTo401, secureStoreGetString, showFlashMessage} from "@/utils/util_functions";
+import {isThemeAdmin, paginate, respondTo401, secureStoreGetAuthString, showFlashMessage} from "@/utils/util_functions";
 import {required} from "vuelidate/lib/validators";
 
 export default {
@@ -304,7 +304,7 @@ export default {
                     description: this.level.desc,
                 }, {
                     headers: {
-                        Authorization: secureStoreGetString()
+                      Authorization: secureStoreGetAuthString()
                     }
                 })
                     .then((response) => {
@@ -344,7 +344,7 @@ export default {
                         headers:
                             {
                                 code: this.old_code,
-                                Authorization: secureStoreGetString()
+                              Authorization: secureStoreGetAuthString()
                             }
                     })
                         .then((response) => {
@@ -376,7 +376,7 @@ export default {
                     headers:
                         {
                             code: code,
-                            Authorization: secureStoreGetString()
+                          Authorization: secureStoreGetAuthString()
                         }
                 })
                     .then((response) => {

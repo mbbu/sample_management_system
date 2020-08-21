@@ -189,7 +189,7 @@ import {
   isThemeAdmin,
   paginate,
   respondTo401,
-  secureStoreGetString,
+  secureStoreGetAuthString,
   selectItemForUpdate,
   showFlashMessage
 } from "@/utils/util_functions";
@@ -389,7 +389,7 @@ export default {
                 }, {
                     headers:
                         {
-                            Authorization: secureStoreGetString()
+                          Authorization: secureStoreGetAuthString()
                         }
                 })
                     .then((response) => {
@@ -433,7 +433,7 @@ export default {
                         headers:
                             {
                                 code: this.old_code,
-                                Authorization: secureStoreGetString()
+                              Authorization: secureStoreGetAuthString()
                             }
                     })
                         .then((response) => {
@@ -466,7 +466,7 @@ export default {
                     headers:
                         {
                             code: code,
-                            Authorization: secureStoreGetString()
+                          Authorization: secureStoreGetAuthString()
                         }
                 })
                     .then((response) => {

@@ -151,7 +151,7 @@
 import axios from 'axios';
 import {theme_resource} from '@/utils/api_paths'
 import TopNav from "../components/TopNav";
-import {isAdmin, respondTo401, secureStoreGetString, showFlashMessage} from '@/utils/util_functions'
+import {isAdmin, respondTo401, secureStoreGetAuthString, showFlashMessage} from '@/utils/util_functions'
 import EventBus from '../components/EventBus';
 import {required} from "vuelidate/lib/validators";
 
@@ -248,7 +248,7 @@ export default {
                     code: this.theme.code,
                 }, {
                     headers: {
-                        Authorization: secureStoreGetString()
+                      Authorization: secureStoreGetAuthString()
                     }
                 })
                     .then((response) => {
@@ -286,7 +286,7 @@ export default {
                         headers:
                             {
                                 code: this.old_code,
-                                Authorization: secureStoreGetString()
+                              Authorization: secureStoreGetAuthString()
                             }
                     })
                         .then((response) => {
@@ -316,7 +316,7 @@ export default {
                 axios.delete(theme_resource, {
                     headers: {
                         code: code,
-                        Authorization: secureStoreGetString()
+                      Authorization: secureStoreGetAuthString()
                     }
                 })
                     .then((response) => {

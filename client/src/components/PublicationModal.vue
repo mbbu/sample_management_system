@@ -90,7 +90,7 @@ import {required} from "vuelidate/lib/validators";
 import {
   getSelectedItemSetTextFieldValue,
   respondTo401,
-  secureStoreGetString,
+  secureStoreGetAuthString,
   showFlashMessage
 } from "@/utils/util_functions";
 import {publication_resource} from "@/utils/api_paths";
@@ -192,7 +192,7 @@ export default {
       }, {
         headers: {
           title: this.old_title,
-          Authorization: secureStoreGetString()
+          Authorization: secureStoreGetAuthString()
         }
       })
           .then((response) => {
