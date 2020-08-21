@@ -101,7 +101,7 @@ import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
 import {
   isUserLoggedIn,
   redirectAfterCountDown,
-  secureStoreSetString,
+  secureStoreSetUserInfo,
   showFlashMessage,
   startLoader,
   viewPassword
@@ -165,8 +165,8 @@ export default {
                               showFlashMessage(self, 'success', 'Logged In', 'Redirecting you to home page in ' +
                                   redirectAfterCountDown(self, '/home') + " seconds");
                                 // set jwt token required across requests
-                                secureStoreSetString(response.data.message.token, response.data.message.email, response.data.message.first_name,
-                                    response.data.message.last_name, response.data.message['role.name']);
+                              secureStoreSetUserInfo(response.data.message.token, response.data.message.email, response.data.message.first_name,
+                                  response.data.message.last_name, response.data.message['role.name']);
                             } else if (response.status === 203) {
                               showFlashMessage(self, 'error', response.data.message, 'You can request for reactivation email')
                               redirectAfterCountDown(self, '/requestConfirmation')

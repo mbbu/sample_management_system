@@ -386,7 +386,7 @@ export function secureStoreGetString() {
     }
 }
 
-export function secureStoreSetString(jwtString, email, fName, lName, role) {
+export function secureStoreSetUserInfo(jwtString, email, fName, lName, role) {
     store.commit("jwtToken", jwtString);
     store.commit('userInfo', {
         email: email,

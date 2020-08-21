@@ -40,7 +40,7 @@ import axios from 'axios';
 import TopNav from "../../components/TopNav";
 import {mdbCard, mdbCardBody, mdbCol, mdbRow} from "mdbvue";
 import {email_confirm_resource} from "@/utils/api_paths";
-import {redirectAfterCountDown, secureStoreSetString, showFlashMessage, startLoader} from "@/utils/util_functions";
+import {redirectAfterCountDown, secureStoreSetUserInfo, showFlashMessage, startLoader} from "@/utils/util_functions";
 
 export default {
   name: "ConfirmUser",
@@ -71,8 +71,8 @@ export default {
                                   redirectAfterCountDown(self, '/home') + " seconds");
 
                                 // set jwt token required across requests
-                                secureStoreSetString(response.data.message.token, response.data.message.email, response.data.message.first_name,
-                                    response.data.message.last_name, response.data.message['role.name']);
+                              secureStoreSetUserInfo(response.data.message.token, response.data.message.email, response.data.message.first_name,
+                                  response.data.message.last_name, response.data.message['role.name']);
                             }
                         }, 3000)
                     })
