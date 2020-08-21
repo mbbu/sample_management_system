@@ -479,7 +479,7 @@ import {
   getUserEmail,
   redirectAfterCountDown,
   respondTo401,
-  secureStoreDeleteString,
+  secureStoreDeleteUserInfo,
   secureStoreGetString,
   setSampleDataList,
   showFlashMessage,
@@ -590,7 +590,7 @@ export default {
             // redirect after successful signUp
             if (response.status === 200) {
               setTimeout(() => {
-                secureStoreDeleteString()
+                secureStoreDeleteUserInfo()
                 loader.hide()
                 showFlashMessage(self, 'success', 'Account Deleted', 'Your account has been successfully deleted.' +
                     '\nSorry to see you go.');

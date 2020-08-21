@@ -41,7 +41,7 @@ export function redirectAfterCountDown(self, route, countDown = 5) {
 * Combined responses for status codes */
 export function respondTo401(self) {
     showFlashMessage(self, 'error', "Session Expired", "You need to log in to perform this operation")
-    secureStoreDeleteString()
+    secureStoreDeleteUserInfo()
     redirectAfterCountDown(self, '/login')
 }
 
@@ -396,7 +396,7 @@ export function secureStoreSetString(jwtString, email, fName, lName, role) {
     });
 }
 
-export function secureStoreDeleteString() {
+export function secureStoreDeleteUserInfo() {
     store.commit("jwtToken", null);
     store.commit('userInfo', null);
 }
@@ -452,7 +452,7 @@ export function logOutUser(self) {
             // redirect after successful signUp
             if (response.status === 200) {
                 setTimeout(() => {
-                    secureStoreDeleteString()
+                    secureStoreDeleteUserInfo()
                     loader.hide()
                     showFlashMessage(self, 'success', 'Logged Out', 'Redirecting you to home page ' +
                         redirectAfterCountDown(self, '/home') + " seconds");

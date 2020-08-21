@@ -133,7 +133,7 @@ import {
   getUserEmail,
   redirectAfterCountDown,
   respondTo401,
-  secureStoreDeleteString,
+  secureStoreDeleteUserInfo,
   secureStoreGetString,
   selectDropDownItemForUpdate,
   showFlashMessage,
@@ -274,8 +274,8 @@ export default {
                         // redirect after successful signUp
                         if (response.status === 200) {
                             setTimeout(() => {
-                                secureStoreDeleteString()
-                                loader.hide()
+                              secureStoreDeleteUserInfo()
+                              loader.hide()
                               showFlashMessage(self, 'success', 'Account Deactivated', 'Your account has been successfully deactivated.' +
                                   '\nSorry to see you go.');
                               +redirectAfterCountDown(self, '/home')
