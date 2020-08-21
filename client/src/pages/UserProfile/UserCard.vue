@@ -472,9 +472,9 @@
 </template>
 <script>
 import {mdbCard, mdbCardBody, mdbCol, mdbRow} from "mdbvue";
-import TopNav from "../../components/TopNav";
+import TopNav from "@/components/TopNav";
 import axios from "axios";
-import {sample_request_resource, user_resource} from "@/utils/api_paths";
+import {publication_resource, sample_request_resource, user_resource} from "@/utils/api_paths";
 import {
   getUserEmail,
   redirectAfterCountDown,
@@ -487,7 +487,6 @@ import {
   viewSample,
 } from "@/utils/util_functions";
 import EventBus from '@/components/EventBus';
-import Publication from "@/pages/Publication";
 import SampleResponseForm from "@/components/SampleResponseForm";
 import PublicationModal from "@/components/PublicationModal";
 
@@ -735,7 +734,6 @@ export default {
       this.requested = requested
     },
 
-    // todo: fix lifecycle issues
     // functions for publication
     viewMyPublication(pubData) {
       this.publication = pubData
@@ -750,15 +748,31 @@ export default {
       EventBus.$emit('update-publication', publication)
     },
 
-    //todo: refactor
-    deletePublication(title) {
-      console.log("deleting pub from dashboard: ", title)
-      EventBus.$emit('delete-publication', title)
-
-      Publication.methods.deletePublication(title)
-      // redirectAfterCountDown(this, '/publication', 2)
+    deletePublication(title, self = this) {
+      axios.delete(publication_resource, {
+        headers:
+            {
+              title: title,
+              Authorization: secureStoreGetAuthString()
+            }
+      })
+          .then((response) => {
+            this.getPublication();
+            showFlashMessage(self, 'success', response.data['message'], '');
+          })
+          .catch((error) => {
+            this.$log.error(error);
+            if (error.response) {
+              if (error.response.status === 401) {
+                respondTo401(self);
+              } else if (error.response.status === 403) {
+                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
+              } else {
+                showFlashMessage(self, 'error', error.response.data['message'], '');
+              }
+            }
+          });
     },
-
   },
 
   created() {
