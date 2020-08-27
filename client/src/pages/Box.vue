@@ -18,15 +18,15 @@
                 <table class=" table table-hover">
                     <thead>
                     <tr>
-                        <th scope="col"> Id</th>
-                        <th scope="col"> Label</th>
-                        <th scope="col"> Tray</th>
-                        <th scope="col"> Rack</th>
-                        <th scope="col"> Chamber</th>
-                        <th scope="col"> Freezer</th>
-                        <th scope="col"> Lab Name</th>
-                        <th scope="col"> Lab Room</th>
-                        <th scope="col"> Actions</th>
+                      <th class="table-header-style" scope="col"> Id</th>
+                      <th class="table-header-style" scope="col"> Label</th>
+                      <th class="table-header-style" scope="col"> Tray</th>
+                      <th class="table-header-style" scope="col"> Rack</th>
+                      <th class="table-header-style" scope="col"> Chamber</th>
+                      <th class="table-header-style" scope="col"> Freezer</th>
+                      <th class="table-header-style" scope="col"> Lab Name</th>
+                      <th class="table-header-style" scope="col"> Lab Room</th>
+                      <th class="table-header-style" scope="col" v-if="isAuth"> Actions</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -40,17 +40,17 @@
                         <td> {{box['tray.rack.chamber.freezer.lab.name']}}</td>
                         <td> {{box['tray.rack.chamber.freezer.lab.room']}}</td>
 
-                        <td>
-                            <b-icon
-                                    :title="`Update box ${ box.label }`"
-                                    @mouseover="fillFormForUpdate(box['tray.number'], box.label, box.code)"
-                                    class="border border-info rounded" font-scale="2.0"
-                                    icon="pencil" v-b-modal.modal-box-edit
-                                    v-b-tooltip.hover
-                                    variant="info"
-                            ></b-icon>
-                            &nbsp;
-                            <b-icon
+                      <td v-if="isAuth">
+                        <b-icon
+                            :title="`Update box ${ box.label }`"
+                            @mouseover="fillFormForUpdate(box['tray.number'], box.label, box.code)"
+                            class="border border-info rounded" font-scale="2.0"
+                            icon="pencil" v-b-modal.modal-box-edit
+                            v-b-tooltip.hover
+                            variant="info"
+                        ></b-icon>
+                        &nbsp;
+                        <b-icon
                                     :title="`Delete box ${box.label}!`" @click="deleteBox(box.code)"
                                     class="border rounded bg-danger p-1" font-scale="1.85"
                                     icon="trash" v-b-tooltip.hover
@@ -182,57 +182,61 @@
                     </form>
                 </b-modal>
             </div>
-            <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-box variant="primary">
-                <span>Add Box</span> <i class="fas fa-plus-circle menu_icon"></i>
-            </b-button>
+          <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-box v-if="isAuth" variant="primary">
+            <span>Add Box</span> <i class="fas fa-plus-circle menu_icon"></i>
+          </b-button>
         </div>
     </div>
 </template>
 
 <script>
-    import axios from 'axios';
-    import TopNav from "../components/TopNav";
-    import {
-        extractTrayData,
-        getItemDataList,
-        respondTo401,
-        secureStoreGetString,
-        selectItemForUpdate,
-        showFlashMessage
-    } from "../utils/util_functions";
-    import {box_resource, tray_resource} from "../utils/api_paths";
-    import EventBus from '../components/EventBus';
-    import FilterCard from "../components/FilterCard";
-    import {required} from "vuelidate/lib/validators";
+import axios from 'axios';
+import TopNav from "@/components/TopNav";
+import {
+  extractTrayData,
+  getItemDataList,
+  isThemeAdmin,
+  respondTo401,
+  secureStoreGetAuthString,
+  selectItemForUpdate,
+  showFlashMessage
+} from "@/utils/util_functions";
+import {box_resource, tray_resource} from "@/utils/api_paths";
+import EventBus from '@/components/EventBus';
+import FilterCard from "@/components/FilterCard";
+import {required} from "vuelidate/lib/validators";
 
-    export default {
-        name: 'Box',
-        components: {TopNav, FilterCard},
+export default {
+  name: 'Box',
+  components: {TopNav, FilterCard},
 
-        data() {
-            return {
-                page_title: 'Boxes',
+  data() {
+    return {
+      page_title: 'Boxes',
 
-                filters: [],
-                boxList: [],
-                response: [],
-                search: '',
+      filters: [],
+      boxList: [],
+      response: [],
+      search: '',
 
-                box: {
-                    tray: '',
-                    label: '',
-                    code: ''
-                },
+      box: {
+        tray: '',
+        label: '',
+        code: ''
+      },
 
-                trayDataList: [],
-                fields: {text: '', value: ''},
+      // variable to check user status and role
+      isAuth: null,
 
-                // values for data modification
-                old_code: null,
-                showModal: true,
-                isEditing: false,
+      trayDataList: [],
+      fields: {text: '', value: ''},
 
-                // data for pagination
+      // values for data modification
+      old_code: null,
+      showModal: true,
+      isEditing: false,
+
+      // data for pagination
                 current: 1,
                 page_length: null,
                 page_array: [],
@@ -449,7 +453,8 @@
 
             // functions to interact with API
             getBox() {
-                this.clearForm();
+              this.isAuth = isThemeAdmin()
+              this.clearForm();
                 axios.get(box_resource)
                     .then((res) => {
                         this.boxList = this.response = res.data['message'];
@@ -469,7 +474,7 @@
                 }, {
                     headers:
                         {
-                            Authorization: secureStoreGetString()
+                          Authorization: secureStoreGetAuthString()
                         }
                 })
                     .then((response) => {
@@ -512,7 +517,7 @@
                         headers:
                             {
                                 code: this.old_code,
-                                Authorization: secureStoreGetString()
+                              Authorization: secureStoreGetAuthString()
                             }
                     })
                         .then((response) => {
@@ -545,7 +550,7 @@
                     headers:
                         {
                             code: code,
-                            Authorization: secureStoreGetString()
+                          Authorization: secureStoreGetAuthString()
                         }
                 })
                     .then((response) => {

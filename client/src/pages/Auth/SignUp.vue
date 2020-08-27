@@ -145,32 +145,33 @@
 </template>
 
 <script>
-    import axios from 'axios';
-    import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
-    import TopNav from "../../components/TopNav";
-    import {email, minLength, required, sameAs} from "vuelidate/lib/validators"
-    import {role_resource, user_resource} from "../../utils/api_paths";
-    import {
-        countDownTimer,
-        extractApiData,
-        getItemDataList,
-        getSelectedItem,
-        showFlashMessage,
-        startLoader,
-        viewPassword
-    } from "../../utils/util_functions"
+import axios from 'axios';
+import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
+import TopNav from "../../components/TopNav";
+import {email, minLength, required, sameAs} from "vuelidate/lib/validators"
+import {role_resource, user_resource} from "@/utils/api_paths";
+import {
+  extractApiData,
+  getItemDataList,
+  getSelectedItem,
+  isUserLoggedIn,
+  redirectAfterCountDown,
+  showFlashMessage,
+  startLoader,
+  viewPassword
+} from "@/utils/util_functions"
 
-    export default {
-        name: "SignUp",
-        components: {
-            mdbInput,
-            mdbBtn,
-            mdbCard,
-            mdbCardBody,
-            mdbCol,
-            mdbRow,
-            TopNav
-        },
+export default {
+  name: "SignUp",
+  components: {
+    mdbInput,
+    mdbBtn,
+    mdbCard,
+    mdbCardBody,
+    mdbCol,
+    mdbRow,
+    TopNav
+  },
 
         data() {
             return {
@@ -266,8 +267,8 @@
                             loader.hide()
                             // redirect after successful signUp
                             if (response.status === 201) {
-                                showFlashMessage(self, 'success', response.data.message, '');
-                                countDownTimer(self, this.countDown, '/home')
+                              showFlashMessage(self, 'success', response.data.message, '');
+                              redirectAfterCountDown(self, '/home')
                             }
                         }, 3500)
                     })
@@ -290,7 +291,8 @@
             },
         },
         created() {
-            this.onLoadPage();
+          if (isUserLoggedIn()) redirectAfterCountDown(this, '/user');
+          else this.onLoadPage();
         }
 
     }

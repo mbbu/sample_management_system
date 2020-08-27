@@ -7,7 +7,7 @@
                 <!-- FLASH MESSAGES -->
                 <FlashMessage :position="'right bottom'"></FlashMessage>
                 <br> <br>
-                <em>About Sample</em>
+                <em class="table-header-style">About Sample</em>
                 <br> <br>
                 <table class="table table-hover">
                     <thead class="blue-gradient white-text">
@@ -43,7 +43,7 @@
 
                 <hr>
                 <hr>
-                <em>Sample Details</em>
+              <em class="table-header-style">Sample Details</em>
                 <br> <br>
                 <table class="table table-hover">
                     <thead class="blue-gradient white-text">
@@ -89,7 +89,7 @@
 
                 <hr>
                 <hr>
-                <em>Sample Location at I.C.I.P.E</em>
+              <em class="table-header-style">Sample Location at I.C.I.P.E</em>
                 <br> <br>
                 <table class="table table-hover">
                     <thead class="blue-gradient white-text">
@@ -145,7 +145,7 @@
                     </tr>
                 </table>
 
-                <em>Other Important Details</em>
+              <em class="table-header-style">Other Important Details</em>
                 <br> <br>
                 <table class="table table-hover">
                     <thead class="blue-gradient white-text">
@@ -235,16 +235,16 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="text-center">
-                            <button @click="requestUpdateSample" class="btn btn-outline-info btn-rounded"
-                                    type="button"> Update Sample
-                                <i class="fas fa-pencil-alt"></i></button>
+                        <div class="text-center" v-if="isSampleOwner(sample.userEmail)">
+                          <button @click="requestUpdateSample" class="btn btn-outline-info btn-rounded"
+                                  type="button"> Update Sample
+                            <i class="fas fa-pencil-alt"></i></button>
                         </div>
-                        <div class="text-center">
-                            <button @click="deleteSample(sample.code)" class="btn btn-outline-danger btn-rounded"
-                                    type="button"> Delete Sample
-                                <i class="far fa-trash-alt"></i></button>
-                        </div>
+                      <div class="text-center" v-if="isSampleOwner(sample.userEmail)">
+                        <button @click="deleteSample(sample.code)" class="btn btn-outline-danger btn-rounded"
+                                type="button"> Delete Sample
+                          <i class="far fa-trash-alt"></i></button>
+                      </div>
                     </mdb-col>
                 </mdb-row>
             </div>
@@ -253,35 +253,36 @@
 </template>
 
 <script>
-    import {mdbCol, mdbRow} from "mdbvue";
-    import TopNav from "../../components/TopNav";
-    import {sample_request_resource, sample_resource} from "../../utils/api_paths";
-    import {FunctionalCalendar} from 'vue-functional-calendar';
-    import axios from 'axios';
-    import {
-        countDownTimer,
-        getSampleCode,
-        isRetentionPeriodValid,
-        overDueRetentionPeriod,
-        respondTo401,
-        secureStoreGetString,
-        setSampleDetailsForEditing,
-        setUpdateSample,
-        showFlashMessage,
-        startLoader
-    } from "../../utils/util_functions";
+import {mdbCol, mdbRow} from "mdbvue";
+import TopNav from "@/components/TopNav";
+import {sample_request_resource, sample_resource} from "@/utils/api_paths";
+import {FunctionalCalendar} from 'vue-functional-calendar';
+import axios from 'axios';
+import {
+  getSampleCode,
+  isRetentionPeriodValid,
+  isSampleOwner,
+  overDueRetentionPeriod,
+  redirectAfterCountDown,
+  respondTo401,
+  secureStoreGetAuthString,
+  setSampleDetailsForEditing,
+  setUpdateSample,
+  showFlashMessage,
+  startLoader
+} from "@/utils/util_functions";
 
-    export default {
-        name: "DetailedSampleView",
-        data() {
-            return {
-                page_title: "Sample MetaData",
-                response: [],
-                sample: {
-                    theme: "",
-                    user: "",
-                    userEmail: "",
-                    project: "",
+export default {
+  name: "DetailedSampleView",
+  data() {
+    return {
+      page_title: "Sample MetaData",
+      response: [],
+      sample: {
+        theme: "",
+        user: "",
+        userEmail: "",
+        project: "",
                     projectOwner: "",
                     sampleType: "",
                     species: "",
@@ -327,17 +328,17 @@
         },
 
         methods: {
-            isRetentionPeriodValid, overDueRetentionPeriod,
-            setSampleData(res) {
-                this.sample.theme = res['theme.name'];
-                this.sample.user = res['user.first_name'] + " " + res['user.last_name'];
-                this.sample.userEmail = res['user.email'];
-                this.sample.project = res['project'];
-                this.sample.projectOwner = res['project_owner'];
-                this.sample.sampleType = res['sample_type'];
-                this.sample.species = res['animal_species'];
-                this.sample.description = res['sample_description'];
-                this.sample.box = res['box.label'];
+          isRetentionPeriodValid, overDueRetentionPeriod, isSampleOwner,
+          setSampleData(res) {
+            this.sample.theme = res['theme.name'];
+            this.sample.user = res['user.first_name'] + " " + res['user.last_name'];
+            this.sample.userEmail = res['user.email'];
+            this.sample.project = res['project'];
+            this.sample.projectOwner = res['project_owner'];
+            this.sample.sampleType = res['sample_type'];
+            this.sample.species = res['animal_species'];
+            this.sample.description = res['sample_description'];
+            this.sample.box = res['box.label'];
                 this.sample.locationCollected = res['location_collected'];
                 this.sample.retention = res['retention_date'];
                 this.sample.barcode = res['barcode'];
@@ -388,8 +389,8 @@
                             if (error.response.status === 401) {
                                 respondTo401(self);
                             } else if (error.response.status === 404) {
-                                showFlashMessage(self, 'error', 'Connection Error', 'Request was timed out');
-                                countDownTimer(self, 3, '/sample')
+                              showFlashMessage(self, 'error', 'Connection Error', 'Request was timed out');
+                              redirectAfterCountDown(self, '/sample')
                             }
                         }
                     });
@@ -402,8 +403,8 @@
                 setTimeout(() => {
                     loader.hide()
                     setSampleDetailsForEditing(this.response)
-                    setUpdateSample(true)
-                    countDownTimer(self, 1, '/addsample')
+                  setUpdateSample(true)
+                  redirectAfterCountDown(self, '/addsample')
                 }, 1000)
             },
 
@@ -417,7 +418,7 @@
                     date: this.sampleRequest.date.selectedDate
                 }, {
                     headers: {
-                        Authorization: secureStoreGetString()
+                      Authorization: secureStoreGetAuthString()
                     }
                 })
                     .then((response) => {
@@ -457,14 +458,14 @@
                     headers:
                         {
                             code: code,
-                            Authorization: secureStoreGetString()
+                          Authorization: secureStoreGetAuthString()
                         }
                 })
                     .then((response) => {
                         setTimeout(() => {
                             loader.hide()
-                            showFlashMessage(self, 'success', response.data['message'], '');
-                            countDownTimer(self, 1, '/sample')
+                          showFlashMessage(self, 'success', response.data['message'], '');
+                          redirectAfterCountDown(self, '/sample')
                         }, 1500)
                     })
                     .catch((error) => {

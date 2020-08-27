@@ -9,7 +9,7 @@ from api.resources.base_resource import BaseResource
 from api.resources.email_confirmation.send_email import send_email
 from api.resources.sample_resource import SampleResource
 from api.utils import format_and_lower_str, log_create, log_update, log_delete, has_required_request_params, log_304, \
-    get_user_by_email, generate_confirmation_token, set_date_from_int
+    get_user_by_email, generate_confirmation_token, set_date_from_int, non_empty_int
 
 
 class SampleRequestResource(BaseResource):
@@ -79,7 +79,7 @@ class SampleRequestResource(BaseResource):
 
         else:
             args = SampleRequestResource.sample_request_parser()
-            amount = int(args['amount'])
+            amount = args['amount']
             user = get_user_by_email(get_jwt_identity())
             sample = SampleResource.get_sample(sample_request.requested_sample.code)
 
@@ -94,7 +94,8 @@ class SampleRequestResource(BaseResource):
                                          requester_email=user.email, species=sample.animal_species,
                                          qt=sample.quantity.id, sample_type=sample.sample_type,
                                          location=sample.location_collected, available=sample.amount,
-                                         storage=storage, amount=amount, sample_request=sample_request.id)
+                                         storage=storage, amount=sample_request.amount,
+                                         sample_request=sample_request.id)
 
                 return BaseResource.send_json_message("Email reminder sent", 200)
 
@@ -144,7 +145,7 @@ class SampleRequestResource(BaseResource):
     def sample_request_parser():
         parser = reqparse.RequestParser()
         parser.add_argument('sample', required=True)
-        parser.add_argument('amount', required=True)
+        parser.add_argument('amount', required=True, type=non_empty_int)
         parser.add_argument('date', required=False)
 
         args = parser.parse_args()

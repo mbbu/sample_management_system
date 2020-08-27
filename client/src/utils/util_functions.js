@@ -3,10 +3,14 @@ import createPersistedState from "vuex-persistedstate";
 import SecureLS from "secure-ls";
 import Vue from "vue";
 import axios from "axios";
-import {logout_resource} from "./api_paths";
+import {logout_resource, sample_resource} from "./api_paths";
 import EventBus from "../components/EventBus";
 
 self.flashMessage = undefined;
+
+
+export const ADMIN = "System Admin"
+export const RESEARCHER = "Researcher"
 
 export function showFlashMessage(self, status, title, message) {
     self.flashMessage.show({
@@ -16,16 +20,19 @@ export function showFlashMessage(self, status, title, message) {
     });
 }
 
-export function countDownTimer(self, countDown, route) {
+export function redirectAfterCountDown(self, route, countDown = 5) {
     if (countDown > 0) {
+        console.log("countdown is: " + countDown)
         setTimeout(() => {
             countDown -= 1;
-            countDownTimer(self, countDown, route);
+            redirectAfterCountDown(self, route, countDown);
         }, 1000)
+        return countDown
     } else if (countDown === 0) {
+
         self.$log.info("**** Timer out ... ****");
         self.$log.info("ROUTE PASSED" + route)
-        self.$router.push({path: route});
+        self.$router.push({path: route}).then(r => console.log('Redirect response: ', r));
     }
     return countDown;
 }
@@ -34,7 +41,8 @@ export function countDownTimer(self, countDown, route) {
 * Combined responses for status codes */
 export function respondTo401(self) {
     showFlashMessage(self, 'error', "Session Expired", "You need to log in to perform this operation")
-    countDownTimer(self, 3, '/login')
+    secureStoreDeleteUserInfo()
+    redirectAfterCountDown(self, '/login')
 }
 
 /*
@@ -263,17 +271,19 @@ export function getSelectedItemCode(elementId, itemDataList) {
 }
 
 export function getSelectedItemSetTextFieldValue(itemDataList, itemVar) {
-    let item = document.getElementById("dropdownlist").value;
-    console.log("Item passed", itemDataList)
+    let element = document.getElementById("dropdownlist");
+    let item
 
-    for (var i = 0; i < itemDataList.length; i++) {
+    if (element !== null) {
+        item = element.value
+    }
+
+    for (let i = 0; i < itemDataList.length; i++) {
         if (item === itemDataList[i].Name) {
             itemVar = itemDataList[i].Code;
             let textValue = itemDataList[i].authorName;
             let textCode = itemDataList[i].authorCode
             return {'sampleCode': itemVar, 'authorText': textValue, 'authorCode': textCode}
-        } else {
-            console.log("NOT FOUND")
         }
     }
 }
@@ -365,7 +375,7 @@ const store = new Vuex.Store({
 
 /*
 * User Authentication and Identification functions */
-export function secureStoreGetString() {
+export function secureStoreGetAuthString() {
     let jwtString = store.state.jwtString;
 
     if (jwtString != null) {
@@ -376,7 +386,7 @@ export function secureStoreGetString() {
     }
 }
 
-export function secureStoreSetString(jwtString, email, fName, lName, role) {
+export function secureStoreSetUserInfo(jwtString, email, fName, lName, role) {
     store.commit("jwtToken", jwtString);
     store.commit('userInfo', {
         email: email,
@@ -386,7 +396,7 @@ export function secureStoreSetString(jwtString, email, fName, lName, role) {
     });
 }
 
-export function secureStoreDeleteString() {
+export function secureStoreDeleteUserInfo() {
     store.commit("jwtToken", null);
     store.commit('userInfo', null);
 }
@@ -420,7 +430,14 @@ export function strongPassword(password1) {
 
 // user status
 export function isUserLoggedIn() {
-    return store.state.jwtString !== "" || getUserEmail() !== "";
+    return store.state.jwtString !== "";
+}
+
+export function getLoggedInUser() {
+    let loggedIn = isUserLoggedIn()
+    if (loggedIn === true) {
+        return getStoredUserDetails()
+    }
 }
 
 export function logOutUser(self) {
@@ -428,17 +445,17 @@ export function logOutUser(self) {
     axios.get(logout_resource, {
         headers:
             {
-                Authorization: secureStoreGetString()
+                Authorization: secureStoreGetAuthString()
             }
     })
         .then((response) => {
             // redirect after successful signUp
             if (response.status === 200) {
                 setTimeout(() => {
-                    secureStoreDeleteString()
+                    secureStoreDeleteUserInfo()
                     loader.hide()
                     showFlashMessage(self, 'success', 'Logged Out', 'Redirecting you to home page ' +
-                        countDownTimer(self, 3, '/home') + " seconds");
+                        redirectAfterCountDown(self, '/home') + " seconds");
                 }, 2500)
             }
         })
@@ -449,6 +466,33 @@ export function logOutUser(self) {
                 showFlashMessage(self, 'error', error.response.data['message'], '');
             }
         })
+}
+
+
+// SYSTEM ADMIN FUNCTIONS
+export function isAdmin() {
+    let userStatus = getLoggedInUser()
+    return !!(userStatus && userStatus.role === ADMIN);
+}
+
+// THEME ADMIN FUNCTIONS
+export function isThemeAdmin() {
+    let userStatus = getLoggedInUser()
+    return !!(userStatus && (userStatus.role === ADMIN || userStatus.role === RESEARCHER));
+}
+
+// PUBLICATION OWNER FUNCTIONS
+export function isPublicationOwner(email) {
+    let userEmail = getUserEmail()
+
+    return !!(userEmail && userEmail === email);
+}
+
+// SAMPLE OWNER FUNCTIONS
+export function isSampleOwner(email) {
+    let userEmail = getUserEmail()
+
+    return !!(userEmail && (userEmail === email || isThemeAdmin()));
 }
 
 // accessor for sample code; used when requesting to view detailed sample page
@@ -480,13 +524,46 @@ export function isUpdate() {
     return updateSample;
 }
 
+// todo: functions could be modularised
+export function viewSample(self, code) {
+    // 1st call the setter function to set the code
+    setSampleCode(code)
+    // redirect to sample view page
+    redirectAfterCountDown(self, '/view-sample')
+}
+
+let fields = null;
+let sampleDataList = []
+let payload = {}
+
+export function setSampleDataList() {
+    getItemDataList(sample_resource).then(data => {
+        let sampleList = extractApiDataForPub(data);
+
+        // update local variables with data from API
+        fields = sampleList['fields'];
+        for (let i = 0; i < sampleList.items.length; i++) {
+            sampleDataList.push({
+                'Code': sampleList.items[i].sampleCode,
+                'Name': sampleList.items[i].sampleName,
+                'authorCode': sampleList.items[i].authorCode,
+                'authorName': sampleList.items[i].authorName
+            });
+        }
+        payload.fields = fields
+        payload.sampleData = sampleDataList
+        EventBus.$emit('sample-data-list', payload)
+    })
+}
+
+// end of sample util functions
 
 export function selectDropDownItemForUpdate(elementId, item, itemDataList) {
     // set dropdownItem to the selected item
     let element = document.getElementById(elementId);
 
     // look up the datalist for a similar name as the value the holder has;
-    for (var i = 0; i < itemDataList.length; i++) {
+    for (let i = 0; i < itemDataList.length; i++) {
         if (item === itemDataList[i].Name || item === itemDataList[i].Code) {
             // -> assign the code to the itemCode
             item = itemDataList[i].Code

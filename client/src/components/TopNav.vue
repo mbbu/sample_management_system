@@ -81,44 +81,44 @@
 </template>
 
 <script>
-    import {getStoredUserDetails, isUserLoggedIn, logOutUser,} from '../utils/util_functions';
-    import {
-        mdbBtn,
-        mdbDropdown,
-        mdbDropdownItem,
-        mdbDropdownMenu,
-        mdbDropdownToggle,
-        mdbFormInline,
-        mdbInput,
-        mdbNavbar,
-        mdbNavbarBrand,
-        mdbNavbarNav,
-        mdbNavbarToggler,
-        mdbNavItem
-    } from 'mdbvue'
-    import EventBus from '../components/EventBus';
+import {getStoredUserDetails, isUserLoggedIn, logOutUser,} from '@/utils/util_functions';
+import {
+  mdbBtn,
+  mdbDropdown,
+  mdbDropdownItem,
+  mdbDropdownMenu,
+  mdbDropdownToggle,
+  mdbFormInline,
+  mdbInput,
+  mdbNavbar,
+  mdbNavbarBrand,
+  mdbNavbarNav,
+  mdbNavbarToggler,
+  mdbNavItem
+} from 'mdbvue'
+import EventBus from '@/components/EventBus';
 
-    export default {
-        name: 'top-nav',
-        props: {
-            page_title: {
-                type: String,
-                required: true,
-            },
-            search_query: {
-                type: String,
-                required: false,
-            }
-        },
-        data() {
-            return {
-                userName: null,
-                isAuth: null,
-            }
-        },
-        methods: {
-            getCompanyLogo() {
-                return require('../assets/logo.png')
+export default {
+  name: 'top-nav',
+  props: {
+    page_title: {
+      type: String,
+      required: true,
+    },
+    search_query: {
+      type: String,
+      required: false,
+    }
+  },
+  data() {
+    return {
+      userName: null,
+      isAuth: null,
+    }
+  },
+  methods: {
+    getCompanyLogo() {
+      return require('../assets/logo.png')
             },
             getUser() {
                 this.isAuth = isUserLoggedIn()

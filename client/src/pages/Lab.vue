@@ -14,11 +14,11 @@
                 <table class=" table table-hover">
                     <thead>
                     <tr>
-                        <th scope="col"> Id</th>
-                        <th scope="col"> Name</th>
-                        <th scope="col"> Code</th>
-                        <th scope="col"> Room</th>
-                        <th scope="col"> Actions</th>
+                      <th class="table-header-style" scope="col"> Id</th>
+                      <th class="table-header-style" scope="col"> Name</th>
+                      <th class="table-header-style" scope="col"> Code</th>
+                      <th class="table-header-style" scope="col"> Room</th>
+                      <th class="table-header-style" scope="col" v-if="isAuth"> Actions</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -28,17 +28,17 @@
                         <td> {{ lab.code }}</td>
                         <td> {{ lab.room }}</td>
 
-                        <td>
-                            <b-icon
-                                    :title="`Update ${ lab.name }`"
-                                    @mouseover="fillFormForUpdate(lab.name, lab.code, lab.room)"
-                                    class="border border-info rounded" font-scale="2.0"
-                                    icon="pencil" v-b-modal.modal-lab-edit
-                                    v-b-tooltip.hover
-                                    variant="info"
-                            ></b-icon>
-                            &nbsp;
-                            <b-icon
+                      <td v-if="isAuth">
+                        <b-icon
+                            :title="`Update ${ lab.name }`"
+                            @mouseover="fillFormForUpdate(lab.name, lab.code, lab.room)"
+                            class="border border-info rounded" font-scale="2.0"
+                            icon="pencil" v-b-modal.modal-lab-edit
+                            v-b-tooltip.hover
+                            variant="info"
+                        ></b-icon>
+                        &nbsp;
+                        <b-icon
                                     :title="`Delete ${lab.name}!`" @click="deleteLab(lab.code)"
                                     class="border rounded bg-danger p-1" font-scale="1.85"
                                     icon="trash" v-b-tooltip.hover
@@ -179,43 +179,47 @@
                     </form>
                 </b-modal>
             </div>
-            <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-lab variant="primary">
-                <span>Add Lab</span> <i class="fas fa-plus-circle menu_icon"></i>
-            </b-button>
+          <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-lab v-if="isAuth" variant="primary">
+            <span>Add Lab</span> <i class="fas fa-plus-circle menu_icon"></i>
+          </b-button>
         </div>
     </div>
 </template>
 
 <script>
-    import axios from 'axios';
-    import {lab_resource} from '../utils/api_paths'
-    import TopNav from "../components/TopNav";
-    import {paginate, respondTo401, secureStoreGetString, showFlashMessage} from "../utils/util_functions";
-    import EventBus from '../components/EventBus';
-    import {required} from "vuelidate/lib/validators";
+import axios from 'axios';
+import {lab_resource} from '@/utils/api_paths'
+import TopNav from "../components/TopNav";
+import {isThemeAdmin, paginate, respondTo401, secureStoreGetAuthString, showFlashMessage} from "@/utils/util_functions";
+import EventBus from '@/components/EventBus';
+import {required} from "vuelidate/lib/validators";
 
-    export default {
-        name: 'Lab',
-        data() {
-            return {
-                page_title: "Labs",
-                response: [],
-                lab: {
-                    name: '',
-                    code: '',
-                    room: '',
-                },
-                search: '',
-                labList: [],
+export default {
+  name: 'Lab',
+  data() {
+    return {
+      page_title: "Labs",
+      response: [],
+      lab: {
+        name: '',
+        code: '',
+        room: '',
+      },
 
-                // values for data modification
-                old_code: null,
-                showModal: true,
-                isEditing: false,
+      // variable to check user status and role
+      isAuth: null,
 
-                // data for pagination
-                current: 1,
-            };
+      search: '',
+      labList: [],
+
+      // values for data modification
+      old_code: null,
+      showModal: true,
+      isEditing: false,
+
+      // data for pagination
+      current: 1,
+    };
         },
 
         validations: {
@@ -276,15 +280,17 @@
             },
 
             getLab() {
-                axios.get(lab_resource)
-                    .then((res) => {
-                        this.$log.info("Response: " + res.status + " " + res.data['message']);
-                        this.labList = this.response = res.data['message'];
-                    })
-                    .catch((error) => {
-                        // eslint-disable-next-line
-                        this.$log.error(error);
-                    });
+              this.isAuth = isThemeAdmin()
+
+              axios.get(lab_resource)
+                  .then((res) => {
+                    this.$log.info("Response: " + res.status + " " + res.data['message']);
+                    this.labList = this.response = res.data['message'];
+                  })
+                  .catch((error) => {
+                    // eslint-disable-next-line
+                    this.$log.error(error);
+                  });
             },
 
             createLab: function () {
@@ -295,7 +301,7 @@
                     room: this.lab.room,
                 }, {
                     headers: {
-                        Authorization: secureStoreGetString()
+                      Authorization: secureStoreGetAuthString()
                     }
                 })
                     .then((response) => {
@@ -334,7 +340,7 @@
                         headers:
                             {
                                 code: this.old_code,
-                                Authorization: secureStoreGetString()
+                              Authorization: secureStoreGetAuthString()
                             }
                     })
                         .then((response) => {
@@ -365,7 +371,7 @@
                     headers:
                         {
                             code: code,
-                            Authorization: secureStoreGetString()
+                          Authorization: secureStoreGetAuthString()
                         }
                 })
                     .then((response) => {

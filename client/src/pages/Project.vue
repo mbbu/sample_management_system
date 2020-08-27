@@ -10,13 +10,13 @@
                 <table class=" table table-hover">
                     <thead>
                     <tr>
-                        <th scope="col"> Id</th>
-                        <th scope="col"> Name</th>
-                        <th scope="col"> Theme</th>
-                        <th scope="col"> Project Head</th>
-                        <th scope="col"> Code</th>
-                        <th scope="col"> Description</th>
-                        <th scope="col"> Actions</th>
+                      <th class="table-header-style" scope="col"> Id</th>
+                      <th class="table-header-style" scope="col"> Name</th>
+                      <th class="table-header-style" scope="col"> Theme</th>
+                      <th class="table-header-style" scope="col"> Project Head</th>
+                      <th class="table-header-style" scope="col"> Code</th>
+                      <th class="table-header-style" scope="col"> Description</th>
+                      <th class="table-header-style" scope="col" v-if="isAuth"> Actions</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -38,17 +38,17 @@
                         <td> {{ project.code }}</td>
                         <td> {{ project.description }}</td>
 
-                        <td>
-                            <b-icon
-                                    :title="`Update project ${ project.name }`"
-                                    @mouseover="fillFormForUpdate(project.code, project.name, project.description, project['theme.name'],
+                      <td v-if="isAuth">
+                        <b-icon
+                            :title="`Update project ${ project.name }`"
+                            @mouseover="fillFormForUpdate(project.code, project.name, project.description, project['theme.name'],
                                     project['lead.first_name'] + ' ' + project['lead.last_name'])"
-                                    class="border border-info rounded" font-scale="2.0"
-                                    icon="pencil" v-b-modal.modal-project-edit
-                                    v-b-tooltip.hover
-                                    variant="info"
-                            ></b-icon>
-                            &nbsp;
+                            class="border border-info rounded" font-scale="2.0"
+                            icon="pencil" v-b-modal.modal-project-edit
+                            v-b-tooltip.hover
+                            variant="info"
+                        ></b-icon>
+                        &nbsp;
                             <b-icon
                                     :title="`Delete project ${project.name}!`" @click="deleteProject(project.code)"
                                     class="border rounded bg-danger p-1" font-scale="1.85"
@@ -191,51 +191,57 @@
                 </b-modal>
             </div>
 
-            <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-project variant="primary">
-                <span>Add Project</span> <i class="fas fa-plus-circle menu_icon"></i>
-            </b-button>
+          <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-project v-if="isAuth"
+                    variant="primary">
+            <span>Add Project</span> <i class="fas fa-plus-circle menu_icon"></i>
+          </b-button>
 
         </div>
     </div>
 </template>
 
 <script>
-    import {
-        extractApiData,
-        extractUserData,
-        getItemDataList,
-        getSelectedItem,
-        getSelectedItemCode,
-        respondTo401,
-        secureStoreGetString,
-        showFlashMessage
-    } from "../utils/util_functions";
-    import {project_resource, theme_resource, user_resource} from "../utils/api_paths";
-    import axios from "axios";
-    import TopNav from "../components/TopNav";
+import {
+  extractApiData,
+  extractUserData,
+  getItemDataList,
+  getSelectedItem,
+  getSelectedItemCode,
+  isThemeAdmin,
+  respondTo401,
+  secureStoreGetAuthString,
+  showFlashMessage
+} from "@/utils/util_functions";
+import {project_resource, theme_resource, user_resource} from "@/utils/api_paths";
+import axios from "axios";
+import TopNav from "../components/TopNav";
 
-    export default {
-        name: "Project",
-        data() {
-            return {
-                page_title: "Project",
-                response: [],
-                project: {
-                    code: null,
-                    name: null,
-                    description: null,
-                    theme: null,
-                    head: null
-                },
-                themeDataList: [],
-                headDataList: [],
-                fields: {text: '', value: ''},
+export default {
+  name: "Project",
+  data() {
+    return {
+      page_title: "Project",
+      response: [],
+      project: {
+        code: null,
+        name: null,
+        description: null,
+        theme: null,
+        head: null
+      },
 
-                // values for data modification
-                old_code: null,
-                showModal: true,
-                isEditing: false,
-            };
+      // variable to check user status and role
+      isAuth: null,
+
+      themeDataList: [],
+      headDataList: [],
+      fields: {text: '', value: ''},
+
+      // values for data modification
+      old_code: null,
+      showModal: true,
+      isEditing: false,
+    };
         },
         methods: {
             // Util Functions
@@ -304,15 +310,17 @@
 
             // Functions to interact with api
             getProject() {
-                this.clearForm();
-                axios.get(project_resource)
-                    .then((res) => {
-                        this.$log.info("Response: " + res.status + " ", res.data['message']);
-                        this.response = res.data;
-                    })
-                    .catch((error) => {
-                        // eslint-disable-next-line
-                        this.$log.error(error);
+              this.isAuth = isThemeAdmin()
+
+              this.clearForm();
+              axios.get(project_resource)
+                  .then((res) => {
+                    this.$log.info("Response: " + res.status + " ", res.data['message']);
+                    this.response = res.data;
+                  })
+                  .catch((error) => {
+                    // eslint-disable-next-line
+                    this.$log.error(error);
                     });
             },
 
@@ -330,7 +338,7 @@
                 }, {
                     headers:
                         {
-                            Authorization: secureStoreGetString()
+                          Authorization: secureStoreGetAuthString()
                         }
                 })
                     .then((response) => {
@@ -372,7 +380,7 @@
                     headers:
                         {
                             code: code,
-                            Authorization: secureStoreGetString()
+                          Authorization: secureStoreGetAuthString()
                         }
                 })
                     .then((response) => {
@@ -403,7 +411,7 @@
                     headers:
                         {
                             code: code,
-                            Authorization: secureStoreGetString()
+                          Authorization: secureStoreGetAuthString()
                         }
                 })
                     .then((response) => {

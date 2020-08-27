@@ -92,30 +92,31 @@
 </template>
 
 <script>
-    import axios from 'axios';
-    import 'es6-promise/auto';
-    import TopNav from "../../components/TopNav";
-    import {auth_resource} from "../../utils/api_paths";
-    import {email, required} from "vuelidate/lib/validators";
-    import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
-    import {
-        countDownTimer,
-        secureStoreSetString,
-        showFlashMessage,
-        startLoader,
-        viewPassword
-    } from "../../utils/util_functions";
+import axios from 'axios';
+import 'es6-promise/auto';
+import TopNav from "../../components/TopNav";
+import {auth_resource} from "@/utils/api_paths";
+import {email, required} from "vuelidate/lib/validators";
+import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
+import {
+  isUserLoggedIn,
+  redirectAfterCountDown,
+  secureStoreSetUserInfo,
+  showFlashMessage,
+  startLoader,
+  viewPassword
+} from "@/utils/util_functions";
 
-    export default {
-        components: {
-            mdbInput,
-            mdbBtn,
-            mdbCard,
-            mdbCardBody,
-            mdbCol,
-            mdbRow,
-            TopNav
-        },
+export default {
+  components: {
+    mdbInput,
+    mdbBtn,
+    mdbCard,
+    mdbCardBody,
+    mdbCol,
+    mdbRow,
+    TopNav
+  },
 
         data() {
             return {
@@ -126,7 +127,6 @@
                     checked: []
                 },
                 show: true,
-                countDown: 3,
             }
         },
 
@@ -162,14 +162,14 @@
                             loader.hide()
                             // redirect after successful login
                             if (response.status === 200) {
-                                showFlashMessage(self, 'success', 'Logged In', 'Redirecting you to home page in ' +
-                                    countDownTimer(self, this.countDown, '/home') + " seconds");
+                              showFlashMessage(self, 'success', 'Logged In', 'Redirecting you to home page in ' +
+                                  redirectAfterCountDown(self, '/home') + " seconds");
                                 // set jwt token required across requests
-                                secureStoreSetString(response.data.message.token, response.data.message.email, response.data.message.first_name,
-                                    response.data.message.last_name, response.data.message['role.name']);
+                              secureStoreSetUserInfo(response.data.message.token, response.data.message.email, response.data.message.first_name,
+                                  response.data.message.last_name, response.data.message['role.name']);
                             } else if (response.status === 203) {
-                                showFlashMessage(self, 'error', response.data.message, 'You can request for reactivation email')
-                                countDownTimer(self, 8, '/requestConfirmation')
+                              showFlashMessage(self, 'error', response.data.message, 'You can request for reactivation email')
+                              redirectAfterCountDown(self, '/requestConfirmation')
                             } else if (response.status === 204) {
                                 showFlashMessage(self, 'error', 'User found but account is deactivated!', 'You can reactivate by signing up again')
                             }
@@ -183,15 +183,18 @@
                             if (error.response.status === 403) {
                                 showFlashMessage(self, 'error', error.response.data['message'], '');
                             } else if (error.response.status === 404) {
-                                showFlashMessage(self, 'error', error.response.data['message'], 'Try to SignUp instead');
+                              showFlashMessage(self, 'error', error.response.data['message'], 'Try to SignUp instead');
                             } else if (error.response.status === 500) {
-                                showFlashMessage(self, 'error', "Fatal Error", 'Admin has been contacted.');
+                              showFlashMessage(self, 'error', "Fatal Error", 'Admin has been contacted.');
                             } else {
-                                showFlashMessage(self, 'error', error.response.data['message'], '');
+                              showFlashMessage(self, 'error', error.response.data['message'], '');
                             }
                         }
                     })
             },
-        }
-    }
+        },
+  created() {
+    if (isUserLoggedIn()) redirectAfterCountDown(this, '/user');
+  }
+}
 </script>

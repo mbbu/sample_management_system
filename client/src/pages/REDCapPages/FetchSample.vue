@@ -58,31 +58,31 @@
 </template>
 
 <script>
-    import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbRow} from "mdbvue";
-    import TopNav from "../../components/TopNav";
-    import {
-        countDownTimer,
-        respondTo401,
-        secureStoreGetString,
-        showFlashMessage,
-        startLoader
-    } from "../../utils/util_functions";
-    import {redcap_sample_resource} from "../../utils/api_paths";
-    import {FunctionalCalendar} from 'vue-functional-calendar';
-    import ErrorsDisplay from "../../components/ErrorsDisplay";
-    import axios from "axios";
+import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbRow} from "mdbvue";
+import TopNav from "../../components/TopNav";
+import {
+  redirectAfterCountDown,
+  respondTo401,
+  secureStoreGetAuthString,
+  showFlashMessage,
+  startLoader
+} from "@/utils/util_functions";
+import {redcap_sample_resource} from "@/utils/api_paths";
+import {FunctionalCalendar} from 'vue-functional-calendar';
+import ErrorsDisplay from "../../components/ErrorsDisplay";
+import axios from "axios";
 
-    export default {
-        name: "FetchSample",
+export default {
+  name: "FetchSample",
 
-        components: {
-            mdbBtn,
-            mdbCard,
-            mdbCol,
-            mdbRow,
-            TopNav,
-            mdbCardBody,
-            ErrorsDisplay,
+  components: {
+    mdbBtn,
+    mdbCard,
+    mdbCol,
+    mdbRow,
+    TopNav,
+    mdbCardBody,
+    ErrorsDisplay,
             FunctionalCalendar
         },
 
@@ -135,14 +135,14 @@
                     {
                         headers:
                             {
-                                Authorization: secureStoreGetString()
+                              Authorization: secureStoreGetAuthString()
                             }
                     })
                     .then((response) => {
                         setTimeout(() => {
                             loader.hide()
-                            showFlashMessage(self, 'success', response.data['message'], '');
-                            countDownTimer(self, 2, '/sample')
+                          showFlashMessage(self, 'success', response.data['message'], '');
+                          redirectAfterCountDown(self, '/sample')
                         }, 4000)
                     })
                     .catch((error) => {

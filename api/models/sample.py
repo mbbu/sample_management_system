@@ -12,7 +12,7 @@ class Sample(BaseModel.db.Model):
     box_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('box.id', ondelete='SET NULL'), nullable=True)
     animal_species = AppDb.Column(AppDb.String(100), nullable=True, index=True)
     sample_type = AppDb.Column(AppDb.String(100), nullable=True, index=True)
-    sample_description = AppDb.Column(AppDb.String(150), nullable=True)
+    sample_description = AppDb.Column(AppDb.String(150), nullable=True)  # todo: change to text
     location_collected = AppDb.Column(AppDb.JSON, nullable=True)
     project = AppDb.Column(AppDb.String(150), nullable=True, index=True)
     project_owner = AppDb.Column(AppDb.String(100), nullable=True)

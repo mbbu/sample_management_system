@@ -13,8 +13,7 @@ from api.resources.decorators.user_role_decorators import is_sample_owner
 from api.resources.quantity_type_resource import QuantityTypeResource
 from api.resources.theme_resource import ThemeResource
 from api.utils import format_and_lower_str, log_create, log_update, log_duplicate, \
-    has_required_request_params, non_empty_int, log_304, \
-    get_user_by_email, set_date_from_int
+    has_required_request_params, non_empty_int, log_304, set_date_from_int, get_any_user_by_email
 
 
 class SampleResource(BaseResource):
@@ -72,7 +71,7 @@ class SampleResource(BaseResource):
         args = SampleResource.sample_args()
         code = format_and_lower_str(args[16])
         theme = ThemeResource.get_theme(args[0]).id
-        user = get_user_by_email(args[1]).id
+        user = get_any_user_by_email(args[1]).id
         box = BoxResource.get_box(args[2]).id
         qt = QuantityTypeResource.get_quantity_type(args[14]).id
         sl = BioHazardLevelResource.get_bio_hazard_level(args[15]).id
@@ -117,7 +116,7 @@ class SampleResource(BaseResource):
                 try:
                     code = format_and_lower_str(args[16])
                     theme = ThemeResource.get_theme(args[0]).id
-                    user = get_user_by_email(args[1]).id
+                    user = get_any_user_by_email(args[1]).id
                     box = BoxResource.get_box(args[2]).id
                     qt = QuantityTypeResource.get_quantity_type(args[14]).id
                     sl = BioHazardLevelResource.get_bio_hazard_level(args[15]).id

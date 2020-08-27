@@ -92,30 +92,30 @@
 </template>
 
 <script>
-    import axios from "axios";
-    import TopNav from "../../components/TopNav";
-    import {password_reset_resource} from "../../utils/api_paths";
-    import {
-        countDownTimer,
-        showFlashMessage,
-        startLoader,
-        strongPassword,
-        viewPassword
-    } from "../../utils/util_functions";
-    import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
-    import {required, sameAs} from "vuelidate/lib/validators";
+import axios from "axios";
+import TopNav from "../../components/TopNav";
+import {password_reset_resource} from "@/utils/api_paths";
+import {
+  redirectAfterCountDown,
+  showFlashMessage,
+  startLoader,
+  strongPassword,
+  viewPassword
+} from "@/utils/util_functions";
+import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
+import {required, sameAs} from "vuelidate/lib/validators";
 
-    export default {
-        name: "PasswordResetConfirmation",
-        data() {
-            return {
-                page_title: "Password Reset",
-                response: null,
-                success: '',
-                fail: '',
-                resetPath: '',
-                user: {
-                    password: '',
+export default {
+  name: "PasswordResetConfirmation",
+  data() {
+    return {
+      page_title: "Password Reset",
+      response: null,
+      success: '',
+      fail: '',
+      resetPath: '',
+      user: {
+        password: '',
                     confirmPassword: ''
                 }
             }
@@ -153,9 +153,9 @@
                             // redirect after successful login
                             if (response.status === 200) {
                                 this.success = response.data.message.response
-                                this.showHideDiv()
-                                showFlashMessage(self, 'success', response.data.message, 'Redirecting you to login page in ' +
-                                    countDownTimer(self, 5, '/login') + " seconds");
+                              this.showHideDiv()
+                              showFlashMessage(self, 'success', response.data.message, 'Redirecting you to login page in ' +
+                                  redirectAfterCountDown(self, '/login') + " seconds");
                             }
                         }, 3000)
                     })
@@ -166,8 +166,8 @@
 
                         if (error.response) {
                             if (error.response.status === 408) {
-                                this.fail = error.response.data.message
-                                countDownTimer(self, 5, '/forgot')
+                              this.fail = error.response.data.message
+                              redirectAfterCountDown(self, '/forgot')
                             }
                         }
                     });

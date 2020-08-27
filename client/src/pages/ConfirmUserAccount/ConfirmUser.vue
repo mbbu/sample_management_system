@@ -36,23 +36,23 @@
 </template>
 
 <script>
-    import axios from 'axios';
-    import TopNav from "../../components/TopNav";
-    import {mdbCard, mdbCardBody, mdbCol, mdbRow} from "mdbvue";
-    import {email_confirm_resource} from "../../utils/api_paths";
-    import {countDownTimer, secureStoreSetString, showFlashMessage, startLoader} from "../../utils/util_functions";
+import axios from 'axios';
+import TopNav from "../../components/TopNav";
+import {mdbCard, mdbCardBody, mdbCol, mdbRow} from "mdbvue";
+import {email_confirm_resource} from "@/utils/api_paths";
+import {redirectAfterCountDown, secureStoreSetUserInfo, showFlashMessage, startLoader} from "@/utils/util_functions";
 
-    export default {
-        name: "ConfirmUser",
-        data() {
-            return {
-                page_title: "Confirm Account",
-                response: null,
-                success: '',
-                fail: '',
-                confirmationPath: ''
-            }
-        },
+export default {
+  name: "ConfirmUser",
+  data() {
+    return {
+      page_title: "Confirm Account",
+      response: null,
+      success: '',
+      fail: '',
+      confirmationPath: ''
+    }
+  },
 
         methods: {
             checkAccount(path) {
@@ -66,13 +66,13 @@
                             // redirect after successful login
                             if (response.status === 200) {
                                 this.$log.info("Email confirmed: ", response)
-                                this.success = response.data.message.response
-                                showFlashMessage(self, 'success', response.data.message.response, 'Redirecting you to home page in ' +
-                                    countDownTimer(self, 3, '/home') + " seconds");
+                              this.success = response.data.message.response
+                              showFlashMessage(self, 'success', response.data.message.response, 'Redirecting you to home page in ' +
+                                  redirectAfterCountDown(self, '/home') + " seconds");
 
                                 // set jwt token required across requests
-                                secureStoreSetString(response.data.message.token, response.data.message.email, response.data.message.first_name,
-                                    response.data.message.last_name, response.data.message['role.name']);
+                              secureStoreSetUserInfo(response.data.message.token, response.data.message.email, response.data.message.first_name,
+                                  response.data.message.last_name, response.data.message['role.name']);
                             }
                         }, 3000)
                     })
@@ -83,11 +83,11 @@
 
                         if (error.response) {
                             if (error.response.status === 404) {
-                                this.fail = error.response.data.message + "\nRedirecting you to login now ..."
-                                countDownTimer(self, 5, '/login')
+                              this.fail = error.response.data.message + "\nRedirecting you to login now ..."
+                              redirectAfterCountDown(self, '/login')
                             } else if (error.response.status === 408) {
-                                this.fail = error.response.data.message
-                                countDownTimer(self, 5, '/requestConfirmation')
+                              this.fail = error.response.data.message
+                              redirectAfterCountDown(self, '/requestConfirmation')
                             }
                         }
                     });
