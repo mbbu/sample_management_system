@@ -207,7 +207,7 @@ import {
   getItemDataList,
   getSelectedItem,
   getSelectedItemCode,
-  isThemeAdmin,
+  isResearcher,
   respondTo401,
   secureStoreGetAuthString,
   showFlashMessage
@@ -310,7 +310,7 @@ export default {
 
             // Functions to interact with api
             getProject() {
-              this.isAuth = isThemeAdmin()
+              this.isAuth = isResearcher()
 
               this.clearForm();
               axios.get(project_resource)

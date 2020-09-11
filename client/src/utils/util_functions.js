@@ -481,6 +481,12 @@ export function isThemeAdmin() {
     return !!(userStatus && (userStatus.role === ADMIN || userStatus.role === RESEARCHER));
 }
 
+//todo: review
+export function isResearcher() {
+    let userStatus = getLoggedInUser()
+    return !!(userStatus && (userStatus.role === ADMIN || userStatus.role === 'Researcher'));
+}
+
 // PUBLICATION OWNER FUNCTIONS
 export function isPublicationOwner(email) {
     let userEmail = getUserEmail()
