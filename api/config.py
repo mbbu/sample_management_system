@@ -32,7 +32,7 @@ class BaseConfig(object):
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     # ADMINS = ['jeffkim207@gmail.com']
-    ADMINS = 'jeffkim207@gmail.com'
+    ADMINS = 'redcap@icipe.org'
 
     # Add Custom log format to config
     LOGGING_FORMAT = RequestFormatter(
