@@ -10,7 +10,7 @@ self.flashMessage = undefined;
 
 
 export const ADMIN = "System Admin"
-export const RESEARCHER = "Researcher"
+export const RESEARCHER = " Lab Technician" //todo: review role
 
 export function showFlashMessage(self, status, title, message) {
     self.flashMessage.show({
