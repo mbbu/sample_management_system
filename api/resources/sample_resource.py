@@ -4,6 +4,7 @@ from flask import current_app, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restful import fields, marshal, reqparse
 
+from api.constants import SAMPLE_IN_LAB
 from api.models.database import BaseModel
 from api.models.sample import Sample
 from api.resources.base_resource import BaseResource
@@ -82,7 +83,7 @@ class SampleResource(BaseResource):
                                 sample_type=args[4], sample_description=args[5], location_collected=args[6],
                                 project=args[7], project_owner=args[8], retention_date=args[9], barcode=args[10],
                                 analysis=args[11], temperature=args[12], amount=args[13], quantity_type=qt,
-                                security_level=sl, code=code)
+                                bio_hazard_level=sl, code=code, status=SAMPLE_IN_LAB)
 
                 BaseModel.db.session.add(sample)
                 BaseModel.db.session.commit()
@@ -139,6 +140,7 @@ class SampleResource(BaseResource):
                     sample.quantity_type = qt
                     sample.bio_hazard_level = sl
                     sample.code = code
+                    sample.status = SAMPLE_IN_LAB
 
                     sample.updated_at = datetime.now()
                     BaseModel.db.session.commit()
@@ -211,13 +213,13 @@ class SampleResource(BaseResource):
         temperature = float(args['temperature'])
         amount = int(args['amount'])
         quantity_type = str(args['quantity_type'])
-        security_level = format_and_lower_str(args['bio_hazard_level'])
+        bio_hazard_level = format_and_lower_str(args['bio_hazard_level'])
         code = format_and_lower_str(args['code'])
 
         return [
             theme_id, user_id, box_id, animal_species, sample_type, sample_description, location_collected,
             project, project_owner, retention_date, barcode, analysis, temperature, amount, quantity_type,
-            security_level, code
+            bio_hazard_level, code
         ]
 
     @staticmethod
