@@ -117,7 +117,7 @@ class UserResource(BaseResource):
                 first_name = args['first_name']
                 last_name = args['last_name']
                 user_email = args['email']
-                role = int(args['role'])
+                role = RoleResource.get_role(args['role']).id
 
                 if first_name != user.first_name or last_name != user.last_name or \
                         user_email != user.email or role != user.role_id:
