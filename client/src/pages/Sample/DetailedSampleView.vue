@@ -153,7 +153,7 @@
                         <th scope="col"><em><b>AMOUNT</b></em></th>
                         <th scope="col"><em><b>STORAGE TEMP (Degree Celsius)</b></em><i
                                 class="fas fa-temperature-low"></i></th>
-                        <th scope="col"><em><b>SECURITY LEVEL</b></em></th>
+                        <th scope="col"><em><b>BioHazard LEVEL</b></em></th>
                     </tr>
                     </thead>
                     <tbody>
