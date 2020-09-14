@@ -194,7 +194,7 @@
 
                 <tab-content :before-change="handleSubmit" title="Finishing Up">
                     <div class="form-group">
-                        <b-form-group id="form-securityLevel" label="Security Level Needed:"
+                        <b-form-group id="form-securityLevel" label="BioHazard Level Needed:"
                                       label-for="form-securityLevel-input">
                             <ejs-dropdownlist
                                     :dataSource='secLevelDataList'
@@ -203,7 +203,7 @@
                                     :value="selectDropDownItemForUpdate('securityLevel-dropdownlist', sample.securityLevel, secLevelDataList)"
                                     @change="setSecurityLevel"
                                     id="securityLevel-dropdownlist"
-                                    placeholder='Select Security Level Needed'
+                                    placeholder='Select BioHazard Level Needed'
                             ></ejs-dropdownlist>
                         </b-form-group>
                     </div>
