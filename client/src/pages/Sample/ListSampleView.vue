@@ -72,7 +72,7 @@
 import axios from 'axios';
 import {sample_resource} from "@/utils/api_paths";
 import TopNav from "@/components/TopNav";
-import {getLoggedInUser, paginate, redirectAfterCountDown, setSampleCode} from "@/utils/util_functions";
+import {getLoggedInUser, paginate, redirectAfterCountDown, setSampleCode, startLoader} from "@/utils/util_functions";
 import EventBus from "@/components/EventBus";
 import FilterCard from "@/components/FilterCard";
 
@@ -248,19 +248,21 @@ export default {
     // methods to interact with api
     getSamples() {
       this.isAuth = getLoggedInUser()
+      let loader = startLoader(this)
+
       axios.get(sample_resource)
           .then((res) => {
-            this.$log.info("Response: " + res.status + " ", res.data.message);
-            this.sampleList = this.response = res.data.message;
-            for (const [key, value] of this.response.entries()) {
-              console.log(key, value);
-              for (let item in key) {
-                console.log(item + typeof item)
-              }
+            setTimeout(() => {
+              loader.hide()
+              this.$log.info("Response: " + res.status + " ", res.data.message);
+              this.sampleList = this.response = res.data.message;
+              for (const [key, value] of this.response.entries()) {
+                console.log(key, value);
+                for (let item in key) {
+                  console.log(item + typeof item)
+                }
             }
-
-            // this.sampleList = this.response.message
-            // this.$log.info(this.sampleList)
+            }, 2000)
           })
           .catch((error) => {
             // eslint-disable-next-line
