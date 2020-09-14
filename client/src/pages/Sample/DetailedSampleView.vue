@@ -220,8 +220,8 @@
                     </mdb-col>
                     <mdb-col class="d-flex justify-content-end" md="7">
                         <div class="text-center">
-                            <div v-if="!isRetentionPeriodValid(sample.retention)">
-                                <button :disabled="!isRetentionPeriodValid(sample.retention)"
+                            <div v-if="!isRetentionPeriodValid(sample.retention) || !isAuth">
+                                <button :disabled="!isRetentionPeriodValid(sample.retention) || !isAuth"
                                         class="btn btn-outline-info btn-rounded"
                                         type="button"> Request Sample
                                     <i aria-hidden="true" class="fa fa-inbox menu_icon"> </i>
@@ -261,7 +261,7 @@ import axios from 'axios';
 import {
   getSampleCode,
   isRetentionPeriodValid,
-  isSampleOwner,
+  isSampleOwner, isUserLoggedIn,
   overDueRetentionPeriod,
   redirectAfterCountDown,
   respondTo401,
@@ -278,48 +278,52 @@ export default {
     return {
       page_title: "Sample MetaData",
       response: [],
+
+      // variable to check user status and role
+      isAuth: null,
+
       sample: {
         theme: "",
         user: "",
         userEmail: "",
         project: "",
-                    projectOwner: "",
-                    sampleType: "",
-                    species: "",
-                    description: "",
-                    box: "",
-                    locationCollected: "",
-                    retention: "",
-                    barcode: "",
-                    analysis: "",
-                    temperature: "",
-                    amount: "",
-                    quantity_type: "",
-                    securityLevel: "",
-                    code: "",
+        projectOwner: "",
+        sampleType: "",
+        species: "",
+        description: "",
+        box: "",
+        locationCollected: "",
+        retention: "",
+        barcode: "",
+        analysis: "",
+        temperature: "",
+        amount: "",
+        quantity_type: "",
+        securityLevel: "",
+        code: "",
 
-                    // extra fields
-                    publication: "",
-                    survey: "",
-                    lab: "",
-                    room: "",
-                    freezer: "",
-                    chamber: "",
-                    rack: "",
-                    tray: "",
-                    date: "",
-                },
+        // extra fields
+        publication: "",
+        survey: "",
+        lab: "",
+        room: "",
+        freezer: "",
+        chamber: "",
+        rack: "",
+        tray: "",
+        date: "",
+      },
 
-                sampleRequest: {
-                    amount: null,
-                    date: null,
-                    /* dates are limited to make sure a request is not made for a date that has already passed or
-                       when the sample is no longer in retention. The maximum date is placed under compute to avoid
-                        onLoad errors since sample by then is not set. */
-                    today: new Date().toLocaleDateString('en-GB'),
-                },
-            }
-        },
+      sampleRequest: {
+          amount: null,
+          date: null,
+          /* dates are limited to make sure a request is not made for a date that has already passed or
+             when the sample is no longer in retention. The maximum date is placed under compute to avoid
+              onLoad errors since sample by then is not set. */
+          today: new Date().toLocaleDateString('en-GB'),
+      },
+    }
+  },
 
         computed: {
             getMaxRequestDate: function () {
@@ -363,6 +367,8 @@ export default {
             },
 
             getSampleByCode(code) {
+                this.isAuth = isUserLoggedIn()
+
                 let self = this;
                 let loader = startLoader(this)
 
