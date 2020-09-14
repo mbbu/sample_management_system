@@ -94,7 +94,7 @@ def send_response_on_request_status(email, requester_name, status, notes, approv
         title = "Request Declined"
 
     # todo: lims url
-    lims_url = '/'
+    lims_url = 'http://10.0.0.155/lims'
     html = render_template('sample_request_response.html', requester_name=requester_name, status=status, notes=notes,
                            lims_url=lims_url, approved_amount=approved_amount, storage=storage, species=species, qt=qt,
                            type=_type, location=location, approved=APPROVED_STATUS, declined=DECLINED_STATUS)
