@@ -138,7 +138,8 @@ import {
   selectDropDownItemForUpdate,
   showFlashMessage,
   startLoader,
-  viewPassword
+  viewPassword,
+  logOutUser
 } from '@/utils/util_functions';
 import {email, minLength, required} from "vuelidate/lib/validators";
 import {role_resource, user_resource} from "@/utils/api_paths";
@@ -231,9 +232,9 @@ export default {
                         if (response.status === 202) {
                             setTimeout(() => {
                               loader.hide()
-                              showFlashMessage(self, 'success', 'User Updated', 'Redirecting you to your dashboard ' +
-                                  redirectAfterCountDown(self, '/user') + " seconds");
-                            }, 2500)
+                              showFlashMessage(self, 'success', 'User Updated', 'Please log-in for changes to take effect ');
+                            }, 1500)
+                          logOutUser(self)
                         }
                     })
                     .catch((error) => {
