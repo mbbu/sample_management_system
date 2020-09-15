@@ -29,5 +29,6 @@
     @import "../node_modules/mdbootstrap/css/bootstrap.min.css";
     @import "../node_modules/mdbvue/lib/css/mdb.min.css";
     @import '../node_modules/vue-loading-overlay/dist/vue-loading.css';
+    @import '../node_modules/vue-progress-path/dist/vue-progress-path.css';
 </style>
 

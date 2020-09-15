@@ -143,6 +143,18 @@
               <span>Add Theme</span> <i class="fas fa-plus-circle menu_icon"></i>
             </b-button>
           </div>
+
+          <div style="margin: auto;">
+            <loading-progress
+              :indeterminate="indeterminate"
+              :hide-background="hideBackground"
+              :progress="progressPath"
+              :size="size"
+              rotate
+              fillDuration="2"
+              rotationDuration="1"
+            />
+          </div>
         </div>
     </div>
 </template>
@@ -151,7 +163,7 @@
 import axios from 'axios';
 import {theme_resource} from '@/utils/api_paths'
 import TopNav from "../components/TopNav";
-import {isAdmin, respondTo401, secureStoreGetAuthString, showFlashMessage} from '@/utils/util_functions'
+import {isAdmin, respondTo401, secureStoreGetAuthString, pageStartLoader, showFlashMessage} from '@/utils/util_functions'
 import EventBus from '../components/EventBus';
 import {required} from "vuelidate/lib/validators";
 
@@ -171,6 +183,15 @@ export default {
 
       // variable to check user status and role
       isAuth: null,
+
+      // loader-time
+      time: 2000,
+
+           // progressPath
+      indeterminate: true,
+      hideBackground: true,
+      progressPath: 5,
+      size: 180,
 
       // values for data modification
       old_code: null,
@@ -227,13 +248,23 @@ export default {
                 this.showModal = true;
             },
 
+          // stop&hide progressPath
+haltProgressPath(cont=false, path=0, size=0){
+  this.indeterminate = cont
+this.progressPath = path
+this.size = size
+},
+
           // api interaction functions
             getTheme() {
               this.isAuth = isAdmin()
 
               axios.get(theme_resource)
                   .then((res) => {
-                    this.themeList = this.response = res.data['message'];
+                    setTimeout(()=> {
+                    this.haltProgressPath()
+                      this.themeList = this.response = res.data['message'];
+                    }, this.time)
                   })
                   .catch((error) => {
                     // eslint-disable-next-line
@@ -243,6 +274,8 @@ export default {
 
             createTheme: function () {
                 let self = this;
+                let loader = pageStartLoader(this)
+
                 axios.post(theme_resource, {
                     name: this.theme.name,
                     code: this.theme.code,
@@ -252,12 +285,16 @@ export default {
                     }
                 })
                     .then((response) => {
+                      setTimeout(()=> {
+                        loader.hide()
                         this.getTheme();
                         this.clearForm();
                         showFlashMessage(self, 'success', 'Success', response.data['message'])
+                      },this.time)
                     })
                     .catch((error) => {
                         this.$log.error(error);
+                        loader.hide();
                         if (error.response) {
                             if (error.response.status === 409) {
                                 showFlashMessage(self, 'error', 'Error', error.response.data['message'])
@@ -279,6 +316,7 @@ export default {
                     evt.preventDefault()
                 } else {
                     let self = this;
+                    let loader = pageStartLoader(this)
                     axios.put(theme_resource, {
                         name: this.theme.name,
                         code: this.theme.code,
@@ -290,11 +328,15 @@ export default {
                             }
                     })
                         .then((response) => {
+                          setTimeout( () => {
+                            loader.hide()
                             this.getTheme();
                             showFlashMessage(self, 'success', 'Success', response.data['message'])
+                          }, this.time)
                         })
                         .catch((error) => {
                             this.$log.error(error);
+                            loader.hide()
                             if (error.response) {
                                 if (error.response.status === 304) {
                                     showFlashMessage(self, 'info', 'Info', 'Record not modified!')
@@ -313,6 +355,8 @@ export default {
 
             deleteTheme: function (code) {
                 let self = this;
+                let loader = pageStartLoader(this)
+
                 axios.delete(theme_resource, {
                     headers: {
                         code: code,
@@ -320,11 +364,15 @@ export default {
                     }
                 })
                     .then((response) => {
+                      setTimeout(() => {
+                        loader.hide()
                         this.getTheme();
                         showFlashMessage(self, 'success', 'Success', response.data['message'])
+                      }, this.time)
                     })
                     .catch((error) => {
                         this.$log.error(error);
+                        loader.hide()
                         if (error.response) {
                             if (error.response.status === 401) {
                                 respondTo401(self);

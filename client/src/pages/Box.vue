@@ -185,6 +185,17 @@
           <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-box v-if="isAuth" variant="primary">
             <span>Add Box</span> <i class="fas fa-plus-circle menu_icon"></i>
           </b-button>
+        <div style="margin: auto;">
+            <loading-progress
+              :indeterminate="indeterminate"
+              :hide-background="hideBackground"
+              :progress="progressPath"
+              :size="size"
+              rotate
+              fillDuration="2"
+              rotationDuration="1"
+            />
+          </div>
         </div>
     </div>
 </template>
@@ -195,7 +206,7 @@ import TopNav from "@/components/TopNav";
 import {
   extractTrayData,
   getItemDataList,
-  isThemeAdmin,
+  isThemeAdmin, pageStartLoader,
   respondTo401,
   secureStoreGetAuthString,
   selectItemForUpdate,
@@ -227,6 +238,15 @@ export default {
 
       // variable to check user status and role
       isAuth: null,
+
+            // loader-time
+      time: 2000,
+
+           // progressPath
+      indeterminate: true,
+      hideBackground: true,
+      progressPath: 5,
+      size: 180,
 
       trayDataList: [],
       fields: {text: '', value: ''},
@@ -450,6 +470,12 @@ export default {
                 })
                 this.getBox()
             },
+                    // stop&hide progressPath
+haltProgressPath(cont=false, path=0, size=0){
+  this.indeterminate = cont
+this.progressPath = path
+this.size = size
+},
 
             // functions to interact with API
             getBox() {
@@ -457,8 +483,11 @@ export default {
               this.clearForm();
                 axios.get(box_resource)
                     .then((res) => {
+                      setTimeout(()=> {
+                    this.haltProgressPath()
                         this.boxList = this.response = res.data['message'];
-                    })
+                    }, this.time)
+                      })
                     .catch((error) => {
                         console.error(error);
                     });
@@ -466,6 +495,7 @@ export default {
 
             createBox: function () {
                 let self = this;
+                let loader = pageStartLoader(this)
 
                 axios.post(box_resource, {
                     tray: this.box.tray,
@@ -478,13 +508,17 @@ export default {
                         }
                 })
                     .then((response) => {
+                      setTimeout(()=> {
+                        loader.hide()
                         this.getBox();
                         showFlashMessage(self, 'success', response.data['message'], '');
                         this.clearForm();
+                      },this.time)
                     })
                     .catch((error) => {
                         this.clearForm();
                         this.$log.error(error);
+                        loader.hide();
                         if (error.response) {
                             if (error.response.status === 409) {
                                 showFlashMessage(self, 'error', error.response.data['message'], '');
@@ -508,6 +542,7 @@ export default {
                     evt.preventDefault()
                 } else {
                     let self = this;
+                    let loader = pageStartLoader(this)
 
                     axios.put(box_resource, {
                         tray: this.box.tray,
@@ -521,13 +556,17 @@ export default {
                             }
                     })
                         .then((response) => {
+                          setTimeout(()=> {
+                        loader.hide()
                             this.getBox();
                             showFlashMessage(self, 'success', response.data['message'], '');
                             this.clearForm();
+                            },this.time)
                         })
                         .catch((error) => {
                             this.clearForm();
                             this.$log.error(error);
+                            loader.hide();
                             if (error.response) {
                                 if (error.response.status === 304) {
                                     showFlashMessage(self, 'info', 'Record not modified!', '');
@@ -546,6 +585,7 @@ export default {
 
             deleteBox: function (code) {
                 let self = this;
+                let loader = pageStartLoader(this)
                 axios.delete(box_resource, {
                     headers:
                         {
@@ -554,11 +594,15 @@ export default {
                         }
                 })
                     .then((response) => {
+                      setTimeout(()=> {
+                        loader.hide()
                         this.getBox();
                         showFlashMessage(self, 'success', response.data['message'], '');
+                    },this.time)
                     })
                     .catch((error) => {
                         this.$log.error(error);
+                        loader.hide();
                         if (error.response) {
                             if (error.response.status === 401) {
                                 respondTo401(self);

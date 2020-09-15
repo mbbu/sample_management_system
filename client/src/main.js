@@ -45,6 +45,10 @@ Vue.use(VueLogger, options);
 Vue.use(FlashMessage, flash_config);
 Vue.use(Loading);
 Vue.use(Page, pagination_config)
+import VueProgress from 'vue-progress-path'
+Vue.use(VueProgress, {
+  defaultShape: 'circle',
+})
 
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.config.productionTip = false;

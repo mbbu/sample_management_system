@@ -622,6 +622,21 @@ export function startLoader(self) {
     })
 }
 
+// loader function for get
+export function pageStartLoader(self) {
+    return self.$loading.show({
+        isFullPage: false,
+        canCancel: false,
+        color: '#074880',
+        loader: 'spinner',
+        width: 128,
+        height: 128,
+        backgroundColor: '#FAAB2C',
+        opacity: 0.7,
+        zIndex: 999,
+    })
+}
+
 
 // PAGINATION FUNCTIONS
 let page_info = {};

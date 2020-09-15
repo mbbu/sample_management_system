@@ -175,6 +175,17 @@
           <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-rack v-if="isAuth" variant="primary">
             <span>Add Rack</span> <i class="fas fa-plus-circle menu_icon"></i>
           </b-button>
+          <div style="margin: auto;">
+            <loading-progress
+              :indeterminate="indeterminate"
+              :hide-background="hideBackground"
+              :progress="progressPath"
+              :size="size"
+              rotate
+              fillDuration="2"
+              rotationDuration="1"
+            />
+          </div>
         </div>
     </div>
 </template>
@@ -186,7 +197,7 @@ import TopNav from "@/components/TopNav";
 import {
   extractChamberData,
   getItemDataList,
-  isThemeAdmin,
+  isThemeAdmin, pageStartLoader,
   paginate,
   respondTo401,
   secureStoreGetAuthString,
@@ -217,6 +228,15 @@ export default {
 
       // variable to check user status and role
       isAuth: null,
+
+            // loader-time
+      time: 2000,
+
+           // progressPath
+      indeterminate: true,
+      hideBackground: true,
+      progressPath: 5,
+      size: 180,
 
       chamberDataList: [],
       fields: {text: '', value: ''},
@@ -360,6 +380,12 @@ export default {
                 })
                 this.getRack()
             },
+                    // stop&hide progressPath
+haltProgressPath(cont=false, path=0, size=0){
+  this.indeterminate = cont
+this.progressPath = path
+this.size = size
+},
             // end of Util functions
 
             // Functions to interact with api
@@ -369,9 +395,12 @@ export default {
               this.clearForm();
               axios.get(rack_resource)
                   .then((res) => {
+                    setTimeout(()=> {
+                    this.haltProgressPath()
                     this.$log.info("Response: " + res.status + " ", res.data['message']);
                     this.rackList = this.response = res.data['message'];
-                  })
+                  }, this.time)
+                    })
                   .catch((error) => {
                     // eslint-disable-next-line
                     this.$log.error(error);
@@ -381,6 +410,7 @@ export default {
             createRack: function () {
                 let self = this;
                 // this.chamber = getSelectedItem(this.chamberDataList, this.chamber);
+                let loader = pageStartLoader(this)
 
                 axios.post(rack_resource, {
                     chamber: this.rack.chamber,
@@ -393,12 +423,16 @@ export default {
                         }
                 })
                     .then((response) => {
+                      setTimeout(()=> {
+                        loader.hide()
                         this.getRack();
                         showFlashMessage(self, 'success', response.data['message'], '');
                         this.clearForm();
+                        },this.time)
                     })
                     .catch((error) => {
                         this.clearForm();
+                        loader.hide()
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 409) {
@@ -424,6 +458,7 @@ export default {
                 } else {
                     let self = this;
                     // this.chamber = getSelectedItem(this.chamberDataList, this.chamber);
+                    let loader = pageStartLoader(this)
 
                     axios.put(rack_resource, {
                         chamber: this.rack.chamber,
@@ -437,13 +472,17 @@ export default {
                             }
                     })
                         .then((response) => {
+                          setTimeout(()=> {
+                            loader.hide()
                             this.getRack();
                             showFlashMessage(self, 'success', response.data['message'], '');
                             this.clearForm();
+                          },this.time)
                         })
                         .catch((error) => {
                             this.clearForm();
                             this.$log.error(error);
+                            loader.hide();
                             if (error.response) {
                                 if (error.response.status === 304) {
                                     showFlashMessage(self, 'info', 'Record not modified!', '');
@@ -462,6 +501,8 @@ export default {
 
             deleteRack: function (code) {
                 let self = this;
+                let loader = pageStartLoader(this)
+
                 axios.delete(rack_resource, {
                     headers:
                         {
@@ -470,11 +511,15 @@ export default {
                         }
                 })
                     .then((response) => {
+                      setTimeout(()=> {
+                        loader.hide()
                         this.getRack();
                         showFlashMessage(self, 'success', response.data['message'], '');
+                      },this.time)
                     })
                     .catch((error) => {
                         this.$log.error(error);
+                        loader.hide();
                         if (error.response) {
                             if (error.response.status === 401) {
                                 respondTo401(self)

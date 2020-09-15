@@ -183,6 +183,17 @@
                     variant="primary">
             <span>Add Chamber</span> <i class="fas fa-plus-circle menu_icon"></i>
           </b-button>
+        <div style="margin: auto;">
+            <loading-progress
+              :indeterminate="indeterminate"
+              :hide-background="hideBackground"
+              :progress="progressPath"
+              :size="size"
+              rotate
+              fillDuration="2"
+              rotationDuration="1"
+            />
+          </div>
         </div>
     </div>
 </template>
@@ -194,7 +205,7 @@ import TopNav from "../components/TopNav";
 import {
   extractFreezerData,
   getItemDataList,
-  isThemeAdmin,
+  isThemeAdmin, pageStartLoader,
   paginate,
   respondTo401,
   secureStoreGetAuthString,
@@ -224,6 +235,15 @@ export default {
 
       // variable to check user status and role
       isAuth: null,
+
+            // loader-time
+      time: 2000,
+
+           // progressPath
+      indeterminate: true,
+      hideBackground: true,
+      progressPath: 5,
+      size: 180,
 
       search: '',
       fields: {text: '', value: ''},
@@ -367,6 +387,12 @@ export default {
                 })
                 this.getChamber()
             },
+                    // stop&hide progressPath
+haltProgressPath(cont=false, path=0, size=0){
+  this.indeterminate = cont
+this.progressPath = path
+this.size = size
+},
             // end of Util functions
 
             // Functions to interact with api
@@ -376,8 +402,11 @@ export default {
               this.clearForm();
               axios.get(chamber_resource)
                   .then((res) => {
+                    setTimeout(()=> {
+                    this.haltProgressPath()
                     this.chamberList = this.response = res.data['message'];
-                  })
+                  }, this.time)
+                    })
                   .catch((error) => {
                     // eslint-disable-next-line
                     this.$log.error(error);
@@ -387,6 +416,7 @@ export default {
             createChamber: function () {
                 let self = this;
                 // this.freezer = getSelectedItem(this.freezerDataList, this.freezer);
+                let loader = pageStartLoader(this)
 
                 axios.post(chamber_resource, {
                     freezer: this.chamber.freezer,
@@ -399,13 +429,17 @@ export default {
                         }
                 })
                     .then((response) => {
+                      setTimeout(()=> {
+                        loader.hide()
                         this.getChamber();
                         showFlashMessage(self, 'success', response.data['message'], '');
                         this.clearForm();
+                        },this.time)
                     })
                     .catch((error) => {
                         this.clearForm();
                         this.$log.error(error);
+                        loader.hide()
                         if (error.response) {
                             if (error.response.status === 409) {
                                 showFlashMessage(self, 'error', error.response.data['message'], '');
@@ -430,7 +464,7 @@ export default {
                 } else {
                     let self = this;
                     // this.freezer = getSelectedItem(this.freezerDataList, this.freezer);
-
+                  let loader = pageStartLoader(this)
                     axios.put(chamber_resource, {
                         freezer: this.chamber.freezer,
                         type: this.chamber.type,
@@ -443,13 +477,17 @@ export default {
                             }
                     })
                         .then((response) => {
+                          setTimeout( () => {
+                            loader.hide()
                             this.getChamber();
                             showFlashMessage(self, 'success', response.data['message'], '');
                             this.clearForm();
+                            }, this.time)
                         })
                         .catch((error) => {
                             this.clearForm();
                             this.$log.error(error);
+                            loader.hide()
                             if (error.response) {
                                 if (error.response.status === 304) {
                                     showFlashMessage(self, 'info', 'Record not modified!', '');
@@ -468,6 +506,8 @@ export default {
 
             deleteChamber: function (code) {
                 let self = this;
+                let loader = pageStartLoader(this)
+
                 axios.delete(chamber_resource, {
                     headers:
                         {
@@ -476,11 +516,15 @@ export default {
                         }
                 })
                     .then((response) => {
+                      setTimeout(() => {
+                        loader.hide()
                         this.getChamber();
                         showFlashMessage(self, 'success', response.data['message'], '');
+                    }, this.time)
                     })
                     .catch((error) => {
                         this.$log.error(error);
+                        loader.hide()
                         if (error.response) {
                             if (error.response.status === 401) {
                                 respondTo401(self);

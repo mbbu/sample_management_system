@@ -176,6 +176,17 @@
           <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-tray v-if="isAuth" variant="primary">
             <span>Add Tray</span> <i class="fas fa-plus-circle menu_icon"></i>
           </b-button>
+          <div style="margin: auto;">
+            <loading-progress
+              :indeterminate="indeterminate"
+              :hide-background="hideBackground"
+              :progress="progressPath"
+              :size="size"
+              rotate
+              fillDuration="2"
+              rotationDuration="1"
+            />
+          </div>
         </div>
     </div>
 </template>
@@ -187,7 +198,7 @@ import TopNav from "@/components/TopNav";
 import {
   extractRackData,
   getItemDataList,
-  isThemeAdmin,
+  isThemeAdmin, pageStartLoader,
   paginate,
   respondTo401,
   secureStoreGetAuthString,
@@ -217,6 +228,15 @@ export default {
 
       // variable to check user status and role
       isAuth: null,
+
+            // loader-time
+      time: 2000,
+
+           // progressPath
+      indeterminate: true,
+      hideBackground: true,
+      progressPath: 5,
+      size: 180,
 
       rackDataList: [],
       fields: {text: '', value: ''},
@@ -359,6 +379,12 @@ export default {
                 })
                 this.getTray()
             },
+                    // stop&hide progressPath
+haltProgressPath(cont=false, path=0, size=0){
+  this.indeterminate = cont
+this.progressPath = path
+this.size = size
+},
             // end of util functions
 
             // Functions to interact with api
@@ -368,8 +394,11 @@ export default {
               this.clearForm();
               axios.get(tray_resource)
                   .then((res) => {
+                    setTimeout(()=> {
+                    this.haltProgressPath()
                     this.$log.info("Response: " + res.status + " ", res.data['message']);
                     this.trayList = this.response = res.data['message'];
+                  }, this.time)
                   })
                   .catch((error) => {
                     // eslint-disable-next-line
@@ -379,6 +408,7 @@ export default {
 
             createTray: function () {
                 let self = this;
+                let loader = pageStartLoader(this)
 
                 axios.post(tray_resource, {
                     rack: this.tray.rack,
@@ -391,13 +421,17 @@ export default {
                         }
                 })
                     .then((response) => {
+                      setTimeout(()=> {
+                        loader.hide()
                         this.getTray();
                         showFlashMessage(self, 'success', response.data['message'], '');
                         this.clearForm();
+                        },this.time)
                     })
                     .catch((error) => {
                         this.clearForm();
                         this.$log.error(error);
+                        loader.hide();
                         if (error.response) {
                             if (error.response.status === 409) {
                                 showFlashMessage(self, 'error', error.response.data['message'], '');
@@ -421,7 +455,7 @@ export default {
                     evt.preventDefault()
                 } else {
                     let self = this;
-
+                    let loader = pageStartLoader(this)
                     axios.put(tray_resource, {
                         rack: this.tray.rack,
                         number: this.tray.number,
@@ -434,13 +468,17 @@ export default {
                             }
                     })
                         .then((response) => {
+                          setTimeout(()=> {
+                        loader.hide()
                             this.getTray();
                             showFlashMessage(self, 'success', response.data['message'], '');
                             this.clearForm();
+                            },this.time)
                         })
                         .catch((error) => {
                             this.clearForm();
                             this.$log.error(error);
+                            loader.hide();
                             if (error.response) {
                                 if (error.response.status === 304) {
                                     showFlashMessage(self, 'info', 'Record not modified!', '');
@@ -459,6 +497,8 @@ export default {
 
             deleteTray: function (code) {
                 let self = this;
+                let loader = pageStartLoader(this)
+
                 axios.delete(tray_resource, {
                     headers:
                         {
@@ -467,11 +507,15 @@ export default {
                         }
                 })
                     .then((response) => {
+                      setTimeout(()=> {
+                        loader.hide()
                         this.getTray();
                         showFlashMessage(self, 'success', response.data['message'], '');
+                    },this.time)
                     })
                     .catch((error) => {
                         this.$log.error(error);
+                        loader.hide();
                         if (error.response) {
                             if (error.response.status === 401) {
                                 respondTo401(self);
