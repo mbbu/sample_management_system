@@ -187,6 +187,17 @@
                     variant="primary">
             <span>Add Bio Hazard Level</span> <i class="fas fa-plus-circle menu_icon"></i>
           </b-button>
+        <div style="margin: auto;">
+            <loading-progress
+              :indeterminate="indeterminate"
+              :hide-background="hideBackground"
+              :progress="progressPath"
+              :size="size"
+              rotate
+              fillDuration="2"
+              rotationDuration="1"
+            />
+          </div>
         </div>
     </div>
 </template>
@@ -196,7 +207,14 @@ import axios from 'axios';
 import TopNav from "../components/TopNav";
 import EventBus from '../components/EventBus';
 import {bio_hazard_level_resource} from '@/utils/api_paths'
-import {isThemeAdmin, paginate, respondTo401, secureStoreGetAuthString, showFlashMessage} from "@/utils/util_functions";
+import {
+  isThemeAdmin,
+  pageStartLoader,
+  paginate,
+  respondTo401,
+  secureStoreGetAuthString,
+  showFlashMessage
+} from "@/utils/util_functions";
 import {required} from "vuelidate/lib/validators";
 
 export default {
@@ -215,6 +233,15 @@ export default {
 
       // variable to check user status and role
       isAuth: null,
+
+      // loader-time
+      time: 2000,
+
+           // progressPath
+      indeterminate: true,
+      hideBackground: true,
+      progressPath: 5,
+      size: 180,
 
       // values for data modification
       old_code: null,
@@ -250,7 +277,6 @@ export default {
         },
 
         methods: {
-
             pageInfo(info) {
                 EventBus.$emit('page-info', {'pgInfo': info, 'pgData': this.bioHazardList})
             },
@@ -282,14 +308,24 @@ export default {
                 this.showModal = true;
             },
 
+                    // stop&hide progressPath
+haltProgressPath(cont=false, path=0, size=0){
+  this.indeterminate = cont
+this.progressPath = path
+this.size = size
+},
+
             getBioHazardLevel() {
               this.isAuth = isThemeAdmin()
               axios.get(bio_hazard_level_resource)
                   .then((res) => {
+                    setTimeout(()=> {
+                      this.haltProgressPath()
                     this.$log.info("Response: " + res.status + " " + res.data['message']);
                     this.response = res.data;
                     this.bioHazardList = this.response.message
-                  })
+                  }, this.time)
+                    })
                   .catch((error) => {
                     // eslint-disable-next-line
                     this.$log.error(error);
@@ -298,6 +334,8 @@ export default {
 
             createBioHazardLevel: function () {
                 let self = this;
+                let loader = pageStartLoader(this);
+
                 axios.post(bio_hazard_level_resource, {
                     name: this.level.name,
                     code: this.level.code,
@@ -308,12 +346,16 @@ export default {
                     }
                 })
                     .then((response) => {
+                      setTimeout(()=> {
+                        loader.hide()
                         this.getBioHazardLevel();
                         this.clearForm();
                         showFlashMessage(self, 'success', response.data['message'], "")
-                    })
+                    },this.time)
+                      })
                     .catch((error) => {
                         this.$log.error(error);
+                        loader.hide()
                         if (error.response) {
                             if (error.response.status === 409) {
                                 showFlashMessage(self, 'error', "Error", error.response.data['message'])
@@ -335,7 +377,7 @@ export default {
                     evt.preventDefault()
                 } else {
                     let self = this;
-
+                    let loader = pageStartLoader(this)
                     axios.put(bio_hazard_level_resource, {
                         name: this.level.name,
                         code: this.level.code,
@@ -348,11 +390,15 @@ export default {
                             }
                     })
                         .then((response) => {
+                          setTimeout( () => {
+                            loader.hide()
                             this.getBioHazardLevel();
                             showFlashMessage(self, 'success', response.data['message'], "")
-                        })
+                        }, this.time)
+                          })
                         .catch((error) => {
                             this.$log.error(error);
+                            loader.hide()
                             if (error.response) {
                                 if (error.response.status === 304) {
                                     showFlashMessage(self, 'info', "Record not modified!", "")
@@ -371,6 +417,7 @@ export default {
 
             deleteBioHazardLevel: function (code) {
                 let self = this;
+                let loader = pageStartLoader(this)
 
                 axios.delete(bio_hazard_level_resource, {
                     headers:
@@ -380,11 +427,15 @@ export default {
                         }
                 })
                     .then((response) => {
+                      setTimeout(() => {
+                        loader.hide()
                         this.getBioHazardLevel();
                         showFlashMessage(self, 'success', response.data['message'], "")
-                    })
+                    }, this.time)
+                      })
                     .catch((error) => {
                         this.$log.error(error);
+                        loader.hide()
                         if (error.response.status === 401) {
                             respondTo401(self)
                         } else if (error.response.status === 403) {

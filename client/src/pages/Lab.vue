@@ -182,6 +182,17 @@
           <b-button class="float_btn" style="border-radius: 50%" v-b-modal.modal-lab v-if="isAuth" variant="primary">
             <span>Add Lab</span> <i class="fas fa-plus-circle menu_icon"></i>
           </b-button>
+                    <div style="margin: auto;">
+            <loading-progress
+              :indeterminate="indeterminate"
+              :hide-background="hideBackground"
+              :progress="progressPath"
+              :size="size"
+              rotate
+              fillDuration="2"
+              rotationDuration="1"
+            />
+          </div>
         </div>
     </div>
 </template>
@@ -190,7 +201,14 @@
 import axios from 'axios';
 import {lab_resource} from '@/utils/api_paths'
 import TopNav from "../components/TopNav";
-import {isThemeAdmin, paginate, respondTo401, secureStoreGetAuthString, showFlashMessage} from "@/utils/util_functions";
+import {
+  isThemeAdmin,
+  pageStartLoader,
+  paginate,
+  respondTo401,
+  secureStoreGetAuthString,
+  showFlashMessage
+} from "@/utils/util_functions";
 import EventBus from '@/components/EventBus';
 import {required} from "vuelidate/lib/validators";
 
@@ -211,6 +229,15 @@ export default {
 
       search: '',
       labList: [],
+
+            // loader-time
+      time: 2000,
+
+           // progressPath
+      indeterminate: true,
+      hideBackground: true,
+      progressPath: 5,
+      size: 180,
 
       // values for data modification
       old_code: null,
@@ -279,13 +306,24 @@ export default {
                 this.showModal = true;
             },
 
+                    // stop&hide progressPath
+haltProgressPath(cont=false, path=0, size=0){
+  this.indeterminate = cont
+this.progressPath = path
+this.size = size
+},
+
+
             getLab() {
               this.isAuth = isThemeAdmin()
 
               axios.get(lab_resource)
                   .then((res) => {
-                    this.$log.info("Response: " + res.status + " " + res.data['message']);
+                    setTimeout(()=> {
+                    this.haltProgressPath()
+                    // this.$log.info("Response: " + res.status + " " + res.data['message']);
                     this.labList = this.response = res.data['message'];
+                  }, this.time)
                   })
                   .catch((error) => {
                     // eslint-disable-next-line
@@ -295,6 +333,7 @@ export default {
 
             createLab: function () {
                 let self = this;
+                let loader = pageStartLoader(this)
                 axios.post(lab_resource, {
                     name: this.lab.name,
                     code: this.lab.code,
@@ -305,9 +344,12 @@ export default {
                     }
                 })
                     .then((response) => {
+                      setTimeout(()=> {
+                        loader.hide()
                         this.getLab();
                         this.clearForm();
                         showFlashMessage(self, 'success', response.data['message'], '')
+                      },this.time)
                     })
                     .catch((error) => {
                         this.$log.error(error);
@@ -332,6 +374,8 @@ export default {
                     evt.preventDefault()
                 } else {
                     let self = this;
+                    let loader = pageStartLoader(this)
+
                     axios.put(lab_resource, {
                         name: this.lab.name,
                         code: this.lab.code,
@@ -344,11 +388,15 @@ export default {
                             }
                     })
                         .then((response) => {
+                          setTimeout( () => {
+                            loader.hide()
                             this.getLab();
                             showFlashMessage(self, 'success', response.data['message'], '')
+                            }, this.time)
                         })
                         .catch((error) => {
                             this.$log.error(error);
+                            loader.hide()
                             if (error.response) {
                                 if (error.response.status === 304) {
                                     showFlashMessage(self, 'info', 'Info', 'Record not modified!')
@@ -367,6 +415,7 @@ export default {
 
             deleteLab: function (code) {
                 let self = this;
+                let loader = pageStartLoader(this)
                 axios.delete(lab_resource, {
                     headers:
                         {
@@ -375,11 +424,15 @@ export default {
                         }
                 })
                     .then((response) => {
+                      setTimeout(() => {
+                        loader.hide()
                         this.getLab();
                         showFlashMessage(self, 'success', response.data['message'], '')
-                    })
+                    }, this.time)
+                      })
                     .catch((error) => {
                         this.$log.error(error);
+                        loader.hide()
                         if (error.response) {
                             if (error.response.status === 401) {
                                 respondTo401(self)

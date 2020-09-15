@@ -225,6 +225,17 @@
                     variant="primary">
             <span>Add Freezer</span> <i class="fas fa-plus-circle menu_icon"></i>
           </b-button>
+        <div style="margin: auto;">
+            <loading-progress
+              :indeterminate="indeterminate"
+              :hide-background="hideBackground"
+              :progress="progressPath"
+              :size="size"
+              rotate
+              fillDuration="2"
+              rotationDuration="1"
+            />
+          </div>
         </div>
     </div>
 </template>
@@ -237,7 +248,7 @@ import {
   extractApiData,
   getItemDataList,
   getSelectedItem,
-  isThemeAdmin,
+  isThemeAdmin, pageStartLoader,
   paginate,
   respondTo401,
   secureStoreGetAuthString,
@@ -269,6 +280,15 @@ export default {
 
       // variable to check user status and role
       isAuth: null,
+
+      // loader-time
+      time: 2000,
+
+           // progressPath
+      indeterminate: true,
+      hideBackground: true,
+      progressPath: 5,
+      size: 180,
 
       search: '',
       fields: {text: '', value: ''},
@@ -413,6 +433,12 @@ export default {
                 })
                 this.getFreezer()
             },
+                    // stop&hide progressPath
+haltProgressPath(cont=false, path=0, size=0){
+  this.indeterminate = cont
+this.progressPath = path
+this.size = size
+},
             // end of Util functions
 
             // Functions to interact with api
@@ -422,8 +448,11 @@ export default {
               this.clearForm();
               axios.get(freezer_resource)
                   .then((res) => {
+                    setTimeout(()=> {
+                    this.haltProgressPath()
                     this.freezerList = this.response = res.data['message'];
-                  })
+                  }, this.time)
+                    })
                   .catch((error) => {
                     // eslint-disable-next-line
                     this.$log.error(error);
@@ -433,6 +462,7 @@ export default {
             createFreezer: function () {
                 let self = this;
                 this.freezer.laboratory = getSelectedItem(this.labDataList, this.freezer.laboratory);
+                let loader = pageStartLoader(this)
 
                 axios.post(freezer_resource, {
                     laboratory: this.freezer.laboratory,
@@ -446,13 +476,17 @@ export default {
                         }
                 })
                     .then((response) => {
+                      setTimeout(()=> {
+                        loader.hide()
                         this.getFreezer();
                         showFlashMessage(self, 'success', response.data['message'], '');
                         this.clearForm();
+                        },this.time)
                     })
                     .catch((error) => {
                         this.clearForm();
                         this.$log.error(error);
+                        loader.hide()
                         if (error.response) {
                             if (error.response.status === 409) {
                                 showFlashMessage(self, 'error', error.response.data['message'], '');
@@ -477,6 +511,7 @@ export default {
                 } else {
                     let self = this;
                     this.freezer.laboratory = getSelectedItem(this.labDataList, this.laboratory);
+                    let loader = pageStartLoader(this)
 
                     axios.put(freezer_resource, {
                         laboratory: this.freezer.laboratory,
@@ -491,13 +526,17 @@ export default {
                             }
                     })
                         .then((response) => {
+                          setTimeout( () => {
+                            loader.hide()
                             this.getFreezer();
                             showFlashMessage(self, 'success', response.data['message'], '');
                             this.clearForm();
+                            }, this.time)
                         })
                         .catch((error) => {
                             this.clearForm();
                             this.$log.error(error);
+                            loader.hide()
                             if (error.response) {
                                 if (error.response.status === 304) {
                                     showFlashMessage(self, 'info', 'Record not modified!', '');
@@ -516,6 +555,8 @@ export default {
 
             deleteFreezer: function (code) {
                 let self = this;
+                let loader = pageStartLoader(this)
+
                 axios.delete(freezer_resource, {
                     headers:
                         {
@@ -524,11 +565,15 @@ export default {
                         }
                 })
                     .then((response) => {
+                      setTimeout(() => {
+                        loader.hide()
                         this.getFreezer();
                         showFlashMessage(self, 'success', response.data['message'], '');
+                    }, this.time)
                     })
                     .catch((error) => {
                         this.$log.error(error);
+                        loader.hide()
                         if (error.response) {
                             if (error.response.status === 401) {
                                 respondTo401(self);

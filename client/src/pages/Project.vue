@@ -196,6 +196,18 @@
             <span>Add Project</span> <i class="fas fa-plus-circle menu_icon"></i>
           </b-button>
 
+
+          <div style="margin: auto;">
+            <loading-progress
+              :indeterminate="indeterminate"
+              :hide-background="hideBackground"
+              :progress="progressPath"
+              :size="size"
+              rotate
+              fillDuration="2"
+              rotationDuration="1"
+            />
+          </div>
         </div>
     </div>
 </template>
@@ -207,7 +219,7 @@ import {
   getItemDataList,
   getSelectedItem,
   getSelectedItemCode,
-  isResearcher,
+  isResearcher, pageStartLoader,
   respondTo401,
   secureStoreGetAuthString,
   showFlashMessage
@@ -232,6 +244,15 @@ export default {
 
       // variable to check user status and role
       isAuth: null,
+
+            // loader-time
+      time: 2000,
+
+           // progressPath
+      indeterminate: true,
+      hideBackground: true,
+      progressPath: 5,
+      size: 180,
 
       themeDataList: [],
       headDataList: [],
@@ -307,7 +328,12 @@ export default {
                 let elementHead = document.getElementById("dropdownlist-head");
                 elementHead.value = head;
             },
-
+          // stop&hide progressPath
+haltProgressPath(cont=false, path=0, size=0){
+  this.indeterminate = cont
+this.progressPath = path
+this.size = size
+},
             // Functions to interact with api
             getProject() {
               this.isAuth = isResearcher()
@@ -315,8 +341,11 @@ export default {
               this.clearForm();
               axios.get(project_resource)
                   .then((res) => {
+                    setTimeout(()=> {
+                    this.haltProgressPath()
                     this.$log.info("Response: " + res.status + " ", res.data['message']);
                     this.response = res.data;
+                    }, this.time)
                   })
                   .catch((error) => {
                     // eslint-disable-next-line
@@ -328,6 +357,7 @@ export default {
                 let self = this;
                 this.project.theme = getSelectedItem(this.themeDataList, this.project.theme);
                 this.project.head = getSelectedItemCode('dropdownlist-head', this.headDataList);
+                let loader = pageStartLoader(this)
 
                 axios.post(project_resource, {
                     code: this.project.code,
@@ -342,13 +372,17 @@ export default {
                         }
                 })
                     .then((response) => {
+                      setTimeout(()=> {
+                        loader.hide()
                         this.getProject();
                         showFlashMessage(self, 'success', response.data['message'], '');
                         this.clearForm();
+                        },this.time)
                     })
                     .catch((error) => {
                         this.clearForm();
                         this.$log.error(error);
+                        loader.hide();
                         if (error.response) {
                             if (error.response.status === 409) {
                                 showFlashMessage(self, 'error', error.response.data['message'], '');
@@ -369,6 +403,7 @@ export default {
                 let self = this;
                 this.project.theme = getSelectedItem(this.themeDataList, this.project.theme);
                 this.project.head = getSelectedItemCode('dropdownlist-head', this.headDataList);
+                let loader = pageStartLoader(this)
 
                 axios.put(project_resource, {
                     code: this.project.code,
@@ -384,12 +419,16 @@ export default {
                         }
                 })
                     .then((response) => {
+                      setTimeout(()=> {
+                        loader.hide()
                         this.getProject();
                         showFlashMessage(self, 'success', response.data['message'], '');
                         this.clearForm();
+                        },this.time)
                     })
                     .catch((error) => {
                         this.clearForm();
+                        loader.hide();
                         this.$log.error(error);
                         if (error.response) {
                             if (error.response.status === 304) {
@@ -407,6 +446,7 @@ export default {
 
             deleteProject: function (code) {
                 let self = this;
+                let loader = pageStartLoader(this)
                 axios.delete(project_resource, {
                     headers:
                         {
@@ -415,11 +455,15 @@ export default {
                         }
                 })
                     .then((response) => {
+                      setTimeout(()=> {
+                        loader.hide()
                         this.getProject();
                         showFlashMessage(self, 'success', response.data['message'], '');
+                      },this.time)
                     })
                     .catch((error) => {
                         this.$log.error(error);
+                        loader.hide();
                         if (error.response) {
                             if (error.response.status === 401) {
                                 respondTo401(self);

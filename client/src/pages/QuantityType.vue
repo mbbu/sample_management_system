@@ -188,6 +188,17 @@
                     variant="primary">
             <span>Add Quantity Type</span> <i class="fas fa-plus-circle menu_icon"></i>
           </b-button>
+                  <div style="margin: auto;">
+            <loading-progress
+              :indeterminate="indeterminate"
+              :hide-background="hideBackground"
+              :progress="progressPath"
+              :size="size"
+              rotate
+              fillDuration="2"
+              rotationDuration="1"
+            />
+          </div>
         </div>
     </div>
 </template>
@@ -196,7 +207,14 @@
 import axios from 'axios';
 import {quantity_type_resource} from '@/utils/api_paths'
 import TopNav from "../components/TopNav";
-import {isThemeAdmin, paginate, respondTo401, secureStoreGetAuthString, showFlashMessage} from "@/utils/util_functions";
+import {
+  isThemeAdmin,
+  pageStartLoader,
+  paginate,
+  respondTo401,
+  secureStoreGetAuthString,
+  showFlashMessage
+} from "@/utils/util_functions";
 import EventBus from '../components/EventBus';
 import {required} from "vuelidate/lib/validators";
 
@@ -214,6 +232,16 @@ export default {
 
       // variable to check user status and role
       isAuth: null,
+
+
+      // loader-time
+      time: 2000,
+
+           // progressPath
+      indeterminate: true,
+      hideBackground: true,
+      progressPath: 5,
+      size: 180,
 
       search: '',
       QTList: [],
@@ -286,14 +314,24 @@ export default {
                 this.showModal = true;
             },
 
+                    // stop&hide progressPath
+haltProgressPath(cont=false, path=0, size=0){
+  this.indeterminate = cont
+this.progressPath = path
+this.size = size
+},
+
             getQuantityType() {
               this.isAuth = isThemeAdmin()
 
               axios.get(quantity_type_resource)
                   .then((res) => {
+                    setTimeout(()=> {
+                    this.haltProgressPath()
                     this.$log.info("Response: " + res.status + " " + res.data['message']);
                     this.QTList = this.response = res.data['message'];
-                  })
+                  }, this.time)
+                    })
                   .catch((error) => {
                     // eslint-disable-next-line
                     this.$log.error(error);
@@ -302,6 +340,8 @@ export default {
 
             createQuantityType: function () {
                 let self = this;
+                let loader = pageStartLoader(this)
+
                 axios.post(quantity_type_resource, {
                     name: this.qt.name,
                     code: this.qt.code,
@@ -312,12 +352,16 @@ export default {
                     }
                 })
                     .then((response) => {
+                      setTimeout(()=> {
+                        loader.hide()
                         this.getQuantityType();
                         this.clearForm();
                         showFlashMessage(self, 'success', response.data['message'], '')
-                    })
+                    },this.time)
+                      })
                     .catch((error) => {
                         this.$log.error(error);
+                        loader.hide()
                         if (error.response) {
                             if (error.response.status === 409) {
                                 showFlashMessage(self, 'error', 'Error', error.response.data['message'])
@@ -339,6 +383,7 @@ export default {
                     evt.preventDefault()
                 } else {
                     let self = this;
+                    let loader = pageStartLoader(this)
                     axios.put(quantity_type_resource, {
                         name: this.qt.name,
                         code: this.qt.code,
@@ -351,11 +396,15 @@ export default {
                             }
                     })
                         .then((response) => {
+                          setTimeout( () => {
+                            loader.hide()
                             this.getQuantityType();
                             showFlashMessage(self, 'success', response.data['message'], '')
-                        })
+                        }, this.time)
+                          })
                         .catch((error) => {
                             this.$log.error(error);
+                            loader.hide()
                             if (error.response) {
                                 if (error.response.status === 304) {
                                     showFlashMessage(self, 'info', 'Info', 'Record not modified!')
@@ -374,6 +423,7 @@ export default {
 
             deleteQuantityType: function (code) {
                 let self = this;
+                let loader = pageStartLoader(this)
                 axios.delete(quantity_type_resource, {
                     headers:
                         {
@@ -382,11 +432,15 @@ export default {
                         }
                 })
                     .then((response) => {
+                      setTimeout(() => {
+                        loader.hide()
                         this.getQuantityType();
                         showFlashMessage(self, 'success', response.data['message'], '')
+                    }, this.time)
                     })
                     .catch((error) => {
                         this.$log.error(error);
+                        loader.hide()
                         if (error.response) {
                             if (error.response.status === 401) {
                                 respondTo401(self)

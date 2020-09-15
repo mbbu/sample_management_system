@@ -64,6 +64,17 @@
               </b-button>
             </a>
           </div>
+        <div style="margin: auto;">
+            <loading-progress
+              :indeterminate="indeterminate"
+              :hide-background="hideBackground"
+              :progress="progressPath"
+              :size="size"
+              rotate
+              fillDuration="2"
+              rotationDuration="1"
+            />
+          </div>
         </div>
     </div>
 </template>
@@ -72,7 +83,7 @@
 import axios from 'axios';
 import {sample_resource} from "@/utils/api_paths";
 import TopNav from "@/components/TopNav";
-import {getLoggedInUser, paginate, redirectAfterCountDown, setSampleCode, startLoader} from "@/utils/util_functions";
+import {getLoggedInUser, paginate, redirectAfterCountDown, setSampleCode} from "@/utils/util_functions";
 import EventBus from "@/components/EventBus";
 import FilterCard from "@/components/FilterCard";
 
@@ -91,6 +102,12 @@ export default {
 
       // data for pagination
       current: 1,
+
+      // progressPath
+      indeterminate: true,
+      hideBackground: true,
+      progressPath: 5,
+      size: 180,
 
       isAuth: null,
     };
@@ -245,15 +262,21 @@ export default {
       EventBus.$emit('page-info', {'pgInfo': info, 'pgData': this.sampleList})
     },
 
+              // stop&hide progressPath
+haltProgressPath(cont=false, path=0, size=0){
+  this.indeterminate = cont
+this.progressPath = path
+this.size = size
+},
+
     // methods to interact with api
     getSamples() {
       this.isAuth = getLoggedInUser()
-      let loader = startLoader(this)
 
       axios.get(sample_resource)
           .then((res) => {
             setTimeout(() => {
-              loader.hide()
+              this.haltProgressPath()
               this.$log.info("Response: " + res.status + " ", res.data.message);
               this.sampleList = this.response = res.data.message;
               for (const [key, value] of this.response.entries()) {
