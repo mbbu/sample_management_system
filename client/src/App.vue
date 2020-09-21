@@ -20,8 +20,6 @@
     @import 'styles/nav.scss';
     @import 'styles/media-queries.scss';
     @import 'styles/nav-toggle-btn.scss';
-    @import 'node_modules/bootstrap/scss/bootstrap';
-    @import 'node_modules/bootstrap-vue/src/index.scss';
     @import "../node_modules/@syncfusion/ej2-base/styles/material.css";
     @import "../node_modules/@syncfusion/ej2-inputs/styles/material.css";
     @import "../node_modules/@syncfusion/ej2-vue-dropdowns/styles/material.css";
