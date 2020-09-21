@@ -30,6 +30,7 @@
     "vue-axios": "^2.1.5",
     "vue-form-wizard": "^0.8.4",
     "vue-functional-calendar": "^2.8.88",
+    "vue-loader": "^15.9.3",
     "vue-loading-overlay": "^3.4.1",
     "vue-material": "^1.0.0-beta-15",
     "vue-material-checkbox": "^2.2.0",
