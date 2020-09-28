@@ -9,7 +9,7 @@ class Sample(BaseModel.db.Model):
     id = AppDb.Column(AppDb.Integer, primary_key=True)
     theme_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('theme.id', ondelete='SET NULL'), nullable=True)
     user_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
-    box_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('box.id', ondelete='SET NULL'), nullable=True)
+    slot_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('slot.id', ondelete='SET NULL'), nullable=True)
     animal_species = AppDb.Column(AppDb.String(100), nullable=True, index=True)
     sample_type = AppDb.Column(AppDb.String(100), nullable=True, index=True)
     sample_description = AppDb.Column(AppDb.Text, nullable=True)
@@ -34,7 +34,7 @@ class Sample(BaseModel.db.Model):
     status = AppDb.Column(AppDb.String, nullable=False, default=SAMPLE_FROM_FIELD)
 
     # relationship(s)
-    box = AppDb.relationship('Box', backref='sample', lazy=True)
+    slot = AppDb.relationship('Slot', backref='sample', lazy=True)
     user = AppDb.relationship('User', backref='sample', lazy=True)
     requests = AppDb.relationship('SampleRequest', backref='requested_sample', lazy=True)
     publication = AppDb.relationship('Publication', backref='sample', lazy=True)
@@ -51,10 +51,10 @@ class Sample(BaseModel.db.Model):
 
     def __repr__(self):
         return '<< Sample: (type={0} || desc={1} || project={2} || barcode={3} || species={4} ||' \
-               'box={5} || retention={6} || amount={7} || quantity={8} || code={9} || location={10} || owner={11}' \
+               'slot={5} || retention={6} || amount={7} || quantity={8} || code={9} || location={10} || owner={11}' \
                '|| analysis={12} || temperature={13} ) >>' \
             .format(self.sample_type, self.sample_description,
                     self.project, self.barcode, self.animal_species,
-                    self.box_id, self.retention_date, self.amount, self.quantity_type, self.code,
+                    self.slot_id, self.retention_date, self.amount, self.quantity_type, self.code,
                     self.location_collected,
                     self.project_owner, self.analysis, self.temperature)
