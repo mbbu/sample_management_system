@@ -63,7 +63,6 @@ def mail_admin(app):
 
 # noinspection PyTypeChecker
 def register_resources(app):
-    # TODO: import resources here
     from api.resources.index_resource import IndexResource
     from api.resources.auth_resource import AuthResource, LogOutResource
     from api.resources.theme_resource import ThemeResource
