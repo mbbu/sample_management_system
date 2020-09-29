@@ -4,7 +4,6 @@ from api.models.database import BaseModel
 
 
 class Slot(BaseModel.db.Model):
-    query = None
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
     box_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('box.id'), nullable=False)
