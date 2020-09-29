@@ -84,6 +84,7 @@ def register_resources(app):
     from .resources.redcap_requests.fetch_sample_resource import SaveSampleFromREDCap
     from api.resources.sample_request_and_response.sample_request_resource import SampleRequestResource
     from api.resources.sample_request_and_response.sample_request_response import SampleRequestResponseResource
+    from .resources.slot_resource import SlotResource
 
     api = Api(app)
     api.add_resource(IndexResource, '/', '/index', '/welcome')
@@ -104,6 +105,7 @@ def register_resources(app):
     api.add_resource(SampleRequestResponseResource, '/sample-request-response/<token>', '/request-response/<token>')
     api.add_resource(SaveSampleFromREDCap, '/redcap-samples')
     api.add_resource(BoxResource, '/box', '/boxes')
+    api.add_resource(SlotResource, '/slots/<box>/<row>/<col>', '/slot')
     api.add_resource(TrayResource, '/tray', '/trays')
     api.add_resource(RackResource, '/rack', '/racks')
 
