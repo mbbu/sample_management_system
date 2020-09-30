@@ -1,10 +1,8 @@
-from flask import current_app
-from flask_jwt_extended import jwt_required
 from faker import Faker
+from flask import current_app
 
 from api import BaseResource, BaseModel
 from api.models import Slot
-from api.resources.decorators.user_role_decorators import is_theme_admin
 from api.utils import log_create, log_duplicate
 
 
@@ -48,4 +46,3 @@ def create_slots(box, row, col):
 # function to create a matrix for the box to visualize the positions
 def matrix_generator(row, col):
     return [[{'row': y + 1, 'col': x + 1} for x in range(col)] for y in range(row)]
-
