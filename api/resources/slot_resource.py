@@ -12,6 +12,10 @@ class SlotResource(BaseResource):
     def get(self):
         return BaseResource.send_json_message("Coming up soon", 200)
 
+    @staticmethod
+    def get_slot(code):
+        return BaseModel.db.session.query(Slot).filter_by(code=code).first()
+
 
 def create_slots(box, row, col):
     box = int(box)
