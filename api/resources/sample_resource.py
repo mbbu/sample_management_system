@@ -205,9 +205,6 @@ class SampleResource(BaseResource):
         project = args['project']
         project_owner = args['project_owner']
         retention_date = set_date_from_int(int(args['retention_period']))
-        print("Args for retention passed: " + str(args['retention_period']) + " of type: "
-              + str(type(args['retention_period'])))
-        print("Retention period is: " + str(retention_date) + " of type " + str(type(retention_date)))
         barcode = args['barcode']
         analysis = args['analysis']
         temperature = float(args['temperature'])
