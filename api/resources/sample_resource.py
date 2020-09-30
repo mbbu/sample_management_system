@@ -9,9 +9,9 @@ from api.models.database import BaseModel
 from api.models.sample import Sample
 from api.resources.base_resource import BaseResource
 from api.resources.bio_hazard_level_resource import BioHazardLevelResource
-from api.resources.box_resource import BoxResource
 from api.resources.decorators.user_role_decorators import is_sample_owner
 from api.resources.quantity_type_resource import QuantityTypeResource
+from api.resources.slot_resource import SlotResource
 from api.resources.theme_resource import ThemeResource
 from api.utils import format_and_lower_str, log_create, log_update, log_duplicate, \
     has_required_request_params, non_empty_int, log_304, set_date_from_int, get_any_user_by_email
@@ -41,13 +41,13 @@ class SampleResource(BaseResource):
         'code': fields.String,
         'created_at': fields.String,
         'updated_at': fields.String,
-        'box.label': fields.String,
-        'box.tray.number': fields.Integer,
-        'box.tray.rack.number': fields.Integer,
-        'box.tray.rack.chamber.type': fields.String,
-        'box.tray.rack.chamber.freezer.number': fields.Integer,
-        'box.tray.rack.chamber.freezer.lab.name': fields.String,
-        'box.tray.rack.chamber.freezer.lab.room': fields.Integer
+        'slot.box.label': fields.String,
+        'slot.box.tray.number': fields.String,
+        'slot.box.tray.rack.number': fields.String,
+        'slot.box.tray.rack.chamber.type': fields.String,
+        'slot.box.tray.rack.chamber.freezer.number': fields.String,
+        'slot.box.tray.rack.chamber.freezer.lab.name': fields.String,
+        'slot.box.tray.rack.chamber.freezer.lab.room': fields.String
 
     }
 
@@ -73,13 +73,13 @@ class SampleResource(BaseResource):
         code = format_and_lower_str(args[16])
         theme = ThemeResource.get_theme(args[0]).id
         user = get_any_user_by_email(args[1]).id
-        box = BoxResource.get_box(args[2]).id
+        slot = SlotResource.get_slot(args[2]).id
         qt = QuantityTypeResource.get_quantity_type(args[14]).id
         sl = BioHazardLevelResource.get_bio_hazard_level(args[15]).id
 
         if not Sample.sample_exists(code):
             try:
-                sample = Sample(theme_id=theme, user_id=user, box_id=box, animal_species=args[3],
+                sample = Sample(theme_id=theme, user_id=user, slot_id=slot, animal_species=args[3],
                                 sample_type=args[4], sample_description=args[5], location_collected=args[6],
                                 project=args[7], project_owner=args[8], retention_date=args[9], barcode=args[10],
                                 analysis=args[11], temperature=args[12], amount=args[13], quantity_type=qt,
@@ -106,26 +106,26 @@ class SampleResource(BaseResource):
         if sample is not None:
             args = SampleResource.sample_args()
             if args[0] != sample.theme_id or args[1] != sample.user_id or \
-                    args[2] != sample.box_id or args[3] != sample.animal_species or \
+                    args[2] != sample.slot_id or args[3] != sample.animal_species or \
                     args[4] != sample.sample_type or args[5] != sample.sample_description \
                     or args[6] != sample.location_collected or args[7] != sample.project \
-                    or args[8] != sample.project_owner or \
-                    args[9] != sample.retention_date \
+                    or args[8] != sample.project_owner or args[9] != sample.retention_date \
                     or args[10] != sample.barcode or args[11] != sample.analysis or args[12] != sample.temperature \
                     or args[13] != sample.amount or args[14] != sample.quantity_type or args[
-                15] != sample.bio_hazard_level or args[16] != sample.code:
+                15] != sample.bio_hazard_level \
+                    or args[16] != sample.code:
                 try:
                     code = format_and_lower_str(args[16])
                     theme = ThemeResource.get_theme(args[0]).id
                     user = get_any_user_by_email(args[1]).id
-                    box = BoxResource.get_box(args[2]).id
+                    slot = SlotResource.get_slot(args[2]).id
                     qt = QuantityTypeResource.get_quantity_type(args[14]).id
                     sl = BioHazardLevelResource.get_bio_hazard_level(args[15]).id
 
                     old_info = str(sample)
                     sample.theme_id = theme
                     sample.user_id = user
-                    sample.box_id = box
+                    sample.slot_id = slot
                     sample.animal_species = args[3]
                     sample.sample_type = args[4]
                     sample.sample_description = args[5]
@@ -177,7 +177,7 @@ class SampleResource(BaseResource):
         parser = reqparse.RequestParser()
         parser.add_argument('theme', required=True)
         parser.add_argument('user', required=False, type=non_empty_int)
-        parser.add_argument('box', required=False)
+        parser.add_argument('slot', required=False)
         parser.add_argument('animal_species', required=False)
         parser.add_argument('sample_type', required=False)
         parser.add_argument('sample_description', required=False)
@@ -197,7 +197,7 @@ class SampleResource(BaseResource):
 
         theme_id = args['theme']
         user_id = args['user']
-        box_id = args['box']
+        slot_code = args['slot']
         animal_species = args['animal_species']
         sample_type = args['sample_type']
         sample_description = args['sample_description']
@@ -214,7 +214,7 @@ class SampleResource(BaseResource):
         code = format_and_lower_str(args['code'])
 
         return [
-            theme_id, user_id, box_id, animal_species, sample_type, sample_description, location_collected,
+            theme_id, user_id, slot_code, animal_species, sample_type, sample_description, location_collected,
             project, project_owner, retention_date, barcode, analysis, temperature, amount, quantity_type,
             bio_hazard_level, code
         ]
