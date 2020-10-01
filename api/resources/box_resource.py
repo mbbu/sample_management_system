@@ -46,8 +46,8 @@ class BoxResource(BaseResource):
         tray = TrayResource.get_tray(args['tray']).id
         label = args['label']
         code = args['code']
-        row = args['row']
-        col = args['col']
+        row = args['rows']
+        col = args['cols']
 
         if not Box.box_exists(code):
             try:
@@ -123,8 +123,8 @@ class BoxResource(BaseResource):
         parser.add_argument('tray', required=True, type=non_empty_int)
         parser.add_argument('label', required=True, type=non_empty_string)
         parser.add_argument('code', required=True, type=standard_non_empty_string)
-        parser.add_argument('row', required=True, type=non_empty_int)
-        parser.add_argument('col', required=True, type=non_empty_int)
+        parser.add_argument('rows', required=True, type=non_empty_int)
+        parser.add_argument('cols', required=True, type=non_empty_int)
 
         args = parser.parse_args()
         return args
