@@ -123,8 +123,8 @@ class BoxResource(BaseResource):
         parser.add_argument('tray', required=True, type=non_empty_int)
         parser.add_argument('label', required=True, type=non_empty_string)
         parser.add_argument('code', required=True, type=standard_non_empty_string)
-        parser.add_argument('rows', required=True, type=non_empty_int)
-        parser.add_argument('cols', required=True, type=non_empty_int)
+        parser.add_argument('rows', required=False, type=non_empty_int)
+        parser.add_argument('cols', required=False, type=non_empty_int)
 
         args = parser.parse_args()
         return args
