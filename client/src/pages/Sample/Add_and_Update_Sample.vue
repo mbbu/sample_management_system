@@ -284,24 +284,15 @@ import VueFormWizard, {TabContent} from 'vue-form-wizard';
 import 'vue-form-wizard/dist/vue-form-wizard.min.css';
 import axios from 'axios';
 import {
-  extractApiData,
-  extractBoxData,
-  extractQTData,
-  extractUserData,
-  getItemDataList,
-  getSampleDetailsForEditing,
-  getSelectedBoxSetTextFieldValue,
-  getSelectedItemCode,
-  isUpdate,
-  redirectAfterCountDown,
-  respondTo401,
-  secureStoreGetAuthString,
-  selectDropDownItemForUpdate,
-  showFlashMessage
+  extractApiData, extractBoxData, extractQTData,
+  getItemDataList, getSampleDetailsForEditing,
+  getSelectedBoxSetTextFieldValue, getSelectedItemCode,
+  isUpdate, redirectAfterCountDown, respondTo401,
+  secureStoreGetAuthString, selectDropDownItemForUpdate, showFlashMessage
 } from "@/utils/util_functions";
 import {
   bio_hazard_level_resource, box_resource, project_resource,
-  quantity_type_resource, sample_resource, theme_resource, user_resource
+  quantity_type_resource, sample_resource, theme_resource
 } from "@/utils/api_paths";
 import TopNav from "@/components/TopNav";
 import ErrorsDisplay from "@/components/ErrorsDisplay";
@@ -353,7 +344,6 @@ export default {
       QTDataList: [],
       projectList: [],
       boxDataList: [],
-      userDataList: [],
       themeDataList: [],
       projectDataList: [],
       secLevelDataList: [],
@@ -404,20 +394,6 @@ export default {
                   this.projectDataList.push({
                       'Code': projectList.items[i].Code,
                       'Name': projectList.items[i].Name,
-                  });
-              }
-          })
-
-          // GET USER LIST
-          getItemDataList(user_resource).then(data => {
-              let userList = extractUserData(data);
-
-              // update local variables with data from API
-              this.fields = userList['fields'];
-              for (let i = 0; i < userList.items.length; i++) {
-                  this.userDataList.push({
-                      'Code': userList.items[i].Code,
-                      'Name': userList.items[i].Name,
                   });
               }
           })
@@ -505,12 +481,6 @@ export default {
                   }
                   if (!this.sample.project) {
                       this.errors.push("Project is required");
-                  }
-                  if (!this.sample.projectOwner) {
-                      this.errors.push("Project Owner is required");
-                  }
-                  if (!this.sample.user) {
-                      this.errors.push("Sample Owner is required");
                   }
                   if (!this.sample.sampleType) {
                       this.errors.push("Sample Type is required");
@@ -602,9 +572,6 @@ export default {
             this.sample.projectHead = this.projectList[i]['lead.first_name'] + " " + this.projectList[i]['lead.last_name']
           }
         }
-      },
-      setUser() {
-          this.sample.user = getSelectedItemCode("user-dropdownlist", this.userDataList)
       },
       setSecurityLevel() {
           this.sample.securityLevel = getSelectedItemCode("securityLevel-dropdownlist", this.secLevelDataList)
