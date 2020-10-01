@@ -13,7 +13,7 @@ from api.utils import format_and_lower_str, log_create, log_duplicate, log_updat
 
 class RackResource(BaseResource):
     fields = {
-        'number': fields.Integer,
+        'number': fields.String,
         'chamber.type': fields.String,
         'code': fields.String
     }

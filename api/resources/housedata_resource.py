@@ -11,7 +11,7 @@ from api.utils import format_and_lower_str, log_create, log_update, log_delete, 
 
 class HouseDataResource(BaseResource):
     fields = {
-        'user_id': fields.Integer,
+        'user_id': fields.String,
         'education': fields.String,
         'employment': fields.String,
         'marital_status': fields.String,

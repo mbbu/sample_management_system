@@ -13,8 +13,8 @@ from api.utils import format_and_lower_str, log_create, log_duplicate, log_updat
 
 class TrayResource(BaseResource):
     fields = {
-        'number': fields.Integer,
-        'rack.number': fields.Integer,
+        'number': fields.String,
+        'rack.number': fields.String,
         'code': fields.String
     }
 

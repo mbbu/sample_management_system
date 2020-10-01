@@ -16,12 +16,12 @@ class BoxResource(BaseResource):
     fields = {
         'label': fields.String,
         'code': fields.String,
-        'tray.number': fields.Integer,
-        'tray.rack.number': fields.Integer,
+        'tray.number': fields.String,
+        'tray.rack.number': fields.String,
         'tray.rack.chamber.type': fields.String,
-        'tray.rack.chamber.freezer.number': fields.Integer,
+        'tray.rack.chamber.freezer.number': fields.String,
         'tray.rack.chamber.freezer.lab.name': fields.String,
-        'tray.rack.chamber.freezer.lab.room': fields.Integer
+        'tray.rack.chamber.freezer.lab.room': fields.String
     }
 
     def get(self):
