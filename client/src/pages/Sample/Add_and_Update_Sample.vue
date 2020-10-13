@@ -84,74 +84,10 @@
                                v-model="sample.locationCollected"/>
                     </div>
 
-                    <div class="form-group">
-                        <b-form-group id="box" label="Select a Box for the sample:" label-for="form-box-input">
-                            <ejs-dropdownlist
-                                    :dataSource='boxDataList'
-                                    :fields="fields"
-                                    :v-model="sample.box"
-                                    :value="selectDropDownItemForUpdate('box-dropdownlist', sample.box, boxDataList)"
-                                    @change="fillFormFieldsDependentOnBox"
-                                    id="box-dropdownlist"
-                                    placeholder='Select a box and its location will be shown'
-                            ></ejs-dropdownlist>
-                        </b-form-group>
+                    <!-- CASCADING DROPDOWNS TO DETERMINE A PLACE FOR THE SAMPLE -->
+                    <div>
+                      <sample-location-finder></sample-location-finder>
                     </div>
-
-                    <!-- Start row -->
-                    <div class="row">
-                        <div class="col">
-                            <div class="form-group">
-                                <label for="tray">Tray Number</label>
-                                <input class="form-control" disabled="disabled" id="tray" placeholder="Tray having box"
-                                       required
-                                       type="text"
-                                       v-model="sample.tray"/>
-                            </div>
-                        </div>
-
-                        <div class="col">
-                            <div class="form-group">
-                                <label for="rack">Rack Number</label>
-                                <input class="form-control" disabled="disabled" id="rack"
-                                       placeholder="Rack holding tray" required
-                                       type="text" v-model="sample.rack"/>
-                            </div>
-                        </div>
-
-                        <div class="col">
-                            <div class="form-group">
-                                <label for="chamber"> Chamber Type </label>
-                                <input class="form-control" disabled="disabled" id="chamber"
-                                       placeholder="Chamber where rack is" required
-                                       type="text" v-model="sample.chamber"/>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- End row -->
-
-
-                    <!-- Start Row -->
-                    <div class="row">
-                        <div class="col">
-                            <div class="form-group">
-                                <label for="freezer">Freezer Number</label>
-                                <input class="form-control" disabled="disabled" id="freezer"
-                                       placeholder="Freezer where box is stored" required
-                                       type="text" v-model="sample.freezer"/>
-                            </div>
-                        </div>
-
-                        <div class="col">
-                            <div class="form-group">
-                                <label for="lab">Lab</label>
-                                <input class="form-control" disabled="disabled" id="lab"
-                                       placeholder="Lab where freezer is" required
-                                       type="text" v-model="sample.lab"/>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- End Row -->
 
                     <!-- Start row -->
                     <div class="row">
@@ -192,7 +128,6 @@
                     <!-- End Row -->
                     <errors-display :errors="errors"></errors-display>
                 </tab-content>
-
 
                 <tab-content :before-change="handleSubmit" title="Finishing Up">
                     <div class="form-group">
@@ -284,18 +219,18 @@ import VueFormWizard, {TabContent} from 'vue-form-wizard';
 import 'vue-form-wizard/dist/vue-form-wizard.min.css';
 import axios from 'axios';
 import {
-  extractApiData, extractBoxData, extractQTData,
-  getItemDataList, getSampleDetailsForEditing,
-  getSelectedBoxSetTextFieldValue, getSelectedItemCode,
-  isUpdate, redirectAfterCountDown, respondTo401,
+  extractApiData, extractQTData, getItemDataList, getSampleDetailsForEditing,
+  getSelectedItemCode, isUpdate, redirectAfterCountDown, respondTo401,
   secureStoreGetAuthString, selectDropDownItemForUpdate, showFlashMessage
 } from "@/utils/util_functions";
 import {
-  bio_hazard_level_resource, box_resource, project_resource,
+  bio_hazard_level_resource, project_resource,
   quantity_type_resource, sample_resource, theme_resource
 } from "@/utils/api_paths";
 import TopNav from "@/components/TopNav";
 import ErrorsDisplay from "@/components/ErrorsDisplay";
+import SampleLocationFinder from "@/components/SampleLocationFinder";
+import EventBus from "@/components/EventBus";
 
 Vue.use(VueFormWizard)
 Vue.use(TabContent)
@@ -307,46 +242,20 @@ export default {
     return {
       response: [],
       sample: {
-        theme: "",
-        sampleOwner: "",
-        project: "",
-        projectHead: "",
-        sampleType: "",
-        species: "",
-        description: "",
-        box: "",
-        locationCollected: "",
-        retention: "",
-        convertedRetentionPeriod: "",
-        barcode: "",
-        analysis: "",
-        temperature: "",
-        amount: "",
-        quantity_type: "",
-        securityLevel: "",
-        code: "",
+        theme: "", sampleOwner: "", project: "", projectHead: "", sampleType: "",
+        species: "", description: "", box: "", locationCollected: "", retention: "",
+        convertedRetentionPeriod: "", barcode: "", analysis: "", temperature: "",
+        amount: "", quantity_type: "", securityLevel: "", code: "",
 
         // extra fields
-        tray: "",
-        rack: "",
-        chamber: "",
-        freezer: "",
-        lab: "",
-
+        tray: "", rack: "", chamber: "", freezer: "", lab: "",
       },
       submitted: false,
 
-      errors: [],
-      tabNum: 0,
-      tabOne: 0,
-      tabTwo: 1,
-      tabThree: 2,
-      QTDataList: [],
-      projectList: [],
-      boxDataList: [],
-      themeDataList: [],
-      projectDataList: [],
-      secLevelDataList: [],
+      tabNum: 0, tabOne: 0, tabTwo: 1, tabThree: 2,
+
+      // lists
+      errors: [], QTDataList: [], projectList: [], themeDataList: [], projectDataList: [], secLevelDataList: [],
       fields: {text: '', value: ''},
       page_title: "Add Sample",
     };
@@ -356,13 +265,10 @@ export default {
       // util functions
       selectDropDownItemForUpdate,
       onLoadPage() {
-          this.$log.info("Is Update True? ", isUpdate())
-
           if (isUpdate()) {
               // call function to fill form
               this.fillSampleFormForUpdate()
           } else {
-              this.$log.info("Just create a new sample")
               this.getDataListItemsForForm()
           }
       },
@@ -412,25 +318,6 @@ export default {
               }
           })
 
-          // GET BOX LIST
-          getItemDataList(box_resource).then(data => {
-              let boxList = extractBoxData(data);
-
-              // update local variables with data from API
-              this.fields = boxList['fields'];
-              for (let i = 0; i < boxList.items.length; i++) {
-                  this.boxDataList.push({
-                      'Code': boxList.items[i].Code,
-                      'Name': boxList.items[i].Name,
-                      'Tray': boxList.items[i].Tray,
-                      'Rack': boxList.items[i].Rack,
-                      'Chamber': boxList.items[i].Chamber,
-                      'Freezer': boxList.items[i].Freezer,
-                      'Lab': boxList.items[i].Lab
-                  });
-              }
-          })
-
           // GET SECURITY LEVEL LIST
           getItemDataList(bio_hazard_level_resource).then(data => {
               let secLevelList = extractApiData(data);
@@ -444,18 +331,6 @@ export default {
                   });
               }
           })
-      },
-
-      fillFormFieldsDependentOnBox() {
-          let dropdownSelection = getSelectedBoxSetTextFieldValue("box-dropdownlist", this.boxDataList);
-          this.sample.box = dropdownSelection.boxCode;
-
-          // SET FIELDS TEXT
-          this.sample.tray = dropdownSelection.tray;
-          this.sample.rack = dropdownSelection.rack;
-          this.sample.chamber = dropdownSelection.chamber;
-          this.sample.freezer = dropdownSelection.freezer;
-          this.sample.lab = dropdownSelection.lab;
       },
 
       handleSubmit() {
@@ -478,23 +353,23 @@ export default {
               case 0:
                   if (!this.sample.theme) {
                       this.errors.push("Theme is required");
-                  }
-                  if (!this.sample.project) {
+                  } if (!this.sample.project) {
                       this.errors.push("Project is required");
-                  }
-                  if (!this.sample.sampleType) {
+                  } if (!this.sample.sampleType) {
                       this.errors.push("Sample Type is required");
-                  }
-                  if (!this.sample.species) {
+                  } if (!this.sample.species) {
                       this.errors.push("Animal species is required");
-                  }
-                  if (!this.sample.description || this.sample.description.length < 25) {
+                  } if (!this.sample.description || this.sample.description.length < 25) {
                       this.errors.push("Description is required and should be at least 2 sentences.");
-                  }
-                  if (this.errors.length) {
+                  } if (this.errors.length) {
                       showFlashMessage(self, "error", "Check Form for Errors", "Correct errors to proceed!")
                   }
+
+                  // no errors found in form
                   if (!this.errors.length) {
+                      // emit event to trigger the fetching of lab data
+                      // required in the next page
+                      EventBus.$emit('locationFinder')
                       this.tabNum++
                       return true;
                   }
@@ -503,23 +378,17 @@ export default {
               case 1:
                   if (!this.sample.locationCollected) {
                       this.errors.push("Location is required");
-                  }
-                  if (!this.sample.box) {
+                  } if (!this.sample.box) {
                       this.errors.push("Box is required");
-                  }
-                  if (!this.sample.temperature) {
+                  } if (!this.sample.temperature) {
                       this.errors.push("Temperature is required");
-                  }
-                  if (!this.sample.amount) {
+                  } if (!this.sample.amount) {
                       this.errors.push("Amount is required");
-                  }
-                  if (!this.sample.quantity_type) {
+                  } if (!this.sample.quantity_type) {
                       this.errors.push("Quantity Type is required");
-                  }
-                  if (this.errors.length) {
+                  } if (this.errors.length) {
                       showFlashMessage(self, "error", "Check Form for Errors", "Correct errors to proceed!")
-                  }
-                  if (!this.errors.length) {
+                  } if (!this.errors.length) {
                       this.tabNum++
                       return true;
                   }
@@ -528,23 +397,17 @@ export default {
               case 2:
                   if (!this.sample.securityLevel) {
                       this.errors.push("Security level is required");
-                  }
-                  if (!this.sample.code) {
+                  } if (!this.sample.code) {
                       this.errors.push("Code is required");
-                  }
-                  if (!this.sample.barcode) {
+                  } if (!this.sample.barcode) {
                       this.errors.push("Barcode Owner is required");
-                  }
-                  if (!this.sample.analysis) {
+                  } if (!this.sample.analysis) {
                       this.errors.push("Analysis is required");
-                  }
-                  if (!this.sample.retention) {
+                  } if (!this.sample.retention) {
                       this.errors.push("Retention period is required");
-                  }
-                  if (this.errors.length) {
+                  } if (this.errors.length) {
                       showFlashMessage(self, "error", "Check Form for Errors", "Correct errors to proceed!")
-                  }
-                  if (!this.errors.length) {
+                  } if (!this.errors.length) {
                       this.tabNum = 0
                       return true;
                   }
@@ -552,9 +415,7 @@ export default {
 
               default:
                   this.errors = [];
-                  if (!this.errors.length) {
-                      return true;
-                  }
+                  if (!this.errors.length) { return true;}
                   break;
           }
       },
@@ -783,6 +644,6 @@ export default {
   created() {
       this.onLoadPage();
   },
-  components: {TopNav, ErrorsDisplay}
+  components: {SampleLocationFinder, TopNav, ErrorsDisplay}
 };
 </script>
