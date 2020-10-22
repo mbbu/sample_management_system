@@ -52,6 +52,7 @@ class SearchableMixin(object):
             'delete': list(session.deleted)
         }
 
+    # todo: fix after_commit; Issue is the db has no engine declared at the point the application is starting.
     @classmethod
     def after_commit(cls, session):
         """
