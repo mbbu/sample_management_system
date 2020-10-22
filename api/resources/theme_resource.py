@@ -6,6 +6,7 @@ from api.models.database import BaseModel
 from api.models.theme import Theme
 from api.resources.base_resource import BaseResource
 from api.resources.decorators.user_role_decorators import is_sys_admin
+from api.search.search import add_to_index, remove_from_index
 from api.utils import log_duplicate, log_304, format_and_lower_str, has_required_request_params, log_create, log_update, \
     standard_non_empty_string, non_empty_string, get_query_params
 
@@ -17,6 +18,8 @@ class ThemeResource(BaseResource):
     }
 
     def get(self):
+        Theme.reindex()
+
         query_strings = get_query_params()
         if query_strings is not None:
             for query_string in query_strings:
@@ -46,6 +49,7 @@ class ThemeResource(BaseResource):
                 theme = Theme(code=code, name=name)
                 BaseModel.db.session.add(theme)
                 BaseModel.db.session.commit()
+                add_to_index(Theme.index_name, theme)
                 log_create(theme)
                 return BaseResource.send_json_message("Theme successfully created", 201)
 
@@ -74,6 +78,7 @@ class ThemeResource(BaseResource):
                     theme.code = code
                     theme.name = name
                     BaseModel.db.session.commit()
+                    add_to_index(Theme.index_name, theme)
                     log_update(old_info, theme)
                     return BaseResource.send_json_message("Theme successfully updated", 200)
 
@@ -98,6 +103,7 @@ class ThemeResource(BaseResource):
 
         BaseModel.db.session.delete(theme)
         BaseModel.db.session.commit()
+        remove_from_index(Theme.index_name, theme)
         return BaseResource.send_json_message("Theme deleted", 200)
 
     @staticmethod
