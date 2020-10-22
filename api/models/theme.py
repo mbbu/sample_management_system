@@ -3,7 +3,7 @@ from api.search.searchable_mixin import SearchableMixin
 
 
 class Theme(BaseModel.db.Model, SearchableMixin):
-    __tablename__ = 'theme'
+    __tablename__ = index_name = 'theme'
     __searchable__ = ['code', 'name']
 
     AppDb = BaseModel.db
