@@ -7,7 +7,7 @@ class BaseModel(object):
 
     @staticmethod
     def init_db(app):
-        BaseModel.db = SQLAlchemy(app)
+        BaseModel.db.init_app(app)
         return BaseModel.db
 
     @staticmethod
