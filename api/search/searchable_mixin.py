@@ -26,6 +26,7 @@ class SearchableMixin(object):
         :param per_page:
         :return:
         """
+        cls.reindex()
         ids, total = query_index(cls.__tablename__, expression, page, per_page)
         if total == 0:
             return cls.query.filter_by(id=0), 0
