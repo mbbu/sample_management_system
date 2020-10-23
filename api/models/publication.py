@@ -1,7 +1,11 @@
 from api.models.database import BaseModel
+from api.search.searchable_mixin import SearchableMixin
 
 
-class Publication(BaseModel.db.Model):
+class Publication(BaseModel.db.Model, SearchableMixin):
+    __tablename__ = index_name = 'publication'
+    __searchable__ = ['publication_title', 'co_authors']
+
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
     sample_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('sample.id', ondelete='SET NULL'), nullable=True)

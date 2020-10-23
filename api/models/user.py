@@ -3,12 +3,16 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from api.models.database import BaseModel
+from api.search.searchable_mixin import SearchableMixin
 
 
-class User(BaseModel.db.Model):
-    __tablename__ = 'users'
+class User(BaseModel.db.Model, SearchableMixin):
+    __tablename__ = index_name = 'users'
+    __searchable__ = ['first_name', 'last_name', 'email',
+                      'is_active', 'is_deleted', 'email_confirmation_sent_on'
+                      ]
+
     AppDb = BaseModel.db
-
     id = AppDb.Column(AppDb.Integer, primary_key=True)
     first_name = AppDb.Column(AppDb.String(65), nullable=False)
     last_name = AppDb.Column(AppDb.String(65), nullable=False)

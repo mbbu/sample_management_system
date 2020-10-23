@@ -12,7 +12,7 @@ from api.resources.decorators.user_role_decorators import authorized_to_modify_u
 from api.resources.email_confirmation.email_confirmation import send_confirmation_email
 from api.resources.role_resource import RoleResource
 from api.utils import get_active_users, get_user_by_email, get_users_by_role, get_users_by_status, get_deactivated_user, \
-    format_and_lower_str, standard_non_empty_string, log_update
+    format_and_lower_str, standard_non_empty_string, log_update, get_query_params
 
 
 class UserResource(BaseResource):
@@ -24,6 +24,15 @@ class UserResource(BaseResource):
     }
 
     def get(self):
+        query_strings = get_query_params()
+        if query_strings is not None:
+            for query_string in query_strings:
+                query, total = User.search(query_string, 1, 15)
+
+                users = query.all()
+                data = marshal(users, self.fields)
+                return BaseResource.send_json_message(data, 200)
+
         email = request.headers.get('email')
         role = request.headers.get('role')
         deleted = request.headers.get('deleted')
