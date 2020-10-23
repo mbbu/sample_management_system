@@ -1,14 +1,8 @@
-from flask_migrate import Migrate
-from flask_sqlalchemy import SQLAlchemy
+from api import db
 
 
 class BaseModel(object):
-    db = SQLAlchemy()
-
-    @staticmethod
-    def init_db(app):
-        BaseModel.db.init_app(app)
-        return BaseModel.db
+    db = db
 
     @staticmethod
     def migrate_db():
@@ -32,8 +26,3 @@ class BaseModel(object):
             Box, Tray, Rack, QuantityType, Chamber,
             Freezer, Laboratory, Publication, Project, SampleRequest
         ]
-
-    @staticmethod
-    def init_app(app):
-        db = BaseModel.init_db(app)
-        Migrate(app=app, db=db, compare_type=True)
