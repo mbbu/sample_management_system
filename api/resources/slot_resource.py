@@ -1,7 +1,8 @@
 from faker import Faker
 from flask import current_app
 
-from api import BaseResource, BaseModel
+from api import BaseResource
+from api.models.database import BaseModel
 from api.models import Slot
 from api.utils import log_create, log_duplicate
 

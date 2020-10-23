@@ -2,7 +2,8 @@ from flask import current_app, request
 from flask_jwt_extended import jwt_required
 from flask_restful import fields, marshal, reqparse
 
-from api import BaseResource, BaseModel
+from api import BaseResource
+from api.models.database import BaseModel
 from api.models import QuantityType
 from api.resources.decorators.user_role_decorators import is_theme_admin
 from api.utils import non_empty_string, format_and_lower_str, log_delete, log_create, log_update, log_duplicate, \
