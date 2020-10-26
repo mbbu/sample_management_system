@@ -1,7 +1,11 @@
 from api.models.database import BaseModel
+from api.search.searchable_mixin import SearchableMixin
 
 
-class Tray(BaseModel.db.Model):
+class Tray(BaseModel.db.Model, SearchableMixin):
+    __tablename__ = index_name = 'tray'
+    __searchable__ = ['code', 'number']
+
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
     rack_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('rack.id', ondelete='SET NULL'), nullable=True)

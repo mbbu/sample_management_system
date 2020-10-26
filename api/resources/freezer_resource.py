@@ -8,7 +8,7 @@ from api.resources.base_resource import BaseResource
 from api.resources.decorators.user_role_decorators import is_theme_admin
 from api.resources.lab_resource import LaboratoryResource
 from api.utils import format_and_lower_str, non_empty_int, log_create, has_required_request_params, \
-    log_update, log_delete, log_duplicate, standard_non_empty_string, non_empty_string, log_304
+    log_update, log_delete, log_duplicate, standard_non_empty_string, non_empty_string, log_304, get_query_params
 
 
 class FreezerResource(BaseResource):
@@ -21,7 +21,16 @@ class FreezerResource(BaseResource):
     }
 
     def get(self):
-        if request.headers.get('code') is not None:
+        query_strings = get_query_params()
+        if query_strings is not None:
+            for query_string in query_strings:
+                query, total = Freezer.search(query_string, 1, 15)
+                freezers = query.all()
+
+                data = marshal(freezers, self.fields)
+                return BaseResource.send_json_message(data, 200)
+
+        elif request.headers.get('code') is not None:
             code = format_and_lower_str(request.headers['code'])
             freezer = FreezerResource.get_freezer(code)
             if freezer is None:

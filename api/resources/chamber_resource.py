@@ -8,7 +8,7 @@ from api.resources.base_resource import BaseResource
 from api.resources.decorators.user_role_decorators import is_theme_admin
 from api.resources.freezer_resource import FreezerResource
 from api.utils import format_and_lower_str, non_empty_string, log_create, log_duplicate, log_update, log_delete, \
-    has_required_request_params, non_empty_int, standard_non_empty_string, log_304
+    has_required_request_params, non_empty_int, standard_non_empty_string, log_304, get_query_params
 
 
 class ChamberResource(BaseResource):
@@ -20,7 +20,16 @@ class ChamberResource(BaseResource):
     }
 
     def get(self):
-        if request.headers.get('code') is not None:
+        query_strings = get_query_params()
+        if query_strings is not None:
+            for query_string in query_strings:
+                query, total = Chamber.search(query_string, 1, 15)
+                chambers = query.all()
+
+                data = marshal(chambers, self.fields)
+                return BaseResource.send_json_message(data, 200)
+
+        elif request.headers.get('code') is not None:
             code = format_and_lower_str(request.headers['code'])
             chamber = ChamberResource.get_chamber(code)
             if chamber is None:

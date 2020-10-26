@@ -2,9 +2,15 @@ from datetime import datetime
 
 from api.constants import SAMPLE_FROM_FIELD
 from api.models.database import BaseModel
+from api.search.searchable_mixin import SearchableMixin
 
 
-class Sample(BaseModel.db.Model):
+class Sample(BaseModel.db.Model, SearchableMixin):
+    __tablename__ = index_name = 'sample'
+    __searchable__ = ['animal_species', 'sample_type', 'status',
+                      'retention_date', 'barcode', 'analysis', 'code',
+                      'temperature', 'bio_hazard_level', 'created_at']
+
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
     theme_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('theme.id', ondelete='SET NULL'), nullable=True)

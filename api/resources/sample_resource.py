@@ -14,7 +14,7 @@ from api.resources.quantity_type_resource import QuantityTypeResource
 from api.resources.slot_resource import SlotResource
 from api.resources.theme_resource import ThemeResource
 from api.utils import format_and_lower_str, log_create, log_update, log_duplicate, \
-    has_required_request_params, non_empty_int, log_304, set_date_from_int, get_any_user_by_email
+    has_required_request_params, non_empty_int, log_304, set_date_from_int, get_any_user_by_email, get_query_params
 
 
 class SampleResource(BaseResource):
@@ -52,7 +52,16 @@ class SampleResource(BaseResource):
     }
 
     def get(self):
-        if request.headers.get('code') is not None:
+        query_strings = get_query_params()
+        if query_strings is not None:
+            for query_string in query_strings:
+                query, total = Sample.search(query_string, 1, 15)
+                samples = query.all()
+
+                data = marshal(samples, self.fields)
+                return BaseResource.send_json_message(data, 200)
+
+        elif request.headers.get('code') is not None:
             code = format_and_lower_str(request.headers['code'])
             sample = SampleResource.get_sample(code)
             if sample is None:
