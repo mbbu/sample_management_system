@@ -1,9 +1,13 @@
 from sqlalchemy.orm import backref
 
 from api.models.database import BaseModel
+from api.search.searchable_mixin import SearchableMixin
 
 
-class Slot(BaseModel.db.Model):
+class Slot(BaseModel.db.Model, SearchableMixin):
+    __tablename__ = index_name = 'slot'
+    __searchable__ = ['code', 'position', 'available']
+
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
     box_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('box.id'), nullable=False)

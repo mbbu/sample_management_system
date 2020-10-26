@@ -1,17 +1,43 @@
 from faker import Faker
 from flask import current_app
+from flask_restful import marshal, fields
 
 from api import BaseResource
 from api.models.database import BaseModel
 from api.models import Slot
-from api.utils import log_create, log_duplicate
+from api.utils import log_create, log_duplicate, get_query_params
 
 
 class SlotResource(BaseResource):
+    fields = {
+        'position': fields.String,
+        'code': fields.String,
+        'available': fields.Boolean,
+        'box.tray.number': fields.String,
+        'box.tray.rack.number': fields.String,
+        'box.tray.rack.chamber.type': fields.String,
+        'box.tray.rack.chamber.freezer.number': fields.String,
+        'box.tray.rack.chamber.freezer.lab.name': fields.String,
+        'box.tray.rack.chamber.freezer.lab.room': fields.String
+    }
+
     fake = Faker()
 
     def get(self):
-        return BaseResource.send_json_message("Coming up soon", 200)
+        query_strings = get_query_params()
+        if query_strings is not None:
+            for query_string in query_strings:
+                query, total = Slot.search(query_string, 1, 15)
+                boxes = query.all()
+
+                data = marshal(boxes, self.fields)
+                return BaseResource.send_json_message(data, 200)
+        else:
+            slots = Slot.query.all()
+            if slots is None:
+                return BaseResource.send_json_message("Slots not found", 404)
+            data = marshal(slots, self.fields)
+            return BaseResource.send_json_message(data, 200)
 
     @staticmethod
     def get_slot(code):
