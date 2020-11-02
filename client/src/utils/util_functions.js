@@ -62,9 +62,9 @@ export function viewPassword() {
 
 // DropDownList Functions
 // eslint-disable-next-line no-unused-vars
-export function getItemDataList(resource, headers=null) {
+export function getItemDataList(resource, params=null) {
     return axios.get(resource, {
-                    headers : headers
+                    params : params
         })
         .then((res) => {
             console.log("Response: " + res.status);
