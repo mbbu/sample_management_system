@@ -25,7 +25,13 @@ class FreezerResource(BaseResource):
         if query_strings is not None:
             for query_string in query_strings:
                 query, total = Freezer.search(query_string, 1, 15)
-                freezers = query.all()
+
+                # todo: fall-back option since elasticsearch index doesn't support relationship indexing
+                if total == 0:
+                    freezers = Freezer.query.filter\
+                        (Freezer.laboratory_id == LaboratoryResource.get_laboratory(query_string).id).all()
+                else:
+                    freezers = query.all()
 
                 data = marshal(freezers, self.fields)
                 return BaseResource.send_json_message(data, 200)
