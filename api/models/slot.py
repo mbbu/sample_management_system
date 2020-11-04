@@ -18,6 +18,9 @@ class Slot(BaseModel.db.Model, SearchableMixin):
     # relationships
     box = AppDb.relationship('Box', backref=backref('slots', cascade='all, delete-orphan'))
 
+    def __repr__(self):
+        return '<< Slot: (box={0} || pos={1} || available={2}) >>'.format(self.box, self.position, self.available)
+
     @staticmethod
     def slot_exists(code):
         if Slot.query.filter(
