@@ -27,9 +27,34 @@ class BoxResource(BaseResource):
         if query_strings is not None:
             for query_string in query_strings:
                 query, total = Box.search(query_string, 1, 15)
-                boxes = query.all()
 
-                data = marshal(boxes, self.fields)
+                if total == 0:
+                    # find all box in the selected freezer.
+                    box_list = []
+
+                    boxes = Box.query.all()
+                    for box in boxes:
+                        if box.tray.rack.chamber.freezer.code == query_string:
+                            # find all boxes that have a free slot.
+                            slots = []
+                            for slot in box.slots:
+                                letters = {'position': slot.position, 'available': slot.available}
+                                slots.append(letters)
+
+                            # try update box; convert box from an SQLAlchemy model to an OrderedDict
+                            box = marshal(box, self.fields)
+                            box['slots'] = slots  # updated box by adding slots
+
+                            # add modified box to box_list
+                            box_list.append(box)
+                        else:
+                            pass
+
+                    data = marshal(box_list, self.fields)
+                else:
+                    boxes = query.all()
+
+                    data = marshal(boxes, self.fields)
                 return BaseResource.send_json_message(data, 200)
 
         elif request.headers.get('code') is not None:
