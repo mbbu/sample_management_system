@@ -1,9 +1,11 @@
 from flask import current_app, request
+from flask_jwt_extended import jwt_required
 from flask_restful import fields, marshal, reqparse
 
 from api.models.box import Box
 from api.models.database import BaseModel
 from api.resources.base_resource import BaseResource
+from api.resources.decorators.user_role_decorators import is_theme_admin
 from api.resources.slot_resource import create_slots
 from api.resources.tray_resource import TrayResource
 from api.utils import format_and_lower_str, log_create, log_duplicate, log_update, log_delete, \
@@ -71,8 +73,8 @@ class BoxResource(BaseResource):
             data = marshal(boxes, self.fields)
             return BaseResource.send_json_message(data, 200)
 
-    # @jwt_required
-    # @is_theme_admin
+    @jwt_required
+    @is_theme_admin
     def post(self):
         args = BoxResource.box_args()
         tray = TrayResource.get_tray(args['tray']).id
@@ -102,8 +104,8 @@ class BoxResource(BaseResource):
             log_duplicate(Box.query.filter(Box.code == code).first())
             return BaseResource.send_json_message("Box already exists", 409)
 
-    # @jwt_required
-    # @is_theme_admin
+    @jwt_required
+    @is_theme_admin
     @has_required_request_params
     def put(self):
         code = format_and_lower_str(request.headers['code'])
@@ -134,8 +136,8 @@ class BoxResource(BaseResource):
         log_304(box)
         return BaseResource.send_json_message("No changes made", 304)
 
-    # @jwt_required
-    # @is_theme_admin
+    @jwt_required
+    @is_theme_admin
     @has_required_request_params
     def delete(self):
         code = format_and_lower_str(request.headers['code'])
