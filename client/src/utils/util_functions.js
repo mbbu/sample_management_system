@@ -293,31 +293,25 @@ export function getSelectedItemSetTextFieldValue(itemDataList, itemVar) {
 export function getSelectedBoxSetTextFieldValue(elementId, itemDataList) {
     let item = document.getElementById(elementId).value;
 
-    for (var i = 0; i < itemDataList.length; i++) {
+    for (let i = 0; i < itemDataList.length; i++) {
         if (item === itemDataList[i].Name) {
             let boxCode = itemDataList[i].Code;
             let trayNum = itemDataList[i].Tray;
             let rackNum = itemDataList[i].Rack;
             let chamberType = itemDataList[i].Chamber;
-            let freezerNum = itemDataList[i].Freezer;
-            let lab = itemDataList[i].Lab;
             return {
                 'boxCode': boxCode,
                 'tray': trayNum,
                 'rack': rackNum,
                 'chamber': chamberType,
-                'freezer': freezerNum,
-                'lab': lab
             }
-        } else {
-            console.log("NOT FOUND")
         }
     }
 }
 
 export function selectItemForUpdate(item) {
     // set dropdownItem to the selected item
-    var element = document.getElementById("dropdownlist");
+    let element = document.getElementById("dropdownlist");
     element.value = item;
 }
 
