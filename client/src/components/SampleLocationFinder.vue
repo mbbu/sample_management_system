@@ -11,7 +11,7 @@
                 <ejs-dropdownlist
                         id="lab-dropdownlist"
                         :dataSource='labData' :fields="labFields" :v-model="loc.lab"
-                        placeholder='Select a lab' :change='getFreezersOfSelectedLab'
+                        placeholder='Select a lab' @change='getFreezersOfSelectedLab'
                 ></ejs-dropdownlist>
             </b-form-group>
           </div>
@@ -90,7 +90,10 @@
     </div>
 </template>
 <script>
-import {extractApiData, getItemDataList, getSelectedBoxSetTextFieldValue} from "@/utils/util_functions";
+import {
+  extractApiData, extractBoxData, extractFreezerData,
+  getItemDataList, getSelectedBoxSetTextFieldValue, getSelectedItemCode
+} from "@/utils/util_functions";
 import {box_resource, freezer_resource, lab_resource} from "@/utils/api_paths";
 import EventBus from "@/components/EventBus";
 
@@ -144,14 +147,24 @@ export default {
       },
 
       getFreezersOfSelectedLab() {
+          // set the lab selected
+          this.loc.lab = getSelectedItemCode("lab-dropdownlist", this.labData)
+
           // enable freezer fields
           this.freezerEnabled = true
 
-          getItemDataList(freezer_resource, {
+          // reset list on getting new list
+          this.freezerData = []
+          this.loc.freezer = ''
+          this.boxData = []
+          this.loc.box = ''
+          this.boxEnabled = false
 
+          getItemDataList(freezer_resource, {
+              'q': this.loc.lab
           }).then(data => {
-            let freezerList = extractApiData(data);
-  
+            let freezerList = extractFreezerData(data);
+
             // update local variables with data from API
             this.freezerFields = freezerList['fields'];
             for (let i = 0; i < freezerList.items.length; i++) {
@@ -164,13 +177,20 @@ export default {
       },
 
       getBoxesInSelectedFreezer() {
+          // set the lab selected
+          this.loc.freezer = getSelectedItemCode("freezer-dropdownlist", this.freezerData)
+
           // enable box fields
           this.boxEnabled = true
 
-          getItemDataList(box_resource, {
+          // reset list on getting new list
+          this.boxData = []
+          this.loc.box = ''
 
+          getItemDataList(box_resource, {
+              'q' : this.loc.freezer
           }).then(data => {
-            let boxList = extractApiData(data);
+            let boxList = extractBoxData(data);
 
             // update local variables with data from API
             this.boxFields = boxList['fields'];
@@ -178,13 +198,17 @@ export default {
               this.boxData.push({
                 'Code': boxList.items[i].Code,
                 'Name': boxList.items[i].Name,
+                'Tray': boxList.items[i].Tray,
+                'Rack': boxList.items[i].Rack,
+                'Chamber': boxList.items[i].Chamber,
+                'Slots': boxList.items[i].Slots
               });
             }
           })
       },
 
       fillFormFieldsDependentOnBox() {
-          let dropdownSelection = getSelectedBoxSetTextFieldValue("box-dropdownlist", this.boxDataList);
+          let dropdownSelection = getSelectedBoxSetTextFieldValue("box-dropdownlist", this.boxData);
           this.loc.box = dropdownSelection.boxCode;
 
           // SET FIELDS TEXT
