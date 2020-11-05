@@ -32,7 +32,7 @@ class BoxResource(BaseResource):
 
                 if total == 0:
                     # find all box in the selected freezer.
-                    box_list = []
+                    data = []
 
                     boxes = Box.query.all()
                     for box in boxes:
@@ -47,12 +47,10 @@ class BoxResource(BaseResource):
                             box = marshal(box, self.fields)
                             box['slots'] = slots  # updated box by adding slots
 
-                            # add modified box to box_list
-                            box_list.append(box)
+                            # add modified box to data
+                            data.append(box)
                         else:
                             pass
-
-                    data = marshal(box_list, self.fields)
                 else:
                     boxes = query.all()
 
