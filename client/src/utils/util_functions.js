@@ -147,15 +147,16 @@ export function extractBoxData(data) {
     let fields = {text: '', value: ''};
     let resultObject = {items: itemList, fields: fields};
 
-    for (var item = 0; item < data.length; item++) {
+    for (let item = 0; item < data.length; item++) {
         itemList.push({
             'Code': data[item].code,
             'Name': data[item].label,
             'Tray': data[item]['tray.number'],
             'Rack': data[item]['tray.rack.number'],
             'Chamber': data[item]['tray.rack.chamber.type'],
-            'Freezer': data[item]['tray.rack.chamber.freezer.number'],
-            'Lab': data[item]['tray.rack.chamber.freezer.lab.name'] + " room " + data[item]['tray.rack.chamber.freezer.lab.room'],
+            'Slots': data[item].slots
+            // 'Freezer': data[item]['tray.rack.chamber.freezer.number'],
+            // 'Lab': data[item]['tray.rack.chamber.freezer.lab.name'] + " room " + data[item]['tray.rack.chamber.freezer.lab.room'],
         });
         fields.text = 'Name';
         fields.value = 'Code';
