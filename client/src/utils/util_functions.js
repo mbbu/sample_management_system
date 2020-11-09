@@ -300,11 +300,13 @@ export function getSelectedBoxSetTextFieldValue(elementId, itemDataList) {
             let trayNum = itemDataList[i].Tray;
             let rackNum = itemDataList[i].Rack;
             let chamberType = itemDataList[i].Chamber;
+            let slots = itemDataList[i].Slots;
             return {
                 'boxCode': boxCode,
                 'tray': trayNum,
                 'rack': rackNum,
                 'chamber': chamberType,
+                'slots': slots,
             }
         }
     }
