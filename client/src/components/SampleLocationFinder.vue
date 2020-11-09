@@ -47,6 +47,18 @@
     </div>
     <!-- END ROW 1 -->
 
+
+    <!--DRAWING BOX SLOTS-->
+      <table id="slots" class="grid" style="--cols:0;">
+        <tr :key="x" v-for="x in this.loc.slots.length">
+          <td>
+            <input type="hidden">
+            <div class="cell"></div>
+          </td>
+        </tr>
+      </table>
+    <!-- END SLOTS -->
+
     <!-- START ROW 2 -->
     <div class="row">
       <!-- CHAMBER-->
@@ -80,12 +92,6 @@
     </div>
     <!-- END ROW 2 -->
 
-
-    <!-- SLOT -->
-    <div class="form-group">
-      <ejs-dropdownlist id='slot' ref='slot' :dataSource='slotData' :fields='slotFields' placeholder='Select a slot'></ejs-dropdownlist>
-    </div>
-
       </div>
     </div>
 </template>
@@ -102,7 +108,7 @@ export default {
     return {
       loc: {
         lab: '', freezer: '', chamber: '',
-        rack: '', tray: '', box: '', slot: '',
+        rack: '', tray: '', box: '', slots: '',
       },
 
       // disabled fields
@@ -114,6 +120,10 @@ export default {
       freezerData: [],
       boxData: [],
       slotData: [],
+
+      // slots data
+      rows: null,
+      cols: null,
 
       // fields
       labFields: { value: '', text: '' },
@@ -207,7 +217,20 @@ export default {
           })
       },
 
+      resetBeforeChange(){
+          this.rows = '';
+          this.cols = '';
+          this.loc.box = '';
+          this.loc.tray = '';
+          this.loc.rack = '';
+          this.loc.slots = '';
+          this.loc.chamber = '';
+          document.getElementById('slots').style.setProperty("--cols", "0");
+      },
+    
       fillFormFieldsDependentOnBox() {
+          this.resetBeforeChange();
+
           let dropdownSelection = getSelectedBoxSetTextFieldValue("box-dropdownlist", this.boxData);
           this.loc.box = dropdownSelection.boxCode;
 
@@ -215,7 +238,17 @@ export default {
           this.loc.tray = dropdownSelection.tray;
           this.loc.rack = dropdownSelection.rack;
           this.loc.chamber = dropdownSelection.chamber;
+          this.loc.slots = dropdownSelection.slots
+
+          // draw the slots of the selected box.
+          // det the dimension of slots i.e rows and cols
+          let last_slot = this.loc.slots[this.loc.slots.length - 1]
+          this.rows = last_slot.position.row
+          this.cols = last_slot.position.col
+
+          let pad = document.getElementById('slots').style.getPropertyValue("--cols");
+          document.getElementById('slots').style.setProperty("--cols", parseInt(pad) + this.cols);
       },
-    }
+  }
 }
 </script>
