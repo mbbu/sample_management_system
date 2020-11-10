@@ -18,6 +18,10 @@ class Slot(BaseModel.db.Model, SearchableMixin):
     # relationships
     box = AppDb.relationship('Box', backref=backref('slots', cascade='all, delete-orphan'))
 
+    __mapper_args__ = {
+        "order_by": id
+    }
+
     def __repr__(self):
         return '<< Slot: (box={0} || pos={1} || available={2}) >>'.format(self.box, self.position, self.available)
 
