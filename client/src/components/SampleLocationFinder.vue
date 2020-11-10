@@ -2,7 +2,7 @@
   <div id="app">
     <div id='container'>
       
-      <!-- START ROW 1 -->
+    <!-- START ROW 1 -->
       <div class="row">
         <!-- LAB -->
         <div class="col">
@@ -47,16 +47,38 @@
     </div>
     <!-- END ROW 1 -->
 
+      <!--DRAWING BOX SLOTS-->
+      <mdb-row class="d-flex align-items-center mb-4 mt-5">
+        <mdb-col class="d-flex justify-content-center" md="7">
+      <div>
+        <table id="slots" class="grid" style="--cols:0;">
+          <tr :key="i" v-for="(x,i) in this.loc.slots">
+            <td>
+              <div v-if="x.available === true">
+                  <input type="hidden">
+                  <div class="cell-available"></div>
+              </div>
+              <div v-else>
+                <div class="cell-occupied" :enabled='slotEnabled'></div>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+        </mdb-col>
 
-    <!--DRAWING BOX SLOTS-->
-      <table id="slots" class="grid" style="--cols:0;">
-        <tr :key="x" v-for="x in this.loc.slots.length">
-          <td>
-            <input type="hidden">
-            <div class="cell"></div>
-          </td>
-        </tr>
-      </table>
+        <!--LEGEND-->
+        <mdb-col class="d-flex justify-content-start" md="5">
+        <div>
+          <ul class="legend">
+            <li><em>Key: </em></li>
+            <li><span class="available"></span> Slot Available</li>
+            <li><span class="occupied"></span> Slot Occupied</li>
+            <li><span class="selected"></span> Slot Selected</li>
+          </ul>
+      </div>
+    </mdb-col>
+      </mdb-row>
     <!-- END SLOTS -->
 
     <!-- START ROW 2 -->
@@ -102,18 +124,20 @@ import {
 } from "@/utils/util_functions";
 import {box_resource, freezer_resource, lab_resource} from "@/utils/api_paths";
 import EventBus from "@/components/EventBus";
+import {mdbCol, mdbRow} from "mdbvue";
 
 export default {
   data () {
     return {
       loc: {
         lab: '', freezer: '', chamber: '',
-        rack: '', tray: '', box: '', slots: '',
+        rack: '', tray: '', box: '', slots: [],
       },
 
       // disabled fields
       freezerEnabled: false,
       boxEnabled: false,
+      slotEnabled: false,
 
       // data lists
       labData: [],
@@ -240,6 +264,8 @@ export default {
           this.loc.chamber = dropdownSelection.chamber;
           this.loc.slots = dropdownSelection.slots
 
+          this.$log.info('Slot list: ', this.loc.slots)
+
           // draw the slots of the selected box.
           // det the dimension of slots i.e rows and cols
           let last_slot = this.loc.slots[this.loc.slots.length - 1]
@@ -248,7 +274,14 @@ export default {
 
           let pad = document.getElementById('slots').style.getPropertyValue("--cols");
           document.getElementById('slots').style.setProperty("--cols", parseInt(pad) + this.cols);
+
+          this.$log.info('Slot list: ', this.loc.slots)
+          this.$log.info('last slot: ', last_slot)
+          this.$log.info('Rows: ' , this.rows,  "\nCols: ", this.cols)
+
+          this.$log.info('Grid config: ', document.getElementById('slots').style.getPropertyValue("--cols"))
       },
-  }
+  },
+  components: {mdbRow, mdbCol},
 }
 </script>
