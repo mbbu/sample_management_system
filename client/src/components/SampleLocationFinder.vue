@@ -55,11 +55,12 @@
           <tr :key="i" v-for="(x,i) in this.loc.slots">
             <td>
               <div v-if="x.available === true">
-                  <input type="hidden">
-                  <div class="cell-available"></div>
+                <div class="cell-available">
+                 <label :for="`${{i}}`"><input :id="`${{i}}`" type="checkbox"/></label>
+                </div>
               </div>
               <div v-else>
-                <div class="cell-occupied" :enabled='slotEnabled'></div>
+                <div class="cell-occupied"></div>
               </div>
             </td>
           </tr>
