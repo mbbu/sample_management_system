@@ -55,8 +55,7 @@
           <tr :key="i" v-for="(x,i) in this.loc.slots">
             <td>
               <div v-if="x.available === true">
-                <div class="cell-available">
-                 <label :for="`${{i}}`"><input :id="`${{i}}`" type="checkbox"/></label>
+                <div  ref="cells" class="cell-available" @click="runCellAvailable(x, i)">
                 </div>
               </div>
               <div v-else>
@@ -144,7 +143,7 @@ export default {
       labData: [],
       freezerData: [],
       boxData: [],
-      slotData: [],
+      selectedSlots: [],
 
       // slots data
       rows: null,
@@ -250,6 +249,7 @@ export default {
           this.loc.rack = '';
           this.loc.slots = '';
           this.loc.chamber = '';
+          this.selectedSlots = []
           document.getElementById('slots').style.setProperty("--cols", "0");
       },
     
@@ -281,6 +281,34 @@ export default {
           this.$log.info('Rows: ' , this.rows,  "\nCols: ", this.cols)
 
           this.$log.info('Grid config: ', document.getElementById('slots').style.getPropertyValue("--cols"))
+      },
+
+      runCellAvailable(cellData, pos){
+          this.$log.info('div cell clicked', cellData, ' at position ' + pos)
+
+          this.$log.info('ref to div elements', this.$refs.cells[pos])
+
+          // capture the code of the element
+          if (this.selectedSlots.includes(cellData.code)){
+            // revert the selection
+            for( let i = 0; i < this.selectedSlots.length; i++){
+              if ( this.selectedSlots[i] === cellData.code) { this.selectedSlots.splice(i, 1); i--; }
+            }
+
+            // update the cell formatting: todo
+            // this.$refs.cells[pos].style.backgroundColor = 'blue'
+            // this.$refs.cells[pos].style.border = "1px solid rgba(81, 203, 238, 1)";
+            // this.$refs.cells[pos].style.boxShadow = "0 0 5px rgba(81, 203, 238, 1)";
+          } else{
+            // add to list
+            this.selectedSlots.push(cellData.code)
+
+            // update the cell formatting: todo
+            // this.$refs.cells[pos].style.backgroundColor = 'blue'
+            // this.$refs.cells[pos].style.border = "1px solid rgba(81, 203, 238, 1)";
+            // this.$refs.cells[pos].style.boxShadow = "0 0 5px rgba(81, 203, 238, 1)";
+          }
+          this.$log.info('selected cells are; ' , this.selectedSlots)
       },
   },
   components: {mdbRow, mdbCol},
