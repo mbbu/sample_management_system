@@ -265,8 +265,6 @@ export default {
           this.loc.chamber = dropdownSelection.chamber;
           this.loc.slots = dropdownSelection.slots
 
-          this.$log.info('Slot list: ', this.loc.slots)
-
           // draw the slots of the selected box.
           // det the dimension of slots i.e rows and cols
           let last_slot = this.loc.slots[this.loc.slots.length - 1]
@@ -275,12 +273,6 @@ export default {
 
           let pad = document.getElementById('slots').style.getPropertyValue("--cols");
           document.getElementById('slots').style.setProperty("--cols", parseInt(pad) + this.cols);
-
-          this.$log.info('Slot list: ', this.loc.slots)
-          this.$log.info('last slot: ', last_slot)
-          this.$log.info('Rows: ' , this.rows,  "\nCols: ", this.cols)
-
-          this.$log.info('Grid config: ', document.getElementById('slots').style.getPropertyValue("--cols"))
       },
 
       runCellAvailable(cellData, pos){
