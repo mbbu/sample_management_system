@@ -40,8 +40,8 @@ class BoxResource(BaseResource):
                             # find all boxes that have a free slot.
                             slots = []
                             for slot in box.slots:
-                                letters = {'position': slot.position, 'available': slot.available}
-                                slots.append(letters)
+                                slots.append(
+                                    {'code': slot.code, 'position': slot.position, 'available': slot.available})
 
                             # try update box; convert box from an SQLAlchemy model to an OrderedDict
                             box = marshal(box, self.fields)
