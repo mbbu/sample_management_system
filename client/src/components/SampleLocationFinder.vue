@@ -276,31 +276,39 @@ export default {
       },
 
       runCellAvailable(cellData, pos){
-          this.$log.info('div cell clicked', cellData, ' at position ' + pos)
+          // get slots that are available
+          let availableSlots = []
+          for (let x=0; x < this.loc.slots.length; x++){
+            if (this.loc.slots[x].available === true ){
+              availableSlots.push(this.loc.slots[x])
+            }
+          }
 
-          this.$log.info('ref to div elements', this.$refs.cells[pos])
+          // check for the position of this slot in the available slots and assign pos to it
+          for (let x=0; x < availableSlots.length; x++){ if (availableSlots[x].code === cellData.code ){ pos = x} }
 
           // capture the code of the element
           if (this.selectedSlots.includes(cellData.code)){
-            // revert the selection
+
+            // revert the selection; remove from array
             for( let i = 0; i < this.selectedSlots.length; i++){
               if ( this.selectedSlots[i] === cellData.code) { this.selectedSlots.splice(i, 1); i--; }
             }
 
-            // update the cell formatting: todo
-            // this.$refs.cells[pos].style.backgroundColor = 'blue'
-            // this.$refs.cells[pos].style.border = "1px solid rgba(81, 203, 238, 1)";
-            // this.$refs.cells[pos].style.boxShadow = "0 0 5px rgba(81, 203, 238, 1)";
+            // revert the cell formatting
+            this.$refs.cells[pos].style.backgroundColor = 'green'
+            this.$refs.cells[pos].style.border = "none";
+            this.$refs.cells[pos].style.boxShadow = "none";
+
           } else{
             // add to list
             this.selectedSlots.push(cellData.code)
 
-            // update the cell formatting: todo
-            // this.$refs.cells[pos].style.backgroundColor = 'blue'
-            // this.$refs.cells[pos].style.border = "1px solid rgba(81, 203, 238, 1)";
-            // this.$refs.cells[pos].style.boxShadow = "0 0 5px rgba(81, 203, 238, 1)";
+            // update the cell formatting
+            this.$refs.cells[pos].style.backgroundColor = 'blue'
+            this.$refs.cells[pos].style.border = "1px solid rgba(81, 203, 238, 1)";
+            this.$refs.cells[pos].style.boxShadow = "0 0 5px rgba(81, 203, 238, 1)";
           }
-          this.$log.info('selected cells are; ' , this.selectedSlots)
       },
   },
   components: {mdbRow, mdbCol},
