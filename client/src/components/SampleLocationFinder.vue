@@ -48,37 +48,33 @@
     <!-- END ROW 1 -->
 
       <!--DRAWING BOX SLOTS-->
-      <mdb-row class="d-flex align-items-center mb-4 mt-5">
-        <mdb-col class="d-flex justify-content-center" md="7">
-      <div>
-        <table id="slots" class="grid" style="--cols:0;">
-          <tr :key="i" v-for="(x,i) in this.loc.slots">
-            <td>
-              <div v-if="x.available === true">
-                <div  ref="cells" class="cell-available" @click="runCellAvailable(x, i)">
+      <div class="row">
+        <div class="col">
+          <table id="slots" class="grid" style="--cols:0;">
+            <tr :key="i" v-for="(x,i) in this.loc.slots">
+              <td>
+                <div v-if="x.available === true">
+                  <div  ref="cells" class="cell-available" @click="runCellAvailable(x, i)">
+                  </div>
                 </div>
-              </div>
-              <div v-else>
-                <div class="cell-occupied"></div>
-              </div>
-            </td>
-          </tr>
-        </table>
-      </div>
-        </mdb-col>
+                <div v-else>
+                  <div class="cell-occupied"></div>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
 
-        <!--LEGEND-->
-        <mdb-col class="d-flex justify-content-start" md="5">
-        <div>
-          <ul class="legend">
-            <li><em>Key: </em></li>
-            <li><span class="available"></span> Slot Available</li>
-            <li><span class="occupied"></span> Slot Occupied</li>
-            <li><span class="selected"></span> Slot Selected</li>
-          </ul>
+          <!--LEGEND-->
+          <div class="col">
+            <ul class="legend">
+              <li><em>Key: </em></li>
+              <li><span class="available"></span> Slot Available</li>
+              <li><span class="occupied"></span> Slot Occupied</li>
+              <li><span class="selected"></span> Slot Selected</li>
+            </ul>
+        </div>
       </div>
-    </mdb-col>
-      </mdb-row>
     <!-- END SLOTS -->
 
     <!-- START ROW 2 -->
@@ -124,7 +120,6 @@ import {
 } from "@/utils/util_functions";
 import {box_resource, freezer_resource, lab_resource} from "@/utils/api_paths";
 import EventBus from "@/components/EventBus";
-import {mdbCol, mdbRow} from "mdbvue";
 
 export default {
   data () {
@@ -311,6 +306,5 @@ export default {
           }
       },
   },
-  components: {mdbRow, mdbCol},
 }
 </script>
