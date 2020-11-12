@@ -104,22 +104,6 @@ ul li {
   cursor: not-allowed !important;;
 }
 
-.cell-selected {
-  width: 30px;
-  height: 30px;
-  background: blue;
-  display: table-cell;
-}
-
-input {
-    display: none;
-}
-:checked + label {
-  border: 1px solid rgba(81, 203, 238, 1);
-  box-shadow: 0 0 5px rgba(81, 203, 238, 1);
-  background: #074880;
-}
-
 // legends for slots
 /* basic positioning */
 .legend { list-style: none; border: double; margin-left: -5px; }
