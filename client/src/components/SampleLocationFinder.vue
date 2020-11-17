@@ -48,7 +48,7 @@
     <!-- END ROW 1 -->
 
       <!--DRAWING BOX SLOTS-->
-      <div class="row">
+      <div class="row" @mouseover="slotsCreated">
         <div class="col">
           <table id="slots" class="grid" style="--cols:0;">
             <tr :key="i" v-for="(x,i) in this.loc.slots">
@@ -144,6 +144,11 @@ export default {
       rows: null,
       cols: null,
 
+      // slotDeselection
+      cellPos: [],
+      cellData: [],
+      availableSlots: [],
+
       // fields
       labFields: { value: '', text: '' },
       freezerFields: { value: '', text: '' },
@@ -236,16 +241,30 @@ export default {
           })
       },
 
+      slotsCreated(){ return this.$refs.cells },
+
       resetBeforeChange(){
+          this.$log.info('resetBeforeChange called')
           this.rows = '';
           this.cols = '';
           this.loc.box = '';
           this.loc.tray = '';
           this.loc.rack = '';
-          this.loc.slots = '';
+          this.loc.slots = [];
           this.loc.chamber = '';
-          this.selectedSlots = []
           document.getElementById('slots').style.setProperty("--cols", "0");
+
+          // remove selections
+          const len = this.selectedSlots.length
+          for (let x=0; x < len; x++){
+             // capture the code of the element
+            if (this.selectedSlots.includes(this.cellData[x].code)){
+              this.$log.info('Cell has been found!: ', this.cellData[x], 'at position ', this.cellPos[x])
+              this.revertCellSelection(this.cellData[x], this.cellPos[x])
+            }
+          }
+
+          this.selectedSlots = [] // reset list now!
       },
     
       fillFormFieldsDependentOnBox() {
@@ -266,35 +285,30 @@ export default {
           this.rows = last_slot.position.row
           this.cols = last_slot.position.col
 
+          // get slots that are available
+          this.availableSlots = []
+          for (let x=0; x < this.loc.slots.length; x++){
+            if (this.loc.slots[x].available === true ){
+              this.availableSlots.push(this.loc.slots[x])
+            }
+          }
+
           let pad = document.getElementById('slots').style.getPropertyValue("--cols");
           document.getElementById('slots').style.setProperty("--cols", parseInt(pad) + this.cols);
       },
 
       runCellAvailable(cellData, pos){
-          // get slots that are available
-          let availableSlots = []
-          for (let x=0; x < this.loc.slots.length; x++){
-            if (this.loc.slots[x].available === true ){
-              availableSlots.push(this.loc.slots[x])
+          // check for the position of this slot in the available slots and assign pos to it
+          for (let x=0; x < this.availableSlots.length; x++) {
+            if (this.availableSlots[x].code === cellData.code ) {
+              pos = x;
+              this.cellPos.push(pos); this.cellData.push(cellData); // update relevant lists
             }
           }
 
-          // check for the position of this slot in the available slots and assign pos to it
-          for (let x=0; x < availableSlots.length; x++){ if (availableSlots[x].code === cellData.code ){ pos = x} }
-
           // capture the code of the element
           if (this.selectedSlots.includes(cellData.code)){
-
-            // revert the selection; remove from array
-            for( let i = 0; i < this.selectedSlots.length; i++){
-              if ( this.selectedSlots[i] === cellData.code) { this.selectedSlots.splice(i, 1); i--; }
-            }
-
-            // revert the cell formatting
-            this.$refs.cells[pos].style.backgroundColor = 'green'
-            this.$refs.cells[pos].style.border = "none";
-            this.$refs.cells[pos].style.boxShadow = "none";
-
+            this.revertCellSelection(cellData, pos)
           } else{
             // add to list
             this.selectedSlots.push(cellData.code)
@@ -305,6 +319,17 @@ export default {
             this.$refs.cells[pos].style.boxShadow = "0 0 5px rgba(81, 203, 238, 1)";
           }
       },
+
+    revertCellSelection(cellData, pos){
+      // revert the selection; remove from array
+      for( let i = 0; i < this.selectedSlots.length; i++)
+      {if ( this.selectedSlots[i] === cellData.code) { this.selectedSlots.splice(i, 1); i--; }}
+
+      // revert the cell formatting
+      this.$refs.cells[pos].style.backgroundColor = 'green'
+      this.$refs.cells[pos].style.border = "none";
+      this.$refs.cells[pos].style.boxShadow = "none";
+    },
   },
 }
 </script>
