@@ -241,7 +241,9 @@ export default {
           })
       },
 
-      slotsCreated(){ return this.$refs.cells },
+      slotsCreated(){
+        return this.$refs.cells
+      },
 
       resetBeforeChange(){
           this.rows = '';
@@ -256,7 +258,6 @@ export default {
           // remove selections
           const len = this.selectedSlots.length
           for (let x=0; x < len; x++){
-             // capture the code of the element
             if (this.selectedSlots.includes(this.cellData[x].code)){
               this.revertCellSelection(this.cellData[x], this.cellPos[x])
             }
@@ -293,6 +294,12 @@ export default {
 
           let pad = document.getElementById('slots').style.getPropertyValue("--cols");
           document.getElementById('slots').style.setProperty("--cols", parseInt(pad) + this.cols);
+
+          for (let i=0; i < this.loc.slots.length; i++){
+            if (this.loc.slots[i].available === false){
+              this.$refs.cells[i].style.backgroundColor = 'darkred'
+            }
+          }
       },
 
       runCellAvailable(cellData, pos){
