@@ -244,7 +244,6 @@ export default {
       slotsCreated(){ return this.$refs.cells },
 
       resetBeforeChange(){
-          this.$log.info('resetBeforeChange called')
           this.rows = '';
           this.cols = '';
           this.loc.box = '';
@@ -259,7 +258,6 @@ export default {
           for (let x=0; x < len; x++){
              // capture the code of the element
             if (this.selectedSlots.includes(this.cellData[x].code)){
-              this.$log.info('Cell has been found!: ', this.cellData[x], 'at position ', this.cellPos[x])
               this.revertCellSelection(this.cellData[x], this.cellPos[x])
             }
           }
