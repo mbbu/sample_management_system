@@ -1,11 +1,10 @@
-from faker import Faker
 from flask import current_app
 from flask_restful import marshal, fields
 
 from api import BaseResource
-from api.models.database import BaseModel
 from api.models import Slot
-from api.utils import log_create, log_duplicate, get_query_params
+from api.models.database import BaseModel
+from api.utils import log_create, log_duplicate, get_query_params, fake
 
 
 class SlotResource(BaseResource):
@@ -20,8 +19,6 @@ class SlotResource(BaseResource):
         'box.tray.rack.chamber.freezer.lab.name': fields.String,
         'box.tray.rack.chamber.freezer.lab.room': fields.String
     }
-
-    fake = Faker()
 
     def get(self):
         query_strings = get_query_params()
@@ -54,7 +51,7 @@ def create_slots(box, row, col):
     for rc in matrix:
         for pos in rc:
             # auto-generate code
-            code = SlotResource.fake.ean(length=8)
+            code = fake.ean(length=8)
 
             if not Slot.slot_exists(code):
                 try:
