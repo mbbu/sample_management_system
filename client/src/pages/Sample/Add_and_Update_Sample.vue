@@ -78,7 +78,7 @@
 
                 <!-- TAB 2 -->
                 <tab-content :before-change="handleSubmit" title="Sample Location in Institution">
-                    <div class="form-group">
+                    <div v-if="isUpdate" class="form-group">
                         <label for="locationCollected">Location Collected</label>
                         <input class="form-control" id="locationCollected" required type="text"
                                v-model="sample.locationCollected"/>
@@ -145,7 +145,7 @@
                         </b-form-group>
                     </div>
 
-                    <div class="form-group">
+                    <div v-if="isUpdate" class="form-group">
                         <label for="code"> Code</label>
                         <input class="form-control" id="code" required
                                type="text"
@@ -155,7 +155,7 @@
                         </div>
                     </div>
 
-                    <div class="form-group">
+                    <div v-if="isUpdate" class="form-group">
                         <label for="barcode"> Barcode</label>
                         <input class="form-control" id="barcode" required type="text" v-model="sample.barcode"/>
                     </div>
@@ -251,6 +251,7 @@ export default {
         tray: "", rack: "", chamber: "", freezer: "", lab: "",
       },
       submitted: false,
+      isUpdate: false,
 
       tabNum: 0, tabOne: 0, tabTwo: 1, tabThree: 2,
 
@@ -272,6 +273,7 @@ export default {
           if (isUpdate()) {
               // call function to fill form
               this.fillSampleFormForUpdate()
+              this.isUpdate = true;
           } else {
               this.getDataListItemsForForm()
           }
@@ -380,9 +382,7 @@ export default {
                   break;
 
               case 1:
-                  if (!this.sample.locationCollected) {
-                      this.errors.push("Location is required");
-                  } if (!this.sample.slots.length) {
+                  if (!this.sample.slots.length) {
                       this.errors.push("Slot(s) is required");
                   } if (!this.sample.temperature) {
                       this.errors.push("Temperature is required");
@@ -401,10 +401,6 @@ export default {
               case 2:
                   if (!this.sample.securityLevel) {
                       this.errors.push("Security level is required");
-                  } if (!this.sample.code) {
-                      this.errors.push("Code is required");
-                  } if (!this.sample.barcode) {
-                      this.errors.push("Barcode Owner is required");
                   } if (!this.sample.analysis) {
                       this.errors.push("Analysis is required");
                   } if (!this.sample.retention) {
