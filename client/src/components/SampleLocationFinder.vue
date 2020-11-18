@@ -48,7 +48,7 @@
     <!-- END ROW 1 -->
 
       <!--DRAWING BOX SLOTS-->
-      <div class="row" @mouseover="slotsCreated">
+      <div class="row">
         <div class="col">
           <table id="slots" class="grid" style="--cols:0;">
             <tr :key="i" v-for="(x,i) in this.loc.slots">
@@ -241,10 +241,6 @@ export default {
           })
       },
 
-      slotsCreated(){
-        return this.$refs.cells
-      },
-
       resetBeforeChange(){
           this.rows = '';
           this.cols = '';
@@ -323,9 +319,12 @@ export default {
             this.$refs.cells[pos].style.border = "1px solid rgba(81, 203, 238, 1)";
             this.$refs.cells[pos].style.boxShadow = "0 0 5px rgba(81, 203, 238, 1)";
           }
+
+          //  emit event to notify parent component
+          EventBus.$emit('slotSelected', this.selectedSlots)
       },
 
-    revertCellSelection(cellData, pos){
+      revertCellSelection(cellData, pos){
       // revert the selection; remove from array
       for( let i = 0; i < this.selectedSlots.length; i++)
       {if ( this.selectedSlots[i] === cellData.code) { this.selectedSlots.splice(i, 1); i--; }}
