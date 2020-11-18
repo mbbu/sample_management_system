@@ -245,7 +245,7 @@ export default {
         theme: "", sampleOwner: "", project: "", projectHead: "", sampleType: "",
         species: "", description: "", box: "", locationCollected: "", retention: "",
         convertedRetentionPeriod: "", barcode: "", analysis: "", temperature: "",
-        amount: "", quantity_type: "", securityLevel: "", code: "",
+        amount: "", quantity_type: "", securityLevel: "", code: "", slots:[],
 
         // extra fields
         tray: "", rack: "", chamber: "", freezer: "", lab: "",
@@ -259,6 +259,10 @@ export default {
       fields: {text: '', value: ''},
       page_title: "Add Sample",
     };
+  },
+
+  mounted(){
+    EventBus.$on('slotSelected', payload=> { this.sample.slots = payload })
   },
 
   methods: {
@@ -378,8 +382,8 @@ export default {
               case 1:
                   if (!this.sample.locationCollected) {
                       this.errors.push("Location is required");
-                  } if (!this.sample.box) {
-                      this.errors.push("Box is required");
+                  } if (!this.sample.slots.length) {
+                      this.errors.push("Slot(s) is required");
                   } if (!this.sample.temperature) {
                       this.errors.push("Temperature is required");
                   } if (!this.sample.amount) {
@@ -479,13 +483,13 @@ export default {
 
               axios.post(sample_resource, {
                 theme: this.sample.theme,
-                user: this.sample.user,
-                box: this.sample.box,
+                user: this.sample.sampleOwner,
+                slots: this.sample.slots,
                 animal_species: this.sample.species,
                 sample_type: this.sample.sampleType,
                 sample_description: this.sample.description,
                 project: this.sample.project,
-                project_owner: this.sample.projectOwner,
+                project_owner: this.sample.projectHead,
                 retention_period: this.sample.convertedRetentionPeriod,
                 barcode: this.sample.barcode,
                 analysis: this.sample.analysis,
@@ -539,7 +543,7 @@ export default {
           let sampleForUpdate = getSampleDetailsForEditing()
 
           this.sample.project = sampleForUpdate['project'];
-          this.sample.projectOwner = sampleForUpdate['project_owner'];
+          this.sample.projectHead = sampleForUpdate['project_owner'];
           this.sample.sampleType = sampleForUpdate['sample_type'];
           this.sample.species = sampleForUpdate['animal_species'];
           this.sample.description = sampleForUpdate['sample_description'];
@@ -559,7 +563,7 @@ export default {
 
           // drop-down data
           this.sample.theme = sampleForUpdate['theme.name'];
-          this.sample.user = sampleForUpdate['user.first_name'] + " " + sampleForUpdate['user.last_name'];
+          this.sample.sampleOwner = sampleForUpdate['user.first_name'] + " " + sampleForUpdate['user.last_name'];
           this.sample.box = sampleForUpdate['box.label'];
           this.sample.quantity_type = sampleForUpdate['quantity.id'];
           this.sample.securityLevel = sampleForUpdate['bioHazardLevel.code'];
@@ -589,13 +593,13 @@ export default {
 
           axios.put(sample_resource, {
             theme: this.sample.theme,
-            user: this.sample.user,
-            box: this.sample.box,
+            user: this.sample.sampleOwner,
+            slots: this.sample.slots,
             animal_species: this.sample.species,
             sample_type: this.sample.sampleType,
             sample_description: this.sample.description,
             project: this.sample.project,
-            project_owner: this.sample.projectOwner,
+            project_owner: this.sample.projectHead,
             retention_period: this.sample.convertedRetentionPeriod,
             barcode: this.sample.barcode,
             analysis: this.sample.analysis,
@@ -641,9 +645,9 @@ export default {
               });
       },
   },
-  created() {
-      this.onLoadPage();
-  },
+
+  created() { this.onLoadPage(); },
+
   components: {SampleLocationFinder, TopNav, ErrorsDisplay}
 };
 </script>
