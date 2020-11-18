@@ -186,7 +186,7 @@ class SampleResource(BaseResource):
         parser = reqparse.RequestParser()
         parser.add_argument('theme', required=True)
         parser.add_argument('user', required=False, type=non_empty_int)
-        parser.add_argument('slot', required=False)
+        parser.add_argument('slots', required=False)
         parser.add_argument('animal_species', required=False)
         parser.add_argument('sample_type', required=False)
         parser.add_argument('sample_description', required=False)
@@ -206,7 +206,7 @@ class SampleResource(BaseResource):
 
         theme_id = args['theme']
         user_id = args['user']
-        slot_code = args['slot']
+        slot_code = args['slots']
         animal_species = args['animal_species']
         sample_type = args['sample_type']
         sample_description = args['sample_description']
