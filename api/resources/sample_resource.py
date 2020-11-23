@@ -1,3 +1,5 @@
+import json
+
 from datetime import datetime
 
 from flask import current_app, request
@@ -79,39 +81,47 @@ class SampleResource(BaseResource):
 
     @jwt_required
     def post(self):
-        code = fake.ean(length=8)
-        barcode = fake.ean(length=13)
-
         args = SampleResource.sample_args()
-        print(args['slots'])
+        slots = json.loads(args['slots'])
 
         theme = ThemeResource.get_theme(args['theme']).id
         user = get_any_user_by_email(args['user']).id
-        slot = SlotResource.get_slot(args['slots']).id
         qt = QuantityTypeResource.get_quantity_type(args['quantity_type']).id
         bhl = BioHazardLevelResource.get_bio_hazard_level(args['bio_hazard_level']).id
 
-        if not Sample.sample_exists(code):
-            try:
+        # register multiple samples
+        for i in range(len(slots)):
+            code = fake.ean(length=8)
+            barcode = fake.ean(length=13)
+            slot = SlotResource.get_slot(slots[i])
 
-                sample = Sample(theme_id=theme, user_id=user, slot_id=slot,
-                                animal_species=args['species'], sample_type=args['type'],
-                                sample_description=args['desc'], location_collected=args['location'],
-                                barcode=barcode, project=args['project'], project_owner=args['project_owner'],
-                                temperature=args['temperature'], amount=args['amount'], quantity_type=qt,
-                                retention_date=args['retention_date'], analysis=args['analysis'],
-                                bio_hazard_level=bhl, code=code, status=SAMPLE_IN_LAB)
+            if not Sample.sample_exists(code):
+                try:
+                    sample = Sample()
 
-                BaseModel.db.session.add(sample)
-                BaseModel.db.session.commit()
-                log_create(sample)
-                return BaseResource.send_json_message("Sample successfully created", 201)
-            except Exception as e:
-                current_app.logger.error(e)
-                BaseModel.db.session.rollback()
-                return BaseResource.send_json_message("Error while adding sample", 500)
-        log_duplicate(Sample.query.filter(Sample.code == code).first())
-        return BaseResource.send_json_message("Sample already exists", 409)
+                    sample.theme_id, sample.user_id, sample.slot_id = theme, user, slot.id
+                    sample.animal_species, sample.sample_type = args['species'], args['type']
+                    sample.sample_description, sample.location_collected = args['desc'], args['location']
+                    sample.barcode, sample.project, sample.project_owner = barcode, args['project'], args[
+                        'project_owner']
+                    sample.temperature, sample.amount, sample.quantity_type = args['temperature'], args['amount'], qt
+                    sample.retention_date, sample.analysis = args['retention_date'], args['analysis']
+                    sample.bio_hazard_level, sample.code, sample.status = bhl, code, SAMPLE_IN_LAB
+
+                    # update that the slot is no longer available
+                    slot.available = False
+
+                    BaseModel.db.session.add(sample)
+                    log_create(sample)
+                except Exception as e:
+                    current_app.logger.error(e)
+                    BaseModel.db.session.rollback()
+                    return BaseResource.send_json_message("Error while adding sample", 500)
+            else:
+                log_duplicate(Sample.query.filter(Sample.code == code).first())
+                return BaseResource.send_json_message("Sample already exists", 409)
+        BaseModel.db.session.commit()
+        return BaseResource.send_json_message("Registered " + str(len(slots)) + " samples.", 201)
 
     @jwt_required
     @is_sample_owner
@@ -131,7 +141,7 @@ class SampleResource(BaseResource):
                     or args['amount'] != sample.amount or args['quantity_type'] != sample.quantity_type \
                     or args['barcode'] != sample.barcode or args['analysis'] != sample.analysis \
                     or args['bio_hazard_level'] != sample.bio_hazard_level \
-                    or args['retention_date'] != sample.retention_date\
+                    or args['retention_date'] != sample.retention_date \
                     or args['temperature'] != sample.temperature:
 
                 try:
