@@ -83,10 +83,11 @@ class SampleResource(BaseResource):
         barcode = fake.ean(length=13)
 
         args = SampleResource.sample_args()
+        print(args['slots'])
 
         theme = ThemeResource.get_theme(args['theme']).id
         user = get_any_user_by_email(args['user']).id
-        slot = SlotResource.get_slot(args['slot']).id
+        slot = SlotResource.get_slot(args['slots']).id
         qt = QuantityTypeResource.get_quantity_type(args['quantity_type']).id
         bhl = BioHazardLevelResource.get_bio_hazard_level(args['bio_hazard_level']).id
 
@@ -215,7 +216,7 @@ class SampleResource(BaseResource):
         args = parser.parse_args()
         return {
             'user': args['user'],
-            'slot': args['slots'],
+            'slots': args['slots'],
             'theme': args['theme'],
             'project': args['project'],
             'type': args['sample_type'],
