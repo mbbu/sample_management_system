@@ -440,7 +440,6 @@ export default {
       setQuantityType() {
           this.sample.quantity_type = getSelectedItemCode("QT-dropdownlist", this.QTDataList)
       },
-
       setRetentionPeriod() {
           let periodSelect = document.getElementById("period")
           let periodValue = parseInt(periodSelect.options[periodSelect.selectedIndex].value);
@@ -480,7 +479,7 @@ export default {
               axios.post(sample_resource, {
                 theme: this.sample.theme,
                 user: this.sample.sampleOwner,
-                slots: this.sample.slots,
+                slots: {'slots': this.sample.slots },
                 animal_species: this.sample.species,
                 sample_type: this.sample.sampleType,
                 sample_description: this.sample.description,
