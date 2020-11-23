@@ -479,7 +479,7 @@ export default {
               axios.post(sample_resource, {
                 theme: this.sample.theme,
                 user: this.sample.sampleOwner,
-                slots: {'slots': this.sample.slots },
+                slots: JSON.stringify(this.sample.slots),
                 animal_species: this.sample.species,
                 sample_type: this.sample.sampleType,
                 sample_description: this.sample.description,
