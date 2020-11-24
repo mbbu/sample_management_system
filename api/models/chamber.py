@@ -1,7 +1,11 @@
 from api.models.database import BaseModel
+from api.search.searchable_mixin import SearchableMixin
 
 
-class Chamber(BaseModel.db.Model):  # todo: what is the unique identifier.
+class Chamber(BaseModel.db.Model, SearchableMixin):
+    __tablename__ = index_name = 'chamber'
+    __searchable__ = ['code', 'type']
+
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
     freezer_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('freezer.id', ondelete='SET NULL'), nullable=True)

@@ -7,7 +7,7 @@ from api.models.database import BaseModel
 from api.resources.base_resource import BaseResource
 from api.resources.decorators.user_role_decorators import is_theme_admin
 from api.utils import format_and_lower_str, has_required_request_params, log_update, log_delete, \
-    standard_non_empty_string, log_create, log_304
+    standard_non_empty_string, log_create, log_304, get_query_params
 
 
 class BioHazardLevelResource(BaseResource):
@@ -18,13 +18,24 @@ class BioHazardLevelResource(BaseResource):
     }
 
     def get(self):
-        if request.headers.get('code') is not None:
+        BioHazardLevel.reindex()
+        query_strings = get_query_params()
+        if query_strings is not None:
+            for query_string in query_strings:
+                query, total = BioHazardLevel.search(query_string, 1, 15)
+                biohazard_levels = query.all()
+
+                data = marshal(biohazard_levels, self.fields)
+                return BaseResource.send_json_message(data, 200)
+
+        elif request.headers.get('code') is not None:
             code = format_and_lower_str(request.headers['code'])
             bio_hazard_level = BioHazardLevelResource.get_bio_hazard_level(code)
             if bio_hazard_level is None:
                 return BaseResource.send_json_message("Bio Hazard level not found", 404)
             data = marshal(bio_hazard_level, self.fields)
             return BaseResource.send_json_message(data, 200)
+
         else:
             bio_hazard_level = BioHazardLevel.query.all()
             if bio_hazard_level is None:

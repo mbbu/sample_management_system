@@ -4,7 +4,8 @@ from flask import current_app, render_template, request
 from flask_jwt_extended import jwt_required
 from flask_restful import reqparse
 
-from api import BaseResource, BaseModel
+from api import BaseResource
+from api.models.database import BaseModel
 from api.constants import APPROVED_STATUS, DECLINED_STATUS
 from api.resources.email_confirmation.send_email import send_email
 from api.resources.sample_request_and_response.sample_request_resource import SampleRequestResource

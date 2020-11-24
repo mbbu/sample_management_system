@@ -1,7 +1,11 @@
 from api.models.database import BaseModel
+from api.search.searchable_mixin import SearchableMixin
 
 
-class BioHazardLevel(BaseModel.db.Model):
+class BioHazardLevel(BaseModel.db.Model, SearchableMixin):
+    __tablename__ = index_name = 'bio_hazard_level'
+    __searchable__ = ['code', 'name', 'description']
+
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
     code = AppDb.Column(AppDb.String(65), nullable=False)

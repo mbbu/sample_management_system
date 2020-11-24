@@ -80,3 +80,36 @@ ul li {
   font-style: italic;
   font-size: medium;
 }
+
+
+// sample location finder
+.grid {
+  display: grid;
+  grid-gap: 1px;
+  grid-template-columns: repeat(var(--cols), 30px );
+}
+
+.cell-available {
+  width: 30px;
+  height: 30px;
+  background: green;
+  display: table-cell;
+}
+
+.cell-occupied {
+  width: 30px;
+  height: 30px;
+  background: darkred;
+  display: table-cell;
+  cursor: not-allowed !important;;
+}
+
+// legends for slots
+/* basic positioning */
+.legend { list-style: none; border: double; margin-left: -5px; }
+.legend span { border: 1px solid #ccc; float: left; width: 12px; height: 12px; margin: 2px; border-radius: 50%; }
+
+/* colors */
+.legend .available { background-color: green; }
+.legend .occupied { background-color: darkred; }
+.legend .selected { background-color: blue; }

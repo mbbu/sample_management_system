@@ -19,6 +19,8 @@ def add_to_index(index, model):
     :param model: Model associated with the index
     :return:
     """
+    if not current_app.elasticsearch:
+        return
     payload = {}
     for field in model.__searchable__:
         payload[field] = getattr(model, field)
@@ -34,6 +36,8 @@ def remove_from_index(index, model):
     :param model:
     :return:
     """
+    if not current_app.elasticsearch:
+        return
     current_app.elasticsearch.delete(index=index, id=model.id)
 
 
@@ -58,6 +62,8 @@ def query_index(index, query, page, per_page):
     :param per_page:
     :return:
     """
+    if not current_app.elasticsearch:
+        return [], 0
     search = current_app.elasticsearch.search(
         index=index,
         body={'query': {'multi_match': {'query': query, 'fields': ['*']}},

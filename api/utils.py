@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from urllib.parse import urlparse, parse_qs
 
+from faker import Faker
 from flask import current_app, request
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jti, get_jwt_identity
 from itsdangerous import URLSafeTimedSerializer
@@ -187,6 +188,8 @@ def faker(count, model, model_name):
 
     return BaseResource.send_json_message("{}s created".format(model_name), 200)
 
+
+fake = Faker()
 
 """
     Functions for token generation and confirmation

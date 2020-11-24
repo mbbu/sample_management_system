@@ -8,18 +8,27 @@ from api.resources.base_resource import BaseResource
 from api.resources.chamber_resource import ChamberResource
 from api.resources.decorators.user_role_decorators import is_theme_admin
 from api.utils import format_and_lower_str, log_create, log_duplicate, log_update, log_delete, \
-    has_required_request_params, standard_non_empty_string, log_304, non_empty_int
+    has_required_request_params, standard_non_empty_string, log_304, non_empty_int, get_query_params
 
 
 class RackResource(BaseResource):
     fields = {
-        'number': fields.Integer,
+        'number': fields.String,
         'chamber.type': fields.String,
         'code': fields.String
     }
 
     def get(self):
-        if request.headers.get('code') is not None:
+        query_strings = get_query_params()
+        if query_strings is not None:
+            for query_string in query_strings:
+                query, total = Rack.search(query_string, 1, 15)
+                racks = query.all()
+
+                data = marshal(racks, self.fields)
+                return BaseResource.send_json_message(data, 200)
+
+        elif request.headers.get('code') is not None:
             code = format_and_lower_str(request.headers['code'])
             rack = RackResource.get_rack(code)
             if rack is None:

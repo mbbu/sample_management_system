@@ -6,7 +6,8 @@ from datetime import datetime
 from flask import current_app, render_template
 from flask_restful import marshal, fields, reqparse
 
-from api import BaseResource, BaseModel
+from api import BaseResource
+from api.models.database import BaseModel
 from api.constants import EXPIRATION_AS_HR, EMAIL_CONFIRM_URI
 from api.resources.email_confirmation.send_email import send_email
 from api.utils import log_in_user_jwt, get_unconfirmed_user, generate_confirmation_token, confirm_token

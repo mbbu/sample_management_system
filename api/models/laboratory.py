@@ -1,7 +1,11 @@
 from api.models.database import BaseModel
+from api.search.searchable_mixin import SearchableMixin
 
 
-class Laboratory(BaseModel.db.Model):
+class Laboratory(BaseModel.db.Model, SearchableMixin):
+    __tablename__ = index_name = 'laboratory'
+    __searchable__ = ['name', 'room', 'code']
+
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
     name = AppDb.Column(AppDb.String(65), nullable=False)

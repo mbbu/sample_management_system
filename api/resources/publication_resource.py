@@ -8,7 +8,7 @@ from api.resources.base_resource import BaseResource
 from api.resources.decorators.user_role_decorators import is_publication_owner
 from api.resources.sample_resource import SampleResource
 from api.utils import log_create, log_duplicate, log_update, log_delete, format_and_lower_str, \
-    has_required_request_params, non_empty_int, log_304, get_any_user_by_email
+    has_required_request_params, non_empty_int, log_304, get_any_user_by_email, get_query_params
 
 
 class PublicationResource(BaseResource):
@@ -26,7 +26,16 @@ class PublicationResource(BaseResource):
     }
 
     def get(self):
-        if request.headers.get('title') is not None:
+        query_strings = get_query_params()
+        if query_strings is not None:
+            for query_string in query_strings:
+                query, total = Publication.search(query_string, 1, 15)
+                publications = query.all()
+
+                data = marshal(publications, self.fields)
+                return BaseResource.send_json_message(data, 200)
+
+        elif request.headers.get('title') is not None:
             title = format_and_lower_str(request.headers['title'])
             publication = PublicationResource.get_publication(title)
             if publication is None:

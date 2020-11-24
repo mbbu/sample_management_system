@@ -2,11 +2,12 @@ from flask import current_app, request
 from flask_jwt_extended import jwt_required
 from flask_restful import fields, marshal, reqparse
 
-from api import BaseResource, BaseModel
+from api import BaseResource
+from api.models.database import BaseModel
 from api.models import QuantityType
 from api.resources.decorators.user_role_decorators import is_theme_admin
 from api.utils import non_empty_string, format_and_lower_str, log_delete, log_create, log_update, log_duplicate, \
-    has_required_request_params, standard_non_empty_string, log_304
+    has_required_request_params, standard_non_empty_string, log_304, get_query_params
 
 
 class QuantityTypeResource(BaseResource):
@@ -17,7 +18,16 @@ class QuantityTypeResource(BaseResource):
     }
 
     def get(self):
-        if request.headers.get('code') is not None:
+        query_strings = get_query_params()
+        if query_strings is not None:
+            for query_string in query_strings:
+                query, total = QuantityType.search(query_string, 1, 15)
+
+                quantity_type = query.all()
+                data = marshal(quantity_type, self.fields)
+                return BaseResource.send_json_message(data, 200)
+
+        elif request.headers.get('code') is not None:
             code = format_and_lower_str(request.headers['code'])
             quantity_type = QuantityTypeResource.get_quantity_type(code)
             if quantity_type is None:
@@ -31,8 +41,8 @@ class QuantityTypeResource(BaseResource):
             data = marshal(quantity_type, self.fields)
             return BaseResource.send_json_message(data, 200)
 
-    @jwt_required
-    @is_theme_admin
+    # @jwt_required
+    # @is_theme_admin
     def post(self):
         args = QuantityTypeResource.quantity_parser()
         _id = args['code']

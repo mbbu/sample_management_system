@@ -9,14 +9,12 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_mail import Mail
 from flask_restful import Api
+from flask_sqlalchemy import SQLAlchemy
 from werkzeug.exceptions import NotFound, InternalServerError
 
 from api.config import BaseConfig
 from api.constants import APP_CONFIG_ENV_VAR, DEV_CONFIG_VAR, PROD_CONFIG_VAR, APP_NAME, SECRET_KEY, revoked_store
-from api.models.database import BaseModel
 from api.resources.base_resource import BaseResource
-from .resources import sample_resource, chamber_resource
-from .resources.password_reset.password_reset import ForgotPasswordResource, PasswordResetResource
 
 
 def get_config_type():
@@ -63,28 +61,29 @@ def mail_admin(app):
 
 # noinspection PyTypeChecker
 def register_resources(app):
-    # TODO: import resources here
-    from api.resources.index_resource import IndexResource
-    from api.resources.auth_resource import AuthResource, LogOutResource
-    from api.resources.theme_resource import ThemeResource
-    from api.resources.sample_resource import SampleResource
-    from api.resources.user_resource import UserResource
-    from api.resources.publication_resource import PublicationResource
-    from api.resources.box_resource import BoxResource
-    from api.resources.role_resource import RoleResource
-    from api.resources.tray_resource import TrayResource
-    from api.resources.rack_resource import RackResource
-    from api.resources.chamber_resource import ChamberResource
-    from api.resources.freezer_resource import FreezerResource
-    from api.resources.lab_resource import LaboratoryResource
-    from api.resources.quantity_type_resource import QuantityTypeResource
-    from api.resources.bio_hazard_level_resource import BioHazardLevelResource
-    from api.resources.housedata_resource import HouseDataResource
-    from api.resources.email_confirmation.email_confirmation import EmailConfirmationResource
-    from api.resources.project_resource import ProjectResource
+    from .resources.index_resource import IndexResource
+    from .resources.auth_resource import AuthResource, LogOutResource
+    from .resources.theme_resource import ThemeResource
+    from .resources.sample_resource import SampleResource
+    from .resources.user_resource import UserResource
+    from .resources.publication_resource import PublicationResource
+    from .resources.box_resource import BoxResource
+    from .resources.role_resource import RoleResource
+    from .resources.tray_resource import TrayResource
+    from .resources.rack_resource import RackResource
+    from .resources.chamber_resource import ChamberResource
+    from .resources.freezer_resource import FreezerResource
+    from .resources.lab_resource import LaboratoryResource
+    from .resources.quantity_type_resource import QuantityTypeResource
+    from .resources.bio_hazard_level_resource import BioHazardLevelResource
+    from .resources.housedata_resource import HouseDataResource
+    from .resources.email_confirmation.email_confirmation import EmailConfirmationResource
+    from .resources.project_resource import ProjectResource
     from .resources.redcap_requests.fetch_sample_resource import SaveSampleFromREDCap
-    from api.resources.sample_request_and_response.sample_request_resource import SampleRequestResource
-    from api.resources.sample_request_and_response.sample_request_response import SampleRequestResponseResource
+    from .resources.sample_request_and_response.sample_request_resource import SampleRequestResource
+    from .resources.sample_request_and_response.sample_request_response import SampleRequestResponseResource
+    from .resources.password_reset.password_reset import ForgotPasswordResource, PasswordResetResource
+    from .resources.slot_resource import SlotResource
 
     api = Api(app)
     api.add_resource(IndexResource, '/', '/index', '/welcome')
@@ -105,6 +104,7 @@ def register_resources(app):
     api.add_resource(SampleRequestResponseResource, '/sample-request-response/<token>', '/request-response/<token>')
     api.add_resource(SaveSampleFromREDCap, '/redcap-samples')
     api.add_resource(BoxResource, '/box', '/boxes')
+    api.add_resource(SlotResource, '/slots/<box>/<row>/<col>', '/slot')
     api.add_resource(TrayResource, '/tray', '/trays')
     api.add_resource(RackResource, '/rack', '/racks')
 
@@ -148,6 +148,9 @@ def config_app(app_instance):
     app_instance.url_map.strict_slashes = False
 
 
+db = SQLAlchemy()
+
+
 def extensions_set_up(app_instance):
     app_instance.config['SECRET_KEY'] = os.getenv(SECRET_KEY)
     # JWT setup
@@ -157,7 +160,7 @@ def extensions_set_up(app_instance):
     mail = Mail(app_instance)
 
     # Database and Migrations setup
-    db = BaseModel.init_app(app_instance)
+    db.init_app(app_instance)
 
     return {'jwt': jwt, 'mail': mail, 'db': db}
 
@@ -202,8 +205,7 @@ def create_app(test_config=None):
     @app.shell_context_processor
     def make_shell_processor():
         return {
-            'db': BaseModel.init_db(app),
-            'models': BaseModel.migrate_db()
+            'db': db,
         }
 
     @app.route('/home')
@@ -217,10 +219,9 @@ def create_app(test_config=None):
 
     @app.errorhandler(InternalServerError)
     def internal_error(error):
-        BaseModel.init_db(app).session.rollback()
+        db.session.rollback()
         app.logger.error(error)
         return BaseResource.send_json_message('An unexpected error occurred!'
-                                              'But stay put the administrator has been notified. '
+                                              'But stay put the administrator has been notified.'
                                               'Sorry for the inconvenience!', 500)
-
     return app

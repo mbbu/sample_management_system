@@ -1,18 +1,11 @@
-from flask_migrate import Migrate
-from flask_sqlalchemy import SQLAlchemy
+from api import db
 
 
 class BaseModel(object):
-    db = SQLAlchemy()
-
-    @staticmethod
-    def init_db(app):
-        BaseModel.db = SQLAlchemy(app)
-        return BaseModel.db
+    db = db
 
     @staticmethod
     def migrate_db():
-        # ToDo imports of models to be placed here
         from api.models.role import Role
         from api.models.sample import Sample
         from api.models.theme import Theme
@@ -27,13 +20,9 @@ class BaseModel(object):
         from api.models.quantity_type import QuantityType
         from api.models.project import Project
         from api.models.sample_request import SampleRequest
+        from api.models.slot import Slot
         return [
-            Role, User, Theme, Sample,
+            Role, User, Theme, Sample, Slot,
             Box, Tray, Rack, QuantityType, Chamber,
             Freezer, Laboratory, Publication, Project, SampleRequest
         ]
-
-    @staticmethod
-    def init_app(app):
-        db = BaseModel.init_db(app)
-        Migrate(app=app, db=db, compare_type=True)

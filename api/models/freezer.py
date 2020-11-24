@@ -1,7 +1,11 @@
 from api.models.database import BaseModel
+from api.search.searchable_mixin import SearchableMixin
 
 
-class Freezer(BaseModel.db.Model):
+class Freezer(BaseModel.db.Model, SearchableMixin):
+    __tablename__ = index_name = 'freezer'
+    __searchable__ = ['code', 'room', 'number']
+
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
     laboratory_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('laboratory.id', ondelete='SET NULL'), nullable=True)

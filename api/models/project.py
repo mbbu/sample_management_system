@@ -1,7 +1,11 @@
 from api.models.database import BaseModel
+from api.search.searchable_mixin import SearchableMixin
 
 
-class Project(BaseModel.db.Model):
+class Project(BaseModel.db.Model, SearchableMixin):
+    __tablename__ = index_name = 'project'
+    __searchable__ = ['code', 'name', 'description']
+
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
     code = AppDb.Column(AppDb.String(20), nullable=False, unique=True, index=True)

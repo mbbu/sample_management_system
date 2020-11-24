@@ -74,6 +74,7 @@ class ThemeResource(BaseResource):
                     theme.code = code
                     theme.name = name
                     BaseModel.db.session.commit()
+                    # add_to_index(Theme.index_name, theme)
                     log_update(old_info, theme)
                     return BaseResource.send_json_message("Theme successfully updated", 200)
 

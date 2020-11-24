@@ -2,7 +2,8 @@ import requests
 from flask import request, current_app, render_template
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from api import BaseResource, BaseModel, BaseConfig
+from api import BaseResource, BaseConfig
+from api.models.database import BaseModel
 from api.constants import REDCAP_URI, SAMPLE_FROM_FIELD
 from api.models import Sample
 from api.resources.email_confirmation.send_email import send_email
