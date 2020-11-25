@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required
 from flask_restful import fields, marshal, reqparse
 
 from api.models.database import BaseModel
-from api.models.housedata import Housedata
+from api.models.housedata import AnimalHealthHouseData
 from api.resources.base_resource import BaseResource
 from api.utils import format_and_lower_str, log_create, log_update, log_delete, has_required_request_params, \
     log_duplicate, non_empty_int, standard_non_empty_string
@@ -34,7 +34,7 @@ class HouseDataResource(BaseResource):
             data = marshal(metadata, self.fields)
             return BaseResource.send_json_message(data, 200)
         else:
-            house_metadata = Housedata.query.all()
+            house_metadata = AnimalHealthHouseData.query.all()
             if house_metadata is None:
                 return BaseResource.send_json_message("House data not found", 404)
             data = marshal(house_metadata, self.fields)
@@ -56,9 +56,9 @@ class HouseDataResource(BaseResource):
         social_economic_data = args['social_economic_data']
         code = args['code']
 
-        if not Housedata.housedata_exists(code):
+        if not AnimalHealthHouseData.housedata_exists(code):
             try:
-                house_data = Housedata(user_id=user, education=education, employment=employment,
+                house_data = AnimalHealthHouseData(user_id=user, education=education, employment=employment,
                                        marital_status=marital_status, number_of_people=number_of_people,
                                        number_of_children=number_of_children, number_of_animals=number_of_animals,
                                        economic_activity=economic_activity, type_of_animals=type_of_animals,
@@ -72,7 +72,7 @@ class HouseDataResource(BaseResource):
                 current_app.logger.error(e)
                 BaseModel.db.session.rollback()
                 return BaseResource.send_json_message("Error while adding the house data", 500)
-        log_duplicate(Housedata.query.filter(Housedata.code == code).first())
+        log_duplicate(AnimalHealthHouseData.query.filter(AnimalHealthHouseData.code == code).first())
         return BaseResource.send_json_message("House data already exists", 409)
 
     @jwt_required
@@ -173,4 +173,4 @@ class HouseDataResource(BaseResource):
 
     @staticmethod
     def get_metadata(code):
-        return BaseModel.db.session.query(Housedata).filter_by(code=code).first()
+        return BaseModel.db.session.query(AnimalHealthHouseData).filter_by(code=code).first()

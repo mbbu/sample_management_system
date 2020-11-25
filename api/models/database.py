@@ -21,8 +21,9 @@ class BaseModel(object):
         from api.models.project import Project
         from api.models.sample_request import SampleRequest
         from api.models.slot import Slot
+        from api.models.housedata import AnimalHealthHouseData
         return [
             Role, User, Theme, Sample, Slot,
-            Box, Tray, Rack, QuantityType, Chamber,
-            Freezer, Laboratory, Publication, Project, SampleRequest
+            Box, Tray, Rack, QuantityType, Chamber, SampleRequest,
+            Freezer, Laboratory, Publication, Project, AnimalHealthHouseData
         ]
