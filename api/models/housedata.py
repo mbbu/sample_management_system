@@ -14,7 +14,7 @@ class AnimalHealthHouseData(BaseModel.db.Model):
     pcv = AppDb.Column(AppDb.String, nullable=True)
     diagnosis = AppDb.Column(AppDb.String, nullable=True)  # dx
     treatment = AppDb.Column(AppDb.String, nullable=True)  # rx
-    cc_ml = AppDb.Column(AppDb.String, nullable=True)
+    cc = AppDb.Column(AppDb.String, nullable=True)
     notes = AppDb.Column(AppDb.Text, nullable=True)
 
     @staticmethod
