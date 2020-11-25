@@ -8,6 +8,7 @@ from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_mail import Mail
+from flask_migrate import Migrate
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.exceptions import NotFound, InternalServerError
@@ -161,8 +162,9 @@ def extensions_set_up(app_instance):
 
     # Database and Migrations setup
     db.init_app(app_instance)
+    migrate = Migrate(app_instance, db)
 
-    return {'jwt': jwt, 'mail': mail, 'db': db}
+    return {'jwt': jwt, 'mail': mail, 'db': db, 'migrate': migrate}
 
 
 # Application Factory
