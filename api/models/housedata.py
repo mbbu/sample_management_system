@@ -1,7 +1,11 @@
 from api.models.database import BaseModel
+from api.search.searchable_mixin import SearchableMixin
 
 
-class AnimalHealthHouseData(BaseModel.db.Model):
+class AnimalHealthHouseData(BaseModel.db.Model, SearchableMixin):
+    __tablename__ = index_name = 'animal_health_house_data'
+    __searchable__ = ['code', 'farmer', 'cattle_id']
+
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
     code = AppDb.Column(AppDb.String(20), nullable=False, unique=True, index=True)
@@ -11,7 +15,7 @@ class AnimalHealthHouseData(BaseModel.db.Model):
     cattle_color = AppDb.Column(AppDb.String(10), nullable=False)
     cattle_sex = AppDb.Column(AppDb.String, nullable=False)
     collar = AppDb.Column(AppDb.String, nullable=True)
-    pcv = AppDb.Column(AppDb.String, nullable=True)
+    pcv = AppDb.Column(AppDb.String, nullable=True)  # packed cell volume
     diagnosis = AppDb.Column(AppDb.String, nullable=True)  # dx
     treatment = AppDb.Column(AppDb.String, nullable=True)  # rx
     cc = AppDb.Column(AppDb.String, nullable=True)
