@@ -19,8 +19,8 @@ class AnimalHealthHouseData(BaseModel.db.Model):
 
     @staticmethod
     def house_data_exists(code):
-        if HouseData.query.filter(
-                HouseData.code == code
+        if AnimalHealthHouseData.query.filter(
+                AnimalHealthHouseData.code == code
         ).first():
             return True
         return False
