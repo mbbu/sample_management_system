@@ -30,9 +30,9 @@ class AnimalHealthHouseData(BaseModel.db.Model, SearchableMixin):
         return False
 
     def __repr__(self):
-        return '{ House Data: (code={0} || farmer={1} || cattle_id={2} || cattle_name={3} ||' \
+        return '<< House Data: (code={0} || farmer={1} || cattle_id={2} || cattle_name={3} ||' \
                'color={4} || sex={5} || collar={6} || pcv={7} || dx={8} || rx={9} || ' \
-               'cc_ml={10} || notes={11} ) }' \
+               'cc={10} || notes={11} ) >>' \
             .format(self.code, self.farmer, self.cattle_id, self.cattle_name,
                     self.cattle_color, self.cattle_sex, self.collar,
-                    self.pcv, self.diagnosis, self.treatment, self.cc_ml, self.notes)
+                    self.pcv, self.diagnosis, self.treatment, self.cc, self.notes)
