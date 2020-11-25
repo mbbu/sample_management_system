@@ -6,27 +6,29 @@ from api.models.database import BaseModel
 from api.models.housedata import AnimalHealthHouseData
 from api.resources.base_resource import BaseResource
 from api.utils import format_and_lower_str, log_create, log_update, log_delete, has_required_request_params, \
-    log_duplicate, non_empty_int, standard_non_empty_string
+    log_duplicate, non_empty_int, get_query_params, fake
 
 
 class HouseDataResource(BaseResource):
     fields = {
-        'user_id': fields.String,
-        'education': fields.String,
-        'employment': fields.String,
-        'marital_status': fields.String,
-        'number_of_people': fields.Integer,
-        'number_of_children': fields.Integer,
-        'number_of_animals': fields.Integer,
-        'economic_activity': fields.String,
-        'type_of_animals': fields.String,
-        'farming_activities': fields.String,
-        'social_economic_data': fields.Boolean,
-        'code': fields.String
+        'farmer': fields.String, 'cattle_id': fields.String,
+        'cattle_name': fields.String, 'cattle_color': fields.String,
+        'cattle_sex': fields.String, 'collar': fields.String,
+        'pcv': fields.String, 'diagnosis': fields.String, 'treatment': fields.String,
+        'cc': fields.String, 'notes': fields.String, 'code': fields.String
     }
 
     def get(self):
-        if request.headers.get('code') is not None:
+        query_strings = get_query_params()
+        if query_strings is not None:
+            for query_string in query_strings:
+                query, total = AnimalHealthHouseData.search(query_string, 1, 15)
+                samples = query.all()
+
+                data = marshal(samples, self.fields)
+                return BaseResource.send_json_message(data, 200)
+
+        elif request.headers.get('code') is not None:
             code = format_and_lower_str(request.headers['code'])
             metadata = HouseDataResource.get_metadata(code)
             if metadata is None:
@@ -42,33 +44,19 @@ class HouseDataResource(BaseResource):
 
     @jwt_required
     def post(self):
-        args = HouseDataResource.metadata_args()
-        user = int(args['user'])
-        education = args['education']
-        employment = args['employment']
-        marital_status = args['marital_status']
-        number_of_people = int(args['people'])
-        number_of_children = int(args['children'])
-        number_of_animals = int(args['animals'])
-        economic_activity = args['economic_activity']
-        type_of_animals = args['type_of_animals']
-        farming_activities = args['farming_activities']
-        social_economic_data = args['social_economic_data']
-        code = args['code']
+        code = fake.ean(length=8)
 
-        if not AnimalHealthHouseData.housedata_exists(code):
+        if not AnimalHealthHouseData.house_data_exists(code):
             try:
-                house_data = AnimalHealthHouseData(user_id=user, education=education, employment=employment,
-                                       marital_status=marital_status, number_of_people=number_of_people,
-                                       number_of_children=number_of_children, number_of_animals=number_of_animals,
-                                       economic_activity=economic_activity, type_of_animals=type_of_animals,
-                                       farming_activities=farming_activities, code=code,
-                                       social_economic_data=bool(social_economic_data))
+                house_data = AnimalHealthHouseData()
+                house_data = HouseDataResource.save_data(house_data, code)
+
                 BaseModel.db.session.add(house_data)
                 BaseModel.db.session.commit()
                 log_create(house_data)
                 return BaseResource.send_json_message("House data successfully created", 201)
             except Exception as e:
+                print(e)
                 current_app.logger.error(e)
                 BaseModel.db.session.rollback()
                 return BaseResource.send_json_message("Error while adding the house data", 500)
@@ -82,44 +70,21 @@ class HouseDataResource(BaseResource):
         house_data = HouseDataResource.get_metadata(code)
 
         if house_data is not None:
-            args = HouseDataResource.metadata_args()
+            args = HouseDataResource.house_data_args()
 
-            user = int(args['user'])
-            education = args['education']
-            employment = args['employment']
-            marital_status = args['marital_status']
-            number_of_people = int(args['people'])
-            number_of_children = int(args['children'])
-            number_of_animals = int(args['animals'])
-            economic_activity = args['economic_activity']
-            type_of_animals = args['type_of_animals']
-            farming_activities = args['farming_activities']
-            social_economic_data = args['social_economic_data']
-            code = args['code']
-
-            if user != house_data.user_id or education != house_data.education or employment != house_data.employment or \
-                    marital_status != house_data.marital_status or number_of_people != house_data.number_of_people or \
-                    number_of_children != house_data.number_of_children or number_of_animals != house_data.number_of_animals or \
-                    economic_activity != house_data.economic_activity or type_of_animals != house_data.type_of_animals or \
-                    farming_activities != house_data.farming_activities or social_economic_data != house_data.social_economic_data \
-                    or code != house_data.code:
+            if house_data.farmer != args['farmer'] or house_data.cattle_id != args['cattle_id'] or \
+                    house_data.cattle_name != args['cattle_name'] or house_data.cattle_color != args['cattle_color'] or \
+                    house_data.cattle_sex != args['cattle_sex'] or house_data.diagnosis != args['diagnosis'] or \
+                    house_data.collar != args['collar'] or house_data.treatment != args['treatment'] or \
+                    house_data.pcv != args['pcv'] or house_data.notes != args['notes'] or house_data.cc != args['cc']:
 
                 try:
-                    house_data.user_id = user
-                    house_data.education = education
-                    house_data.employment = employment
-                    house_data.marital_status = marital_status
-                    house_data.number_of_people = number_of_people
-                    house_data.number_of_children = number_of_children
-                    house_data.number_of_animals = number_of_animals
-                    house_data.economic_activity = economic_activity
-                    house_data.type_of_animals = type_of_animals
-                    house_data.farming_activities = farming_activities
-                    house_data.social_economic_data = bool(social_economic_data)
-                    house_data.code = code
+                    old_info = str(house_data)
+
+                    house_data = HouseDataResource.save_data(house_data, code)
 
                     BaseModel.db.session.commit()
-                    log_update(house_data, house_data)
+                    log_update(old_info, house_data)
                     return BaseResource.send_json_message("House data successfully updated", 202)
 
                 except Exception as e:
@@ -147,29 +112,41 @@ class HouseDataResource(BaseResource):
         return BaseResource.send_json_message("House data deleted", 200)
 
     @staticmethod
-    def metadata_args():
+    def house_data_args():
         parser = reqparse.RequestParser()
-        parser.add_argument('user', required=False, type=non_empty_int)
-        parser.add_argument('education', required=False)
-        parser.add_argument('employment', required=False)
-        parser.add_argument('marital_status', required=False)
-        parser.add_argument('people', required=False)
-        parser.add_argument('children', required=False)
-        parser.add_argument('animals', required=False)
-        parser.add_argument('economic_activity', required=False)
-        parser.add_argument('type_of_animals', required=False)
-        parser.add_argument('farming_activities', required=False)
-        parser.add_argument('social_economic_data', required=False)
-        parser.add_argument('code', required=True, type=standard_non_empty_string)
+        parser.add_argument('farmer', required=False, type=non_empty_int)
+        parser.add_argument('cattle_id', required=False)
+        parser.add_argument('cattle_name', required=False)
+        parser.add_argument('cattle_color', required=False)
+        parser.add_argument('cattle_sex', required=False)
+        parser.add_argument('collar', required=False)
+        parser.add_argument('pcv', required=False)
+        parser.add_argument('diagnosis', required=False)
+        parser.add_argument('treatment', required=False)
+        parser.add_argument('cc', required=False)
+        parser.add_argument('notes', required=False)
 
         args = parser.parse_args()
-        return args
+        return {
+            'farmer': args['farmer'], 'cattle_id': args['cattle_id'],
+            'cattle_name': args['cattle_name'], 'cattle_color': args['cattle_color'],
+            'cattle_sex': args['cattle_sex'], 'collar': args['collar'],
+            'pcv': args['pcv'], 'diagnosis': args['diagnosis'],
+            'treatment': args['treatment'], 'cc': args['cc'], 'notes': args['notes'],
+        }
 
-        # return [
-        #     user_id, education, employment, marital_status, number_of_people,
-        #     number_of_children, number_of_animals, economic_activity, type_of_animals,
-        #     farming_activities, social_economic_data, code
-        # ]
+    @staticmethod
+    def save_data(house_data, code):
+        args = HouseDataResource.house_data_args()
+
+        house_data.code, house_data.farmer = code, args['farmer']
+        house_data.cattle_id, house_data.cattle_name = args['cattle_id'], args['cattle_name']
+        house_data.cattle_color, house_data.cattle_sex = args['cattle_color'], args['cattle_sex']
+        house_data.diagnosis, house_data.collar = args['diagnosis'], args['collar'],
+        house_data.treatment, house_data.pcv = args['treatment'], args['pcv'],
+        house_data.notes, house_data.cc = args['notes'], args['cc']
+
+        return house_data
 
     @staticmethod
     def get_metadata(code):
