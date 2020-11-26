@@ -20,6 +20,7 @@ class AnimalHealthHouseData(BaseModel.db.Model, SearchableMixin):
     treatment = AppDb.Column(AppDb.String, nullable=True)  # rx
     cc = AppDb.Column(AppDb.String, nullable=True)
     notes = AppDb.Column(AppDb.Text, nullable=True)
+    study_block_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('study_block.id', ondelete='SET NULL'), nullable=True)
 
     @staticmethod
     def house_data_exists(code):

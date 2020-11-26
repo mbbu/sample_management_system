@@ -13,6 +13,7 @@ class StudyBlock(BaseModel.db.Model, SearchableMixin):
     name = AppDb.Column(AppDb.String(65), nullable=False, unique=True, index=True)
 
     # relationship
+    house_hold_data = AppDb.relationship('AnimalHealthHouseData', backref='study_block', lazy=True)
 
     @staticmethod
     def study_block_exists(code):
