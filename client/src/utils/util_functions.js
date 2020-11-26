@@ -652,3 +652,20 @@ EventBus.$on('page-info', (payload) => {
     page_info = payload.pgInfo
     paginate(payload.pgData)
 })
+
+
+// generic function to handle errors on web-server response
+export function handleError(self, error){
+    if (error.response.status === 304) {
+        showFlashMessage(self, 'info', 'Record not modified!', '');
+    } else if (error.response.status === 400) {
+        showFlashMessage(self, 'error', error.response.data['message'], 'Kindly refill the form');
+    } else if (error.response.status === 401) { respondTo401(self);}
+      else if (error.response.status === 403) {
+        showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
+    } else if (error.response.status === 409) {
+        showFlashMessage(self, 'error', error.response.data['message'], '');
+    } else {
+        showFlashMessage(self, 'error', error.response.data['message'], '');
+    }
+}
