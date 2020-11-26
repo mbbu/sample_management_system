@@ -65,6 +65,7 @@ def register_resources(app):
     from .resources.index_resource import IndexResource
     from .resources.auth_resource import AuthResource, LogOutResource
     from .resources.theme_resource import ThemeResource
+    from .resources.study_block_resource import StudyBlockResource
     from .resources.sample_resource import SampleResource
     from .resources.user_resource import UserResource
     from .resources.publication_resource import PublicationResource
@@ -91,6 +92,7 @@ def register_resources(app):
     api.add_resource(AuthResource, '/auth', '/login', '/auth/login')
     api.add_resource(LogOutResource, '/logout', '/log-out')
     api.add_resource(ThemeResource, '/theme', '/themes')
+    api.add_resource(StudyBlockResource, '/study-block', '/study_block')
     api.add_resource(ProjectResource, '/project', '/projects')
     api.add_resource(RoleResource, '/role', '/roles')
     api.add_resource(UserResource, '/user', '/users')
@@ -162,7 +164,7 @@ def extensions_set_up(app_instance):
 
     # Database and Migrations setup
     db.init_app(app_instance)
-    migrate = Migrate(app_instance, db)
+    migrate = Migrate(app_instance, db)  # , compare_type=True
 
     return {'jwt': jwt, 'mail': mail, 'db': db, 'migrate': migrate}
 
