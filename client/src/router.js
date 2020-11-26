@@ -29,6 +29,7 @@ import Project from "./pages/Project";
 import FetchSample from "./pages/REDCapPages/FetchSample";
 import SampleRequestResponse from "./pages/SampleRequest/SampleRequestResponse";
 import PageNotFound from "./pages/PageNotFound";
+import StudyBlock from "@/pages/StudyBlock";
 
 
 Vue.use(Router);
@@ -215,6 +216,13 @@ export default new Router({
             name: 'Publication',
             alias: ['/publications'],
             component: Publication,
+        },
+
+        {
+            path: '/study-block',
+            name: 'Study Block',
+            alias: ['/study_block'],
+            component: StudyBlock,
         },
 
         // redcap routes
