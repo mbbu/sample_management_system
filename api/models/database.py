@@ -22,8 +22,9 @@ class BaseModel(object):
         from api.models.sample_request import SampleRequest
         from api.models.slot import Slot
         from api.models.housedata import AnimalHealthHouseData
+        from api.models.study_block import StudyBlock
         return [
-            Role, User, Theme, Sample, Slot,
+            Role, User, Theme, Sample, Slot, StudyBlock,
             Box, Tray, Rack, QuantityType, Chamber, SampleRequest,
             Freezer, Laboratory, Publication, Project, AnimalHealthHouseData
         ]
