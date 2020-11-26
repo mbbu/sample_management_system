@@ -164,7 +164,7 @@ def extensions_set_up(app_instance):
 
     # Database and Migrations setup
     db.init_app(app_instance)
-    migrate = Migrate(app_instance, db)  # , compare_type=True
+    migrate = Migrate(app_instance, db, compare_type=True)
 
     return {'jwt': jwt, 'mail': mail, 'db': db, 'migrate': migrate}
 
