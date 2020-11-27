@@ -26,6 +26,7 @@ import ResendConfirmation from "./pages/ConfirmUserAccount/ResendConfirmation";
 import PasswordResetRequest from "./pages/Auth/PasswordResetRequest";
 import PasswordResetConfirmation from "./pages/Auth/PasswordResetConfirmation";
 import Project from "./pages/Project";
+import HouseHoldData from "./pages/HouseHoldData";
 import FetchSample from "./pages/REDCapPages/FetchSample";
 import SampleRequestResponse from "./pages/SampleRequest/SampleRequestResponse";
 import PageNotFound from "./pages/PageNotFound";
@@ -223,6 +224,13 @@ export default new Router({
             name: 'Study Block',
             alias: ['/study_block'],
             component: StudyBlock,
+        },
+
+        {
+            path: '/household-data',
+            name: 'House Data',
+            alias: ['/household', '/house-data'],
+            component: HouseHoldData,
         },
 
         // redcap routes

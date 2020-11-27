@@ -25,3 +25,4 @@ export var sample_request_resource = `http://${API_BASE_URL}/request-sample`;
 export var auth_resource = `http://${API_BASE_URL}/auth`;
 export var sample_response_resource = `http://${API_BASE_URL}/request-response/`;
 export var study_block_resource = `http://${API_BASE_URL}/study-block/`;
+export var house_hold_data_resource = `http://${API_BASE_URL}/house-data/`;
