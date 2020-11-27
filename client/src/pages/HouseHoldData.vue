@@ -44,7 +44,7 @@
               <b-icon
                   v-b-modal.modal-house_hold_data-edit
                   v-b-tooltip.hover
-                  :title="`Update house_hold_data ${ house_hold_data.name }`" class="border border-info rounded"
+                  :title="`Update house_hold_data ${ house_hold_data.farmer }`" class="border border-info rounded"
                   font-scale="2.0" icon="pencil"
                   variant="info"
                   @mouseover="fillFormForUpdate(house_hold_data)"
@@ -52,7 +52,7 @@
               &nbsp;
               <b-icon
                   v-b-tooltip.hover
-                  :title="`Delete house_hold_data ${house_hold_data.name}!`"
+                  :title="`Delete house_hold_data ${house_hold_data.farmer}!`"
                   class="border rounded bg-danger p-1" font-scale="1.85"
                   icon="trash" variant="light"
                   @click="deleteHouseHoldData(house_hold_data.code)"
@@ -64,151 +64,213 @@
       </div>
 
       <div v-if="!isEditing">
-        <b-modal
-            id="modal-house_hold_data"
-            cancel-variant="danger"
-            ok-title="Save"
-            title="Add HouseHoldData"
-            @hidden="clearForm"
-            @ok="createHouseHoldData"
-            @submit="clearForm"
+        <b-modal id="modal-house_hold_data"
+            cancel-variant="danger" ok-title="Save" :title="`Add ${page_title}`"
+            @hidden="clearForm" @ok="createHouseHoldData" @submit="clearForm"
         >
           <form @submit.prevent="createHouseHoldData">
-            <b-form-group id="form-theme-group" label="Theme:" label-for="form-theme-input">
-              <ejs-dropdownlist
-                  id='dropdownlist'
-                  :dataSource='themeDataList'
-                  :fields="fields"
-                  :v-model="house_hold_data.theme"
-                  placeholder='Select a theme'
-              ></ejs-dropdownlist>
-            </b-form-group>
+            <vue-tiny-tabs class="tinytabs tabs" id="mytabs" :anchor="false" :closable="false" :hideTitle="true">
+                <div class="section tab" id="farmer-info">
+                  <h4 class="title"><small><b>Farmer Info</b></small></h4>
 
-            <b-form-group id="form-head-group" label="HouseHoldData Head:" label-for="form-head-input">
-              <ejs-dropdownlist
-                  id='dropdownlist-head'
-                  :dataSource='headDataList'
-                  :fields="fields"
-                  :v-model="house_hold_data.head"
-                  placeholder='Select the house_hold_data head'
-              ></ejs-dropdownlist>
-            </b-form-group>
+                  <!--STUDY-BLOCK-->
+                  <b-form-group id="form-study_block-group" label="Study Block:" label-for="form-study_block-input">
+                    <ejs-dropdownlist
+                        id='dropdownlist'
+                        :dataSource='studyBlockDataList'
+                        :fields="fields"
+                        :v-model="house_hold_data.study_block"
+                        placeholder='Select a study block'
+                    ></ejs-dropdownlist>
+                  </b-form-group>
 
-            <b-form-group id="form-code-group" label="Code:" label-for="form-code-input">
-              <b-form-input
-                  id="form-code-input"
-                  v-model="house_hold_data.code"
-                  placeholder="Enter Code"
-                  required
-                  type="text"
-              ></b-form-input>
-            </b-form-group>
+                  <!--FARMER-->
+                  <b-form-group id="form-farmer-group" label="Farmer Name:" label-for="form-farmer-input">
+                    <b-form-input id="form-farmer-input" v-model="house_hold_data.farmer"
+                                  placeholder="Enter Farmer Name" required type="text"></b-form-input>
+                  </b-form-group>
+                </div>
 
-            <b-form-group id="form-name-group" label="Name:" label-for="form-name-input">
-              <b-form-input
-                  id="form-name-input"
-                  v-model="house_hold_data.name"
-                  placeholder="Enter HouseHoldData Name"
-                  required
-                  type="text">
-              </b-form-input>
-            </b-form-group>
+                <div class="section tab" id="cattle-info">
+                  <h4 class="title"><small><b>Cattle Info</b></small></h4>
+                  <!--CATTLE_ID-->
+                  <b-form-group id="form-cattle_id-group" label="Cattle ID:" label-for="form-cattle_id-input">
+                    <b-form-input id="form-cattle_id-input" v-model="house_hold_data.cattle_id"
+                        placeholder="Enter Cattle ID" required type="text"></b-form-input>
+                  </b-form-group>
 
-            <b-form-group id="form-desc-group" label="Description:" label-for="form-desc-input">
-              <b-form-textarea
-                  id="form-desc-input"
-                  v-model="house_hold_data.description"
-                  placeholder="Enter Description"
-                  required
-                  type="text">
-              </b-form-textarea>
-            </b-form-group>
+                  <!--CATTLE NAME-->
+                  <b-form-group id="form-cattle_name-group" label="Cattle Name:" label-for="form-cattle_name-input">
+                    <b-form-input id="form-cattle_name-input" v-model="house_hold_data.cattle_name"
+                        placeholder="Enter Cattle Name" required type="text"></b-form-input>
+                  </b-form-group>
 
+                  <!--CATTLE COLOR-->
+                  <b-form-group id="form-cattle-color-group" label="Cattle Color:" label-for="form-cattle-color-input">
+                    <b-form-input id="form-cattle-color-input" v-model="house_hold_data.cattle_color"
+                        placeholder="Enter Cattle Name" required type="text"></b-form-input>
+                  </b-form-group>
+
+                  <!--CATTLE Sex-->
+                  <div id="cattle-sex">
+                    <p>Cattle Sex:</p>
+                    <input type="radio" id="male" value="Male" v-model="house_hold_data.cattle_sex">
+                    <label for="male">Male</label>
+                    <br>
+                    <input type="radio" id="female" value="Female" v-model="house_hold_data.cattle_sex">
+                    <label for="female">Female</label>
+                    <br>
+                  </div>
+                </div>
+
+                <div class="section tab" id="health-info">
+                  <h4 class="title"><small><b>Health Info</b></small></h4>
+
+                  <!--CATTLE PCV-->
+                  <b-form-group id="form-pcv-group" label="PCV(Packed Cell Volume):" label-for="form-pcv-input">
+                    <b-form-input id="form-pcv-input" v-model="house_hold_data.pcv"
+                        placeholder="Enter PCV" required type="text"></b-form-input>
+                  </b-form-group>
+
+                  <!--CATTLE Diagnosis-->
+                  <b-form-group id="form-diagnosis-group" label="Diagnosis:" label-for="form-diagnosis-input">
+                    <b-form-input id="form-diagnosis-input" v-model="house_hold_data.diagnosis"
+                        placeholder="Enter Diagnosis" required type="text"></b-form-input>
+                  </b-form-group>
+
+                  <!--CATTLE Treatment-->
+                  <b-form-group id="form-treatment-group" label="Treatment:" label-for="form-treatment-input">
+                    <b-form-input id="form-treatment-input" v-model="house_hold_data.treatment"
+                        placeholder="Enter Treatment" required type="text"></b-form-input>
+                  </b-form-group>
+
+                  <!--CATTLE CC/ML-->
+                  <b-form-group id="form-cc/ml-group" label="Dosage:" label-for="form-cc/ml-input">
+                    <b-form-input id="form-cc/ml-input" v-model="house_hold_data.cc"
+                        placeholder="Enter cc/ml" required type="number"></b-form-input>
+                  </b-form-group>
+
+                  <!--CATTLE Notes-->
+                  <b-form-group id="form-notes-group" label="Notes:" label-for="form-notes-input">
+                    <b-form-textarea id="form-notes-input" v-model="house_hold_data.notes"
+                        placeholder="Enter Notes" required type="text"></b-form-textarea>
+                  </b-form-group>
+                </div>
+            </vue-tiny-tabs>
           </form>
         </b-modal>
       </div>
 
       <div v-else-if="isEditing">
-        <b-modal
-            id="modal-house_hold_data-edit"
-            cancel-variant="danger"
-            ok-title="Update"
-            title="Edit HouseHoldData"
-            @hidden="clearForm"
-            @ok="updateHouseHoldData(old_code)"
+        <b-modal id="modal-house_hold_data-edit" :title="`Edit ${page_title}`"
+            cancel-variant="danger" ok-title="Update"
+            @hidden="clearForm" @ok="updateHouseHoldData(old_code)"
             @shown="selectDropDownItemsForUpdate(house_hold_data.study_block)"
             @submit="showModal = false"
         >
-          <form @submit.prevent="updateHouseHoldData">
-            <b-form-group id="form-theme-group-edit" label="Theme:" label-for="form-theme-input">
-              <ejs-dropdownlist
-                  id='dropdownlist'
-                  :dataSource='themeDataList'
-                  :fields="fields"
-                  :v-model="house_hold_data.theme"
-                  placeholder='Select a theme'
-              ></ejs-dropdownlist>
-            </b-form-group>
+                    <form @submit.prevent="createHouseHoldData">
+            <vue-tiny-tabs class="tinytabs tabs" id="mytabs" :anchor="false" :closable="false" :hideTitle="true">
+                <div class="section tab" id="farmer-info-edit">
+                  <h4 class="title"><small><b>Farmer Info</b></small></h4>
 
-            <b-form-group id="form-head-group-edit" label="HouseHoldData Head:" label-for="form-head-input">
-              <ejs-dropdownlist
-                  id='dropdownlist-head'
-                  :dataSource='headDataList'
-                  :fields="fields"
-                  :v-model="house_hold_data.head"
-                  placeholder='Select the house_hold_data head'
-              ></ejs-dropdownlist>
-            </b-form-group>
+                  <!--STUDY-BLOCK-->
+                  <b-form-group id="form-study_block-group-edit" label="Study Block:" label-for="form-study_block-input">
+                    <ejs-dropdownlist
+                        id='dropdownlist'
+                        :dataSource='studyBlockDataList'
+                        :fields="fields"
+                        :v-model="house_hold_data.study_block"
+                        placeholder='Select a study block'
+                    ></ejs-dropdownlist>
+                  </b-form-group>
 
-            <b-form-group id="form-code-group-edit" label="Code:" label-for="form-code-input">
-              <b-form-input
-                  id="form-code-input"
-                  v-model="house_hold_data.code"
-                  placeholder="Enter Code"
-                  required
-                  type="text"
-              ></b-form-input>
-            </b-form-group>
+                  <!--FARMER-->
+                  <b-form-group id="form-farmer-group-edit" label="Farmer Name:" label-for="form-farmer-input">
+                    <b-form-input id="form-farmer-input" v-model="house_hold_data.farmer"
+                                  placeholder="Enter Farmer Name" required type="text"></b-form-input>
+                  </b-form-group>
+                </div>
 
-            <b-form-group id="form-name-group-edit" label="Name:" label-for="form-name-input">
-              <b-form-input
-                  id="form-name-input"
-                  v-model="house_hold_data.name"
-                  placeholder="Enter HouseHoldData Name"
-                  required
-                  type="text">
-              </b-form-input>
-            </b-form-group>
+                <div class="section tab" id="cattle-info-edit">
+                  <h4 class="title"><small><b>Cattle Info</b></small></h4>
+                  <!--CATTLE_ID-->
+                  <b-form-group id="form-cattle_id-group-edit" label="Cattle ID:" label-for="form-cattle_id-input">
+                    <b-form-input id="form-cattle_id-input" v-model="house_hold_data.cattle_id"
+                        placeholder="Enter Cattle ID" required type="text"></b-form-input>
+                  </b-form-group>
 
-            <b-form-group id="form-desc-group-edit" label="Description:" label-for="form-desc-input">
-              <b-form-textarea
-                  id="form-desc-input"
-                  v-model="house_hold_data.description"
-                  placeholder="Enter Description"
-                  required
-                  type="text">
-              </b-form-textarea>
-            </b-form-group>
+                  <!--CATTLE NAME-->
+                  <b-form-group id="form-cattle_name-group-edit" label="Cattle Name:" label-for="form-cattle_name-input">
+                    <b-form-input id="form-cattle_name-input" v-model="house_hold_data.cattle_name"
+                        placeholder="Enter Cattle Name" required type="text"></b-form-input>
+                  </b-form-group>
+
+                  <!--CATTLE COLOR-->
+                  <b-form-group id="form-cattle-color-group-edit" label="Cattle Color:" label-for="form-cattle-color-input">
+                    <b-form-input id="form-cattle-color-input" v-model="house_hold_data.cattle_color"
+                        placeholder="Enter Cattle Name" required type="text"></b-form-input>
+                  </b-form-group>
+
+                  <!--CATTLE Sex-->
+                  <div id="cattle-sex-edit">
+                    <p>Cattle Sex:</p>
+                    <input type="radio" id="male-edit" value="Male" v-model="house_hold_data.cattle_sex">
+                    <label for="male-edit">Male</label>
+                    <br>
+                    <input type="radio" id="female-edit" value="Female" v-model="house_hold_data.cattle_sex">
+                    <label for="female-edit">Female</label>
+                    <br>
+                  </div>
+                </div>
+
+                <div class="section tab" id="health-info-edit">
+                  <h4 class="title"><small><b>Health Info</b></small></h4>
+
+                  <!--CATTLE PCV-->
+                  <b-form-group id="form-pcv-group-edit" label="PCV(Packed Cell Volume):" label-for="form-pcv-input">
+                    <b-form-input id="form-pcv-input" v-model="house_hold_data.pcv"
+                        placeholder="Enter PCV" required type="text"></b-form-input>
+                  </b-form-group>
+
+                  <!--CATTLE Diagnosis-->
+                  <b-form-group id="form-diagnosis-group-edit" label="Diagnosis:" label-for="form-diagnosis-input">
+                    <b-form-input id="form-diagnosis-input" v-model="house_hold_data.diagnosis"
+                        placeholder="Enter Diagnosis" required type="text"></b-form-input>
+                  </b-form-group>
+
+                  <!--CATTLE Treatment-->
+                  <b-form-group id="form-treatment-group-edit" label="Treatment:" label-for="form-treatment-input">
+                    <b-form-input id="form-treatment-input" v-model="house_hold_data.treatment"
+                        placeholder="Enter Treatment" required type="text"></b-form-input>
+                  </b-form-group>
+
+                  <!--CATTLE CC/ML-->
+                  <b-form-group id="form-cc/ml-group-edit" label="Dosage:" label-for="form-cc/ml-input">
+                    <b-form-input id="form-cc/ml-input" v-model="house_hold_data.cc"
+                        placeholder="Enter cc/ml" required type="number"></b-form-input>
+                  </b-form-group>
+
+                  <!--CATTLE Notes-->
+                  <b-form-group id="form-notes-group-edit" label="Notes:" label-for="form-notes-input">
+                    <b-form-textarea id="form-notes-input" v-model="house_hold_data.notes"
+                        placeholder="Enter Notes" required type="text"></b-form-textarea>
+                  </b-form-group>
+                </div>
+            </vue-tiny-tabs>
           </form>
         </b-modal>
       </div>
 
       <b-button v-if="isAuth" v-b-modal.modal-house_hold_data class="float_btn" style="border-radius: 50%"
                 variant="primary">
-        <span>Add HouseHoldData</span> <i class="fas fa-plus-circle menu_icon"></i>
+        <span>Add House Data</span> <i class="fas fa-plus-circle menu_icon"></i>
       </b-button>
 
 
       <div style="margin: auto;">
         <loading-progress
-            :hide-background="hideBackground"
-            :indeterminate="indeterminate"
-            :progress="progressPath"
-            :size="size"
-            fillDuration="2"
-            rotate
-            rotationDuration="1"
-        />
+            :hide-background="hideBackground" :indeterminate="indeterminate" :progress="progressPath" :size="size"
+            fillDuration="2" rotate rotationDuration="1"/>
       </div>
     </div>
   </div>
@@ -229,6 +291,7 @@ import {
 import {house_hold_data_resource, study_block_resource} from "@/utils/api_paths";
 import axios from "axios";
 import TopNav from "@/components/TopNav";
+import VueTinyTabs from 'vue-tiny-tabs'
 
 export default {
   name: "HouseHoldData",
@@ -297,7 +360,6 @@ export default {
     onLoadPage() {
       getItemDataList(study_block_resource).then(data => {
         let study_blockList = extractApiData(data);
-        this.$log.info("Study block list json: ", JSON.stringify(study_blockList));
 
         // update local variables with data from API
         this.fields = study_blockList['fields'];
@@ -308,6 +370,7 @@ export default {
           });
         }
       })
+      this.getHouseHoldData();
     },
 
     selectDropDownItemsForUpdate(study_block) {
@@ -439,9 +502,7 @@ export default {
           });
     },
   },
-  created() {
-    this.getHouseHoldData();
-  },
-  components: {TopNav}
+  created() { this.onLoadPage();},
+  components: {TopNav, VueTinyTabs}
 }
 </script>
