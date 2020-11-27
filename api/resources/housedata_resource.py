@@ -5,6 +5,7 @@ from flask_restful import fields, marshal, reqparse
 from api.models.database import BaseModel
 from api.models.housedata import AnimalHealthHouseData
 from api.resources.base_resource import BaseResource
+from api.resources.study_block_resource import StudyBlockResource
 from api.utils import format_and_lower_str, log_create, log_update, log_delete, has_required_request_params, \
     log_duplicate, non_empty_int, get_query_params, fake
 
@@ -15,7 +16,8 @@ class HouseDataResource(BaseResource):
         'cattle_name': fields.String, 'cattle_color': fields.String,
         'cattle_sex': fields.String, 'collar': fields.String,
         'pcv': fields.String, 'diagnosis': fields.String, 'treatment': fields.String,
-        'cc': fields.String, 'notes': fields.String, 'code': fields.String
+        'cc': fields.String, 'notes': fields.String, 'code': fields.String,
+        'study_block.name': fields.String, 'study_block.code': fields.String, 'study_block.area': fields.String
     }
 
     def get(self):
@@ -125,13 +127,14 @@ class HouseDataResource(BaseResource):
         parser.add_argument('treatment', required=False)
         parser.add_argument('cc', required=False)
         parser.add_argument('notes', required=False)
+        parser.add_argument('study_block', required=False)
 
         args = parser.parse_args()
         return {
             'farmer': args['farmer'], 'cattle_id': args['cattle_id'],
             'cattle_name': args['cattle_name'], 'cattle_color': args['cattle_color'],
             'cattle_sex': args['cattle_sex'], 'collar': args['collar'],
-            'pcv': args['pcv'], 'diagnosis': args['diagnosis'],
+            'pcv': args['pcv'], 'diagnosis': args['diagnosis'], 'study_block': args['study_block'],
             'treatment': args['treatment'], 'cc': args['cc'], 'notes': args['notes'],
         }
 
@@ -145,6 +148,7 @@ class HouseDataResource(BaseResource):
         house_data.diagnosis, house_data.collar = args['diagnosis'], args['collar'],
         house_data.treatment, house_data.pcv = args['treatment'], args['pcv'],
         house_data.notes, house_data.cc = args['notes'], args['cc']
+        house_data.study_block_id = StudyBlockResource.get_study_block(args['study_block'])
 
         return house_data
 
