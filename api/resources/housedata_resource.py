@@ -148,7 +148,7 @@ class HouseDataResource(BaseResource):
         house_data.diagnosis, house_data.collar = args['diagnosis'], args['collar'],
         house_data.treatment, house_data.pcv = args['treatment'], args['pcv'],
         house_data.notes, house_data.cc = args['notes'], args['cc']
-        house_data.study_block_id = StudyBlockResource.get_study_block(args['study_block'])
+        house_data.study_block_id = StudyBlockResource.get_study_block(args['study_block']).id
 
         return house_data
 
