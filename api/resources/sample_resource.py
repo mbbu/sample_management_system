@@ -33,8 +33,9 @@ class SampleResource(BaseResource):
         'sample_type': fields.String,
         'sample_description': fields.String,
         'location_collected': fields.String,
-        'project': fields.String,
-        'project_owner': fields.String,
+        'project.name': fields.String,
+        'project.lead.first_name': fields.String,
+        'project.lead.last_name': fields.String,
         'retention_date': fields.DateTime,
         'barcode': fields.String,
         'analysis': fields.String,
@@ -46,6 +47,7 @@ class SampleResource(BaseResource):
         'code': fields.String,
         'created_at': fields.String,
         'updated_at': fields.String,
+        'slot.position': fields.String,
         'slot.box.label': fields.String,
         'slot.box.tray.number': fields.String,
         'slot.box.tray.rack.number': fields.String,
@@ -250,7 +252,8 @@ class SampleResource(BaseResource):
         sample.theme_id, sample.user_id, sample.slot_id = theme, user, slot.id
         sample.animal_species, sample.sample_type = args['species'], args['type']
         sample.sample_description, sample.location_collected = args['desc'], args['location']
-        sample.barcode, sample.project_id, sample.project_owner = barcode, project, args['project_owner']
+        sample.barcode, sample.project_id = barcode, project
+                                                                  #sample.project_owner args['project_owner']
         sample.temperature, sample.amount, sample.quantity_type = args['temperature'], args['amount'], qt
         sample.retention_date, sample.analysis = args['retention_date'], args['analysis']
         sample.bio_hazard_level, sample.code, sample.status = bhl, code, SAMPLE_IN_LAB
