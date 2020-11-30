@@ -39,7 +39,7 @@
                         <b-icon
                             :title="`Update freezer ${ freezer.number }`"
                             @mouseover="fillFormForUpdate(freezer.number, freezer.code, freezer.room, freezer['lab.name'])"
-                            class="border border-info rounded" font-scale="2.0"
+                            class="border border-info rounded" :font-scale="`${font_scale}`"
                             icon="pencil" v-b-modal.modal-freezer-edit
                             v-b-tooltip.hover
                             variant="info"
@@ -47,7 +47,7 @@
                         &nbsp;
                         <b-icon
                                     :title="`Delete freezer ${freezer.number}!`" @click="deleteFreezer(freezer.code)"
-                                    class="border rounded bg-danger p-1" font-scale="1.85"
+                                    class="border rounded bg-danger p-1" :font-scale="`${font_scale}`"
                                     icon="trash" v-b-tooltip.hover
                                     variant="light"
                             ></b-icon>
@@ -255,6 +255,7 @@ import {
   selectItemForUpdate,
   showFlashMessage
 } from "@/utils/util_functions";
+import {font_scale} from '@/utils/constants';
 import EventBus from '@/components/EventBus';
 import FilterCard from "@/components/FilterCard";
 import {required} from "vuelidate/lib/validators";
@@ -277,6 +278,8 @@ export default {
         number: '',
         laboratory: null,
       },
+      
+      font_scale,
 
       // variable to check user status and role
       isAuth: null,

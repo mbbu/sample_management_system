@@ -27,7 +27,7 @@
                         <b-icon
                             :title="`Update ${ study_block.name }`"
                             @mouseover="fillFormForUpdate(study_block.area, study_block.name, study_block.code)"
-                            class="border border-info rounded" font-scale="2.0"
+                            class="border border-info rounded" :font-scale="`${font_scale}`"
                             icon="pencil" v-b-modal.modal-study_block-edit
                             v-b-tooltip.hover
                             variant="info"
@@ -35,7 +35,7 @@
                         &nbsp;
                         <b-icon
                                     :title="`Delete ${study_block.name}!`" @click="deleteStudyBlock(study_block.code)"
-                                    class="border rounded bg-danger p-1" font-scale="1.85"
+                                    class="border rounded bg-danger p-1" :font-scale="`${font_scale}`"
                                     icon="trash" v-b-tooltip.hover
                                     variant="light"
                             ></b-icon>
@@ -195,6 +195,7 @@ import {
   secureStoreGetAuthString,
   showFlashMessage
 } from "@/utils/util_functions";
+import {font_scale} from '@/utils/constants';
 import axios from "axios";
 import {study_block_resource} from "@/utils/api_paths";
 import TopNav from "@/components/TopNav";
@@ -209,6 +210,8 @@ name: "StudyBlock",
       study_blockList: [],
 
       study_block: { area: '', name: '', code: ''},
+
+      font_scale,
 
       // variable to check user status and role
       isAuth: null,

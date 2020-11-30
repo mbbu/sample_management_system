@@ -41,11 +41,11 @@
                     <td v-if="isAuth">
                       <b-icon :title="`Update box ${ box.label }`"
                           @mouseover="fillFormForUpdate(box['tray.number'], box.label, box.code)"
-                          class="border border-info rounded" font-scale="2.0"
+                          class="border border-info rounded" :font-scale="`${font_scale}`"
                           icon="pencil" v-b-modal.modal-box-edit v-b-tooltip.hover variant="info"></b-icon>
                       &nbsp;
                       <b-icon :title="`Delete box ${box.label}!`" @click="deleteBox(box.code)"
-                          class="border rounded bg-danger p-1" font-scale="1.85"
+                          class="border rounded bg-danger p-1" :font-scale="`${font_scale}`"
                           icon="trash" v-b-tooltip.hover variant="light"></b-icon>
                       </td>
                   </tr>
@@ -185,6 +185,7 @@ import {
   isThemeAdmin, pageStartLoader,
   secureStoreGetAuthString, selectItemForUpdate, showFlashMessage
 } from "@/utils/util_functions";
+import {font_scale} from '@/utils/constants';
 import {box_resource, tray_resource} from "@/utils/api_paths";
 import EventBus from '@/components/EventBus';
 import FilterCard from "@/components/FilterCard";
@@ -201,6 +202,8 @@ export default {
       filters: [], boxList: [], response: [], search: '',
 
       box: { tray: '', label: '', code: '', rows: '', cols: '' },
+
+      font_scale,
 
       // variable to check user status and role
       isAuth: null,

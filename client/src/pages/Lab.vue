@@ -32,7 +32,7 @@
                         <b-icon
                             :title="`Update ${ lab.name }`"
                             @mouseover="fillFormForUpdate(lab.name, lab.code, lab.room)"
-                            class="border border-info rounded" font-scale="2.0"
+                            class="border border-info rounded" :font-scale="`${font_scale}`"
                             icon="pencil" v-b-modal.modal-lab-edit
                             v-b-tooltip.hover
                             variant="info"
@@ -40,7 +40,7 @@
                         &nbsp;
                         <b-icon
                                     :title="`Delete ${lab.name}!`" @click="deleteLab(lab.code)"
-                                    class="border rounded bg-danger p-1" font-scale="1.85"
+                                    class="border rounded bg-danger p-1" :font-scale="`${font_scale}`"
                                     icon="trash" v-b-tooltip.hover
                                     variant="light"
                             ></b-icon>
@@ -209,6 +209,7 @@ import {
   secureStoreGetAuthString,
   showFlashMessage
 } from "@/utils/util_functions";
+import {font_scale} from '@/utils/constants';
 import EventBus from '@/components/EventBus';
 import {required} from "vuelidate/lib/validators";
 
@@ -223,6 +224,8 @@ export default {
         code: '',
         room: '',
       },
+      
+      font_scale,
 
       // variable to check user status and role
       isAuth: null,
@@ -307,11 +310,11 @@ export default {
             },
 
                     // stop&hide progressPath
-haltProgressPath(cont=false, path=0, size=0){
-  this.indeterminate = cont
-this.progressPath = path
-this.size = size
-},
+      haltProgressPath(cont=false, path=0, size=0){
+        this.indeterminate = cont
+        this.progressPath = path
+        this.size = size
+      },
 
 
             getLab() {

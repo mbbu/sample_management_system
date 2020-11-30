@@ -25,7 +25,7 @@
                         <b-icon
                             :title="`Update ${ theme.name }`"
                             @mouseover="fillFormForUpdate(theme.name, theme.code)"
-                            class="border border-info rounded" font-scale="2.0"
+                            class="border border-info rounded" :font-scale="`${font_scale}`"
                             icon="pencil" v-b-modal.modal-theme-edit
                             v-b-tooltip.hover
                             variant="info"
@@ -33,7 +33,7 @@
                         &nbsp;
                         <b-icon
                                     :title="`Delete ${theme.name}!`" @click="deleteTheme(theme.code)"
-                                    class="border rounded bg-danger p-1" font-scale="1.85"
+                                    class="border rounded bg-danger p-1" :font-scale="`${font_scale}`"
                                     icon="trash" v-b-tooltip.hover
                                     variant="light"
                             ></b-icon>
@@ -125,6 +125,7 @@ import axios from 'axios';
 import {theme_resource} from '@/utils/api_paths'
 import TopNav from "../components/TopNav";
 import {isAdmin, secureStoreGetAuthString, handleError, pageStartLoader, showFlashMessage} from '@/utils/util_functions'
+import {font_scale} from '@/utils/constants';
 import EventBus from '../components/EventBus';
 import {required} from "vuelidate/lib/validators";
 
@@ -137,6 +138,8 @@ export default {
       page_title: "Themes",
       response: [], themeList: [], search: '',
       theme: { name: '', code: '' },
+
+      font_scale,
 
       // variable to check user status and role
       isAuth: null,

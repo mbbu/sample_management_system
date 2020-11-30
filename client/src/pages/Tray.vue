@@ -36,7 +36,7 @@
                         <b-icon
                             :title="`Update tray ${ tray.code }`"
                             @mouseover="fillFormForUpdate(tray['rack.number'], tray.number, tray.code)"
-                            class="border border-info rounded" font-scale="2.0"
+                            class="border border-info rounded" :font-scale="`${font_scale}`"
                             icon="pencil" v-b-modal.modal-tray-edit
                             v-b-tooltip.hover
                             variant="info"
@@ -44,7 +44,7 @@
                         &nbsp;
                         <b-icon
                                     :title="`Delete tray ${tray.code}!`" @click="deleteTray(tray.code)"
-                                    class="border rounded bg-danger p-1" font-scale="1.85"
+                                    class="border rounded bg-danger p-1" :font-scale="`${font_scale}`"
                                     icon="trash" v-b-tooltip.hover
                                     variant="light"
                             ></b-icon>
@@ -205,6 +205,7 @@ import {
   selectItemForUpdate,
   showFlashMessage
 } from "@/utils/util_functions";
+import {font_scale} from '@/utils/constants';
 import EventBus from '@/components/EventBus';
 import FilterCard from "@/components/FilterCard";
 import {required} from "vuelidate/lib/validators";
@@ -226,6 +227,8 @@ export default {
         number: '',
       },
 
+      font_scale,
+      
       // variable to check user status and role
       isAuth: null,
 
@@ -251,7 +254,7 @@ export default {
             };
         },
 
-        validations: {
+  validations: {
             tray: {
                 rack: {required},
                 code: {required},
@@ -259,11 +262,11 @@ export default {
             }
         },
 
-        created() {
+  created() {
             this.onLoadPage();
         },
 
-        mounted() {
+  mounted() {
             EventBus.$on('searchQuery', (payload) => {
                 this.search = payload
                 this.searchData()
@@ -277,7 +280,7 @@ export default {
             })
         },
 
-        computed: {
+  computed: {
             /**
              * return a list of dictionaries containing the filters required
              */
@@ -329,7 +332,7 @@ export default {
             },
         },
 
-        methods: {
+  methods: {
             // Util Functions
             selectItemForUpdate,
 
@@ -562,5 +565,5 @@ this.size = size
             },
             // end-of methods for search and filter
         },
-    };
+};
 </script>

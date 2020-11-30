@@ -30,7 +30,7 @@
                                 <b-icon
                                         :title="`Contact project head (${ project['lead.email'] })`"
                                         class="border border-info rounded"
-                                        font-scale="1.5" icon="envelope"
+                                        :font-scale="`${font_scale}`" icon="envelope"
                                         v-b-tooltip.hover variant="info"
                                 ></b-icon>
                             </a>
@@ -43,7 +43,7 @@
                             :title="`Update project ${ project.name }`"
                             @mouseover="fillFormForUpdate(project.code, project.name, project.description, project['theme.name'],
                                     project['lead.first_name'] + ' ' + project['lead.last_name'])"
-                            class="border border-info rounded" font-scale="2.0"
+                            class="border border-info rounded" :font-scale="`${font_scale}`"
                             icon="pencil" v-b-modal.modal-project-edit
                             v-b-tooltip.hover
                             variant="info"
@@ -51,7 +51,7 @@
                         &nbsp;
                             <b-icon
                                     :title="`Delete project ${project.name}!`" @click="deleteProject(project.code)"
-                                    class="border rounded bg-danger p-1" font-scale="1.85"
+                                    class="border rounded bg-danger p-1" :font-scale="`${font_scale}`"
                                     icon="trash" v-b-tooltip.hover
                                     variant="light"
                             ></b-icon>
@@ -224,6 +224,7 @@ import {
   secureStoreGetAuthString,
   showFlashMessage
 } from "@/utils/util_functions";
+import {font_scale} from '@/utils/constants';
 import {project_resource, theme_resource, user_resource} from "@/utils/api_paths";
 import axios from "axios";
 import TopNav from "../components/TopNav";
@@ -241,6 +242,8 @@ export default {
         theme: null,
         head: null
       },
+      
+      font_scale,
 
       // variable to check user status and role
       isAuth: null,

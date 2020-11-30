@@ -32,7 +32,7 @@
                                 <b-icon
                                         :title="`Contact author(${ publication['user.email'] })`"
                                         class="border border-info rounded"
-                                        font-scale="1.5" icon="envelope"
+                                        :font-scale="`${font_scale}`" icon="envelope"
                                         v-b-tooltip.hover variant="info"
                                 ></b-icon>
                             </a>
@@ -43,7 +43,7 @@
                             <b-icon v-if="isPublicationOwner(publication['user.email'])"
                                     :title="`Update ${ publication.publication_title }`"
                                     @click="fillFormForUpdate(publication)"
-                                    class="border border-info rounded" font-scale="2.0"
+                                    class="border border-info rounded" :font-scale="`${font_scale}`"
                                     icon="pencil"
                                     v-b-tooltip.hover
                                     variant="info"
@@ -51,7 +51,7 @@
                           &nbsp;
                           <b-icon
                               @click="downloadPublication(publication.publication_title)"
-                              class="border border-info rounded" font-scale="2.0"
+                              class="border border-info rounded" :font-scale="`${font_scale}`"
                               icon="download" title="Download"
                               v-b-tooltip.hover variant="info"
                           ></b-icon>
@@ -59,7 +59,7 @@
                           <b-icon :title="`Delete ${ publication.publication_title }!`"
                                   @click="deletePublication(publication.publication_title)"
                                   class="border rounded bg-danger p-1"
-                                  font-scale="1.85" icon="trash"
+                                  :font-scale="`${font_scale}`" icon="trash"
                                   v-b-tooltip.hover v-if="isPublicationOwner(publication['user.email'])"
                                   variant="light"
                           ></b-icon>
@@ -185,6 +185,7 @@ import {
   setSampleDataList,
   showFlashMessage
 } from "@/utils/util_functions";
+import {font_scale} from '@/utils/constants';
 import EventBus from '@/components/EventBus';
 import {required} from "vuelidate/lib/validators";
 import PublicationModal from "@/components/PublicationModal";
@@ -203,6 +204,8 @@ export default {
         sample_results: null,
         co_authors: null
       },
+      
+      font_scale,
 
       isRedirected: false,
       item: null,

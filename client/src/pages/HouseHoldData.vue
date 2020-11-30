@@ -43,17 +43,16 @@
             <td v-if="isAuth">
               <b-icon
                   v-b-modal.modal-house_hold_data-edit
-                  v-b-tooltip.hover
+                  v-b-tooltip.hover :font-scale="`${font_scale}`"
                   :title="`Update house_hold_data ${ house_hold_data.farmer }`" class="border border-info rounded"
-                  font-scale="2.0" icon="pencil"
-                  variant="info"
+                  icon="pencil" variant="info"
                   @mouseover="fillFormForUpdate(house_hold_data)"
               ></b-icon>
               &nbsp;
               <b-icon
                   v-b-tooltip.hover
                   :title="`Delete house_hold_data ${house_hold_data.farmer}!`"
-                  class="border rounded bg-danger p-1" font-scale="1.85"
+                  class="border rounded bg-danger p-1" :font-scale="`${font_scale}`"
                   icon="trash" variant="light"
                   @click="deleteHouseHoldData(house_hold_data.code)"
               ></b-icon>
@@ -301,6 +300,7 @@ import {
   secureStoreGetAuthString,
   showFlashMessage
 } from "@/utils/util_functions";
+import {font_scale} from '@/utils/constants';
 import {house_hold_data_resource, study_block_resource} from "@/utils/api_paths";
 import axios from "axios";
 import TopNav from "@/components/TopNav";
@@ -316,6 +316,8 @@ export default {
         farmer: '', cattle_id: '', cattle_name: '', cattle_color: '', cc: '', notes: '',
         cattle_sex: '', collar: '', pcv: '', diagnosis: '', treatment: '', study_block: ''
       },
+
+      font_scale: font_scale,
 
       // variable to check user status and role
       isAuth: null,

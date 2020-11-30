@@ -118,10 +118,11 @@
                     <td v-else> N/A</td>
                     <td v-if="sample.location"> {{ sample.location }}</td>
                     <td v-else> N/A</td>
+                    &nbsp;
                     <b-icon
                         @click="viewMySample(sample.code)"
                         class="border border-info rounded"
-                        font-scale="1.8" icon="eye-fill"
+                        :font-scale="`${font_scale}`" icon="eye-fill"
                         ref="delete"
                         title="View"
                         v-b-tooltip.hover
@@ -169,10 +170,11 @@
                     <td v-else> N/A</td>
                     <td v-if="request.status"> {{ request.status }}</td>
                     <td v-else> N/A</td>
+                    &nbsp;
                     <b-icon
                         @click="viewMyRequest(request)"
                         class="border border-info rounded"
-                        font-scale="1.8" icon="eye-fill"
+                        :font-scale="`${font_scale}`" icon="eye-fill"
                         title="View"
                         v-b-modal.modal-sample-request
                         v-b-tooltip.hover variant="info"
@@ -182,7 +184,7 @@
                         @click="showModal = !showModal"
                         @mouseover="fillFormForUpdate(request)"
                         class="border border-info rounded"
-                        font-scale="1.8"
+                        :font-scale="`${font_scale}`"
                         icon="pencil" title="Update"
                         v-b-modal.modal-sample-request-edit v-b-tooltip.hover
                         v-if="request.status === 'PENDING'"
@@ -192,7 +194,7 @@
                     <b-icon
                         @click="deleteSampleRequest(request.code)"
                         class="border rounded bg-danger p-1"
-                        font-scale="1.7" icon="trash"
+                        :font-scale="`${font_scale}`" icon="trash"
                         title="Delete" v-b-tooltip.hover
                         variant="light"
                     ></b-icon>
@@ -297,29 +299,29 @@
                     <td v-else> N/A</td>
                     <td v-if="requested.status"> {{ requested.status }}</td>
                     <td v-else> N/A</td>
-                    <b-icon
+                    &nbsp; <b-icon
                         @click="viewMyRequestedSamples(requested)"
                         class="border border-info rounded"
-                        font-scale="1.8" icon="eye-fill"
+                        :font-scale="`${font_scale}`" icon="eye-fill"
                         title="View"
                         v-b-modal.modal-requested-sample-view
                         v-b-tooltip.hover variant="info"
                     ></b-icon>
                     &nbsp;
-                    <b-icon
+                    &nbsp; <b-icon
                         @click="setRequestCode(requested.code)"
                         class="border border-info rounded"
-                        font-scale="1.8"
+                        :font-scale="`${font_scale}`"
                         icon="pencil" title="Update"
                         v-b-modal.modal-requested-sample v-b-tooltip.hover
                         v-if="requested.status === 'PENDING'"
                         variant="info"
                     ></b-icon>
                     &nbsp;
-                    <b-icon
+                    &nbsp; <b-icon
                         @click="deleteSampleRequest(requested.code)"
                         class="border rounded bg-danger p-1"
-                        font-scale="1.7" icon="trash"
+                        :font-scale="`${font_scale}`" icon="trash"
                         title="Delete" v-b-tooltip.hover
                         variant="light"
                     ></b-icon>
@@ -396,34 +398,34 @@
                     <td v-else> N/A</td>
                     <td v-if="publication.co_authors"> {{ publication.co_authors }}</td>
                     <td v-else> N/A</td>
-                    <b-icon
+                    &nbsp; <b-icon
                         @click="viewMyPublication(publication)"
                         class="border border-info rounded"
-                        font-scale="1.8" icon="eye-fill"
+                        :font-scale="`${font_scale}`" icon="eye-fill"
                         title="View"
                         v-b-modal.modal-publication
                         v-b-tooltip.hover variant="info"
                     ></b-icon>
                     &nbsp;
-                    <b-icon :title="`Update ${ publication.title }`"
+                    &nbsp; <b-icon :title="`Update ${ publication.title }`"
                             @click="updatePublication(publication)"
-                            class="border border-info rounded" font-scale="1.8"
+                            class="border border-info rounded" :font-scale="`${font_scale}`"
                             icon="pencil" v-b-modal.modal-publication-edit
                             v-b-tooltip.hover
                             variant="info"
                     ></b-icon>
                     &nbsp;
-                    <b-icon
+                    &nbsp; <b-icon
                         @click="downloadPublication(publication.title)"
-                        class="border border-info rounded" font-scale="1.8"
+                        class="border border-info rounded" :font-scale="`${font_scale}`"
                         icon="download" title="Download"
                         v-b-tooltip.hover variant="info"
                     ></b-icon>
                     &nbsp;
-                    <b-icon
+                    &nbsp; <b-icon
                         @click="deletePublication(publication.title)"
                         class="border rounded bg-danger p-1"
-                        font-scale="1.7" icon="trash"
+                        :font-scale="`${font_scale}`" icon="trash"
                         title="Delete" v-b-tooltip.hover
                         variant="light"
                     ></b-icon>
@@ -486,6 +488,7 @@ import {
   startLoader,
   viewSample,
 } from "@/utils/util_functions";
+import {font_scale} from '@/utils/constants';
 import EventBus from '@/components/EventBus';
 import SampleResponseForm from "@/components/SampleResponseForm";
 import PublicationModal from "@/components/PublicationModal";
@@ -516,7 +519,8 @@ export default {
       userEmail: '',
       requestCode: null,
       fields: null,
-      sampleDataList: []
+      sampleDataList: [],
+      font_scale,
     };
   },
   mounted() {
