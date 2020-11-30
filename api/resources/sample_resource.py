@@ -99,17 +99,8 @@ class SampleResource(BaseResource):
                 try:
                     sample = Sample()
 
-                    sample.theme_id, sample.user_id, sample.slot_id = theme, user, slot.id
-                    sample.animal_species, sample.sample_type = args['species'], args['type']
-                    sample.sample_description, sample.location_collected = args['desc'], args['location']
-                    sample.barcode, sample.project, sample.project_owner = barcode, args['project'], args[
-                        'project_owner']
-                    sample.temperature, sample.amount, sample.quantity_type = args['temperature'], args['amount'], qt
-                    sample.retention_date, sample.analysis = args['retention_date'], args['analysis']
-                    sample.bio_hazard_level, sample.code, sample.status = bhl, code, SAMPLE_IN_LAB
-
-                    # update that the slot is no longer available
-                    slot.available = False
+                    SampleResource.save_sample(sample, args, theme, user, qt, bhl, barcode, slot, code)
+                    slot.available = False  # update that the slot is no longer available
 
                     BaseModel.db.session.add(sample)
                     log_create(sample)
@@ -249,3 +240,17 @@ class SampleResource(BaseResource):
     @staticmethod
     def get_samples():
         return BaseModel.db.session.query(Sample).all()
+
+    @staticmethod
+    def save_sample(sample, args, theme, user, qt, bhl, barcode, slot, code):
+
+        sample.theme_id, sample.user_id, sample.slot_id = theme, user, slot.id
+        sample.animal_species, sample.sample_type = args['species'], args['type']
+        sample.sample_description, sample.location_collected = args['desc'], args['location']
+        sample.barcode, sample.project, sample.project_owner = barcode, args['project'], args[
+            'project_owner']
+        sample.temperature, sample.amount, sample.quantity_type = args['temperature'], args['amount'], qt
+        sample.retention_date, sample.analysis = args['retention_date'], args['analysis']
+        sample.bio_hazard_level, sample.code, sample.status = bhl, code, SAMPLE_IN_LAB
+
+        return sample
