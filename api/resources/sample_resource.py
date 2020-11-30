@@ -12,6 +12,7 @@ from api.models.sample import Sample
 from api.resources.base_resource import BaseResource
 from api.resources.bio_hazard_level_resource import BioHazardLevelResource
 from api.resources.decorators.user_role_decorators import is_sample_owner
+from api.resources.project_resource import ProjectResource
 from api.resources.quantity_type_resource import QuantityTypeResource
 from api.resources.slot_resource import SlotResource
 from api.resources.theme_resource import ThemeResource
@@ -24,6 +25,7 @@ class SampleResource(BaseResource):
     fields = {
         'status': fields.String,
         'theme.name': fields.String,
+        # user is the sample owner
         'user.email': fields.String,
         'user.first_name': fields.String,
         'user.last_name': fields.String,
@@ -84,11 +86,6 @@ class SampleResource(BaseResource):
         args = SampleResource.sample_args()
         slots = json.loads(args['slots'])
 
-        theme = ThemeResource.get_theme(args['theme']).id
-        user = get_any_user_by_email(args['user']).id
-        qt = QuantityTypeResource.get_quantity_type(args['quantity_type']).id
-        bhl = BioHazardLevelResource.get_bio_hazard_level(args['bio_hazard_level']).id
-
         # register multiple samples
         for i in range(len(slots)):
             code = fake.ean(length=8)
@@ -99,7 +96,7 @@ class SampleResource(BaseResource):
                 try:
                     sample = Sample()
 
-                    SampleResource.save_sample(sample, args, theme, user, qt, bhl, barcode, slot, code)
+                    SampleResource.save_sample(sample, args, barcode, slot, code)
                     slot.available = False  # update that the slot is no longer available
 
                     BaseModel.db.session.add(sample)
@@ -212,7 +209,7 @@ class SampleResource(BaseResource):
         parser.add_argument('bio_hazard_level', required=True)
         parser.add_argument('sample_description', required=False)
         parser.add_argument('location_collected', required=False)
-        parser.add_argument('user', required=False, type=non_empty_int)
+        parser.add_argument('user', required=False, type=non_empty_int)  # user is the sample owner
 
         args = parser.parse_args()
         return {
@@ -242,13 +239,18 @@ class SampleResource(BaseResource):
         return BaseModel.db.session.query(Sample).all()
 
     @staticmethod
-    def save_sample(sample, args, theme, user, qt, bhl, barcode, slot, code):
+    def save_sample(sample, args, barcode, slot, code):
+
+        theme = ThemeResource.get_theme(args['theme']).id
+        user = get_any_user_by_email(args['user']).id
+        qt = QuantityTypeResource.get_quantity_type(args['quantity_type']).id
+        bhl = BioHazardLevelResource.get_bio_hazard_level(args['bio_hazard_level']).id
+        project = ProjectResource.get_project(args['project']).id
 
         sample.theme_id, sample.user_id, sample.slot_id = theme, user, slot.id
         sample.animal_species, sample.sample_type = args['species'], args['type']
         sample.sample_description, sample.location_collected = args['desc'], args['location']
-        sample.barcode, sample.project, sample.project_owner = barcode, args['project'], args[
-            'project_owner']
+        sample.barcode, sample.project_id, sample.project_owner = barcode, project, args['project_owner']
         sample.temperature, sample.amount, sample.quantity_type = args['temperature'], args['amount'], qt
         sample.retention_date, sample.analysis = args['retention_date'], args['analysis']
         sample.bio_hazard_level, sample.code, sample.status = bhl, code, SAMPLE_IN_LAB
