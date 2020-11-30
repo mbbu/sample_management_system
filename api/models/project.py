@@ -15,6 +15,7 @@ class Project(BaseModel.db.Model, SearchableMixin):
     description = AppDb.Column(AppDb.String(255), nullable=True)
 
     # relationship(s) defined here
+    samples = AppDb.relationship('Sample', backref='project', lazy=True)
 
     @staticmethod
     def project_exists(code):
