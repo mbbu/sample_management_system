@@ -21,7 +21,7 @@
                       <th class="table-header-style" scope="col"> Id</th>
                       <th class="table-header-style" scope="col"> Theme</th>
                       <th class="table-header-style" scope="col"> Project</th>
-                      <th class="table-header-style" scope="col"> Owner (P.I)</th>
+                      <th class="table-header-style" scope="col"> (P.I)</th>
                       <th class="table-header-style" scope="col"> Location Collected</th>
                       <th class="table-header-style" scope="col"> Animal Species</th>
                       <th class="table-header-style" scope="col"> BarCode</th>
@@ -33,8 +33,8 @@
                     <tr :key="sample.id" v-for="(sample, index) in matchFiltersAndSearch.arr">
                         <td> {{ index + 1 }}</td>
                         <td> {{ sample['theme.name'] }}</td>
-                        <td> {{ sample.project }}</td>
-                        <td> {{ sample.project_owner }}</td>
+                        <td> {{ sample['project.name'] }}</td>
+                        <td> {{ sample['project.lead.first_name'] }} {{ sample['project.lead.last_name'] }}</td>
                         <td> {{ sample.location_collected }}</td>
                         <td> {{ sample.animal_species }}</td>
                         <td> {{ sample.barcode }}</td>
@@ -211,7 +211,6 @@ export default {
 
         let lowest = 0;
         for (let i = 1; i < filteredData.length; i++) {
-          console.log("Item  " + i + " ", filteredData[i])
           if ((filteredData[i] < filteredData[lowest]) && filteredData[i].length > 0) lowest = i;
         }
         return paginate(filteredData[lowest]);
@@ -262,12 +261,12 @@ export default {
       EventBus.$emit('page-info', {'pgInfo': info, 'pgData': this.sampleList})
     },
 
-              // stop&hide progressPath
-haltProgressPath(cont=false, path=0, size=0){
-  this.indeterminate = cont
-this.progressPath = path
-this.size = size
-},
+    // stop&hide progressPath
+    haltProgressPath(cont=false, path=0, size=0){
+      this.indeterminate = cont
+      this.progressPath = path
+      this.size = size
+    },
 
     // methods to interact with api
     getSamples() {
