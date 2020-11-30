@@ -229,7 +229,7 @@ class UserResource(BaseResource):
             for sample in user_samples:
                 sample_details = {}
                 theme = sample.theme.name
-                project = sample.project
+                project = sample.project_id
                 species = sample.animal_species
                 _type = sample.sample_type
                 barcode = sample.barcode

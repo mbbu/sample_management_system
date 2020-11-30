@@ -63,4 +63,4 @@ class Sample(BaseModel.db.Model, SearchableMixin):
                     self.project, self.barcode, self.animal_species,
                     self.slot_id, self.retention_date, self.amount, self.quantity_type, self.code,
                     self.location_collected,
-                    self.project_owner, self.analysis, self.temperature)
+                    self.project_id, self.analysis, self.temperature)
