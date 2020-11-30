@@ -253,7 +253,6 @@ class SampleResource(BaseResource):
         sample.animal_species, sample.sample_type = args['species'], args['type']
         sample.sample_description, sample.location_collected = args['desc'], args['location']
         sample.barcode, sample.project_id = barcode, project
-                                                                  #sample.project_owner args['project_owner']
         sample.temperature, sample.amount, sample.quantity_type = args['temperature'], args['amount'], qt
         sample.retention_date, sample.analysis = args['retention_date'], args['analysis']
         sample.bio_hazard_level, sample.code, sample.status = bhl, code, SAMPLE_IN_LAB
