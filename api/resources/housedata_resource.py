@@ -16,7 +16,7 @@ class HouseDataResource(BaseResource):
         'cattle_name': fields.String, 'cattle_color': fields.String,
         'cattle_sex': fields.String, 'collar': fields.String,
         'pcv': fields.String, 'diagnosis': fields.String, 'treatment': fields.String,
-        'cc': fields.String, 'notes': fields.String, 'code': fields.String,
+        'cc': fields.String, 'notes': fields.String, 'code': fields.String, 'weight': fields.String,
         'study_block.name': fields.String, 'study_block.code': fields.String, 'study_block.area': fields.String
     }
 
