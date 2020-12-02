@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from api.models.database import BaseModel
 from api.search.searchable_mixin import SearchableMixin
 
@@ -22,6 +24,7 @@ class AnimalHealthHouseData(BaseModel.db.Model, SearchableMixin):
     notes = AppDb.Column(AppDb.Text, nullable=True)
     weight = AppDb.Column(AppDb.Float(precision=2), nullable=True)
     study_block_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('study_block.id', ondelete='SET NULL'), nullable=True)
+    date_collected = AppDb.Column(AppDb.DateTime, nullable=False, default=datetime.now)
 
     @staticmethod
     def house_data_exists(code):

@@ -13,11 +13,12 @@ from api.utils import format_and_lower_str, log_create, log_update, log_delete, 
 class HouseDataResource(BaseResource):
     fields = {
         'farmer': fields.String, 'cattle_id': fields.String,
-        'cattle_name': fields.String, 'cattle_color': fields.String,
         'cattle_sex': fields.String, 'collar': fields.String,
+        'cattle_name': fields.String, 'cattle_color': fields.String,
         'pcv': fields.String, 'diagnosis': fields.String, 'treatment': fields.String,
         'cc': fields.String, 'notes': fields.String, 'code': fields.String, 'weight': fields.String,
-        'study_block.name': fields.String, 'study_block.code': fields.String, 'study_block.area': fields.String
+        'study_block.name': fields.String, 'study_block.code': fields.String, 'study_block.area': fields.String,
+        'date_collected': fields.DateTime
     }
 
     def get(self):

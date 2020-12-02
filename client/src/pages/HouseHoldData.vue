@@ -63,9 +63,13 @@
 
         <vue-tiny-tabs id="my-view-tabs" :anchor="false" :closable="false" :hideTitle="true" class="tinytabs tabs">
           <div id="farmer-info-view" class="section tab">
-            <h4 class="title"><small><b>Farmer Info</b></small></h4>
+            <h4 class="title"><small><b>General Info</b></small></h4>
+            <!--SITE-->
+            <p><em>Site:</em> {{ house_data['study_block.area'] }}</p>
             <!--STUDY-BLOCK-->
-            <p><em>Site:</em> {{ house_data['study_block.name'] }}</p>
+            <p><em>Study Block:</em> {{ house_data['study_block.name'] }}</p>
+            <!--DATE COLLECTED-->
+            <p><em>Date Collected:</em> {{ house_data.date_collected }}</p>
             <!--FARMER-->
             <p><em>Farmer Name:</em> {{ house_data.farmer }}</p>
           </div>
@@ -386,13 +390,11 @@ export default {
       page_title: "HouseHoldData",
       response: [],
       house_hold_data: {
-        farmer: '', cattle_id: '', cattle_name: '', cattle_color: '', cc: '', notes: '',
+        farmer: '', cattle_id: '', cattle_name: '', cattle_color: '', cc: '', notes: '', date_collected: null,
         cattle_sex: '', collar: '', pcv: '', diagnosis: '', treatment: '', study_block: '', weight:0
       },
 
-      house_data: {},
-
-      font_scale: font_scale,
+      house_data: {}, font_scale,
 
       // variable to check user status and role
       isAuth: null,
@@ -411,7 +413,7 @@ export default {
   },
   methods: {
     // Util Functions
-  clearForm() {
+    clearForm() {
       this.house_hold_data.farmer = '';
       this.house_hold_data.cattle_id = '';
       this.house_hold_data.cattle_name = '';
