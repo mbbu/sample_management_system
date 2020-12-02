@@ -11,17 +11,9 @@
           <thead>
           <tr>
             <th class="table-header-style" scope="col"> Id</th>
-            <th class="table-header-style" scope="col"> Study Block</th>
-            <th class="table-header-style" scope="col"> Farmer Name</th>
+            <th class="table-header-style" scope="col"> Study Block(Site)</th>
+            <th class="table-header-style" scope="col"> Date of Collection</th>
             <th class="table-header-style" scope="col"> Cattle ID</th>
-            <th class="table-header-style" scope="col"> Cattle Name</th>
-            <th class="table-header-style" scope="col"> Color</th>
-            <th class="table-header-style" scope="col"> Sex</th>
-            <th class="table-header-style" scope="col"> Collar</th>
-            <th class="table-header-style" scope="col"> PCV</th>
-            <th class="table-header-style" scope="col"> Dx</th>
-            <th class="table-header-style" scope="col"> Rx</th>
-            <th class="table-header-style" scope="col"> Notes</th>
             <th v-if="isAuth" class="table-header-style" scope="col"> Actions</th>
           </tr>
           </thead>
@@ -31,16 +23,17 @@
             <td> {{ house_hold_data['study_block.name'] }}</td>
             <td> {{ house_hold_data.farmer }}</td>
             <td> {{ house_hold_data.cattle_id }}</td>
-            <td> {{ house_hold_data.cattle_name }}</td>
-            <td> {{ house_hold_data.cattle_color }}</td>
-            <td> {{ house_hold_data.cattle_sex }}</td>
-            <td> {{ house_hold_data.collar }}</td>
-            <td> {{ house_hold_data.pcv }}</td>
-            <td> {{ house_hold_data.diagnosis }}</td>
-            <td> {{ house_hold_data.treatment }}</td>
-            <td> {{ house_hold_data.notes }}</td>
 
             <td v-if="isAuth">
+              <b-icon
+                        @click="viewHouseData(house_hold_data)"
+                        class="border border-info rounded"
+                        :font-scale="`${font_scale}`" icon="eye-fill"
+                        title="View"
+                        v-b-modal.modal-house-data
+                        v-b-tooltip.hover variant="info"
+              ></b-icon>
+              &nbsp;
               <b-icon
                   v-b-modal.modal-house_hold_data-edit
                   v-b-tooltip.hover :font-scale="`${font_scale}`"
@@ -61,6 +54,74 @@
           </tbody>
         </table>
       </div>
+
+      <!--MODAL TO SHOW EXTRA DATA-->
+      <b-modal id="modal-house-data"
+               title="House Hold Info"
+      >
+        <h4><em>Cattle Id:</em> {{ house_data.cattle_id }}</h4><br>
+
+        <vue-tiny-tabs id="my-view-tabs" :anchor="false" :closable="false" :hideTitle="true" class="tinytabs tabs">
+          <div id="farmer-info-view" class="section tab">
+            <h4 class="title"><small><b>Farmer Info</b></small></h4>
+            <!--STUDY-BLOCK-->
+            <p><em>Site:</em> {{ house_data['study_block.name'] }}</p>
+            <!--FARMER-->
+            <p><em>Farmer Name:</em> {{ house_data.farmer }}</p>
+          </div>
+
+          <div id="cattle-info-view" class="section tab">
+            <h4 class="title"><small><b>Cattle Info</b></small></h4>
+            <!--CATTLE_ID-->
+
+
+            <!--CATTLE NAME-->
+            <p><em>Cattle Name:</em> {{ house_data.cattle_name }}</p>
+
+            <!--CATTLE COLOR-->
+            <p><em>Color:</em> {{ house_data.cattle_color }}</p>
+
+
+            <!--CATTLE COLLAR-->
+            <p><em>Collar:</em> {{ house_data.collar }}</p>
+
+            <!--CATTLE Sex-->
+            <p><em>Sex:</em> {{ house_data.cattle_sex }}</p>
+          </div>
+
+          <div id="health-info-view" class="section tab">
+            <h4 class="title"><small><b>Health Info</b></small></h4>
+
+            <!--CATTLE WEIGHT-->
+            <p><em>Weight:</em> {{ house_data.weight }} kg</p>
+
+            <!--CATTLE PCV-->
+            <p><em>PCV:</em> {{ house_data.pcv }}</p>
+
+            <!--CATTLE Diagnosis-->
+            <p><em>Diagnosis(Dx):</em> <br> {{ house_data.diagnosis }}</p>
+
+            <!--CATTLE Treatment-->
+            <p><em>Treatment(Rx):</em> <br> {{ house_data.treatment }}</p>
+
+            <!--CATTLE CC/ML-->
+            <p><em>Dosage:</em> {{ house_data.cc }} cc</p>
+
+            <!--CATTLE Notes-->
+            <p><em>Notes:</em> <br> {{ house_data.notes }}</p>
+          </div>
+        </vue-tiny-tabs>
+
+        <template v-slot:modal-footer="{ ok, cancel, hide }">
+          <!-- Emulate built in modal footer ok and cancel button actions -->
+          <b-button @click="cancel()" size="md" variant="primary-outline">Cancel</b-button>
+          <b-button @click="fillFormForUpdate(house_data)" size="md" variant="primary"
+                    data-toggle="modal" data-target="#modal-house_hold_data-edit" data-dismiss="modal"
+                    v-b-modal.modal-house_hold_data-edit> Update</b-button>
+          <b-button @click=" close() && deleteHouseHoldData(house_data.code)"
+                    size="md" variant="danger"> Delete</b-button>
+        </template>
+      </b-modal>
 
       <div v-if="!isEditing">
         <b-modal id="modal-house_hold_data"
@@ -135,7 +196,7 @@
                 <!--CATTLE WEIGHT-->
                 <b-form-group id="form-weight-group" label="Weight:" label-for="form-weight-input">
                   <b-form-input id="form-weight-input" v-model="house_hold_data.weight"
-                                placeholder="Enter Weight" required type="num" min=1></b-form-input>
+                                placeholder="Enter Weight" required type="number" min=1></b-form-input>
                 </b-form-group>
 
                 <!--CATTLE PCV-->
@@ -245,6 +306,12 @@
               <div id="health-info-edit" class="section tab">
                 <h4 class="title"><small><b>Health Info</b></small></h4>
 
+                <!--CATTLE WEIGHT-->
+                <b-form-group id="form-weight-group-edit" label="Weight:" label-for="form-weight-input-edit">
+                  <b-form-input id="form-weight-input-edit" v-model="house_hold_data.weight"
+                                placeholder="Enter Weight" required type="number" min=1></b-form-input>
+                </b-form-group>
+
                 <!--CATTLE PCV-->
                 <b-form-group id="form-pcv-group-edit" label="PCV(Packed Cell Volume):" label-for="form-pcv-input">
                   <b-form-input id="form-pcv-input" v-model="house_hold_data.pcv"
@@ -323,6 +390,8 @@ export default {
         cattle_sex: '', collar: '', pcv: '', diagnosis: '', treatment: '', study_block: '', weight:0
       },
 
+      house_data: {},
+
       font_scale: font_scale,
 
       // variable to check user status and role
@@ -342,7 +411,7 @@ export default {
   },
   methods: {
     // Util Functions
-    clearForm() {
+  clearForm() {
       this.house_hold_data.farmer = '';
       this.house_hold_data.cattle_id = '';
       this.house_hold_data.cattle_name = '';
@@ -362,7 +431,6 @@ export default {
     },
 
     fillFormForUpdate(data) {
-      this.$log.info('data for form is ', data)
       this.house_hold_data.farmer = data.farmer;
       this.house_hold_data.cattle_id = data.cattle_id;
       this.house_hold_data.cattle_name = data.cattle_name;
@@ -398,7 +466,6 @@ export default {
     },
 
     selectDropDownItemsForUpdate(study_block) {
-      console.log("Study block:" + study_block)
       let elementTheme = document.getElementById("dropdownlist");
       elementTheme.value = study_block;
     },
@@ -407,6 +474,10 @@ export default {
       this.indeterminate = cont;
       this.progressPath = path;
       this.size = size
+    },
+
+    viewHouseData(house_data){
+      this.house_data = house_data
     },
 
     // Functions to interact with api
@@ -509,6 +580,7 @@ export default {
       });
     },
   },
+
   created() { this.onLoadPage(); },
   components: {TopNav, VueTinyTabs}
 }
