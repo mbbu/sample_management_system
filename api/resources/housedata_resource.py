@@ -75,7 +75,8 @@ class HouseDataResource(BaseResource):
             args = HouseDataResource.house_data_args()
 
             if house_data.farmer != args['farmer'] or house_data.cattle_id != args['cattle_id'] or \
-                    house_data.cattle_name != args['cattle_name'] or house_data.cattle_color != args['cattle_color'] or \
+                    house_data.cattle_name != args['cattle_name'] or house_data.cattle_color != args['cattle_color'] \
+                    or house_data.weight != args['weight'] or \
                     house_data.cattle_sex != args['cattle_sex'] or house_data.diagnosis != args['diagnosis'] or \
                     house_data.collar != args['collar'] or house_data.treatment != args['treatment'] or \
                     house_data.pcv != args['pcv'] or house_data.notes != args['notes'] or house_data.cc != args['cc']:
@@ -128,6 +129,7 @@ class HouseDataResource(BaseResource):
         parser.add_argument('cc', required=False)
         parser.add_argument('notes', required=False)
         parser.add_argument('study_block', required=False)
+        parser.add_argument('weight', required=False)
 
         args = parser.parse_args()
         return {
@@ -136,6 +138,7 @@ class HouseDataResource(BaseResource):
             'cattle_sex': args['cattle_sex'], 'collar': args['collar'],
             'pcv': args['pcv'], 'diagnosis': args['diagnosis'], 'study_block': args['study_block'],
             'treatment': args['treatment'], 'cc': args['cc'], 'notes': args['notes'],
+            'weight': args['weight']
         }
 
     @staticmethod
@@ -148,6 +151,7 @@ class HouseDataResource(BaseResource):
         house_data.diagnosis, house_data.collar = args['diagnosis'], args['collar'],
         house_data.treatment, house_data.pcv = args['treatment'], args['pcv'],
         house_data.notes, house_data.cc = args['notes'], args['cc']
+        house_data.weight = args['weight']
         house_data.study_block_id = StudyBlockResource.get_study_block(args['study_block']).id
 
         return house_data

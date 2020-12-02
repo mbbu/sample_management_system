@@ -20,6 +20,7 @@ class AnimalHealthHouseData(BaseModel.db.Model, SearchableMixin):
     treatment = AppDb.Column(AppDb.String, nullable=True)  # rx
     cc = AppDb.Column(AppDb.String, nullable=True)
     notes = AppDb.Column(AppDb.Text, nullable=True)
+    weight = AppDb.Column(AppDb.Float(precision=2), nullable=True)
     study_block_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('study_block.id', ondelete='SET NULL'), nullable=True)
 
     @staticmethod

@@ -132,6 +132,12 @@
               <div id="health-info" class="section tab">
                 <h4 class="title"><small><b>Health Info</b></small></h4>
 
+                <!--CATTLE WEIGHT-->
+                <b-form-group id="form-weight-group" label="Weight:" label-for="form-weight-input">
+                  <b-form-input id="form-weight-input" v-model="house_hold_data.weight"
+                                placeholder="Enter Weight" required type="num" min=1></b-form-input>
+                </b-form-group>
+
                 <!--CATTLE PCV-->
                 <b-form-group id="form-pcv-group" label="PCV(Packed Cell Volume):" label-for="form-pcv-input">
                   <b-form-input id="form-pcv-input" v-model="house_hold_data.pcv"
@@ -314,7 +320,7 @@ export default {
       response: [],
       house_hold_data: {
         farmer: '', cattle_id: '', cattle_name: '', cattle_color: '', cc: '', notes: '',
-        cattle_sex: '', collar: '', pcv: '', diagnosis: '', treatment: '', study_block: ''
+        cattle_sex: '', collar: '', pcv: '', diagnosis: '', treatment: '', study_block: '', weight:0
       },
 
       font_scale: font_scale,
@@ -349,6 +355,7 @@ export default {
       this.house_hold_data.cc = '';
       this.house_hold_data.notes = '';
       this.house_hold_data.study_block = '';
+      this.house_hold_data.weight = 0;
       this.isEditing = false;
       this.studyBlockDataList = [];
       this.onLoadPage();
@@ -367,6 +374,7 @@ export default {
       this.house_hold_data.treatment = data.treatment;
       this.house_hold_data.cc = data.cc;
       this.house_hold_data.notes = data.notes;
+      this.house_hold_data.weight = data.weight;
       this.house_hold_data.study_block = data['study_block.name'];
       this.old_code = data.code;
       this.isEditing = true;
@@ -426,7 +434,7 @@ export default {
         cattle_name: this.house_hold_data.cattle_name, cattle_color: this.house_hold_data.cattle_color,
         cattle_sex: this.house_hold_data.cattle_sex, collar: this.house_hold_data.collar,
         pcv: this.house_hold_data.pcv, diagnosis: this.house_hold_data.diagnosis,
-        treatment: this.house_hold_data.treatment, cc: this.house_hold_data.cc,
+        treatment: this.house_hold_data.treatment, cc: this.house_hold_data.cc, weight: this.house_hold_data.weight,
         notes: this.house_hold_data.notes, study_block: this.house_hold_data.study_block,
       }, {
         headers:
@@ -458,7 +466,7 @@ export default {
         cattle_name: this.house_hold_data.cattle_name, cattle_color: this.house_hold_data.cattle_color,
         cattle_sex: this.house_hold_data.cattle_sex, collar: this.house_hold_data.collar,
         pcv: this.house_hold_data.pcv, diagnosis: this.house_hold_data.diagnosis,
-        treatment: this.house_hold_data.treatment, cc: this.house_hold_data.cc,
+        treatment: this.house_hold_data.treatment, cc: this.house_hold_data.cc, weight: this.house_hold_data.weight,
         notes: this.house_hold_data.notes, study_block: this.house_hold_data.study_block,
       }, {
         headers:
