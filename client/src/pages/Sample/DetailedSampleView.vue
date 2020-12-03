@@ -20,13 +20,13 @@
           </thead>
           <tbody>
           <tr>
-            <td v-if="sample.theme"> {{ sample.theme}}</td>
+            <td v-if="sample.theme"> {{ sample.theme }}</td>
             <td v-else>N/A</td>
-            <td v-if="sample.project"> {{ sample.project}}</td>
+            <td v-if="sample.project"> {{ sample.project }}</td>
             <td v-else>N/A</td>
-            <td v-if="sample.projectHead">{{sample.projectHead}}</td>
+            <td v-if="sample.projectHead">{{ sample.projectHead }}</td>
             <td v-else>N/A</td>
-            <td v-if="sample.user">{{ sample.user}} &nbsp;
+            <td v-if="sample.user">{{ sample.user }} &nbsp;
 
               <a :href="`mailto:${ sample.userEmail }`" target="_blank">
                 <i class="far fa-envelope fa-lg"
@@ -56,13 +56,13 @@
           </thead>
           <tr>
             <th id="c1" headers="blank"></th>
-            <td v-if="sample.sampleType" headers="co1 c1">{{ sample.sampleType}}</td>
+            <td v-if="sample.sampleType" headers="co1 c1">{{ sample.sampleType }}</td>
             <td v-else-if="!sample.sampleType">N/A</td>
-            <td v-if="sample.species" headers="co3 c1">{{ sample.species}}</td>
+            <td v-if="sample.species" headers="co3 c1">{{ sample.species }}</td>
             <td v-else-if="!sample.species">N/A</td>
-            <td v-if="sample.locationCollected" headers="co4 c1">{{ sample.locationCollected}}</td>
+            <td v-if="sample.locationCollected" headers="co4 c1">{{ sample.locationCollected }}</td>
             <td v-else-if="!sample.locationCollected">N/A</td>
-            <td v-if="sample.analysis" headers="co5 c1">{{ sample.analysis}}</td>
+            <td v-if="sample.analysis" headers="co5 c1">{{ sample.analysis }}</td>
             <td v-else-if="!sample.analysis">N/A</td>
           </tr>
           <thead class="blue-gradient white-text">
@@ -76,11 +76,11 @@
           </thead>
           <tr>
             <th id="c2" headers="blank"></th>
-            <td v-if="sample.publication" headers="co6 c2">{{ sample.publication}}</td>
+            <td v-if="sample.publication" headers="co6 c2">{{ sample.publication }}</td>
             <td v-else-if="!sample.publication">N/A</td>
-            <td v-if="sample.survey" headers="co7 c2">{{ sample.survey}}</td>
+            <td v-if="sample.survey" headers="co7 c2">{{ sample.survey }}</td>
             <td v-else-if="!sample.survey">N/A</td>
-            <td v-if="sample.description" headers="co8 c2">{{ sample.description}}</td>
+            <td v-if="sample.description" headers="co8 c2">{{ sample.description }}</td>
             <td v-else-if="!sample.description">N/A</td>
             <td headers="co8. c2"></td>
           </tr>
@@ -134,12 +134,13 @@
             <td v-if="sample.slot" headers="loc_co8 loc_c2">{{ sample.slot }}</td>
             <td v-else>N/A</td>
             <td v-if="sample.retention && isRetentionPeriodValid(sample.retention)"
-                headers="loc_co9 loc_c2"> {{sample.retention }}
+                headers="loc_co9 loc_c2"> {{ sample.retention }}
               <i class="fas fa-check fa-icon-checked" title="Sample available"></i>
             </td>
-            <td v-if="sample.retention && !isRetentionPeriodValid(sample.retention)" class="text-danger font-weight-bold"
+            <td v-if="sample.retention && !isRetentionPeriodValid(sample.retention)"
+                class="text-danger font-weight-bold"
                 headers="loc_co9 loc_c2">
-              {{sample.retention }} - Sample is overdue by {{overDueRetentionPeriod(sample.retention)}}.
+              {{ sample.retention }} - Sample is overdue by {{ overDueRetentionPeriod(sample.retention) }}.
               <i class="fas fa-exclamation-triangle fa-icon-exclamation"
                  title="Sample not available"></i>
             </td>
@@ -164,9 +165,9 @@
               {{ sample.date }}
             </td>
             <td v-else-if="!sample.amount">N/A</td>
-            <td v-if="sample.temperature">{{ sample.temperature}}</td>
+            <td v-if="sample.temperature">{{ sample.temperature }}</td>
             <td v-else-if="!sample.temperature">N/A</td>
-            <td v-if="sample.securityLevel">{{ sample.securityLevel}}</td>
+            <td v-if="sample.securityLevel">{{ sample.securityLevel }}</td>
             <td v-else-if="!sample.securityLevel">N/A</td>
           </tr>
           </tbody>
@@ -262,12 +263,12 @@ import {FunctionalCalendar} from 'vue-functional-calendar';
 import axios from 'axios';
 import {
   getSampleCode,
+  handleError,
   isRetentionPeriodValid,
   isSampleOwner,
   isUserLoggedIn,
   overDueRetentionPeriod,
   redirectAfterCountDown,
-  respondTo401,
   secureStoreGetAuthString,
   setSampleDetailsForEditing,
   setUpdateSample,
@@ -375,8 +376,6 @@ export default {
 
     getSampleByCode(code) {
       this.isAuth = isUserLoggedIn()
-
-      let self = this;
       let loader = startLoader(this)
 
       axios.get(sample_resource, {
@@ -390,39 +389,24 @@ export default {
               loader.hide()
               this.response = res.data.message;
               this.setSampleData(this.response)
-              this.$log.info("Response: " + res.status + " " + res.data +
-                  " this.response has", this.response);
             }, 2500)
-          })
-          .catch((error) => {
-            // eslint-disable-next-line
-            loader.hide()
-            this.$log.error(error);
-            if (error.response) {
-              if (error.response.status === 401) {
-                respondTo401(self);
-              } else if (error.response.status === 404) {
-                showFlashMessage(self, 'error', 'Connection Error', 'Request was timed out');
-
-              }
-            }
-          });
+          }).catch((error) => {
+        handleError(this, error, loader)
+      });
     },
 
     requestUpdateSample() {
-      let self = this;
       let loader = startLoader(this)
 
       setTimeout(() => {
         loader.hide()
         setSampleDetailsForEditing(this.response)
         setUpdateSample(true)
-        redirectAfterCountDown(self, '/addsample')
+        redirectAfterCountDown(this, '/addsample')
       }, 1000)
     },
 
     requestSample: function (code) {
-      let self = this;
       let loader = startLoader(this)
 
       axios.post(sample_request_resource, {
@@ -438,23 +422,12 @@ export default {
             setTimeout(() => {
               loader.hide()
               if (response.status === 201) {
-                showFlashMessage(self, 'success', response.data['message'], '')
+                showFlashMessage(this, 'success', response.data['message'], '')
               }
             }, 1000)
           })
           .catch((error) => {
-            this.$log.error(error);
-            if (error.response) {
-              if (error.response.status === 409) {
-                showFlashMessage(self, 'error', 'Error', error.response.data['message'])
-              } else if (error.response.status === 401) {
-                respondTo401(self);
-              } else if (error.response.status === 403) {
-                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
-              } else {
-                showFlashMessage(self, 'error', 'Error', error.response.data['message'])
-              }
-            }
+            handleError(this, error, loader)
           })
     },
 
@@ -464,7 +437,6 @@ export default {
     },
 
     deleteSample: function (code) {
-      let self = this;
       let loader = startLoader(this)
 
       axios.delete(sample_resource, {
@@ -473,26 +445,15 @@ export default {
               code: code,
               Authorization: secureStoreGetAuthString()
             }
-      })
-          .then((response) => {
-            setTimeout(() => {
-              loader.hide()
-              showFlashMessage(self, 'success', response.data['message'], '');
-              redirectAfterCountDown(self, '/sample')
-            }, 1500)
-          })
-          .catch((error) => {
-            this.$log.error(error);
-            if (error.response) {
-              if (error.response.status === 401) {
-                respondTo401(self);
-              } else if (error.response.status === 403) {
-                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
-              } else {
-                showFlashMessage(self, 'error', error.response.data['message'], '');
-              }
-            }
-          });
+      }).then((response) => {
+        setTimeout(() => {
+          loader.hide()
+          showFlashMessage(this, 'success', response.data['message'], '');
+          redirectAfterCountDown(this, '/sample')
+        }, 1500)
+      }).catch((error) => {
+        handleError(this, error, loader)
+      });
     },
   },
   components: {TopNav, mdbCol, mdbRow, FunctionalCalendar},

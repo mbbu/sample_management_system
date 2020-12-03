@@ -478,7 +478,7 @@ import TopNav from "@/components/TopNav";
 import axios from "axios";
 import {publication_resource, sample_request_resource, user_resource} from "@/utils/api_paths";
 import {
-  getUserEmail,
+  getUserEmail, handleError,
   redirectAfterCountDown,
   respondTo401,
   secureStoreDeleteUserInfo,
@@ -537,7 +537,6 @@ export default {
   },
   methods: {
     getUserDetails(email) {
-      let self = this;
       let loader = startLoader(this)
 
       axios.get(user_resource, {
@@ -545,42 +544,25 @@ export default {
             {
               email: email,
             }
-      })
-          .then((res) => {
+      }).then((res) => {
             setTimeout(() => {
               loader.hide()
               this.response = res.data.message;
-              this.$log.info("Response: " + res.status + " " + res.data +
-                  " this.response has", this.response);
             }, 2500)
           })
-          .catch((error) => {
-            // eslint-disable-next-line
-            loader.hide()
-            this.$log.error(error);
-            if (error.response) {
-              if (error.response.status === 401) {
-                respondTo401(self);
-              } else if (error.response.status === 404) {
-                showFlashMessage(self, 'error', 'Connection Error', 'Request was timed out');
-                redirectAfterCountDown(self, '/home')
-              }
-            }
-          });
+          .catch((error) => { handleError(this, error, loader)});
     },
 
     requestUpdateUser() {
-      let self = this;
       let loader = startLoader(this)
 
       setTimeout(() => {
         loader.hide()
-        redirectAfterCountDown(self, '/edit-user')
+        redirectAfterCountDown(this, '/edit-user')
       }, 1000)
     },
 
     deleteUser() {
-      let self = this;
       let loader = startLoader(this)
 
       axios.delete(user_resource, {
@@ -595,33 +577,12 @@ export default {
               setTimeout(() => {
                 secureStoreDeleteUserInfo()
                 loader.hide()
-                showFlashMessage(self, 'success', 'Account Deleted', 'Your account has been successfully deleted.' +
+                showFlashMessage(this, 'success', 'Account Deleted', 'Your account has been successfully deleted.' +
                     '\nSorry to see you go.');
-                redirectAfterCountDown(self, '/home')
+                redirectAfterCountDown(this, '/home')
               }, 2500)
             }
-          })
-          .catch((error) => {
-            this.$log.error(error);
-            loader.hide()
-            if (error.response) {
-              if (error.response.status === 409) {
-                showFlashMessage(self, 'error', error.response.data['message'], '');
-              } else if (error.response.status === 404) {
-                showFlashMessage(self, 'error', 'User not found', "");
-              } else if (error.response.status === 400) {
-                showFlashMessage(self, 'error', error.response.data['message'], 'Kindly refill the form');
-              } else if (error.response.status === 401) {
-                respondTo401(self)
-              } else if (error.response.status === 403) {
-                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
-              } else if (error.response.status === 500) {
-                showFlashMessage(self, 'error', "Fatal Error", 'Admin has been contacted.');
-              } else {
-                showFlashMessage(self, 'error', error.response.data['message'], '');
-              }
-            }
-          })
+          }).catch((error) => { handleError(this, error, loader) })
     },
 
     // functions for samples
@@ -641,7 +602,6 @@ export default {
     },
 
     updateSample(code) {
-      let self = this;
       let header = '';
       this.showModal = false
       this.showModalView = false
@@ -664,64 +624,27 @@ export default {
           .then((response) => {
             setTimeout(() => {
               loader.hide()
-              this.$log.info("Response: ", response);
-              showFlashMessage(self, 'success', response.data.message, '')
+              showFlashMessage(this, 'success', response.data.message, '')
             }, 2500)
           })
-          .catch((error) => {
-            // eslint-disable-next-line
-            loader.hide()
-            this.$log.error(error);
-            if (error.response) {
-              if (error.response.status === 401) {
-                respondTo401(self);
-              } else if (error.response.status === 304) {
-                showFlashMessage(self, 'error', 'Info', error.response.message);
-              } else if (error.response.status === 404) {
-                showFlashMessage(self, 'error', 'Not Found!', error.response.message);
-              } else if (error.response.status === 409) {
-                showFlashMessage(self, 'error', 'Error', error.response.message);
-              } else if (error.response.status === 500) {
-                showFlashMessage(self, 'error', 'Fatal', "Fatal error admin has been contacted!");
-              }
-            }
-          });
+          .catch((error) => { handleError(this, error, loader) });
     },
 
     deleteSampleRequest(code) {
-      let self = this;
       let loader = startLoader(this)
-
-      console.log(code)
 
       axios.delete(sample_request_resource, {
         headers: {
           Authorization: secureStoreGetAuthString(),
           code: code
         }
-      })
-
-          .then((response) => {
+      }).then((response) => {
             setTimeout(() => {
               loader.hide()
-              this.$log.info("Response: ", response);
-              showFlashMessage(self, 'success', response.data.message, '')
+              showFlashMessage(this, 'success', response.data.message, '')
             }, 2500)
           })
-          .catch((error) => {
-            // eslint-disable-next-line
-            loader.hide()
-            this.$log.error(error);
-            if (error.response) {
-              if (error.response.status === 401) {
-                respondTo401(self);
-              } else if (error.response.status === 404) {
-                showFlashMessage(self, 'error', 'Not Found!', error.response.message);
-              } else if (error.response.status === 500) {
-                showFlashMessage(self, 'error', 'Fatal', "Fatal error admin has been contacted!");
-              }
-            }
-          });
+          .catch((error) => { handleError(this, error, loader)});
 
       this.getUserDetails(this.userEmail)
 
@@ -752,27 +675,25 @@ export default {
       EventBus.$emit('update-publication', publication)
     },
 
-    deletePublication(title, self = this) {
+    deletePublication(title) {
       axios.delete(publication_resource, {
         headers:
             {
               title: title,
               Authorization: secureStoreGetAuthString()
             }
-      })
-          .then((response) => {
+      }).then((response) => {
             this.getPublication();
-            showFlashMessage(self, 'success', response.data['message'], '');
-          })
-          .catch((error) => {
+            showFlashMessage(this, 'success', response.data['message'], '');
+      }).catch((error) => {
             this.$log.error(error);
             if (error.response) {
               if (error.response.status === 401) {
-                respondTo401(self);
+                respondTo401(this);
               } else if (error.response.status === 403) {
-                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
+                showFlashMessage(this, 'error', 'Unauthorized', error.response.data['message'])
               } else {
-                showFlashMessage(self, 'error', error.response.data['message'], '');
+                showFlashMessage(this, 'error', error.response.data['message'], '');
               }
             }
           });
@@ -787,5 +708,3 @@ export default {
   components: {PublicationModal, SampleResponseForm, mdbCard, mdbCardBody, mdbRow, mdbCol, TopNav}
 };
 </script>
-<style>
-</style>

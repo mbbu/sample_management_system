@@ -377,18 +377,13 @@ export default {
         headers: {
           Authorization: secureStoreGetAuthString()
         }
-      })
-          .then((response) => {
+      }).then((response) => {
             setTimeout(() => {
               loader.hide()
               this.getStudyBlock();
-              this.clearForm();
               showFlashMessage(self, 'success', 'Success', response.data['message'])
             }, this.time)
-          })
-          .catch((error) => {
-            handleError(this, error, loader)
-          });
+          }).catch((error) => {handleError(this, error, loader)});
       this.clearForm();
     },
 
@@ -416,8 +411,7 @@ export default {
                 this.getStudyBlock();
                 showFlashMessage(self, 'success', 'Success', response.data['message'])
               }, this.time)
-            })
-            .catch((error) => { handleError(this, error, loader) });
+            }).catch((error) => { handleError(this, error, loader) });
         this.clearForm();
       }
     },
@@ -431,17 +425,13 @@ export default {
           code: code,
           Authorization: secureStoreGetAuthString()
         }
-      })
-          .then((response) => {
-            setTimeout(() => {
-              loader.hide()
-              this.getStudyBlock();
-              showFlashMessage(self, 'success', 'Success', response.data['message'])
-            }, this.time)
-          })
-          .catch((error) => {
-            handleError(this, error, loader)
-          });
+      }).then((response) => {
+        setTimeout(() => {
+          loader.hide()
+          this.getStudyBlock();
+          showFlashMessage(self, 'success', 'Success', response.data['message'])
+        }, this.time)
+      }).catch((error) => { handleError(this, error, loader) });
       this.clearForm();
     },
 

@@ -276,7 +276,6 @@ export default {
           .then((res) => {
             setTimeout(() => {
               this.haltProgressPath()
-              this.$log.info("Response: " + res.status + " ", res.data.message);
               this.sampleList = this.response = res.data.message;
               for (const [key, value] of this.response.entries()) {
                 console.log(key, value);
@@ -293,19 +292,15 @@ export default {
     },
 
     viewSample(code) {
-      let self = this;
       // 1st call the setter function to set the code
       setSampleCode(code)
       // redirect to sample view page
-      redirectAfterCountDown(self, '/view-sample', 1)
+      redirectAfterCountDown(this, '/view-sample', 1)
     },
     //end of methods for api interaction
 
     /* Methods associated with searching and filtering of data in the page */
     filterData(data) {
-      // box.label: (...)
-      // retention_date: (...)
-      console.log("FilterData called")
       let filterByTheme = this.filters.length
           ? data.filter(sample =>
               this.filters.some(filter => sample['theme.name'] ? sample['theme.name'].toString().match(filter) : null))
@@ -406,31 +401,22 @@ export default {
               : null
 
           if (byTheme) {
-            console.log("byTheme", byTheme)
             return byTheme
           } else if (byProject) {
-            console.log("byProject", byProject)
             return byProject
           } else if (byPI) {
-            console.log("byPI", byPI)
             return byPI
           } else if (byLocCollected) {
-            console.log("byLocCollected", byLocCollected)
             return byLocCollected
           } else if (byLocInLab) {
-            console.log("byLocInLab", byLocInLab)
             return byLocInLab
           } else if (bySpecies) {
-            console.log("bySpecies", bySpecies)
             return bySpecies
           } else if (byType) {
-            console.log("byType", byType)
             return byType
           } else if (byStatus) {
-            console.log("byStatus", byStatus)
             return byStatus
           } else if (byRetention) {
-            console.log("byRetention", byRetention)
             return byRetention
           }
         }

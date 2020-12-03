@@ -423,10 +423,8 @@ export default {
                 loader.hide(); this.getBox();
                 showFlashMessage(self, 'success', response.data['message'], '');
               },this.time)
-            }).catch((error) => {
-                this.clearForm(); this.$log.error(error); loader.hide();
-                if (error.response) { if (error.response.status === 409) { handleError(this, error) } }
-            }); this.clearForm();
+            }).catch((error) => { handleError(this, error, loader) });
+        this.clearForm();
     },
 
     updateBox: function (evt) {
@@ -446,10 +444,7 @@ export default {
                   loader.hide(); this.getBox();
                   showFlashMessage(self, 'success', response.data['message'], '');
                   },this.time)
-              }).catch((error) => {
-                  this.clearForm(); this.$log.error(error); loader.hide();
-                  if (error.response) { handleError(this, error) }
-              });
+              }).catch((error) => { handleError(this, error, loader) });
           this.clearForm();
       }
     },
@@ -466,10 +461,8 @@ export default {
                 loader.hide(); this.getBox();
                 showFlashMessage(self, 'success', response.data['message'], '');
             },this.time)
-            }).catch((error) => {
-                this.$log.error(error); loader.hide();
-                if (error.response) { handleError(this, error) }
-            }); this.clearForm();
+            }).catch((error) => { handleError(this, error, loader)});
+        this.clearForm();
     },
     //end of methods for api interaction
 

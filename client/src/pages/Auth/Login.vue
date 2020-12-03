@@ -99,6 +99,7 @@ import {auth_resource} from "@/utils/api_paths";
 import {email, required} from "vuelidate/lib/validators";
 import {mdbBtn, mdbCard, mdbCardBody, mdbCol, mdbInput, mdbRow} from "mdbvue";
 import {
+  handleError,
   isUserLoggedIn,
   redirectAfterCountDown,
   secureStoreSetUserInfo,
@@ -143,7 +144,6 @@ export default {
                 // stop here if form is invalid
                 this.$v.$touch();
                 if (this.$v.$invalid) {
-                    this.$log.info("FORM INVALID!");
                     return;
                 }
                 this.logInUser(this.user);
@@ -151,46 +151,28 @@ export default {
 
             logInUser: function (user) {
                 let loader = startLoader(this)
-                let self = this;
 
                 axios.post(auth_resource, {
                     email: user.email,
                     password: user.password
-                })
-                    .then((response) => {
+                }).then((response) => {
                         setTimeout(() => {
                             loader.hide()
                             // redirect after successful login
                             if (response.status === 200) {
-                              showFlashMessage(self, 'success', 'Logged In', 'Redirecting you to home page in ' +
-                                  redirectAfterCountDown(self, '/home') + " seconds");
-                                // set jwt token required across requests
+                              showFlashMessage(this, 'success', 'Logged In', 'Redirecting you to home page in ' +
+                                  redirectAfterCountDown(this, '/home') + " seconds");
+                              // set jwt token required across requests
                               secureStoreSetUserInfo(response.data.message.token, response.data.message.email, response.data.message.first_name,
                                   response.data.message.last_name, response.data.message['role.name']);
                             } else if (response.status === 203) {
-                              showFlashMessage(self, 'error', response.data.message, 'You can request for reactivation email')
-                              redirectAfterCountDown(self, '/requestConfirmation')
+                              showFlashMessage(this, 'error', response.data.message, 'You can request for reactivation email')
+                              redirectAfterCountDown(this, '/requestConfirmation')
                             } else if (response.status === 204) {
-                                showFlashMessage(self, 'error', 'User found but account is deactivated!', 'You can reactivate by signing up again')
+                                showFlashMessage(this, 'error', 'User found but account is deactivated!', 'You can reactivate by signing up again')
                             }
                         }, 3000)
-                    })
-                    .catch((error) => {
-                        loader.hide()
-                        this.$log.error(error);
-                        this.$log.error("error: ", error.response.status);
-                        if (error.response) {
-                            if (error.response.status === 403) {
-                                showFlashMessage(self, 'error', error.response.data['message'], '');
-                            } else if (error.response.status === 404) {
-                              showFlashMessage(self, 'error', error.response.data['message'], 'Try to SignUp instead');
-                            } else if (error.response.status === 500) {
-                              showFlashMessage(self, 'error', "Fatal Error", 'Admin has been contacted.');
-                            } else {
-                              showFlashMessage(self, 'error', error.response.data['message'], '');
-                            }
-                        }
-                    })
+                }).catch((error) => { handleError( this, error, loader)})
             },
         },
   created() {

@@ -581,13 +581,7 @@ export default {
           this.getHouseHoldData();
           showFlashMessage(this, 'success', response.data['message'], '');
         }, this.time)
-      }).catch((error) => {
-        this.$log.error(error);
-        loader.hide();
-        if (error.response) {
-          handleError(this, error)
-        }
-      });
+      }).catch((error) => { handleError(this, error, loader) });
       this.clearForm();
     },
 
@@ -614,11 +608,7 @@ export default {
           this.getHouseHoldData();
           showFlashMessage(this, 'success', response.data['message'], '');
         }, this.time)
-      }).catch((error) => {
-        loader.hide();
-        this.$log.error(error);
-        if (error.response) { handleError(this, error) }
-      });
+      }).catch((error) => { handleError(this, error, loader) });
       this.clearForm();
     },
 
@@ -636,11 +626,7 @@ export default {
           showFlashMessage(this, 'success', response.data['message'], '');
           this.getHouseHoldData();
         }, this.time)
-      }).catch((error) => {
-        this.$log.error(error);
-        loader.hide();
-        if (error.response) { handleError(this, error) }
-      });
+      }).catch((error) => { handleError(this, error, loader) });
     },
   },
 

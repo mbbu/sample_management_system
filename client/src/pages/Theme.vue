@@ -225,10 +225,7 @@ export default {
               loader.hide(); this.getTheme(); this.clearForm();
               showFlashMessage(self, 'success', 'Success', response.data['message'])
             },this.time)
-          }).catch((error) => {
-              this.$log.error(error); loader.hide();
-              if (error.response) { handleError(this, error) }
-          });
+          }).catch((error) => { handleError(this, error, loader) });
       this.clearForm();
     },
 
@@ -250,10 +247,7 @@ export default {
                   loader.hide(); this.getTheme();
                   showFlashMessage(self, 'success', 'Success', response.data['message'])
                 }, this.time)
-              }).catch((error) => {
-                  this.$log.error(error); loader.hide();
-                  if (error.response) { handleError(this, error) }
-              });
+              }).catch((error) => { handleError(this, error, loader) });
           this.clearForm();
       }
     },
@@ -271,10 +265,7 @@ export default {
               loader.hide(); this.getTheme();
               showFlashMessage(self, 'success', 'Success', response.data['message'])
             }, this.time)
-          }).catch((error) => {
-              this.$log.error(error); loader.hide()
-              if (error.response) {handleError(this, error)}
-          });
+          }).catch((error) => { handleError(this, error, loader) });
       this.clearForm();
     },
 

@@ -178,9 +178,10 @@ import {publication_resource} from "@/utils/api_paths";
 import {
   getLoggedInUser,
   getSelectedItemSetTextFieldValue,
+  handleError,
   isPublicationOwner,
+  pageStartLoader,
   paginate,
-  respondTo401,
   secureStoreGetAuthString,
   setSampleDataList,
   showFlashMessage
@@ -333,8 +334,7 @@ export default {
     },
 
     createPublication() {
-      let self = this;
-
+      let loader = pageStartLoader(this)
       axios.post(publication_resource, {
         publication_title: this.publication.title,
         sample: this.publication.sample,
@@ -345,55 +345,27 @@ export default {
         headers: {
           Authorization: secureStoreGetAuthString()
         }
-      })
-          .then((response) => {
+      }).then((response) => {
             this.getPublication();
-            showFlashMessage(self, 'success', response.data['message'], '');
-            this.clearForm();
-          })
-          .catch((error) => {
-            this.clearForm();
-            this.$log.error(error);
-            if (error.response) {
-              if (error.response.status === 409) {
-                showFlashMessage(self, 'error', error.response.data['message'], '');
-              } else if (error.response.status === 400) {
-                showFlashMessage(self, 'error', error.response.data['message'], 'Kindly refill the form');
-              } else if (error.response.status === 401) {
-                respondTo401(self);
-              } else {
-                showFlashMessage(self, 'error', error.response.data['message'], '');
-              }
-            }
-          });
+            loader.hide();
+            showFlashMessage(this, 'success', response.data['message'], '');
+          }).catch((error) => { handleError(this, error, loader)});
       this.clearForm();
     },
 
-    deletePublication: function (title, self = this) {
+    deletePublication: function (title) {
+      let loader = pageStartLoader(this)
       axios.delete(publication_resource, {
         headers:
             {
               title: title,
               Authorization: secureStoreGetAuthString()
             }
-      })
-          .then((response) => {
+      }).then((response) => {
             this.getPublication();
-            showFlashMessage(self, 'success', response.data['message'], '');
-            this.clearForm();
-          })
-          .catch((error) => {
-            this.$log.error(error);
-            if (error.response) {
-              if (error.response.status === 401) {
-                respondTo401(self);
-              } else if (error.response.status === 403) {
-                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
-              } else {
-                showFlashMessage(self, 'error', error.response.data['message'], '');
-              }
-            }
-          });
+            loader.hide();
+            showFlashMessage(this, 'success', response.data['message'], '');
+      }).catch((error) => { handleError(this, error, loader) });
       this.getPublication();
     },
 
