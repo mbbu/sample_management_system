@@ -7,6 +7,11 @@
         <!-- FLASH MESSAGES -->
         <FlashMessage :position="'right bottom'"></FlashMessage>
         <br> <br>
+
+        <!--TOP-PAGINATION-->
+        <v-page :total-row="page_length" @page-change="pageInfo" align="center"
+                v-model="current"></v-page>
+        <br>
         <table class=" table table-hover">
           <thead>
           <tr>
@@ -53,6 +58,10 @@
           </tr>
           </tbody>
         </table>
+        <!--BOTTOM-PAGINATION-->
+        <v-page :total-row="page_length" @page-change="pageInfo" align="center"
+                v-model="current"></v-page>
+        <br>
       </div>
 
       <!--MODAL TO SHOW EXTRA DATA-->
@@ -409,6 +418,9 @@ export default {
 
       // values for data modification
       old_code: null, showModal: true, isEditing: false,
+
+      // data for pagination
+      current: 1, page_length: null, page_array: [], page_info: {},
     };
   },
   methods: {
@@ -471,6 +483,7 @@ export default {
       let elementTheme = document.getElementById("dropdownlist");
       elementTheme.value = study_block;
     },
+
     // stop&hide progressPath
     haltProgressPath(cont = false, path = 0, size = 0) {
       this.indeterminate = cont;
@@ -480,6 +493,29 @@ export default {
 
     viewHouseData(house_data){
       this.house_data = house_data
+    },
+
+    // pagination
+    pageInfo(info) {
+      this.page_info = info
+    },
+
+    paginate(data) {
+      let start = 0, end = 0;
+
+      start = this.page_info.pageSize * (this.page_info.pageNumber - 1)
+      end = start + this.page_info.pageSize
+
+      this.page_array.splice(0, this.page_array.length);
+
+      if (end > data.length) end = data.length;
+
+      for (let i = start; i < end; i++) {
+          this.page_array.push(data[i])
+      }
+
+      this.page_length = data.length
+      return this.page_array
     },
 
     // Functions to interact with api
