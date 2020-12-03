@@ -7,8 +7,12 @@
                 <FlashMessage :position="'right bottom'"></FlashMessage>
                 <br>
 
+                <!-- FILTER CARD SECTION -->
+                <filter-card :all-filters="allFilters"></filter-card>
+                <br>
+
                 <!--TOP-PAGINATION-->
-                <v-page :total-row="page_length" @page-change="pageInfo" align="center"
+                <v-page :total-row="matchFiltersAndSearch.pg_len" @page-change="pageInfo" align="center"
                         v-model="current"></v-page>
                 <br>
                 <table class=" table table-hover">
@@ -22,7 +26,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr :key="study_block.id" v-for="(study_block, index) in filteredList">
+                    <tr :key="study_block.id" v-for="(study_block, index) in matchFiltersAndSearch.arr">
                         <td> {{ index + 1 }}</td>
                         <td> {{ study_block.area }}</td>
                         <td> {{ study_block.name }}</td>
@@ -192,7 +196,7 @@ import {required} from "vuelidate/lib/validators";
 import EventBus from "@/components/EventBus";
 import {
   isAdmin,
-  pageStartLoader,
+  pageStartLoader, paginate,
   respondTo401,
   secureStoreGetAuthString,
   showFlashMessage
@@ -201,6 +205,7 @@ import {font_scale} from '@/utils/constants';
 import axios from "axios";
 import {study_block_resource} from "@/utils/api_paths";
 import TopNav from "@/components/TopNav";
+import FilterCard from "@/components/FilterCard";
 
 export default {
 name: "StudyBlock",
@@ -209,7 +214,8 @@ name: "StudyBlock",
       page_title: "Study Blocks",
       response: [],
       search: '',
-      study_blockList: [],
+      studyBlockList: [],
+      filters: [],
 
       study_block: { area: '', name: '', code: ''},
 
@@ -239,214 +245,267 @@ name: "StudyBlock",
           this.search = payload
           this.searchData()
       })
+
+      EventBus.$on('filters', (payload) => {
+          this.filters = payload
+          if (this.filters.length === 0) {
+              this.studyBlockList = this.response
+          }
+      })
   },
 
   computed: {
-      filteredList() {
-          return this.study_blockList.filter(study_block => {
-              return study_block.name.toLowerCase().includes(this.search.toLowerCase())
-          })
-      }
+      /**
+      * return a list of dictionaries containing the filters required
+      */
+      allFilters: function () {
+          return [
+              {
+                  'By Site': this.response
+                      .map(({area: site}) => site)
+                      .filter((value, index, self) => self.indexOf(value) === index),
+              },
+              // {
+              //     'By Room': this.response
+              //         .map(({room}) => room)
+              //         .filter((value, index, self) => self.indexOf(value) === index)
+              // },
+          ]
+      },
+
+      /**
+       * function checks for any filters or searches applied to the data and returns filtered/searched list.
+       * @returns {null|[]|*}
+       */
+      matchFiltersAndSearch: function () {
+          let searchList = this.search ? this.searchData() : null
+
+          /* studyBlockList,which is a copy of response, is passed as the data here instead of response to avoid
+          mutating response data.*/
+          let filteredData = this.filterData(this.studyBlockList)
+
+          let filterBySite = filteredData.site
+          let filterByArea = filteredData.area
+
+          if (searchList !== null) {
+              return paginate(searchList)
+          } else if (this.filters.length > 1) {
+              // Possibly, multiple filters have been applied. Return the array with the least elements
+              return filterBySite.length < filterByArea.length ?
+                  paginate(filterBySite) : paginate(filterByArea)
+          } else if (filterBySite !== null && filterBySite.length > 0) {
+              this.studyBlockList = filterBySite // eslint-disable-line
+              this.filterData(filterBySite)
+              return paginate(filterBySite)
+          } else if (filterByArea !== null && filterByArea.length > 0) {
+              this.freezerList = filterByArea // eslint-disable-line
+              this.filterData(filterByArea)
+              return paginate(filterByArea)
+          }
+          return paginate(this.studyBlockList)
+      },
+
+      // filteredList() {
+      //     return this.response.filter(study_block => {
+      //         return study_block.name.toLowerCase().includes(this.search.toLowerCase())
+      //     })
+      // }
   },
 
   methods: {
-    // util functions
+      // util functions
       onSubmit(evt) {
-          this.$v.$touch();
-          if (this.$v.$invalid) {
-              evt.preventDefault()
-              return;
-          }
-          this.createStudyBlock();
-      },
+            this.$v.$touch();
+            if (this.$v.$invalid) {
+                evt.preventDefault()
+                return;
+            }
+            this.createStudyBlock();
+        },
 
       clearForm() {
-          this.study_block.area = null;
-          this.study_block.name = null;
-          this.study_block.code = null;
-          this.isEditing = false;
-          this.$v.$reset();
-      },
+            this.study_block.area = null;
+            this.study_block.name = null;
+            this.study_block.code = null;
+            this.isEditing = false;
+            this.$v.$reset();
+        },
 
       fillFormForUpdate(area, name, code) {
-          this.study_block.area = area;
-          this.study_block.name = name;
-          this.study_block.name = name;
-          this.study_block.code = code;
-          this.old_code = code;
-          this.isEditing = true;
-          this.showModal = true;
+            this.study_block.area = area;
+            this.study_block.name = name;
+            this.study_block.name = name;
+            this.study_block.code = code;
+            this.old_code = code;
+            this.isEditing = true;
+            this.showModal = true;
+        },
+
+      // stop&hide progressPath
+      haltProgressPath(cont=false, path=0, size=0){
+        this.indeterminate = cont
+        this.progressPath = path
+        this.size = size
       },
 
-    // stop&hide progressPath
-    haltProgressPath(cont=false, path=0, size=0){
-      this.indeterminate = cont
-      this.progressPath = path
-      this.size = size
-    },
-    // pagination
-    pageInfo(info) {
-      this.page_info = info
-    },
+      // pagination
+      pageInfo(info) {
+        EventBus.$emit('page-info', {'pgInfo': info, 'pgData': this.studyBlockList})
+      },
 
-    paginate(data) {
-      let start = 0, end = 0;
+      // api interaction functions
+      getStudyBlock() {
+        this.isAuth = isAdmin()
 
-      start = this.page_info.pageSize * (this.page_info.pageNumber - 1)
-      end = start + this.page_info.pageSize
-
-      this.page_array.splice(0, this.page_array.length);
-
-      if (end > data.length) end = data.length;
-
-      for (let i = start; i < end; i++) {
-          this.page_array.push(data[i])
-      }
-
-      this.page_length = data.length
-      return this.page_array
-    },
-
-    // api interaction functions
-    getStudyBlock() {
-      this.isAuth = isAdmin()
-
-      axios.get(study_block_resource)
-          .then((res) => {
-            setTimeout(()=> {
-            this.haltProgressPath()
-              this.study_blockList = this.response = res.data['message'];
-            }, this.time)
-          })
-          .catch((error) => {
-            // eslint-disable-next-line
-            this.$log.error(error);
-          });
-    },
-
-    createStudyBlock: function () {
-        let self = this;
-        let loader = pageStartLoader(this)
-
-        axios.post(study_block_resource, {
-            area: this.study_block.area,
-            name: this.study_block.name,
-            code: this.study_block.code,
-        }, {
-            headers: {
-              Authorization: secureStoreGetAuthString()
-            }
-        })
-            .then((response) => {
+        axios.get(study_block_resource)
+            .then((res) => {
               setTimeout(()=> {
-                loader.hide()
-                this.getStudyBlock();
-                this.clearForm();
-                showFlashMessage(self, 'success', 'Success', response.data['message'])
-              },this.time)
-            })
-            .catch((error) => {
-                this.$log.error(error);
-                loader.hide();
-                if (error.response) {
-                    if (error.response.status === 409) {
-                        showFlashMessage(self, 'error', 'Error', error.response.data['message'])
-                    } else if (error.response.status === 401) {
-                        respondTo401(self);
-                    } else if (error.response.status === 403) {
-                        showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
-                    } else {
-                        showFlashMessage(self, 'error', 'Error', error.response.data['message'])
-                    }
-                }
-            });
-        this.clearForm();
-    },
-
-    updateStudyBlock: function (evt) {
-        this.$v.$touch();
-        if (this.$v.$invalid) {
-            evt.preventDefault()
-        } else {
-            let self = this;
-            let loader = pageStartLoader(this)
-            axios.put(study_block_resource, {
-                area: this.study_block.area,
-                name: this.study_block.name,
-                code: this.study_block.code,
-            }, {
-                headers:
-                    {
-                      code: this.old_code,
-                      Authorization: secureStoreGetAuthString()
-                    }
-            })
-                .then((response) => {
-                  setTimeout( () => {
-                    loader.hide()
-                    this.getStudyBlock();
-                    showFlashMessage(self, 'success', 'Success', response.data['message'])
-                  }, this.time)
-                })
-                .catch((error) => {
-                    this.$log.error(error);
-                    loader.hide()
-                    if (error.response) {
-                        if (error.response.status === 304) {
-                            showFlashMessage(self, 'info', 'Info', 'Record not modified!')
-                        } else if (error.response.status === 401) {
-                            respondTo401(self);
-                        } else if (error.response.status === 403) {
-                            showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
-                        } else {
-                            showFlashMessage(self, 'error', 'Error', error.response.data['message'])
-                        }
-                    }
-                });
-            this.clearForm();
-        }
-    },
-
-    deleteStudyBlock: function (code) {
-        let self = this;
-        let loader = pageStartLoader(this)
-
-        axios.delete(study_block_resource, {
-            headers: {
-                code: code,
-              Authorization: secureStoreGetAuthString()
-            }
-        })
-            .then((response) => {
-              setTimeout(() => {
-                loader.hide()
-                this.getStudyBlock();
-                showFlashMessage(self, 'success', 'Success', response.data['message'])
+              this.haltProgressPath();
+              this.studyBlockList = this.response = res.data['message'];
               }, this.time)
             })
             .catch((error) => {
-                this.$log.error(error);
-                loader.hide()
-                if (error.response) {
-                    if (error.response.status === 401) {
-                        respondTo401(self);
-                    } else if (error.response.status === 403) {
-                        showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
-                    } else {
-                        showFlashMessage(self, 'error', 'Error', error.response.data['message'])
-                    }
-                }
+              // eslint-disable-next-line
+              this.$log.error(error);
             });
-        this.clearForm();
-    },
+      },
 
-    searchData() {
-        return this.study_blockList.filter(study_block => {
+      createStudyBlock: function () {
+          let self = this;
+          let loader = pageStartLoader(this)
+
+          axios.post(study_block_resource, {
+              area: this.study_block.area,
+              name: this.study_block.name,
+              code: this.study_block.code,
+          }, {
+              headers: {
+                Authorization: secureStoreGetAuthString()
+              }
+          })
+              .then((response) => {
+                setTimeout(()=> {
+                  loader.hide()
+                  this.getStudyBlock();
+                  this.clearForm();
+                  showFlashMessage(self, 'success', 'Success', response.data['message'])
+                },this.time)
+              })
+              .catch((error) => {
+                  this.$log.error(error);
+                  loader.hide();
+                  if (error.response) {
+                      if (error.response.status === 409) {
+                          showFlashMessage(self, 'error', 'Error', error.response.data['message'])
+                      } else if (error.response.status === 401) {
+                          respondTo401(self);
+                      } else if (error.response.status === 403) {
+                          showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
+                      } else {
+                          showFlashMessage(self, 'error', 'Error', error.response.data['message'])
+                      }
+                  }
+              });
+          this.clearForm();
+      },
+
+      updateStudyBlock: function (evt) {
+          this.$v.$touch();
+          if (this.$v.$invalid) {
+              evt.preventDefault()
+          } else {
+              let self = this;
+              let loader = pageStartLoader(this)
+              axios.put(study_block_resource, {
+                  area: this.study_block.area,
+                  name: this.study_block.name,
+                  code: this.study_block.code,
+              }, {
+                  headers:
+                      {
+                        code: this.old_code,
+                        Authorization: secureStoreGetAuthString()
+                      }
+              })
+                  .then((response) => {
+                    setTimeout( () => {
+                      loader.hide()
+                      this.getStudyBlock();
+                      showFlashMessage(self, 'success', 'Success', response.data['message'])
+                    }, this.time)
+                  })
+                  .catch((error) => {
+                      this.$log.error(error);
+                      loader.hide()
+                      if (error.response) {
+                          if (error.response.status === 304) {
+                              showFlashMessage(self, 'info', 'Info', 'Record not modified!')
+                          } else if (error.response.status === 401) {
+                              respondTo401(self);
+                          } else if (error.response.status === 403) {
+                              showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
+                          } else {
+                              showFlashMessage(self, 'error', 'Error', error.response.data['message'])
+                          }
+                      }
+                  });
+              this.clearForm();
+          }
+      },
+
+      deleteStudyBlock: function (code) {
+          let self = this;
+          let loader = pageStartLoader(this)
+
+          axios.delete(study_block_resource, {
+              headers: {
+                  code: code,
+                Authorization: secureStoreGetAuthString()
+              }
+          })
+              .then((response) => {
+                setTimeout(() => {
+                  loader.hide()
+                  this.getStudyBlock();
+                  showFlashMessage(self, 'success', 'Success', response.data['message'])
+                }, this.time)
+              })
+              .catch((error) => {
+                  this.$log.error(error);
+                  loader.hide()
+                  if (error.response) {
+                      if (error.response.status === 401) {
+                          respondTo401(self);
+                      } else if (error.response.status === 403) {
+                          showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
+                      } else {
+                          showFlashMessage(self, 'error', 'Error', error.response.data['message'])
+                      }
+                  }
+              });
+          this.clearForm();
+      },
+
+      /* Methods associated with searching and filtering of data in the page */
+      filterData(data) {
+          let filterBySite = this.filters.length
+              ? data.filter(study_block => this.filters.some(filter => study_block.area.match(filter)))
+              : null // site
+
+          let filterByArea = this.filters.length
+              ? data.filter(study_block => this.filters.some(filter => study_block.name.match(filter)))
+              : null // area
+
+          return {'site': filterBySite, 'area': filterByArea}
+      },
+
+      searchData() {
+        return this.response.filter(study_block => {
             return study_block.name.toLowerCase().includes(this.search.toLowerCase())
         })
     }
   },
-  created() { this.getStudyBlock();}, components: {TopNav}
+  created() { this.getStudyBlock();}, components: {TopNav, FilterCard}
 }
 
 </script>
