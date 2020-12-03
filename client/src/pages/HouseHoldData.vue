@@ -21,7 +21,7 @@
           <tr v-for="(house_hold_data, index) in response.message" :key="house_hold_data.id">
             <td> {{ index + 1 }}</td>
             <td> {{ house_hold_data['study_block.name'] }}</td>
-            <td> {{ house_hold_data.farmer }}</td>
+            <td> {{ house_hold_data.date_collected }}</td>
             <td> {{ house_hold_data.cattle_id }}</td>
 
             <td v-if="isAuth">
