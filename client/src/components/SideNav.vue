@@ -15,9 +15,23 @@
             <a> <i aria-hidden="true" class="fas fa-project-diagram menu_icon"></i> Projects</a>
         </router-link>
 
+        <router-link to="/publication">
+            <a> <i class="fas fa-brain menu_icon"></i> Publications</a>
+        </router-link>
+
+        <hr>
+        <hr>
+
         <router-link to="/study-block">
             <a> <i aria-hidden="true" class="fas fa-cubes menu_icon"></i> Study Blocks</a>
         </router-link>
+
+        <router-link to="/household-data">
+            <a> <i aria-hidden="true" class="fas fa-house-user menu_icon"></i> HouseHold Data</a>
+        </router-link>
+
+        <hr>
+        <hr>
 
         <router-link to="/bio-hazard-level">
             <a> <i aria-hidden="true" class="fas fa-biohazard menu_icon"> </i> Bio Hazard Level</a>
@@ -26,6 +40,9 @@
         <router-link to="/quantity-type">
             <a> <i aria-hidden="true" class="fas fa-balance-scale menu_icon"></i> Quantity Type</a>
         </router-link>
+
+        <hr>
+        <hr>
 
         <router-link to="/lab">
             <a> <i aria-hidden="true" class="fa fa-building menu_icon"></i> Labs</a>
@@ -52,10 +69,6 @@
             <a> <i class="fas fa-briefcase menu_icon"></i> Boxes</a>
         </router-link>
 
-        <router-link to="/publication">
-            <a> <i class="fas fa-brain menu_icon"></i> Publications</a>
-        </router-link>
-
         <hr>
         <hr>
 
@@ -65,7 +78,6 @@
 
 <script>
     import FooterScript from "./../components/Footer";
-
     export default {
         name: 'side-menu',
         components: {FooterScript}
