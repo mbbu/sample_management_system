@@ -6,6 +6,11 @@
 
                 <FlashMessage :position="'right bottom'"></FlashMessage>
                 <br>
+
+                <!--TOP-PAGINATION-->
+                <v-page :total-row="page_length" @page-change="pageInfo" align="center"
+                        v-model="current"></v-page>
+                <br>
                 <table class=" table table-hover">
                     <thead>
                     <tr>
@@ -43,6 +48,10 @@
                     </tr>
                     </tbody>
                 </table>
+                <!--BOTTOM-PAGINATION-->
+                <v-page :total-row="page_length" @page-change="pageInfo" align="center"
+                        v-model="current"></v-page>
+                <br>
             </div>
 
             <div v-if="!isEditing">
@@ -171,15 +180,8 @@
           </div>
 
           <div style="margin: auto;">
-            <loading-progress
-              :indeterminate="indeterminate"
-              :hide-background="hideBackground"
-              :progress="progressPath"
-              :size="size"
-              rotate
-              fillDuration="2"
-              rotationDuration="1"
-            />
+            <loading-progress :indeterminate="indeterminate" :hide-background="hideBackground" :progress="progressPath"
+              :size="size" rotate fillDuration="2" rotationDuration="1"/>
           </div>
         </div>
     </div>
@@ -220,15 +222,13 @@ name: "StudyBlock",
       time: 2000,
 
       // progressPath
-      indeterminate: true,
-      hideBackground: true,
-      progressPath: 5,
-      size: 180,
+      indeterminate: true, hideBackground: true, progressPath: 5, size: 180,
 
       // values for data modification
-      old_code: null,
-      showModal: true,
-      isEditing: false,
+      old_code: null, showModal: true, isEditing: false,
+
+      // data for pagination
+      current: 1, page_length: null, page_array: [], page_info: {},
     };
   },
 
@@ -283,6 +283,28 @@ name: "StudyBlock",
       this.indeterminate = cont
       this.progressPath = path
       this.size = size
+    },
+    // pagination
+    pageInfo(info) {
+      this.page_info = info
+    },
+
+    paginate(data) {
+      let start = 0, end = 0;
+
+      start = this.page_info.pageSize * (this.page_info.pageNumber - 1)
+      end = start + this.page_info.pageSize
+
+      this.page_array.splice(0, this.page_array.length);
+
+      if (end > data.length) end = data.length;
+
+      for (let i = start; i < end; i++) {
+          this.page_array.push(data[i])
+      }
+
+      this.page_length = data.length
+      return this.page_array
     },
 
     // api interaction functions
