@@ -15,8 +15,8 @@
                     <thead>
                     <tr>
                       <th class="table-header-style" scope="col"> Id</th>
+                      <th class="table-header-style" scope="col"> Site</th>
                       <th class="table-header-style" scope="col"> Area</th>
-                      <th class="table-header-style" scope="col"> Name</th>
                       <th class="table-header-style" scope="col"> Code</th>
                       <th class="table-header-style" scope="col" v-if="isAuth"> Actions</th>
                     </tr>
