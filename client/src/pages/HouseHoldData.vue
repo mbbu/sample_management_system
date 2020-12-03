@@ -2,7 +2,7 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col-sm-12">
-        <top-nav :page_title="page_title"></top-nav>
+        <top-nav :page_title="page_title" v-bind:search_query.sync="search"></top-nav>
 
         <!-- FLASH MESSAGES -->
         <FlashMessage :position="'right bottom'"></FlashMessage>
@@ -23,7 +23,7 @@
           </tr>
           </thead>
           <tbody>
-          <tr v-for="(house_hold_data, index) in response.message" :key="house_hold_data.id">
+          <tr v-for="(house_hold_data, index) in filteredList" :key="house_hold_data.id">
             <td> {{ index + 1 }}</td>
             <td> {{ house_hold_data['study_block.name'] }}</td>
             <td> {{ house_hold_data.date_collected }}</td>
@@ -390,20 +390,24 @@ import {font_scale} from '@/utils/constants';
 import {house_hold_data_resource, study_block_resource} from "@/utils/api_paths";
 import axios from "axios";
 import TopNav from "@/components/TopNav";
-import VueTinyTabs from 'vue-tiny-tabs'
+import EventBus from '@/components/EventBus';
+import VueTinyTabs from 'vue-tiny-tabs';
 
 export default {
   name: "HouseHoldData",
+
   data() {
     return {
       page_title: "HouseHoldData",
-      response: [],
       house_hold_data: {
         farmer: '', cattle_id: '', cattle_name: '', cattle_color: '', cc: '', notes: '', date_collected: null,
         cattle_sex: '', collar: '', pcv: '', diagnosis: '', treatment: '', study_block: '', weight:0
       },
 
       house_data: {}, font_scale,
+
+      // search
+      search: '', response: [],
 
       // variable to check user status and role
       isAuth: null,
@@ -422,6 +426,20 @@ export default {
       // data for pagination
       current: 1, page_length: null, page_array: [], page_info: {},
     };
+  },
+
+  mounted() {
+    EventBus.$on('searchQuery', (payload) => {
+        this.search = payload; this.searchData();
+    })
+  },
+
+  computed: {
+    filteredList() {
+        return this.response.filter(hhd => {
+            return hhd.cattle_id.toLowerCase().includes(this.search.toLowerCase())
+        })
+    }
   },
   methods: {
     // Util Functions
@@ -518,6 +536,13 @@ export default {
       return this.page_array
     },
 
+    // search fn
+    searchData() {
+        return this.response.filter(hhd => {
+            return hhd.cattle_id.toLowerCase().includes(this.search.toLowerCase())
+        })
+    },
+
     // Functions to interact with api
     getHouseHoldData() {
       this.isAuth = isResearcher();
@@ -525,7 +550,7 @@ export default {
           .then((res) => {
             setTimeout(() => {
                   this.haltProgressPath();
-                  this.response = res.data;
+                  this.response = res.data['message'];
                 }
                 , this.time)
           }).catch((error) => {
