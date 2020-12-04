@@ -266,11 +266,6 @@ export default {
               .map(({area: site}) => site)
               .filter((value, index, self) => self.indexOf(value) === index),
         },
-        // {
-        //     'By Room': this.response
-        //         .map(({room}) => room)
-        //         .filter((value, index, self) => self.indexOf(value) === index)
-        // },
       ]
     },
 
