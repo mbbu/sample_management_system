@@ -15,7 +15,7 @@
           <thead>
           <tr>
             <th class="table-header-style" scope="col"> Id</th>
-            <th class="table-header-style" scope="col"> Name</th>
+            <th class="table-header-style" scope="col"> Building</th>
             <th class="table-header-style" scope="col"> Code</th>
             <th class="table-header-style" scope="col"> Room</th>
             <th v-if="isAuth" class="table-header-style" scope="col"> Actions</th>
@@ -24,7 +24,7 @@
           <tbody>
           <tr v-for="(lab, index) in filteredList.arr" :key="lab.id">
             <td> {{ index + 1 }}</td>
-            <td> {{ lab.name }}</td>
+            <td> {{ lab.building }}</td>
             <td> {{ lab.code }}</td>
             <td> {{ lab.room }}</td>
 
@@ -32,15 +32,15 @@
               <b-icon
                   v-b-modal.modal-lab-edit
                   v-b-tooltip.hover
-                  :font-scale="`${font_scale}`" :title="`Update ${ lab.name }`"
+                  :font-scale="`${font_scale}`" :title="`Update ${ lab.code }`"
                   class="border border-info rounded" icon="pencil"
                   variant="info"
-                  @mouseover="fillFormForUpdate(lab.name, lab.code, lab.room)"
+                  @mouseover="fillFormForUpdate(lab.building, lab.code, lab.room)"
               ></b-icon>
               &nbsp;
               <b-icon
                   v-b-tooltip.hover :font-scale="`${font_scale}`"
-                  :title="`Delete ${lab.name}!`" class="border rounded bg-danger p-1"
+                  :title="`Delete ${lab.code}!`" class="border rounded bg-danger p-1"
                   icon="trash" variant="light"
                   @click="deleteLab(lab.code)"
               ></b-icon>
@@ -65,18 +65,18 @@
             @submit="showModal = false"
         >
           <form @submit.prevent="createLab">
-            <!-- NAME -->
-            <b-form-group id="form-name-group"
-                          :class="{ 'form-group--error': $v.lab.name.$error }" label="Name:" label-for="form-name-input">
+            <!-- building -->
+            <b-form-group id="form-building-group"
+                          :class="{ 'form-group--error': $v.lab.building.$error }" label="Building:" label-for="form-building-input">
               <b-form-input
-                  id="form-name-input"
-                  v-model.trim="$v.lab.name.$model"
-                  placeholder="Enter Name"
+                  id="form-building-input"
+                  v-model.trim="$v.lab.building.$model"
+                  placeholder="Enter building"
                   required
                   type="text"
               ></b-form-input>
-              <div v-if="$v.lab.name.$dirty">
-                <div v-if="!$v.lab.name.required" class="error">Field is
+              <div v-if="$v.lab.building.$dirty">
+                <div v-if="!$v.lab.building.required" class="error">Field is
                   required
                 </div>
               </div>
@@ -127,18 +127,18 @@
             @submit="showModal = false"
         >
           <form @submit.prevent="updateLab">
-            <!-- NAME -->
-            <b-form-group id="form-name-group-edit"
-                          :class="{ 'form-group--error': $v.lab.name.$error }" label="Name:" label-for="form-name-input">
+            <!-- building -->
+            <b-form-group id="form-building-group-edit"
+                          :class="{ 'form-group--error': $v.lab.building.$error }" label="Building:" label-for="form-building-input">
               <b-form-input
-                  id="form-name-input"
-                  v-model.trim="$v.lab.name.$model"
-                  placeholder="Enter Name"
+                  id="form-building-input"
+                  v-model.trim="$v.lab.building.$model"
+                  placeholder="Enter building"
                   required
                   type="text"
               ></b-form-input>
-              <div v-if="$v.lab.name.$dirty">
-                <div v-if="!$v.lab.name.required" class="error">Field is
+              <div v-if="$v.lab.building.$dirty">
+                <div v-if="!$v.lab.building.required" class="error">Field is
                   required
                 </div>
               </div>
@@ -213,7 +213,7 @@ export default {
       page_title: "Labs",
       response: [],
       lab: {
-        name: '',
+        building: '',
         code: '',
         room: '',
       },
@@ -247,7 +247,7 @@ export default {
 
   validations: {
     lab: {
-      name: {required},
+      building: {required},
       code: {required},
       room: {required},
     }
@@ -286,15 +286,15 @@ export default {
       this.createLab();
     },
     clearForm() {
-      this.lab.name = null;
+      this.lab.building = null;
       this.lab.code = null;
       this.lab.room = null;
       this.isEditing = false;
       this.$v.$reset();
     },
 
-    fillFormForUpdate(name, code, room) {
-      this.lab.name = name;
+    fillFormForUpdate(building, code, room) {
+      this.lab.building = building;
       this.lab.code = code;
       this.lab.room = room;
       this.old_code = code;
@@ -328,7 +328,7 @@ export default {
     createLab: function () {
       let loader = pageStartLoader(this)
       axios.post(lab_resource, {
-        name: this.lab.name,
+        building: this.lab.building,
         code: this.lab.code,
         room: this.lab.room,
       }, {
@@ -356,7 +356,7 @@ export default {
         let loader = pageStartLoader(this)
 
         axios.put(lab_resource, {
-          name: this.lab.name,
+          building: this.lab.building,
           code: this.lab.code,
           room: this.lab.room,
         }, {
@@ -401,12 +401,12 @@ export default {
     searchData() {
       return this.response.filter(lab => {
         for (let count = 0; count <= this.response.length; count++) {
-          let byName = lab.name.toString().toLowerCase().includes(this.search.toLowerCase())
+          let bybuilding = lab.building.toString().toLowerCase().includes(this.search.toLowerCase())
           let byCode = lab.code.toString().toLowerCase().includes(this.search.toLowerCase())
           let byRoom = lab.room.toString().toLowerCase().includes(this.search.toLowerCase())
 
-          if (byName) {
-            return byName
+          if (bybuilding) {
+            return bybuilding
           } else if (byCode) {
             return byCode
           } else if (byRoom) {
