@@ -168,16 +168,6 @@ export default {
               .filter((value, index, self) => self.indexOf(value) === index),
         },
         {
-          'By Type': this.response
-              .map(({sample_type}) => sample_type)
-              .filter((value, index, self) => self.indexOf(value) === index),
-        },
-        {
-          'By Status': this.response
-              .map(({status}) => status)
-              .filter((value, index, self) => self.indexOf(value) === index),
-        },
-        {
           'By Retention': this.response
               .map(({retention_date}) => retention_date)
               .filter((value, index, self) => self.indexOf(value) === index),
@@ -196,9 +186,7 @@ export default {
       let filteredData = this.filterData(this.sampleList)
 
       let filterByPI = filteredData.pi
-      let filterByType = filteredData.type
       let filterByTheme = filteredData.theme
-      let filterByStatus = filteredData.status
       let filterByProject = filteredData.project
       let filterBySpecies = filteredData.species
       let filterByRetention = filteredData.retention
@@ -219,18 +207,10 @@ export default {
         this.sampleList = filterByPI // eslint-disable-line
         this.filterData(filterByPI)
         return paginate(filterByPI)
-      } else if (filterByType !== null && filterByType.length > 0) {
-        this.sampleList = filterByType // eslint-disable-line
-        this.filterData(filterByType)
-        return paginate(filterByType)
       } else if (filterByTheme !== null && filterByTheme.length > 0) {
         this.sampleList = filterByTheme // eslint-disable-line
         this.filterData(filterByTheme)
         return paginate(filterByTheme)
-      } else if (filterByStatus !== null && filterByStatus.length > 0) {
-        this.sampleList = filterByStatus // eslint-disable-line
-        this.filterData(filterByStatus)
-        return paginate(filterByStatus)
       } else if (filterByProject !== null && filterByProject.length > 0) {
         this.sampleList = filterByProject // eslint-disable-line
         this.filterData(filterByProject)
@@ -332,16 +312,6 @@ export default {
               this.filters.some(filter => sample.animal_species ? sample.animal_species.toString().match(filter) : null))
           : null
 
-      let filterByType = this.filters.length
-          ? data.filter(sample =>
-              this.filters.some(filter => sample.sample_type ? sample.sample_type.toString().match(filter) : null))
-          : null
-
-      let filterByStatus = this.filters.length
-          ? data.filter(sample =>
-              this.filters.some(filter => sample.status ? sample.status.toString().match(filter) : null))
-          : null
-
       let filterByRetention = this.filters.length
           ? data.filter(sample =>
               this.filters.some(filter => sample.retention ? sample.retention.toString().match(filter) : null))
@@ -350,9 +320,7 @@ export default {
 
       return {
         'pi': filterByPI,
-        'type': filterByType,
         'theme': filterByTheme,
-        'status': filterByStatus,
         'project': filterByProject,
         'species': filterBySpecies,
         'retention': filterByRetention,
