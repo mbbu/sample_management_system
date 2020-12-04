@@ -5,7 +5,6 @@ from flask_restful import reqparse, fields, marshal
 from api.models.database import BaseModel
 from api.models.study_block import StudyBlock
 from api.resources.base_resource import BaseResource
-from api.resources.decorators.user_role_decorators import is_sys_admin
 from api.utils import log_duplicate, log_304, format_and_lower_str, has_required_request_params, log_create, log_update, \
     standard_non_empty_string, non_empty_string, get_query_params
 
@@ -42,7 +41,7 @@ class StudyBlockResource(BaseResource):
                 data = marshal(study_blocks, self.fields)
                 return BaseResource.send_json_message(data, 200)
 
-    # @jwt_required
+    @jwt_required
     def post(self):
         args = StudyBlockResource.study_block_parser()
         if not StudyBlock.study_block_exists(args['code']):
@@ -62,7 +61,7 @@ class StudyBlockResource(BaseResource):
         log_duplicate(StudyBlock.query.filter(StudyBlock.code == args['code']).first())
         return BaseResource.send_json_message("Study block already exists", 409)
 
-    # @jwt_required
+    @jwt_required
     @has_required_request_params
     def put(self):
         code = format_and_lower_str(request.headers.get('code'))
@@ -88,7 +87,7 @@ class StudyBlockResource(BaseResource):
             return BaseResource.send_json_message("No changes made", 304)
         return BaseResource.send_json_message("Study block not found", 404)
 
-    # @jwt_required
+    @jwt_required
     @has_required_request_params
     def delete(self):
         code = format_and_lower_str(request.headers.get('code'))
