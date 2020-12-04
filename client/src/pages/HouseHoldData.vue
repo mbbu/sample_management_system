@@ -6,12 +6,17 @@
 
         <!-- FLASH MESSAGES -->
         <FlashMessage :position="'right bottom'"></FlashMessage>
-        <br> <br>
+        <br>
+
+        <!-- FILTER CARD SECTION -->
+        <filter-card :all-filters="allFilters"></filter-card>
+        <br>
 
         <!--TOP-PAGINATION-->
-        <v-page :total-row="page_length" @page-change="pageInfo" align="center"
+        <v-page :total-row="matchFiltersAndSearch.pg_len" @page-change="pageInfo" align="center"
                 v-model="current"></v-page>
         <br>
+
         <table class=" table table-hover">
           <thead>
           <tr>
@@ -23,7 +28,7 @@
           </tr>
           </thead>
           <tbody>
-          <tr v-for="(house_hold_data, index) in filteredList" :key="house_hold_data.id">
+          <tr v-for="(house_hold_data, index) in matchFiltersAndSearch.arr" :key="house_hold_data.id">
             <td> {{ index + 1 }}</td>
             <td> {{ house_hold_data['study_block.name'] }}</td>
             <td> {{ house_hold_data.date_collected }}</td>
@@ -59,7 +64,7 @@
           </tbody>
         </table>
         <!--BOTTOM-PAGINATION-->
-        <v-page :total-row="page_length" @page-change="pageInfo" align="center"
+        <v-page :total-row="matchFiltersAndSearch.pg_len" @page-change="pageInfo" align="center"
                 v-model="current"></v-page>
         <br>
       </div>
@@ -365,7 +370,6 @@
         <span>Add House Data</span> <i class="fas fa-plus-circle menu_icon"></i>
       </b-button>
 
-
       <div style="margin: auto;">
         <loading-progress
             :hide-background="hideBackground" :indeterminate="indeterminate" :progress="progressPath" :size="size"
@@ -382,7 +386,7 @@ import {
   getSelectedItemCode,
   handleError,
   isResearcher,
-  pageStartLoader,
+  pageStartLoader, paginate,
   secureStoreGetAuthString,
   showFlashMessage
 } from "@/utils/util_functions";
@@ -392,6 +396,7 @@ import axios from "axios";
 import TopNav from "@/components/TopNav";
 import EventBus from '@/components/EventBus';
 import VueTinyTabs from 'vue-tiny-tabs';
+import FilterCard from "@/components/FilterCard";
 
 export default {
   name: "HouseHoldData",
@@ -409,6 +414,9 @@ export default {
       // search
       search: '', response: [],
 
+      // filters
+      filters:[], houseDataList:[],
+
       // variable to check user status and role
       isAuth: null,
 
@@ -424,7 +432,7 @@ export default {
       old_code: null, showModal: true, isEditing: false,
 
       // data for pagination
-      current: 1, page_length: null, page_array: [], page_info: {},
+      current: 1, page_array: [], page_info: {},
     };
   },
 
@@ -432,14 +440,75 @@ export default {
     EventBus.$on('searchQuery', (payload) => {
         this.search = payload; this.searchData();
     })
+
+    EventBus.$on('filters', (payload) => {
+      this.filters = payload
+      if (this.filters.length === 0) {
+        this.houseDataList = this.response
+      }
+    })
   },
 
   computed: {
-    filteredList() {
-        return this.response.filter(hhd => {
-            return hhd.cattle_id.toLowerCase().includes(this.search.toLowerCase())
-        })
-    }
+        /**
+     * return a list of dictionaries containing the filters required
+     */
+    allFilters: function () {
+      return [
+        {
+          'By Site': this.response
+              .map(({['study_block.area']: site}) => site)
+              .filter((value, index, self) => self.indexOf(value) === index),
+        },
+        {
+          'By Area': this.response
+              .map(({['study_block.name']: area}) => area)
+              .filter((value, index, self) => self.indexOf(value) === index),
+        },
+        {
+          'By Date': this.response
+              .map(({date_collected: date}) => date)
+              .filter((value, index, self) => self.indexOf(value) === index),
+        },
+      ]
+    },
+    
+    /**
+     * function checks for any filters or searches applied to the data and returns filtered/searched list.
+     * @returns {null|[]|*}
+     */
+    matchFiltersAndSearch: function () {
+      let searchList = this.search ? this.searchData() : null
+
+      /* houseDataList,which is a copy of response, is passed as the data here instead of response to avoid
+      mutating response data.*/
+      let filteredData = this.filterData(this.houseDataList)
+
+      let filterBySite = filteredData.site
+      let filterByArea = filteredData.area
+      let filterByDate = filteredData.date
+
+      if (searchList !== null) {
+        return paginate(searchList)
+      } else if (this.filters.length > 1) {
+        // Possibly, multiple filters have been applied. Return the array with the least elements
+        return filterBySite.length < filterByArea.length ?
+            paginate(filterBySite) : paginate(filterByArea)
+      } else if (filterBySite !== null && filterBySite.length > 0) {
+        this.houseDataList = filterBySite // eslint-disable-line
+        this.filterData(filterBySite)
+        return paginate(filterBySite)
+      } else if (filterByArea !== null && filterByArea.length > 0) {
+        this.freezerList = filterByArea // eslint-disable-line
+        this.filterData(filterByArea)
+        return paginate(filterByArea)
+      } else if (filterByDate !== null && filterByDate.length > 0) {
+        this.freezerList = filterByDate // eslint-disable-line
+        this.filterData(filterByDate)
+        return paginate(filterByDate)
+      }
+      return paginate(this.houseDataList)
+    },
   },
   methods: {
     // Util Functions
@@ -515,32 +584,31 @@ export default {
 
     // pagination
     pageInfo(info) {
-      this.page_info = info
+      EventBus.$emit('page-info', {'pgInfo': info, 'pgData': this.houseDataList})
     },
 
-    paginate(data) {
-      let start = 0, end = 0;
+    /* Methods associated with searching and filtering of data in the page */
+    filterData(data) {
+      let filterBySite = this.filters.length
+          ? data.filter(hhd => this.filters.some(filter => hhd['study_block.area'].match(filter)))
+          : null // site
 
-      start = this.page_info.pageSize * (this.page_info.pageNumber - 1)
-      end = start + this.page_info.pageSize
+      let filterByArea = this.filters.length
+          ? data.filter(hhd => this.filters.some(filter => hhd['study_block.name'].match(filter)))
+          : null // area
 
-      this.page_array.splice(0, this.page_array.length);
+      let filterByDate = this.filters.length
+          ? data.filter(hhd => this.filters.some(filter => hhd.date_collected.match(filter)))
+          : null // area
 
-      if (end > data.length) end = data.length;
-
-      for (let i = start; i < end; i++) {
-          this.page_array.push(data[i])
-      }
-
-      this.page_length = data.length
-      return this.page_array
+      return {'site': filterBySite, 'area': filterByArea, 'date': filterByDate}
     },
 
     // search fn
     searchData() {
-        return this.response.filter(hhd => {
-            return hhd.cattle_id.toLowerCase().includes(this.search.toLowerCase())
-        })
+      return this.response.filter(hhd => {
+          return hhd.cattle_id.toLowerCase().includes(this.search.toLowerCase())
+      })
     },
 
     // Functions to interact with api
@@ -550,7 +618,7 @@ export default {
           .then((res) => {
             setTimeout(() => {
                   this.haltProgressPath();
-                  this.response = res.data['message'];
+                  this.houseDataList = this.response = res.data['message'];
                 }
                 , this.time)
           }).catch((error) => {
@@ -631,6 +699,7 @@ export default {
   },
 
   created() { this.onLoadPage(); },
-  components: {TopNav, VueTinyTabs}
+
+  components: {TopNav, VueTinyTabs, FilterCard}
 }
 </script>
