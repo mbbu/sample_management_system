@@ -53,7 +53,7 @@
           </tbody>
         </table>
         <!--BOTTOM-PAGINATION-->
-        <v-page v-model="current" :total-row="page_length" align="center"
+        <v-page v-model="current" :total-row="matchFiltersAndSearch.pg_len" align="center"
                 @page-change="pageInfo"></v-page>
         <br>
       </div>
@@ -235,7 +235,7 @@ export default {
       old_code: null, showModal: true, isEditing: false,
 
       // data for pagination
-      current: 1, page_length: null, page_array: [], page_info: {},
+      current: 1, page_array: [], page_info: {},
     };
   },
 
