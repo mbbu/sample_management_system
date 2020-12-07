@@ -371,8 +371,8 @@ export default {
           if (!this.sample.species) {
             this.errors.push("Animal species is required");
           }
-          if (!this.sample.description || this.sample.description.length < 25) {
-            this.errors.push("Description is required and should be at least 2 sentences.");
+          if (!this.sample.description) {
+            this.errors.push("Description is required.");
           }
           if (this.errors.length) {
             showFlashMessage(this, "error", "Check Form for Errors", "Correct errors to proceed!")
