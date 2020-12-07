@@ -13,8 +13,8 @@
         <br>
 
         <!--TOP-PAGINATION-->
-        <v-page :total-row="matchFiltersAndSearch.pg_len" @page-change="pageInfo" align="center"
-                v-model="current"></v-page>
+        <v-page v-model="current" :total-row="matchFiltersAndSearch.pg_len" align="center"
+                @page-change="pageInfo"></v-page>
         <br>
 
         <table class=" table table-hover">
@@ -36,12 +36,12 @@
 
             <td v-if="isAuth">
               <b-icon
-                        @click="viewHouseData(house_hold_data)"
-                        class="border border-info rounded"
-                        :font-scale="`${font_scale}`" icon="eye-fill"
-                        title="View"
-                        v-b-modal.modal-house-data
-                        v-b-tooltip.hover variant="info"
+                  v-b-modal.modal-house-data
+                  v-b-tooltip.hover
+                  :font-scale="`${font_scale}`" class="border border-info rounded"
+                  icon="eye-fill"
+                  title="View"
+                  variant="info" @click="viewHouseData(house_hold_data)"
               ></b-icon>
               &nbsp;
               <b-icon
@@ -54,8 +54,8 @@
               &nbsp;
               <b-icon
                   v-b-tooltip.hover
-                  :title="`Delete house_hold_data ${house_hold_data.farmer}!`"
-                  class="border rounded bg-danger p-1" :font-scale="`${font_scale}`"
+                  :font-scale="`${font_scale}`"
+                  :title="`Delete house_hold_data ${house_hold_data.farmer}!`" class="border rounded bg-danger p-1"
                   icon="trash" variant="light"
                   @click="deleteHouseHoldData(house_hold_data.code)"
               ></b-icon>
@@ -64,8 +64,8 @@
           </tbody>
         </table>
         <!--BOTTOM-PAGINATION-->
-        <v-page :total-row="matchFiltersAndSearch.pg_len" @page-change="pageInfo" align="center"
-                v-model="current"></v-page>
+        <v-page v-model="current" :total-row="matchFiltersAndSearch.pg_len" align="center"
+                @page-change="pageInfo"></v-page>
         <br>
       </div>
 
@@ -132,19 +132,21 @@
 
         <template v-slot:modal-footer="{ ok, cancel, hide }">
           <!-- Emulate built in modal footer ok and cancel button actions -->
-          <b-button @click="cancel()" size="md" variant="primary-outline">Cancel</b-button>
-          <b-button @click="fillFormForUpdate(house_data)" size="md" variant="primary"
-                    data-toggle="modal" data-target="#modal-house_hold_data-edit" data-dismiss="modal"
-                    v-b-modal.modal-house_hold_data-edit> Update</b-button>
-          <b-button @click=" close() && deleteHouseHoldData(house_data.code)"
-                    size="md" variant="danger"> Delete</b-button>
+          <b-button size="md" variant="primary-outline" @click="cancel()">Cancel</b-button>
+          <b-button v-b-modal.modal-house_hold_data-edit data-dismiss="modal" data-target="#modal-house_hold_data-edit"
+                    data-toggle="modal" size="md" variant="primary"
+                    @click="fillFormForUpdate(house_data)"> Update
+          </b-button>
+          <b-button size="md"
+                    variant="danger" @click=" close() && deleteHouseHoldData(house_data.code)"> Delete
+          </b-button>
         </template>
       </b-modal>
 
       <div v-if="!isEditing">
         <b-modal id="modal-house_hold_data"
                  :title="`Add ${page_title}`" cancel-variant="danger" ok-title="Save"
-                 @hidden="clearForm" @ok="createHouseHoldData" @submit="clearForm"
+                 @hidden="clearForm" @ok="onSubmit" @submit="showModal=false"
         >
           <form @submit.prevent="createHouseHoldData">
             <vue-tiny-tabs id="mytabs" :anchor="false" :closable="false" :hideTitle="true" class="tinytabs tabs">
@@ -152,59 +154,85 @@
                 <h4 class="title"><small><b>Farmer Info</b></small></h4>
 
                 <!--STUDY-BLOCK-->
-                <b-form-group id="form-study_block-group" label="Study Block:" label-for="form-study_block-input">
+                <b-form-group :class="{ 'form-group--error': $v.house_hold_data.study_block.$error }"
+                    id="form-study_block-group" label="Study Block:" label-for="form-study_block-input">
                   <ejs-dropdownlist
                       id='dropdownlist'
                       :dataSource='studyBlockDataList'
                       :fields="fields"
-                      :v-model="house_hold_data.study_block"
+                      v-model.trim="$v.house_hold_data.study_block.$model"
                       placeholder='Select a study block'
                   ></ejs-dropdownlist>
+                  <div v-if="$v.house_hold_data.study_block.$dirty">
+                      <div class="error" v-if="!$v.house_hold_data.study_block.required">Field is required</div>
+                  </div>
                 </b-form-group>
 
                 <!--FARMER-->
-                <b-form-group id="form-farmer-group" label="Farmer Name:" label-for="form-farmer-input">
-                  <b-form-input id="form-farmer-input" v-model="house_hold_data.farmer"
+                <b-form-group :class="{ 'form-group--error': $v.house_hold_data.farmer.$error }"
+                    id="form-farmer-group" label="Farmer Name:" label-for="form-farmer-input">
+                  <b-form-input id="form-farmer-input" v-model.trim="$v.house_hold_data.farmer.$model"
                                 placeholder="Enter Farmer Name" required type="text"></b-form-input>
                 </b-form-group>
+                <div v-if="$v.house_hold_data.farmer.$dirty">
+                    <div class="error" v-if="!$v.house_hold_data.farmer.required">Field is required</div>
+                </div>
               </div>
 
               <div id="cattle-info" class="section tab">
                 <h4 class="title"><small><b>Cattle Info</b></small></h4>
                 <!--CATTLE_ID-->
-                <b-form-group id="form-cattle_id-group" label="Cattle ID:" label-for="form-cattle_id-input">
-                  <b-form-input id="form-cattle_id-input" v-model="house_hold_data.cattle_id"
+                <b-form-group :class="{ 'form-group--error': $v.house_hold_data.cattle_id.$error }"
+                    id="form-cattle_id-group" label="Cattle ID:" label-for="form-cattle_id-input">
+                  <b-form-input id="form-cattle_id-input" v-model.trim="$v.house_hold_data.cattle_id.$model"
                                 placeholder="Enter Cattle ID" required type="text"></b-form-input>
+                  <div v-if="$v.house_hold_data.cattle_id.$dirty">
+                    <div class="error" v-if="!$v.house_hold_data.cattle_id.required">Field is required</div>
+                  </div>
                 </b-form-group>
 
                 <!--CATTLE NAME-->
-                <b-form-group id="form-cattle_name-group" label="Cattle Name:" label-for="form-cattle_name-input">
-                  <b-form-input id="form-cattle_name-input" v-model="house_hold_data.cattle_name"
+                <b-form-group :class="{ 'form-group--error': $v.house_hold_data.cattle_name.$error }"
+                    id="form-cattle_name-group" label="Cattle Name:" label-for="form-cattle_name-input">
+                  <b-form-input id="form-cattle_name-input" v-model.trim="$v.house_hold_data.cattle_name.$model"
                                 placeholder="Enter Cattle Name" required type="text"></b-form-input>
+                  <div v-if="$v.house_hold_data.cattle_name.$dirty">
+                    <div class="error" v-if="!$v.house_hold_data.cattle_name.required">Field is required</div>
+                  </div>
                 </b-form-group>
 
                 <!--CATTLE COLOR-->
-                <b-form-group id="form-cattle-color-group" label="Cattle Color:" label-for="form-cattle-color-input">
-                  <b-form-input id="form-cattle-color-input" v-model="house_hold_data.cattle_color"
+                <b-form-group :class="{ 'form-group--error': $v.house_hold_data.cattle_color.$error }"
+                    id="form-cattle-color-group" label="Cattle Color:" label-for="form-cattle-color-input">
+                  <b-form-input id="form-cattle-color-input" v-model.trim="$v.house_hold_data.cattle_color.$model"
                                 placeholder="Enter Cattle Color" required type="text"></b-form-input>
+                  <div v-if="$v.house_hold_data.cattle_color.$dirty">
+                    <div class="error" v-if="!$v.house_hold_data.cattle_color.required">Field is required</div>
+                  </div>
                 </b-form-group>
-
-
-                 <!--CATTLE COLOR-->
-                <b-form-group id="form-cattle-collar-group" label="Collar:" label-for="form-cattle-collar-input">
-                  <b-form-input id="form-cattle-collar-input" v-model="house_hold_data.collar"
+                
+                <!--CATTLE COLLAR-->
+                <b-form-group :class="{ 'form-group--error': $v.house_hold_data.collar.$error }"
+                    id="form-cattle-collar-group" label="Collar:" label-for="form-cattle-collar-input">
+                  <b-form-input id="form-cattle-collar-input" v-model.trim="$v.house_hold_data.collar.$model"
                                 placeholder="Enter Collar" required type="text"></b-form-input>
+                  <div v-if="$v.house_hold_data.collar.$dirty">
+                    <div class="error" v-if="!$v.house_hold_data.collar.required">Field is required</div>
+                  </div>
                 </b-form-group>
 
                 <!--CATTLE Sex-->
-                <div id="cattle-sex">
+                <div :class="{ 'form-group--error': $v.house_hold_data.cattle_sex.$error }" id="cattle-sex">
                   <p>Cattle Sex:</p>
-                  <input id="male" v-model="house_hold_data.cattle_sex" type="radio" value="Male">
+                  <input id="male" v-model.trim="$v.house_hold_data.cattle_sex.$model" type="radio" value="Male">
                   <label for="male">Male</label>
                   <br>
-                  <input id="female" v-model="house_hold_data.cattle_sex" type="radio" value="Female">
+                  <input id="female" v-model.trim="$v.house_hold_data.cattle_sex.$model" type="radio" value="Female">
                   <label for="female">Female</label>
                   <br>
+                  <div v-if="$v.house_hold_data.cattle_sex.$dirty">
+                    <div class="error" v-if="!$v.house_hold_data.cattle_sex.required">Field is required</div>
+                  </div>
                 </div>
               </div>
 
@@ -212,39 +240,63 @@
                 <h4 class="title"><small><b>Health Info</b></small></h4>
 
                 <!--CATTLE WEIGHT-->
-                <b-form-group id="form-weight-group" label="Weight:" label-for="form-weight-input">
-                  <b-form-input id="form-weight-input" v-model="house_hold_data.weight"
-                                placeholder="Enter Weight" required type="number" min=1></b-form-input>
+                <b-form-group :class="{ 'form-group--error': $v.house_hold_data.weight.$error }"
+                    id="form-weight-group" label="Weight:" label-for="form-weight-input">
+                  <b-form-input id="form-weight-input" v-model.trim="$v.house_hold_data.weight.$model"
+                                min=1 placeholder="Enter Weight" required type="number"></b-form-input>
+                  <div v-if="$v.house_hold_data.weight.$dirty">
+                    <div class="error" v-if="!$v.house_hold_data.weight.required">Field is required</div>
+                  </div>
                 </b-form-group>
 
                 <!--CATTLE PCV-->
-                <b-form-group id="form-pcv-group" label="PCV(Packed Cell Volume):" label-for="form-pcv-input">
-                  <b-form-input id="form-pcv-input" v-model="house_hold_data.pcv"
+                <b-form-group :class="{ 'form-group--error': $v.house_hold_data.pcv.$error }"
+                    id="form-pcv-group" label="PCV(Packed Cell Volume):" label-for="form-pcv-input">
+                  <b-form-input id="form-pcv-input" v-model.trim="$v.house_hold_data.pcv.$model"
                                 placeholder="Enter PCV" required type="text"></b-form-input>
+                  <div v-if="$v.house_hold_data.pcv.$dirty">
+                    <div class="error" v-if="!$v.house_hold_data.pcv.required">Field is required</div>
+                  </div>
                 </b-form-group>
 
                 <!--CATTLE Diagnosis-->
-                <b-form-group id="form-diagnosis-group" label="Diagnosis:" label-for="form-diagnosis-input">
-                  <b-form-input id="form-diagnosis-input" v-model="house_hold_data.diagnosis"
+                <b-form-group :class="{ 'form-group--error': $v.house_hold_data.diagnosis.$error }"
+                    id="form-diagnosis-group" label="Diagnosis:" label-for="form-diagnosis-input">
+                  <b-form-input id="form-diagnosis-input" v-model.trim="$v.house_hold_data.diagnosis.$model"
                                 placeholder="Enter Diagnosis" required type="text"></b-form-input>
+                  <div v-if="$v.house_hold_data.diagnosis.$dirty">
+                    <div class="error" v-if="!$v.house_hold_data.diagnosis.required">Field is required</div>
+                  </div>
                 </b-form-group>
 
                 <!--CATTLE Treatment-->
-                <b-form-group id="form-treatment-group" label="Treatment:" label-for="form-treatment-input">
-                  <b-form-input id="form-treatment-input" v-model="house_hold_data.treatment"
+                <b-form-group :class="{ 'form-group--error': $v.house_hold_data.treatment.$error }"
+                    id="form-treatment-group" label="Treatment:" label-for="form-treatment-input">
+                  <b-form-input id="form-treatment-input" v-model.trim="$v.house_hold_data.treatment.$model"
                                 placeholder="Enter Treatment" required type="text"></b-form-input>
+                  <div v-if="$v.house_hold_data.treatment.$dirty">
+                    <div class="error" v-if="!$v.house_hold_data.treatment.required">Field is required</div>
+                  </div>
                 </b-form-group>
 
                 <!--CATTLE CC/ML-->
-                <b-form-group id="form-cc/ml-group" label="Dosage:" label-for="form-cc/ml-input">
-                  <b-form-input id="form-cc/ml-input" v-model="house_hold_data.cc"
+                <b-form-group :class="{ 'form-group--error': $v.house_hold_data.cc.$error }" 
+                    id="form-cc/ml-group" label="Dosage:" label-for="form-cc/ml-input">
+                  <b-form-input id="form-cc/ml-input" v-model.trim="$v.house_hold_data.cc.$model"
                                 placeholder="Enter cc/ml" required type="number"></b-form-input>
+                  <div v-if="$v.house_hold_data.cc.$dirty">
+                    <div class="error" v-if="!$v.house_hold_data.cc.required">Field is required</div>
+                  </div>
                 </b-form-group>
 
                 <!--CATTLE Notes-->
-                <b-form-group id="form-notes-group" label="Notes:" label-for="form-notes-input">
-                  <b-form-textarea id="form-notes-input" v-model="house_hold_data.notes"
+                <b-form-group :class="{ 'form-group--error': $v.house_hold_data.notes.$error }" 
+                    id="form-notes-group" label="Notes:" label-for="form-notes-input">
+                  <b-form-textarea id="form-notes-input" v-model.trim="$v.house_hold_data.notes.$model"
                                    placeholder="Enter Notes" required type="text"></b-form-textarea>
+                  <div v-if="$v.house_hold_data.notes.$dirty">
+                    <div class="error" v-if="!$v.house_hold_data.notes.required">Field is required</div>
+                  </div>
                 </b-form-group>
               </div>
             </vue-tiny-tabs>
@@ -265,59 +317,85 @@
                 <h4 class="title"><small><b>Farmer Info</b></small></h4>
 
                 <!--STUDY-BLOCK-->
-                <b-form-group id="form-study_block-group-edit" label="Study Block:" label-for="form-study_block-input">
+                <b-form-group :class="{ 'form-group--error': $v.house_hold_data.study_block.$error }"
+                    id="form-study_block-group-edit" label="Study Block:" label-for="form-study_block-input">
                   <ejs-dropdownlist
                       id='dropdownlist'
                       :dataSource='studyBlockDataList'
                       :fields="fields"
-                      :v-model="house_hold_data.study_block"
+                      v-model.trim="$v.house_hold_data.study_block.$model"
                       placeholder='Select a study block'
                   ></ejs-dropdownlist>
+                  <div v-if="$v.house_hold_data.study_block.$dirty">
+                      <div class="error" v-if="!$v.house_hold_data.study_block.required">Field is required</div>
+                  </div>
                 </b-form-group>
 
                 <!--FARMER-->
-                <b-form-group id="form-farmer-group-edit" label="Farmer Name:" label-for="form-farmer-input">
-                  <b-form-input id="form-farmer-input" v-model="house_hold_data.farmer"
+                <b-form-group :class="{ 'form-group--error': $v.house_hold_data.farmer.$error }"
+                    id="form-farmer-group-edit" label="Farmer Name:" label-for="form-farmer-input">
+                  <b-form-input id="form-farmer-input" v-model.trim="$v.house_hold_data.farmer.$model"
                                 placeholder="Enter Farmer Name" required type="text"></b-form-input>
                 </b-form-group>
+                <div v-if="$v.house_hold_data.farmer.$dirty">
+                    <div class="error" v-if="!$v.house_hold_data.farmer.required">Field is required</div>
+                </div>
               </div>
 
               <div id="cattle-info-edit" class="section tab">
                 <h4 class="title"><small><b>Cattle Info</b></small></h4>
                 <!--CATTLE_ID-->
-                <b-form-group id="form-cattle_id-group-edit" label="Cattle ID:" label-for="form-cattle_id-input">
-                  <b-form-input id="form-cattle_id-input" v-model="house_hold_data.cattle_id"
+                <b-form-group :class="{ 'form-group--error': $v.house_hold_data.cattle_id.$error }"
+                    id="form-cattle_id-group-edit" label="Cattle ID:" label-for="form-cattle_id-input">
+                  <b-form-input id="form-cattle_id-input" v-model.trim="$v.house_hold_data.cattle_id.$model"
                                 placeholder="Enter Cattle ID" required type="text"></b-form-input>
+                  <div v-if="$v.house_hold_data.cattle_id.$dirty">
+                    <div class="error" v-if="!$v.house_hold_data.cattle_id.required">Field is required</div>
+                  </div>
                 </b-form-group>
 
                 <!--CATTLE NAME-->
-                <b-form-group id="form-cattle_name-group-edit" label="Cattle Name:" label-for="form-cattle_name-input">
-                  <b-form-input id="form-cattle_name-input" v-model="house_hold_data.cattle_name"
+                <b-form-group :class="{ 'form-group--error': $v.house_hold_data.cattle_name.$error }"
+                    id="form-cattle_name-group-edit" label="Cattle Name:" label-for="form-cattle_name-input">
+                  <b-form-input id="form-cattle_name-input" v-model.trim="$v.house_hold_data.cattle_name.$model"
                                 placeholder="Enter Cattle Name" required type="text"></b-form-input>
+                  <div v-if="$v.house_hold_data.cattle_name.$dirty">
+                    <div class="error" v-if="!$v.house_hold_data.cattle_name.required">Field is required</div>
+                  </div>
                 </b-form-group>
 
                 <!--CATTLE COLOR-->
-                <b-form-group id="form-cattle-color-group-edit" label="Cattle Color:"
-                              label-for="form-cattle-color-input">
-                  <b-form-input id="form-cattle-color-input" v-model="house_hold_data.cattle_color"
-                                placeholder="Enter Cattle Name" required type="text"></b-form-input>
+                <b-form-group :class="{ 'form-group--error': $v.house_hold_data.cattle_color.$error }"
+                    id="form-cattle-color-group-edit" label="Cattle Color:" label-for="form-cattle-color-input">
+                  <b-form-input id="form-cattle-color-input" v-model.trim="$v.house_hold_data.cattle_color.$model"
+                                placeholder="Enter Cattle Color" required type="text"></b-form-input>
+                  <div v-if="$v.house_hold_data.cattle_color.$dirty">
+                    <div class="error" v-if="!$v.house_hold_data.cattle_color.required">Field is required</div>
+                  </div>
                 </b-form-group>
 
-                <!--CATTLE COLOR-->
-                <b-form-group id="form-cattle-collar-group-edit" label="Collar:" label-for="form-cattle-collar-input">
-                  <b-form-input id="form-cattle-collar-input" v-model="house_hold_data.collar"
+                <!--CATTLE COLLAR-->
+                <b-form-group :class="{ 'form-group--error': $v.house_hold_data.collar.$error }"
+                    id="form-cattle-collar-group-edit" label="Collar:" label-for="form-cattle-collar-input">
+                  <b-form-input id="form-cattle-collar-input" v-model.trim="$v.house_hold_data.collar.$model"
                                 placeholder="Enter Collar" required type="text"></b-form-input>
+                  <div v-if="$v.house_hold_data.collar.$dirty">
+                    <div class="error" v-if="!$v.house_hold_data.collar.required">Field is required</div>
+                  </div>
                 </b-form-group>
 
                 <!--CATTLE Sex-->
-                <div id="cattle-sex-edit">
+                <div :class="{ 'form-group--error': $v.house_hold_data.cattle_sex.$error }" id="cattle-sex-edit">
                   <p>Cattle Sex:</p>
-                  <input id="male-edit" v-model="house_hold_data.cattle_sex" type="radio" value="Male">
-                  <label for="male-edit">Male</label>
+                  <input id="male-edit" v-model.trim="$v.house_hold_data.cattle_sex.$model" type="radio" value="Male">
+                  <label for="male">Male</label>
                   <br>
-                  <input id="female-edit" v-model="house_hold_data.cattle_sex" type="radio" value="Female">
-                  <label for="female-edit">Female</label>
+                  <input id="female-edit" v-model.trim="$v.house_hold_data.cattle_sex.$model" type="radio" value="Female">
+                  <label for="female">Female</label>
                   <br>
+                  <div v-if="$v.house_hold_data.cattle_sex.$dirty">
+                    <div class="error" v-if="!$v.house_hold_data.cattle_sex.required">Field is required</div>
+                  </div>
                 </div>
               </div>
 
@@ -325,39 +403,63 @@
                 <h4 class="title"><small><b>Health Info</b></small></h4>
 
                 <!--CATTLE WEIGHT-->
-                <b-form-group id="form-weight-group-edit" label="Weight:" label-for="form-weight-input-edit">
-                  <b-form-input id="form-weight-input-edit" v-model="house_hold_data.weight"
-                                placeholder="Enter Weight" required type="number" min=1></b-form-input>
+                <b-form-group :class="{ 'form-group--error': $v.house_hold_data.weight.$error }"
+                    id="form-weight-group-edit" label="Weight:" label-for="form-weight-input">
+                  <b-form-input id="form-weight-input" v-model.trim="$v.house_hold_data.weight.$model"
+                                min=1 placeholder="Enter Weight" required type="number"></b-form-input>
+                  <div v-if="$v.house_hold_data.weight.$dirty">
+                    <div class="error" v-if="!$v.house_hold_data.weight.required">Field is required</div>
+                  </div>
                 </b-form-group>
 
                 <!--CATTLE PCV-->
-                <b-form-group id="form-pcv-group-edit" label="PCV(Packed Cell Volume):" label-for="form-pcv-input">
-                  <b-form-input id="form-pcv-input" v-model="house_hold_data.pcv"
+                <b-form-group :class="{ 'form-group--error': $v.house_hold_data.pcv.$error }"
+                    id="form-pcv-group-edit" label="PCV(Packed Cell Volume):" label-for="form-pcv-input">
+                  <b-form-input id="form-pcv-input" v-model.trim="$v.house_hold_data.pcv.$model"
                                 placeholder="Enter PCV" required type="text"></b-form-input>
+                  <div v-if="$v.house_hold_data.pcv.$dirty">
+                    <div class="error" v-if="!$v.house_hold_data.pcv.required">Field is required</div>
+                  </div>
                 </b-form-group>
 
                 <!--CATTLE Diagnosis-->
-                <b-form-group id="form-diagnosis-group-edit" label="Diagnosis:" label-for="form-diagnosis-input">
-                  <b-form-input id="form-diagnosis-input" v-model="house_hold_data.diagnosis"
+                <b-form-group :class="{ 'form-group--error': $v.house_hold_data.diagnosis.$error }"
+                    id="form-diagnosis-group-edit" label="Diagnosis:" label-for="form-diagnosis-input">
+                  <b-form-input id="form-diagnosis-input" v-model.trim="$v.house_hold_data.diagnosis.$model"
                                 placeholder="Enter Diagnosis" required type="text"></b-form-input>
+                  <div v-if="$v.house_hold_data.diagnosis.$dirty">
+                    <div class="error" v-if="!$v.house_hold_data.diagnosis.required">Field is required</div>
+                  </div>
                 </b-form-group>
 
                 <!--CATTLE Treatment-->
-                <b-form-group id="form-treatment-group-edit" label="Treatment:" label-for="form-treatment-input">
-                  <b-form-input id="form-treatment-input" v-model="house_hold_data.treatment"
+                <b-form-group :class="{ 'form-group--error': $v.house_hold_data.treatment.$error }"
+                    id="form-treatment-group-edit" label="Treatment:" label-for="form-treatment-input">
+                  <b-form-input id="form-treatment-input" v-model.trim="$v.house_hold_data.treatment.$model"
                                 placeholder="Enter Treatment" required type="text"></b-form-input>
+                  <div v-if="$v.house_hold_data.treatment.$dirty">
+                    <div class="error" v-if="!$v.house_hold_data.treatment.required">Field is required</div>
+                  </div>
                 </b-form-group>
 
                 <!--CATTLE CC/ML-->
-                <b-form-group id="form-cc/ml-group-edit" label="Dosage:" label-for="form-cc/ml-input">
-                  <b-form-input id="form-cc/ml-input" v-model="house_hold_data.cc"
+                <b-form-group :class="{ 'form-group--error': $v.house_hold_data.cc.$error }"
+                    id="form-cc/ml-group-edit" label="Dosage:" label-for="form-cc/ml-input">
+                  <b-form-input id="form-cc/ml-input" v-model.trim="$v.house_hold_data.cc.$model"
                                 placeholder="Enter cc/ml" required type="number"></b-form-input>
+                  <div v-if="$v.house_hold_data.cc.$dirty">
+                    <div class="error" v-if="!$v.house_hold_data.cc.required">Field is required</div>
+                  </div>
                 </b-form-group>
 
                 <!--CATTLE Notes-->
-                <b-form-group id="form-notes-group-edit" label="Notes:" label-for="form-notes-input">
-                  <b-form-textarea id="form-notes-input" v-model="house_hold_data.notes"
+                <b-form-group :class="{ 'form-group--error': $v.house_hold_data.notes.$error }"
+                    id="form-notes-group-edit" label="Notes:" label-for="form-notes-input">
+                  <b-form-textarea id="form-notes-input" v-model.trim="$v.house_hold_data.notes.$model"
                                    placeholder="Enter Notes" required type="text"></b-form-textarea>
+                  <div v-if="$v.house_hold_data.notes.$dirty">
+                    <div class="error" v-if="!$v.house_hold_data.notes.required">Field is required</div>
+                  </div>
                 </b-form-group>
               </div>
             </vue-tiny-tabs>
@@ -386,7 +488,8 @@ import {
   getSelectedItemCode,
   handleError,
   isResearcher,
-  pageStartLoader, paginate,
+  pageStartLoader,
+  paginate,
   secureStoreGetAuthString,
   showFlashMessage
 } from "@/utils/util_functions";
@@ -397,6 +500,7 @@ import TopNav from "@/components/TopNav";
 import EventBus from '@/components/EventBus';
 import VueTinyTabs from 'vue-tiny-tabs';
 import FilterCard from "@/components/FilterCard";
+import {minValue, required} from "vuelidate/lib/validators";
 
 export default {
   name: "HouseHoldData",
@@ -406,7 +510,7 @@ export default {
       page_title: "HouseHoldData",
       house_hold_data: {
         farmer: '', cattle_id: '', cattle_name: '', cattle_color: '', cc: '', notes: '', date_collected: null,
-        cattle_sex: '', collar: '', pcv: '', diagnosis: '', treatment: '', study_block: '', weight:0
+        cattle_sex: '', collar: '', pcv: '', diagnosis: '', treatment: '', study_block: '', weight: 0
       },
 
       house_data: {}, font_scale,
@@ -415,7 +519,7 @@ export default {
       search: '', response: [],
 
       // filters
-      filters:[], houseDataList:[],
+      filters: [], houseDataList: [],
 
       // variable to check user status and role
       isAuth: null,
@@ -436,9 +540,18 @@ export default {
     };
   },
 
+  validations: {
+    house_hold_data: {
+      farmer: {required}, cattle_id: {required}, cattle_name: {required}, cattle_color: {required},
+      cc: {required}, notes: {required}, cattle_sex: {required}, collar: {required}, pcv: {required},
+      diagnosis: {required}, treatment: {required}, study_block: {required}, weight: {required, minValue: minValue(1)}
+    }
+  },
+
   mounted() {
     EventBus.$on('searchQuery', (payload) => {
-        this.search = payload; this.searchData();
+      this.search = payload;
+      this.searchData();
     })
 
     EventBus.$on('filters', (payload) => {
@@ -450,7 +563,7 @@ export default {
   },
 
   computed: {
-        /**
+    /**
      * return a list of dictionaries containing the filters required
      */
     allFilters: function () {
@@ -472,7 +585,7 @@ export default {
         },
       ]
     },
-    
+
     /**
      * function checks for any filters or searches applied to the data and returns filtered/searched list.
      * @returns {null|[]|*}
@@ -510,8 +623,17 @@ export default {
       return paginate(this.houseDataList)
     },
   },
+
   methods: {
     // Util Functions
+    onSubmit(evt) {
+      this.$v.$touch();
+      if (this.$v.$invalid) { evt.preventDefault();
+        this.$log.info('validations', this.$v.house_hold_data)
+      return;}
+      this.createHouseHoldData();
+    },
+
     clearForm() {
       this.house_hold_data.farmer = '';
       this.house_hold_data.cattle_id = '';
@@ -578,7 +700,7 @@ export default {
       this.size = size
     },
 
-    viewHouseData(house_data){
+    viewHouseData(house_data) {
       this.house_data = house_data
     },
 
@@ -607,7 +729,7 @@ export default {
     // search fn
     searchData() {
       return this.response.filter(hhd => {
-          return hhd.cattle_id.toLowerCase().includes(this.search.toLowerCase())
+        return hhd.cattle_id.toLowerCase().includes(this.search.toLowerCase())
       })
     },
 
@@ -649,7 +771,9 @@ export default {
           this.getHouseHoldData();
           showFlashMessage(this, 'success', response.data['message'], '');
         }, this.time)
-      }).catch((error) => { handleError(this, error, loader) });
+      }).catch((error) => {
+        handleError(this, error, loader)
+      });
       this.clearForm();
     },
 
@@ -676,7 +800,9 @@ export default {
           this.getHouseHoldData();
           showFlashMessage(this, 'success', response.data['message'], '');
         }, this.time)
-      }).catch((error) => { handleError(this, error, loader) });
+      }).catch((error) => {
+        handleError(this, error, loader)
+      });
       this.clearForm();
     },
 
@@ -694,11 +820,15 @@ export default {
           showFlashMessage(this, 'success', response.data['message'], '');
           this.getHouseHoldData();
         }, this.time)
-      }).catch((error) => { handleError(this, error, loader) });
+      }).catch((error) => {
+        handleError(this, error, loader)
+      });
     },
   },
 
-  created() { this.onLoadPage(); },
+  created() {
+    this.onLoadPage();
+  },
 
   components: {TopNav, VueTinyTabs, FilterCard}
 }
