@@ -8,13 +8,12 @@ from api.resources.base_resource import BaseResource
 from api.resources.decorators.user_role_decorators import is_theme_admin
 from api.resources.lab_resource import LaboratoryResource
 from api.utils import format_and_lower_str, non_empty_int, log_create, has_required_request_params, \
-    log_update, log_delete, log_duplicate, standard_non_empty_string, non_empty_string, log_304, get_query_params
+    log_update, log_delete, log_duplicate, standard_non_empty_string, log_304, get_query_params
 
 
 class FreezerResource(BaseResource):
     fields = {
         'number': fields.String,
-        'room': fields.String,
         'lab.name': fields.String,
         'lab.room': fields.String,
         'code': fields.String
@@ -28,7 +27,7 @@ class FreezerResource(BaseResource):
 
                 # todo: fall-back option since elasticsearch index doesn't support relationship indexing
                 if total == 0:
-                    freezers = Freezer.query.filter\
+                    freezers = Freezer.query.filter \
                         (Freezer.laboratory_id == LaboratoryResource.get_laboratory(query_string).id).all()
                 else:
                     freezers = query.all()
@@ -63,7 +62,6 @@ class FreezerResource(BaseResource):
             laboratory = args['laboratory']
 
         number = args['number']
-        room = args['room']
         code = args['code']
 
         if not Freezer.freezer_exists(code):
@@ -71,7 +69,6 @@ class FreezerResource(BaseResource):
                 freezer = Freezer(
                     laboratory_id=laboratory,
                     number=number,
-                    room=room,
                     code=code
                 )
 
@@ -105,16 +102,14 @@ class FreezerResource(BaseResource):
                 laboratory = args['laboratory']
 
             number = args['number']
-            room = args['room']
             code = args['code']
 
             if laboratory != freezer.laboratory_id or number != freezer.number or \
-                    room != freezer.room or code != freezer.code:
+                    code != freezer.code:
                 old_info = str(freezer)
                 try:
                     freezer.laboratory_id = laboratory
                     freezer.number = number
-                    freezer.room = room
                     freezer.code = code
                     BaseModel.db.session.commit()
                     log_update(old_info, freezer)
@@ -147,7 +142,6 @@ class FreezerResource(BaseResource):
         parser = reqparse.RequestParser()
         parser.add_argument('laboratory', required=True, type=non_empty_int)
         parser.add_argument('number', required=True, type=non_empty_int)
-        parser.add_argument('room', required=True, type=non_empty_string)
         parser.add_argument('code', required=True, type=standard_non_empty_string)
 
         args = parser.parse_args()
