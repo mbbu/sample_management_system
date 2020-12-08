@@ -2,13 +2,14 @@ from flask import current_app, request
 from flask_jwt_extended import jwt_required
 from flask_restful import fields, marshal, reqparse
 
+from api.models import Chamber, Rack, Tray
 from api.models.database import BaseModel
 from api.models.freezer import Freezer
 from api.resources.base_resource import BaseResource
 from api.resources.decorators.user_role_decorators import is_theme_admin
 from api.resources.lab_resource import LaboratoryResource
 from api.utils import format_and_lower_str, non_empty_int, log_create, has_required_request_params, \
-    log_update, log_delete, log_duplicate, standard_non_empty_string, log_304, get_query_params
+    log_update, log_delete, log_duplicate, standard_non_empty_string, log_304, get_query_params, fake
 
 
 class FreezerResource(BaseResource):
@@ -56,23 +57,38 @@ class FreezerResource(BaseResource):
     def post(self):
         args = FreezerResource.freezer_args()
         if type(args['laboratory']) is str:
-            lab = LaboratoryResource.get_laboratory(args['laboratory'])
-            laboratory = lab.id
+            lab = LaboratoryResource.get_laboratory(args['laboratory']).id
         else:
-            laboratory = args['laboratory']
+            lab = args['laboratory']
 
         number = args['number']
-        code = args['code']
+        code = fake.ean(length=8)
+        chambers = int(args['chambers'])
+        racks = int(args['racks'])
+        trays = int(args['trays'])
 
         if not Freezer.freezer_exists(code):
             try:
-                freezer = Freezer(
-                    laboratory_id=laboratory,
-                    number=number,
-                    code=code
-                )
+                freezer = Freezer(lab=lab, num=number, code=code)
+                BaseModel.db.session.add(freezer)  # add freezer to session
+                BaseModel.db.session.flush()  # flush session to make it available for reference even b4 commit
 
-                BaseModel.db.session.add(freezer)
+                # create other resources
+                number = 13
+                for _ in range(chambers):
+                    chamber = Chamber(freezer=freezer.id, _type="Default", code=fake.ean(length=8))
+                    BaseModel.db.session.add(chamber)
+                    BaseModel.db.session.flush()
+                    for _ in range(racks):
+                        rack = Rack(chamber=chamber.id, num=number, code=fake.ean(length=8))
+                        BaseModel.db.session.add(rack)
+                        BaseModel.db.session.flush()
+                        for _ in range(trays):
+                            tray = Tray(rack=rack.id, num=number, code=fake.ean(length=8))
+                            tray.number = number
+                            BaseModel.db.session.add(tray)
+                            BaseModel.db.session.flush()
+
                 BaseModel.db.session.commit()
                 log_create(freezer)
                 return BaseResource.send_json_message("Freezer Successfully Created", 201)
@@ -143,6 +159,9 @@ class FreezerResource(BaseResource):
         parser.add_argument('laboratory', required=True, type=non_empty_int)
         parser.add_argument('number', required=True, type=non_empty_int)
         parser.add_argument('code', required=True, type=standard_non_empty_string)
+        parser.add_argument('chambers', required=False, type=non_empty_int)
+        parser.add_argument('racks', required=False, type=non_empty_int)
+        parser.add_argument('trays', required=False, type=non_empty_int)
 
         args = parser.parse_args()
         return args
