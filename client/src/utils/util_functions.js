@@ -162,6 +162,22 @@ export function extractBoxData(data) {
     return resultObject;
 }
 
+export function extractLabData(data) {
+    let labList = [];
+    let fields = {text: '', value: ''};
+    let resultObject = {items: labList, fields: fields};
+
+    for (let item = 0; item < data.length; item++) {
+        labList.push({
+            'Code': data[item].code,
+            'Name': data[item].building,
+        });
+        fields.text = 'Name';
+        fields.value = 'Code';
+    }
+    return resultObject;
+}
+
 export function extractFreezerData(data) {
     let itemList = [];
     let fields = {text: '', value: ''};

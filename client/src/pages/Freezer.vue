@@ -29,7 +29,7 @@
           <tbody>
           <tr v-for="(freezer, index) in matchFiltersAndSearch.arr" :key="freezer.id">
             <td> {{ index + 1 }}</td>
-            <td> {{ freezer['lab.name'] }}</td>
+            <td> {{ freezer['lab.building'] }}</td>
             <td> {{ freezer.number }}</td>
             <td> {{ freezer.code }}</td>
 
@@ -40,7 +40,7 @@
                   :font-scale="`${font_scale}`" :title="`Update freezer ${ freezer.number }`"
                   class="border border-info rounded" icon="pencil"
                   variant="info"
-                  @mouseover="fillFormForUpdate(freezer.number, freezer.code, freezer['lab.name'])"
+                  @mouseover="fillFormForUpdate(freezer.number, freezer.code, freezer['lab.building'])"
               ></b-icon>
               &nbsp;
               <b-icon
@@ -88,7 +88,8 @@
 
             <!--NUMBER-->
             <b-form-group id="form-num-group"
-                          :class="{ 'form-group--error': $v.freezer.number.$error }" label="Num:" label-for="form-num-input">
+                          :class="{ 'form-group--error': $v.freezer.number.$error }" label="Num:"
+                          label-for="form-num-input">
               <b-form-input
                   id="form-num-input"
                   v-model.trim="$v.freezer.number.$model"
@@ -104,7 +105,8 @@
             </b-form-group>
 
             <b-form-group id="form-code-group"
-                          :class="{ 'form-group--error': $v.freezer.code.$error }" label="Code:" label-for="form-code-input">
+                          :class="{ 'form-group--error': $v.freezer.code.$error }" label="Code:"
+                          label-for="form-code-input">
               <b-form-input
                   id="form-code-input"
                   v-model.trim="$v.freezer.code.$model"
@@ -152,7 +154,8 @@
 
             <!--NUMBER-->
             <b-form-group id="form-num-group-edit"
-                          :class="{ 'form-group--error': $v.freezer.number.$error }" label="Num:" label-for="form-num-input">
+                          :class="{ 'form-group--error': $v.freezer.number.$error }" label="Num:"
+                          label-for="form-num-input">
               <b-form-input
                   id="form-num-input"
                   v-model.trim="$v.freezer.number.$model"
@@ -168,7 +171,8 @@
             </b-form-group>
 
             <b-form-group id="form-code-group-edit"
-                          :class="{ 'form-group--error': $v.freezer.code.$error }" label="Code:" label-for="form-code-input">
+                          :class="{ 'form-group--error': $v.freezer.code.$error }" label="Code:"
+                          label-for="form-code-input">
               <b-form-input
                   id="form-code-input"
                   v-model.trim="$v.freezer.code.$model"
@@ -209,7 +213,7 @@ import axios from 'axios';
 import {freezer_resource, lab_resource} from '@/utils/api_paths'
 import TopNav from "../components/TopNav";
 import {
-  extractApiData,
+  extractLabData,
   getItemDataList,
   getSelectedItem,
   handleError,
@@ -369,7 +373,7 @@ export default {
 
     onLoadPage() {
       getItemDataList(lab_resource).then(data => {
-        let labList = extractApiData(data);
+        let labList = extractLabData(data);
 
         // update local variables with data from API
         this.fields = labList['fields'];
@@ -489,7 +493,7 @@ export default {
     /* Methods associated with searching and filtering of data in the page */
     filterData(data) {
       let filterByLab = this.filters.length
-          ? data.filter(freezer => this.filters.some(filter => freezer['lab.name'].match(filter)))
+          ? data.filter(freezer => this.filters.some(filter => freezer['lab.building'].match(filter)))
           : null
 
       return {'lab': filterByLab}
@@ -500,7 +504,7 @@ export default {
         for (let count = 0; count <= this.response.length; count++) {
           let byCode = freezer.code.toString().toLowerCase().includes(this.search.toLowerCase())
           let byNumber = freezer.number.toString().toLowerCase().includes(this.search.toLowerCase())
-          let byLabName = freezer['lab.name'].toString().toLowerCase().includes(this.search.toLowerCase())
+          let byLabName = freezer['lab.building'].toString().toLowerCase().includes(this.search.toLowerCase())
 
           if (byNumber === true) {
             return byNumber
