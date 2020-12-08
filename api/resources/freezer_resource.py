@@ -14,7 +14,7 @@ from api.utils import format_and_lower_str, non_empty_int, log_create, has_requi
 class FreezerResource(BaseResource):
     fields = {
         'number': fields.String,
-        'lab.name': fields.String,
+        'lab.building': fields.String,
         'lab.room': fields.String,
         'code': fields.String
     }
