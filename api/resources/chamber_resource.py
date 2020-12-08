@@ -59,7 +59,7 @@ class ChamberResource(BaseResource):
 
         if not Chamber.chamber_exists(code):
             try:
-                chamber = Chamber(freezer_id=freezer, type=_type, code=code)
+                chamber = Chamber(freezer=freezer, _type=_type, code=code)
                 BaseModel.db.session.add(chamber)
                 BaseModel.db.session.commit()
                 log_create(chamber)
