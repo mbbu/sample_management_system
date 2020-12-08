@@ -23,5 +23,10 @@ class Chamber(BaseModel.db.Model, SearchableMixin):
             return True
         return False
 
+    def __init__(self, freezer, _type, code):
+        self.freezer_id = freezer
+        self.type = _type
+        self.code = code
+
     def __repr__(self):
         return '<< Chamber:  (type={0} || freezer={1} || code={2}) >>'.format(self.type, self.freezer_id, self.code)

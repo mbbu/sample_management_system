@@ -23,5 +23,10 @@ class Tray(BaseModel.db.Model, SearchableMixin):
             return True
         return False
 
+    def __init__(self, rack, num, code):
+        self.rack_id = rack
+        self.num = num
+        self.code = code
+
     def __repr__(self):
         return '<< Tray: (number={0} || rack={1} || code={2}) >>'.format(self.number, self.rack_id, self.code)

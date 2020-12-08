@@ -23,5 +23,10 @@ class Rack(BaseModel.db.Model, SearchableMixin):
             return True
         return False
 
+    def __init__(self, chamber, num, code):
+        self.chamber_id = chamber
+        self.number = num
+        self.code = code
+
     def __repr__(self):
         return '<< Rack: (number={0} || chamber={1} || code={2}) >>'.format(self.number, self.chamber_id, self.code)

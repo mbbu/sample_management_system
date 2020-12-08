@@ -23,6 +23,11 @@ class Freezer(BaseModel.db.Model, SearchableMixin):
             return True
         return False
 
+    def __init__(self, lab, num, code):
+        self.laboratory_id = lab
+        self.number = num
+        self.code = code
+
     def __repr__(self):
         return '<< Freezer: (number={0} || lab={1} || code={2}) >>' \
             .format(self.number, self.laboratory_id, self.code)
