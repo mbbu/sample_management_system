@@ -8,7 +8,7 @@ from api.resources.base_resource import BaseResource
 from api.resources.decorators.user_role_decorators import is_theme_admin
 from api.resources.rack_resource import RackResource
 from api.utils import format_and_lower_str, log_create, log_duplicate, log_update, log_delete, \
-    has_required_request_params, standard_non_empty_string, log_304, get_query_params
+    has_required_request_params, standard_non_empty_string, log_304, get_query_params, fake
 
 
 class TrayResource(BaseResource):
@@ -48,11 +48,11 @@ class TrayResource(BaseResource):
         args = TrayResource.tray_parser()
         rack = RackResource.get_rack(args['rack']).id
         number = int(args['number'])
-        code = args['code']
+        code = fake.ean(length=8)
 
         if not Tray.tray_exists(code):
             try:
-                tray = Tray(rack_id=rack, number=number, code=code)
+                tray = Tray(rack=rack, num=number, code=code)
                 BaseModel.db.session.add(tray)
                 BaseModel.db.session.commit()
                 log_create(tray)

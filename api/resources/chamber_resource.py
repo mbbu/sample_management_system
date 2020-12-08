@@ -8,7 +8,7 @@ from api.resources.base_resource import BaseResource
 from api.resources.decorators.user_role_decorators import is_theme_admin
 from api.resources.freezer_resource import FreezerResource
 from api.utils import format_and_lower_str, non_empty_string, log_create, log_duplicate, log_update, log_delete, \
-    has_required_request_params, non_empty_int, standard_non_empty_string, log_304, get_query_params
+    has_required_request_params, non_empty_int, standard_non_empty_string, log_304, get_query_params, fake
 
 
 class ChamberResource(BaseResource):
@@ -50,13 +50,12 @@ class ChamberResource(BaseResource):
     def post(self):
         args = ChamberResource.chamber_parser()
         if type(args['freezer']) is str:
-            freezer_db = FreezerResource.get_freezer(args['freezer'])
-            freezer = freezer_db.id
+            freezer = FreezerResource.get_freezer(args['freezer']).id
         else:
             freezer = args['freezer']
 
         _type = args['type']
-        code = args['code']
+        code = fake.ean(length=8)
 
         if not Chamber.chamber_exists(code):
             try:

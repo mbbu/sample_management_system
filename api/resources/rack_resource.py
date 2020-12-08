@@ -8,7 +8,7 @@ from api.resources.base_resource import BaseResource
 from api.resources.chamber_resource import ChamberResource
 from api.resources.decorators.user_role_decorators import is_theme_admin
 from api.utils import format_and_lower_str, log_create, log_duplicate, log_update, log_delete, \
-    has_required_request_params, standard_non_empty_string, log_304, non_empty_int, get_query_params
+    has_required_request_params, standard_non_empty_string, log_304, non_empty_int, get_query_params, fake
 
 
 class RackResource(BaseResource):
@@ -49,17 +49,16 @@ class RackResource(BaseResource):
     def post(self):
         args = RackResource.rack_parser()
         if type(args['chamber']) is str:
-            chamber_db = ChamberResource.get_chamber(args['chamber'])
-            chamber = chamber_db.id
+            chamber = ChamberResource.get_chamber(args['chamber']).id
         else:
             chamber = args['chamber']
 
         number = args['number']
-        code = args['code']
+        code = fake.ean(lenght=8)
 
         if not Rack.rack_exists(code):
             try:
-                rack = Rack(chamber_id=chamber, number=number, code=code)
+                rack = Rack(chamber=chamber, num=number, code=code)
                 BaseModel.db.session.add(rack)
                 BaseModel.db.session.commit()
                 log_create(rack)
