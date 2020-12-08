@@ -60,66 +60,90 @@
       </div>
 
       <div v-if="!isEditing">
-        <b-modal
-            id="modal-freezer"
-            cancel-variant="danger"
-            ok-title="Save"
-            title="Add Freezer"
-            @hidden="clearForm"
-            @ok="onSubmit"
-            @submit="showModal=false"
+        <b-modal id="modal-freezer" title="Add Freezer"
+            cancel-variant="danger" ok-title="Save"
+            @hidden="clearForm" @ok="onSubmit" @submit="showModal=false"
         >
           <form @submit.prevent="createFreezer">
-            <!--LABORATORY-->
-            <b-form-group id="form-lab-group" label="Lab:" label-for="form-lab-input">
-              <ejs-dropdownlist
-                  id='dropdownlist'
-                  v-model.trim="$v.freezer.laboratory.$model"
-                  :dataSource='labDataList'
-                  :fields="fields"
-                  placeholder='Select a lab'
-              ></ejs-dropdownlist>
-              <div v-if="$v.freezer.laboratory.$dirty">
-                <div v-if="!$v.freezer.laboratory.required" class="error">Field is
-                  required
-                </div>
-              </div>
-            </b-form-group>
+            <vue-tiny-tabs id="freezer-tabs" :anchor="false" :closable="false" :hideTitle="true" class="tinytabs tabs">
+              <!-- TAB 1 -->
+              <div id="freezer-info" class="section tab">
+                  <h4 class="title"><small><b>Freezer Info</b></small></h4>
+                  <!--LABORATORY-->
+                  <b-form-group id="form-lab-group" label="Lab:" label-for="form-lab-input">
+                    <ejs-dropdownlist id='dropdownlist'
+                        v-model.trim="$v.freezer.laboratory.$model"
+                        :dataSource='labDataList' :fields="fields"
+                        placeholder='Select a lab'></ejs-dropdownlist>
+                    <div v-if="$v.freezer.laboratory.$dirty">
+                      <div v-if="!$v.freezer.laboratory.required" class="error">Field is required</div>
+                    </div>
+                  </b-form-group>
 
-            <!--NUMBER-->
-            <b-form-group id="form-num-group"
-                          :class="{ 'form-group--error': $v.freezer.number.$error }" label="Num:"
-                          label-for="form-num-input">
-              <b-form-input
-                  id="form-num-input"
-                  v-model.trim="$v.freezer.number.$model"
-                  placeholder="Enter Freezer Number"
-                  required
-                  type="text">
-              </b-form-input>
-              <div v-if="$v.freezer.number.$dirty">
-                <div v-if="!$v.freezer.number.required" class="error">Field is
-                  required
-                </div>
-              </div>
-            </b-form-group>
+                  <!--NUMBER-->
+                  <b-form-group id="form-num-group" label="Number:"
+                                :class="{ 'form-group--error': $v.freezer.number.$error }" label-for="form-num-input">
+                    <b-form-input
+                        id="form-num-input" v-model.trim="$v.freezer.number.$model"
+                        placeholder="Enter Freezer Number" required type="text">
+                    </b-form-input>
+                    <div v-if="$v.freezer.number.$dirty">
+                      <div v-if="!$v.freezer.number.required" class="error">Field is required</div>
+                    </div>
+                  </b-form-group>
 
-            <b-form-group id="form-code-group"
-                          :class="{ 'form-group--error': $v.freezer.code.$error }" label="Code:"
-                          label-for="form-code-input">
-              <b-form-input
-                  id="form-code-input"
-                  v-model.trim="$v.freezer.code.$model"
-                  placeholder="Enter Code"
-                  required
-                  type="text">
-              </b-form-input>
-              <div v-if="$v.freezer.code.$dirty">
-                <div v-if="!$v.freezer.code.required" class="error">Field is
-                  required
-                </div>
+                <!--CODE-->
+                <b-form-group id="form-code-group" label="Code:"
+                              :class="{ 'form-group--error': $v.freezer.code.$error }" label-for="form-code-input">
+                  <b-form-input id="form-code-input"
+                      v-model.trim="$v.freezer.code.$model"
+                      placeholder="Enter Code" required type="text"></b-form-input>
+                  <div v-if="$v.freezer.code.$dirty">
+                    <div v-if="!$v.freezer.code.required" class="error">Field is required</div>
+                  </div>
+                </b-form-group>
               </div>
-            </b-form-group>
+
+              <!-- TAB 2 -->
+              <div id="freezer-details" class="section tab">
+                <h4 class="title"><small><b>Freezer Resources</b></small></h4>
+                <!--CHAMBERS-->
+                <b-form-group id="form-chambers-group" label="Chambers:" label-for="form-chambers-input"
+                              :class="{ 'form-group--error': $v.freezer.chambers.$error }">
+                  <b-form-input id="form-chambers-input"
+                      v-model.trim="$v.freezer.chambers.$model"
+                      placeholder="Enter number of chambers" required type="number" min=1></b-form-input>
+                  <div v-if="$v.freezer.chambers.$dirty">
+                    <div v-if="!$v.freezer.chambers.required" class="error">Field is required</div>
+                    <div v-if="!$v.freezer.chambers.min" class="error">Minimum value is 1</div>
+                  </div>
+                </b-form-group>
+
+                <!--RACKS-->
+                <b-form-group id="form-racks-group" label="Racks per Chamber:"
+                              :class="{ 'form-group--error': $v.freezer.racks.$error }" label-for="form-racks-input">
+                  <b-form-input id="form-racks-input"
+                      v-model.trim="$v.freezer.racks.$model"
+                      placeholder="Enter no. racks per chamber" required type="number" min=1></b-form-input>
+                  <div v-if="$v.freezer.racks.$dirty">
+                    <div v-if="!$v.freezer.racks.required" class="error">Field is required</div>
+                    <div v-if="!$v.freezer.racks.min" class="error">Minimum value is 1</div>
+                  </div>
+                </b-form-group>
+
+                <!--TRAYS-->
+                <b-form-group id="form-trays-group" label="Trays per Rack:"
+                              :class="{ 'form-group--error': $v.freezer.trays.$error }" label-for="form-trays-input">
+                  <b-form-input id="form-trays-input"
+                      v-model.trim="$v.freezer.trays.$model"
+                      placeholder="Enter no. trays per rack" required type="number"></b-form-input>
+                  <div v-if="$v.freezer.trays.$dirty">
+                    <div v-if="!$v.freezer.trays.required" class="error">Field is required</div>
+                    <div v-if="!$v.freezer.trays.min" class="error">Minimum value is 1</div>
+                  </div>
+                </b-form-group>
+              </div>
+            </vue-tiny-tabs>
           </form>
         </b-modal>
       </div>
@@ -194,15 +218,8 @@
         <span>Add Freezer</span> <i class="fas fa-plus-circle menu_icon"></i>
       </b-button>
       <div style="margin: auto;">
-        <loading-progress
-            :hide-background="hideBackground"
-            :indeterminate="indeterminate"
-            :progress="progressPath"
-            :size="size"
-            fillDuration="2"
-            rotate
-            rotationDuration="1"
-        />
+        <loading-progress :hide-background="hideBackground" :indeterminate="indeterminate"
+            :progress="progressPath" :size="size" fillDuration="2" rotate rotationDuration="1"/>
       </div>
     </div>
   </div>
@@ -213,25 +230,20 @@ import axios from 'axios';
 import {freezer_resource, lab_resource} from '@/utils/api_paths'
 import TopNav from "../components/TopNav";
 import {
-  extractLabData,
-  getItemDataList,
-  getSelectedItem,
-  handleError,
-  isThemeAdmin,
-  pageStartLoader,
-  paginate,
-  secureStoreGetAuthString,
-  selectItemForUpdate,
-  showFlashMessage
+  extractLabData, getItemDataList, getSelectedItem,
+  handleError, isThemeAdmin, pageStartLoader, paginate,
+  secureStoreGetAuthString, selectItemForUpdate, showFlashMessage
 } from "@/utils/util_functions";
 import {font_scale} from '@/utils/constants';
 import EventBus from '@/components/EventBus';
 import FilterCard from "@/components/FilterCard";
-import {required} from "vuelidate/lib/validators";
+import VueTinyTabs from 'vue-tiny-tabs';
+import {minValue, required} from "vuelidate/lib/validators";
 
 export default {
   name: 'Freezer',
-  components: {TopNav, FilterCard},
+
+  components: {TopNav, FilterCard, VueTinyTabs},
 
   data() {
     return {
@@ -245,6 +257,9 @@ export default {
         code: '',
         number: '',
         laboratory: null,
+
+        //additional fields for data auto-generation
+        chambers: 0, racks: 0, trays: 0
       },
 
       font_scale,
@@ -256,18 +271,13 @@ export default {
       time: 2000,
 
       // progressPath
-      indeterminate: true,
-      hideBackground: true,
-      progressPath: 5,
-      size: 180,
+      indeterminate: true, hideBackground: true, progressPath: 5, size: 180,
 
       search: '',
       fields: {text: '', value: ''},
 
       // values for data modification
-      old_code: null,
-      showModal: true,
-      isEditing: false,
+      old_code: null, showModal: true, isEditing: false,
 
       // data for pagination
       current: 1,
@@ -276,9 +286,8 @@ export default {
 
   validations: {
     freezer: {
-      code: {required},
-      number: {required},
-      laboratory: {required},
+      code: {required}, number: {required}, laboratory: {required},
+      chambers: {required, min: minValue(1)}, racks: {required, min: minValue(1)}, trays: {required, min: minValue(1)},
     }
   },
 
@@ -355,11 +364,9 @@ export default {
     },
     // Util Functions
     clearForm() {
-      this.freezer.laboratory = null;
-      this.freezer.number = null;
-      this.freezer.code = null;
-      this.isEditing = false;
-      this.$v.$reset();
+      this.freezer.laboratory = null; this.freezer.number = null;this.freezer.code = null;
+      this.freezer.chambers = 0;this.freezer.racks = 0;this.freezer.trays = 0;
+      this.isEditing = false; this.$v.$reset();
     },
 
     fillFormForUpdate(number, code, laboratory) {
@@ -419,6 +426,9 @@ export default {
         laboratory: this.freezer.laboratory,
         number: this.freezer.number,
         code: this.freezer.code,
+        chambers: this.freezer.chambers,
+        racks: this.freezer.racks,
+        trays: this.freezer.trays,
       }, {
         headers:
             {
