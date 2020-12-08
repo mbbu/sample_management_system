@@ -21,7 +21,6 @@
           <tr>
             <th class="table-header-style" scope="col"> Id</th>
             <th class="table-header-style" scope="col"> Lab Located</th>
-            <th class="table-header-style" scope="col"> Room</th>
             <th class="table-header-style" scope="col"> Freezer Number</th>
             <th class="table-header-style" scope="col"> Code</th>
             <th v-if="isAuth" class="table-header-style" scope="col"> Actions</th>
@@ -31,7 +30,6 @@
           <tr v-for="(freezer, index) in matchFiltersAndSearch.arr" :key="freezer.id">
             <td> {{ index + 1 }}</td>
             <td> {{ freezer['lab.name'] }}</td>
-            <td> {{ freezer.room }}</td>
             <td> {{ freezer.number }}</td>
             <td> {{ freezer.code }}</td>
 
@@ -42,7 +40,7 @@
                   :font-scale="`${font_scale}`" :title="`Update freezer ${ freezer.number }`"
                   class="border border-info rounded" icon="pencil"
                   variant="info"
-                  @mouseover="fillFormForUpdate(freezer.number, freezer.code, freezer.room, freezer['lab.name'])"
+                  @mouseover="fillFormForUpdate(freezer.number, freezer.code, freezer['lab.name'])"
               ></b-icon>
               &nbsp;
               <b-icon
@@ -83,23 +81,6 @@
               ></ejs-dropdownlist>
               <div v-if="$v.freezer.laboratory.$dirty">
                 <div v-if="!$v.freezer.laboratory.required" class="error">Field is
-                  required
-                </div>
-              </div>
-            </b-form-group>
-
-            <!-- ROOM -->
-            <b-form-group id="form-room-group"
-                          :class="{ 'form-group--error': $v.freezer.room.$error }" label="Room:" label-for="form-room-input">
-              <b-form-input
-                  id="form-room-input"
-                  v-model.trim="$v.freezer.room.$model"
-                  placeholder="Enter Room Number"
-                  required
-                  type="text"
-              ></b-form-input>
-              <div v-if="$v.freezer.room.$dirty">
-                <div v-if="!$v.freezer.room.required" class="error">Field is
                   required
                 </div>
               </div>
@@ -164,23 +145,6 @@
               ></ejs-dropdownlist>
               <div v-if="$v.freezer.laboratory.$dirty">
                 <div v-if="!$v.freezer.laboratory.required" class="error">Field is
-                  required
-                </div>
-              </div>
-            </b-form-group>
-
-            <!-- ROOM -->
-            <b-form-group id="form-room-group-edit"
-                          :class="{ 'form-group--error': $v.freezer.room.$error }" label="Room:" label-for="form-room-input">
-              <b-form-input
-                  id="form-room-input"
-                  v-model.trim="$v.freezer.room.$model"
-                  placeholder="Enter Room Number"
-                  required
-                  type="text"
-              ></b-form-input>
-              <div v-if="$v.freezer.room.$dirty">
-                <div v-if="!$v.freezer.room.required" class="error">Field is
                   required
                 </div>
               </div>
@@ -275,7 +239,6 @@ export default {
 
       freezer: {
         code: '',
-        room: '',
         number: '',
         laboratory: null,
       },
@@ -309,7 +272,6 @@ export default {
 
   validations: {
     freezer: {
-      room: {required},
       code: {required},
       number: {required},
       laboratory: {required},
@@ -345,11 +307,6 @@ export default {
               .map(({['lab.name']: lab}) => lab)
               .filter((value, index, self) => self.indexOf(value) === index),
         },
-        {
-          'By Room': this.response
-              .map(({room}) => room)
-              .filter((value, index, self) => self.indexOf(value) === index)
-        },
       ]
     },
 
@@ -364,23 +321,13 @@ export default {
       let filteredData = this.filterData(this.freezerList)
 
       let filterByLab = filteredData.lab
-      let filterByRoom = filteredData.room
-
 
       if (searchList !== null) {
         return paginate(searchList)
-      } else if (this.filters.length > 1) {
-        // Possibly, multiple filters have been applied. Return the array with the least elements
-        return filterByLab.length < filterByRoom.length ?
-            paginate(filterByLab) : paginate(filterByRoom)
       } else if (filterByLab !== null && filterByLab.length > 0) {
         this.freezerList = filterByLab // eslint-disable-line
         this.filterData(filterByLab)
         return paginate(filterByLab)
-      } else if (filterByRoom !== null && filterByRoom.length > 0) {
-        this.freezerList = filterByRoom // eslint-disable-line
-        this.filterData(filterByRoom)
-        return paginate(filterByRoom)
       }
       return paginate(this.freezerList)
     },
@@ -407,16 +354,14 @@ export default {
       this.freezer.laboratory = null;
       this.freezer.number = null;
       this.freezer.code = null;
-      this.freezer.room = null;
       this.isEditing = false;
       this.$v.$reset();
     },
 
-    fillFormForUpdate(number, code, room, laboratory) {
+    fillFormForUpdate(number, code, laboratory) {
       this.freezer.laboratory = laboratory;
       this.freezer.number = number;
       this.freezer.code = code;
-      this.freezer.room = room;
       this.old_code = code;
       this.isEditing = true;
       this.showModal = true;
@@ -470,7 +415,6 @@ export default {
         laboratory: this.freezer.laboratory,
         number: this.freezer.number,
         code: this.freezer.code,
-        room: this.freezer.room,
       }, {
         headers:
             {
@@ -500,7 +444,6 @@ export default {
           laboratory: this.freezer.laboratory,
           number: this.freezer.number,
           code: this.freezer.code,
-          room: this.freezer.room,
         }, {
           headers:
               {
@@ -545,29 +488,22 @@ export default {
 
     /* Methods associated with searching and filtering of data in the page */
     filterData(data) {
-      let filterByRoom = this.filters.length
-          ? data.filter(freezer => this.filters.some(filter => freezer.room.match(filter)))
-          : null
-
       let filterByLab = this.filters.length
           ? data.filter(freezer => this.filters.some(filter => freezer['lab.name'].match(filter)))
           : null
 
-      return {'lab': filterByLab, 'room': filterByRoom}
+      return {'lab': filterByLab}
     },
 
     searchData() {
       return this.response.filter(freezer => {
         for (let count = 0; count <= this.response.length; count++) {
-          let byRoom = freezer.room.toString().toLowerCase().includes(this.search.toLowerCase())
           let byCode = freezer.code.toString().toLowerCase().includes(this.search.toLowerCase())
           let byNumber = freezer.number.toString().toLowerCase().includes(this.search.toLowerCase())
           let byLabName = freezer['lab.name'].toString().toLowerCase().includes(this.search.toLowerCase())
 
           if (byNumber === true) {
             return byNumber
-          } else if (byRoom) {
-            return byRoom
           } else if (byCode) {
             return byCode
           } else if (byLabName) {
