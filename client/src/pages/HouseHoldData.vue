@@ -246,6 +246,7 @@
                                 min=1 placeholder="Enter Weight" required type="number"></b-form-input>
                   <div v-if="$v.house_hold_data.weight.$dirty">
                     <div class="error" v-if="!$v.house_hold_data.weight.required">Field is required</div>
+                    <div class="error" v-if="!$v.house_hold_data.weight.minValue">Minimum value is 1</div>
                   </div>
                 </b-form-group>
 
@@ -409,6 +410,7 @@
                                 min=1 placeholder="Enter Weight" required type="number"></b-form-input>
                   <div v-if="$v.house_hold_data.weight.$dirty">
                     <div class="error" v-if="!$v.house_hold_data.weight.required">Field is required</div>
+                    <div class="error" v-if="!$v.house_hold_data.weight.minValue">Minimum value is 1</div>
                   </div>
                 </b-form-group>
 
@@ -612,11 +614,11 @@ export default {
         this.filterData(filterBySite)
         return paginate(filterBySite)
       } else if (filterByArea !== null && filterByArea.length > 0) {
-        this.freezerList = filterByArea // eslint-disable-line
+        this.houseDataList = filterByArea // eslint-disable-line
         this.filterData(filterByArea)
         return paginate(filterByArea)
       } else if (filterByDate !== null && filterByDate.length > 0) {
-        this.freezerList = filterByDate // eslint-disable-line
+        this.houseDataList = filterByDate // eslint-disable-line
         this.filterData(filterByDate)
         return paginate(filterByDate)
       }
