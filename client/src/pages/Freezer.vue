@@ -20,7 +20,8 @@
           <thead>
           <tr>
             <th class="table-header-style" scope="col"> Id</th>
-            <th class="table-header-style" scope="col"> Lab Located</th>
+            <th class="table-header-style" scope="col"> Building</th>
+            <th class="table-header-style" scope="col"> Lab Room</th>
             <th class="table-header-style" scope="col"> Freezer Number</th>
             <th class="table-header-style" scope="col"> Code</th>
             <th v-if="isAuth" class="table-header-style" scope="col"> Actions</th>
@@ -30,6 +31,7 @@
           <tr v-for="(freezer, index) in matchFiltersAndSearch.arr" :key="freezer.id">
             <td> {{ index + 1 }}</td>
             <td> {{ freezer['lab.building'] }}</td>
+            <td> {{ freezer['lab.room'] }}</td>
             <td> {{ freezer.number }}</td>
             <td> {{ freezer.code }}</td>
 
@@ -317,7 +319,13 @@ export default {
       return [
         {
           'By Lab': this.response
-              .map(({['lab.name']: lab}) => lab)
+              .map(({['lab.building']: lab}) => lab)
+              .filter((value, index, self) => self.indexOf(value) === index),
+        },
+
+        {
+          'By Room': this.response
+              .map(({['lab.room']: lab}) => lab)
               .filter((value, index, self) => self.indexOf(value) === index),
         },
       ]
@@ -334,6 +342,7 @@ export default {
       let filteredData = this.filterData(this.freezerList)
 
       let filterByLab = filteredData.lab
+      let filterByLabRoom = filteredData.room
 
       if (searchList !== null) {
         return paginate(searchList)
@@ -341,6 +350,10 @@ export default {
         this.freezerList = filterByLab // eslint-disable-line
         this.filterData(filterByLab)
         return paginate(filterByLab)
+      } else if (filterByLabRoom !== null && filterByLabRoom.length > 0) {
+        this.freezerList = filterByLabRoom // eslint-disable-line
+        this.filterData(filterByLabRoom)
+        return paginate(filterByLabRoom)
       }
       return paginate(this.freezerList)
     },
@@ -506,7 +519,12 @@ export default {
           ? data.filter(freezer => this.filters.some(filter => freezer['lab.building'].match(filter)))
           : null
 
-      return {'lab': filterByLab}
+
+      let filterByLabRoom = this.filters.length
+          ? data.filter(freezer => this.filters.some(filter => freezer['lab.room'].match(filter)))
+          : null
+
+      return {'lab': filterByLab, 'room': filterByLabRoom}
     },
 
     searchData() {
