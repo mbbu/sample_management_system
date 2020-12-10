@@ -37,6 +37,14 @@
 
             <td v-if="isAuth">
               <b-icon
+                  v-b-modal.modal-freezer-view
+                  v-b-tooltip.hover
+                  :font-scale="`${font_scale}`" :title="`View freezer ${ freezer.number }`"
+                  class="border border-info rounded" icon="eye" variant="info"
+                  @click="setSelectedFreezer(freezer.code)"
+              ></b-icon>
+              &nbsp;
+              <b-icon
                   v-b-modal.modal-freezer-edit
                   v-b-tooltip.hover
                   :font-scale="`${font_scale}`" :title="`Update freezer ${ freezer.number }`"
@@ -61,6 +69,7 @@
         <br>
       </div>
 
+      <freezer-view></freezer-view>
       <div v-if="!isEditing">
         <b-modal id="modal-freezer" title="Add Freezer"
             cancel-variant="danger" ok-title="Save"
@@ -241,11 +250,12 @@ import EventBus from '@/components/EventBus';
 import FilterCard from "@/components/FilterCard";
 import VueTinyTabs from 'vue-tiny-tabs';
 import {minValue, required} from "vuelidate/lib/validators";
+import FreezerView from "@/forms/FreezerView";
 
 export default {
   name: 'Freezer',
 
-  components: {TopNav, FilterCard, VueTinyTabs},
+  components: {FreezerView, TopNav, FilterCard, VueTinyTabs},
 
   data() {
     return {
@@ -365,6 +375,8 @@ export default {
     pageInfo(info) {
       EventBus.$emit('page-info', {'pgInfo': info, 'pgData': this.freezerList})
     },
+
+    setSelectedFreezer(code){ EventBus.$emit('freezerSet', code) },
 
     onSubmit(evt) {
       this.$v.$touch();
@@ -548,3 +560,10 @@ export default {
   },
 };
 </script>
+<style>
+@media screen and (min-width: 676px) {
+    .modal-dialog {
+      max-width: 60% !important; /* New width for default modal */
+    }
+}
+</style>
