@@ -92,9 +92,7 @@ export default {
     onLoadPage(){
       getItemDataList(freezer_resource, {q: this.freezerCode}).then(data => {
         this.chamberData = []
-        this.$log.info('chamber data received',data)
         let chamberList = extractChamberData(data);
-        this.$log.info('chamber data extracted',chamberList)
 
         // update local variables with data from API
         this.chamberFields = chamberList['fields'];
@@ -104,7 +102,6 @@ export default {
             'Name': chamberList.items[i].Name,
           });
         }
-        this.$log.info('Chamber data', this.chamberData)
       })
     },
 
