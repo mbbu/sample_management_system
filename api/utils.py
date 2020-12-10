@@ -4,6 +4,7 @@ from urllib.parse import urlparse, parse_qs
 from faker import Faker
 from flask import current_app, request
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jti, get_jwt_identity
+from flask_restful import marshal, fields
 from itsdangerous import URLSafeTimedSerializer
 from mixer.backend.flask import Mixer
 
@@ -240,3 +241,13 @@ def get_query_params():
     query = parse_qs(parsed_url.query)
 
     return query.get('q')
+
+
+def get_chambers(f):
+    field = {
+        'type': fields.String,
+        'freezer.number': fields.String,
+        'code': fields.String
+    }
+    chambers = BaseModel.db.session.query(Chamber).filter_by(freezer_id=f).all()
+    return marshal(chambers, field)
