@@ -44,15 +44,15 @@
               <ejs-dropdownlist
                   id='box-dropdownlist' ref='box'
                   :dataSource='boxData' :enabled='boxEnabled' :fields='boxFields'
-                  placeholder='Select a box' @change="fillFormFieldsDependentOnBox"
+                  placeholder='Select a box' @change="getSlotsOfBox"
               ></ejs-dropdownlist>
             </b-form-group>
           </div>
       </div>
         <div class="justify-content-center">
-<!--          <div class="col justify-content-center">-->
+          <div v-if="boxCode" class="col justify-content-center">
             <rectangle></rectangle>
-<!--          </div>-->
+          </div>
         </div>
       </b-modal>
     </div>
@@ -63,7 +63,13 @@
 import Rectangle from "@/components/Rectangle";
 import {extractBoxData, extractChamberData, extractRackData, extractTrayData,
         getItemDataList, getSelectedItemCode} from "@/utils/util_functions";
-import {chamber_resource, freezer_resource, rack_resource, tray_resource} from "@/utils/api_paths";
+import {
+  box_resource,
+  chamber_resource,
+  freezer_resource,
+  rack_resource,
+  tray_resource
+} from "@/utils/api_paths";
 import EventBus from "@/components/EventBus";
 export default {
   name: "FreezerView",
@@ -72,7 +78,7 @@ export default {
 
   data() {
     return{
-      freezerCode: '', chamberCode: '', rackCode: '', trayCode: '',
+      freezerCode: '', chamberCode: '', rackCode: '', trayCode: '', boxCode: '',
       chamberData: [], chamberFields: {text: '', value: ''}, chamberEnabled: true,
       rackData: [], rackFields: {text: '', value: ''}, rackEnabled: false,
       trayData: [], trayFields: {text: '', value: ''}, trayEnabled: false,
@@ -106,7 +112,7 @@ export default {
     },
 
     resetFields(){
-      this.freezerCode= ''; this.chamberCode= ''; this.rackCode= ''; this.trayCode = '';
+      this.freezerCode= ''; this.chamberCode= ''; this.rackCode= ''; this.trayCode = ''; this.boxCode = '';
       this.chamberData= []; this.chamberFields= {text:'', value:''}; this.chamberEnabled= true;
       this.rackData= []; this.rackFields= {text:'', value:''}; this.rackEnabled= false;
       this.trayData= []; this.trayFields= {text:'', value:''}; this.trayEnabled= false;
@@ -173,7 +179,14 @@ export default {
       })
     },
 
-    fillFormFieldsDependentOnBox(){},
+    getSlotsOfBox(){
+      this.boxCode = getSelectedItemCode('box-dropdownlist', this.boxData)
+
+      // get trays of the selected rack
+      getItemDataList(box_resource, {q: this.boxCode}).then(data => {
+        EventBus.$emit('slots-fetched', data)
+      })
+    },
   },
 }
 </script>
