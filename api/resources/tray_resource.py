@@ -8,7 +8,7 @@ from api.resources.base_resource import BaseResource
 from api.resources.decorators.user_role_decorators import is_theme_admin
 from api.resources.rack_resource import RackResource
 from api.utils import format_and_lower_str, log_create, log_duplicate, log_update, log_delete, \
-    has_required_request_params, standard_non_empty_string, log_304, get_query_params, fake
+    has_required_request_params, standard_non_empty_string, log_304, get_query_params, fake, get_boxes
 
 
 class TrayResource(BaseResource):
@@ -23,7 +23,15 @@ class TrayResource(BaseResource):
         if query_strings is not None:
             for query_string in query_strings:
                 query, total = Tray.search(query_string, 1, 15)
-                trays = query.all()
+
+                # query tray to check for boxes
+                box = TrayResource.get_tray(query_string).id
+
+                if box is not None:
+                    data = get_boxes(box)
+                    return BaseResource.send_json_message(data, 200)
+                else:
+                    trays = query.all()
 
                 data = marshal(trays, self.fields)
                 return BaseResource.send_json_message(data, 200)
