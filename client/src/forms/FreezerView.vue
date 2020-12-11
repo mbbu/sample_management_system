@@ -61,7 +61,7 @@
 
 <script>
 import Rectangle from "@/components/Rectangle";
-import {extractChamberData, extractRackData,
+import {extractChamberData, extractRackData, extractTrayData,
   getItemDataList, getSelectedItemCode}
   from "@/utils/util_functions";
 import {chamber_resource, freezer_resource, rack_resource} from "@/utils/api_paths";
@@ -133,6 +133,28 @@ export default {
         this.rackEnabled = true
       })
     },
+
+
+    getTraysInRack(){
+      this.rackCode = getSelectedItemCode('rack-dropdownlist', this.rackData)
+
+      // get trays of the selected rack
+      getItemDataList(rack_resource, {q: this.rackCode}).then(data => {
+        this.trayData = []
+        let trayList = extractTrayData(data);
+
+        // update local variables with data from API
+        this.trayFields = trayList['fields'];
+        for (let i = 0; i < trayList.items.length; i++) {
+          this.trayData.push({
+            'Code': trayList.items[i].Code,
+            'Name': trayList.items[i].Name,
+          });
+        }
+        this.trayEnabled = true
+      })
+    },
+
     fillFormFieldsDependentOnTray(){},
     fillFormFieldsDependentOnBox(){},
   },
