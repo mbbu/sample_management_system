@@ -280,3 +280,14 @@ def get_boxes(b):
     }
     boxes = BaseModel.db.session.query(Box).filter_by(tray_id=b).all()
     return marshal(boxes, field)
+
+
+def get_slots(s):
+    field = {
+        'position': fields.String,
+        'code': fields.String,
+        'available': fields.Boolean,
+    }
+
+    slots = BaseModel.db.session.query(Slot).filter_by(box_id=s).all()
+    return marshal(slots, field)
