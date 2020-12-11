@@ -20,7 +20,7 @@
               <ejs-dropdownlist
                   id='rack-dropdownlist' ref='rack'
                   :dataSource='rackData' :enabled='rackEnabled' :fields='rackFields'
-                  placeholder='Select a rack' @change="fillFormFieldsDependentOnRack"
+                  placeholder='Select a rack' @change="getTraysInRack"
               ></ejs-dropdownlist>
             </b-form-group>
           </div>
@@ -64,7 +64,7 @@ import Rectangle from "@/components/Rectangle";
 import {extractChamberData, extractRackData,
   getItemDataList, getSelectedItemCode}
   from "@/utils/util_functions";
-import {chamber_resource, freezer_resource} from "@/utils/api_paths";
+import {chamber_resource, freezer_resource, rack_resource} from "@/utils/api_paths";
 import EventBus from "@/components/EventBus";
 export default {
   name: "FreezerView",
@@ -73,7 +73,7 @@ export default {
 
   data() {
     return{
-      freezerCode: '', chamberCode: '',
+      freezerCode: '', chamberCode: '', rackCode: '',
       chamberData: [], chamberFields: {text: '', value: ''}, chamberEnabled: true,
       rackData: [], rackFields: {text: '', value: ''}, rackEnabled: false,
       trayData: [], trayFields: {text: '', value: ''}, trayEnabled: false,
@@ -92,7 +92,7 @@ export default {
     onLoadPage(){
       // get freezer chamber
       getItemDataList(freezer_resource, {q: this.freezerCode}).then(data => {
-        this.chamberData = []
+        this.resetFields()
         let chamberList = extractChamberData(data);
 
         // update local variables with data from API
@@ -106,6 +106,14 @@ export default {
       })
     },
 
+    resetFields(){
+      this.freezerCode= ''; this.chamberCode= ''; this.rackCode= '';
+      this.chamberData= []; this.chamberFields= {text:'', value:''}; this.chamberEnabled= true;
+      this.rackData= []; this.rackFields= {text:'', value:''}; this.rackEnabled= false;
+      this.trayData= []; this.trayFields= {text:'', value:''}; this.trayEnabled= false;
+      this.boxData= []; this.boxFields= {text:'', value:''}; this.boxEnabled= false
+    },
+    
     getChamberRacks(){
       this.chamberCode = getSelectedItemCode('chamber-dropdownlist', this.chamberData)
 
@@ -125,7 +133,6 @@ export default {
         this.rackEnabled = true
       })
     },
-    fillFormFieldsDependentOnRack(){},
     fillFormFieldsDependentOnTray(){},
     fillFormFieldsDependentOnBox(){},
   },
