@@ -251,3 +251,13 @@ def get_chambers(f):
     }
     chambers = BaseModel.db.session.query(Chamber).filter_by(freezer_id=f).all()
     return marshal(chambers, field)
+
+
+def get_racks(c):
+    field = {
+        'chamber.type': fields.String,
+        'number': fields.String,
+        'code': fields.String
+    }
+    racks = BaseModel.db.session.query(Rack).filter_by(chamber_id=c).all()
+    return marshal(racks, field)
