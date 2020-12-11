@@ -284,7 +284,7 @@ def get_boxes(b):
 
 def get_slots(s):
     field = {
-        'position': fields.String,
+        'position': fields.Raw,
         'code': fields.String,
         'available': fields.Boolean,
     }
