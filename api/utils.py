@@ -271,3 +271,12 @@ def get_trays(r):
     }
     trays = BaseModel.db.session.query(Tray).filter_by(rack_id=r).all()
     return marshal(trays, field)
+
+
+def get_boxes(b):
+    field = {
+        'label': fields.String,
+        'code': fields.String,
+    }
+    boxes = BaseModel.db.session.query(Box).filter_by(tray_id=b).all()
+    return marshal(boxes, field)
