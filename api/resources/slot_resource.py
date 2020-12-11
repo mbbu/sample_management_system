@@ -55,7 +55,7 @@ def create_slots(box, row, col):
 
             if not Slot.slot_exists(code):
                 try:
-                    slot = Slot(box_id=box, code=code, position=pos)
+                    slot = Slot(box=box, code=code, pos=pos)
 
                     BaseModel.db.session.add(slot)
                     log_create(slot)

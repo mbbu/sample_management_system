@@ -22,6 +22,11 @@ class Slot(BaseModel.db.Model, SearchableMixin):
         "order_by": id
     }
 
+    def __init__(self, box, code, pos):
+        self.box_id = box
+        self.code = code
+        self.pos = pos
+
     def __repr__(self):
         return '<< Slot: (box={0} || pos={1} || available={2}) >>'.format(self.box, self.position, self.available)
 
