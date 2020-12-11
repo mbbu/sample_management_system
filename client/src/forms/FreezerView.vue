@@ -71,6 +71,7 @@ import {
   tray_resource
 } from "@/utils/api_paths";
 import EventBus from "@/components/EventBus";
+
 export default {
   name: "FreezerView",
 
@@ -190,7 +191,3 @@ export default {
   },
 }
 </script>
-
-<style scoped>
-
-</style>
