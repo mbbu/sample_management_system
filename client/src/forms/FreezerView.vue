@@ -33,7 +33,7 @@
               <ejs-dropdownlist
                   id='tray-dropdownlist' ref='tray'
                   :dataSource='trayData' :enabled='trayEnabled' :fields='trayFields'
-                  placeholder='Select a tray' @change="fillFormFieldsDependentOnTray"
+                  placeholder='Select a tray' @change="getBoxesInTray"
               ></ejs-dropdownlist>
             </b-form-group>
           </div>
@@ -61,10 +61,9 @@
 
 <script>
 import Rectangle from "@/components/Rectangle";
-import {extractChamberData, extractRackData, extractTrayData,
-  getItemDataList, getSelectedItemCode}
-  from "@/utils/util_functions";
-import {chamber_resource, freezer_resource, rack_resource} from "@/utils/api_paths";
+import {extractBoxData, extractChamberData, extractRackData, extractTrayData,
+        getItemDataList, getSelectedItemCode} from "@/utils/util_functions";
+import {chamber_resource, freezer_resource, rack_resource, tray_resource} from "@/utils/api_paths";
 import EventBus from "@/components/EventBus";
 export default {
   name: "FreezerView",
@@ -73,7 +72,7 @@ export default {
 
   data() {
     return{
-      freezerCode: '', chamberCode: '', rackCode: '',
+      freezerCode: '', chamberCode: '', rackCode: '', trayCode: '',
       chamberData: [], chamberFields: {text: '', value: ''}, chamberEnabled: true,
       rackData: [], rackFields: {text: '', value: ''}, rackEnabled: false,
       trayData: [], trayFields: {text: '', value: ''}, trayEnabled: false,
@@ -107,7 +106,7 @@ export default {
     },
 
     resetFields(){
-      this.freezerCode= ''; this.chamberCode= ''; this.rackCode= '';
+      this.freezerCode= ''; this.chamberCode= ''; this.rackCode= ''; this.trayCode = '';
       this.chamberData= []; this.chamberFields= {text:'', value:''}; this.chamberEnabled= true;
       this.rackData= []; this.rackFields= {text:'', value:''}; this.rackEnabled= false;
       this.trayData= []; this.trayFields= {text:'', value:''}; this.trayEnabled= false;
@@ -134,7 +133,6 @@ export default {
       })
     },
 
-
     getTraysInRack(){
       this.rackCode = getSelectedItemCode('rack-dropdownlist', this.rackData)
 
@@ -155,7 +153,26 @@ export default {
       })
     },
 
-    fillFormFieldsDependentOnTray(){},
+    getBoxesInTray(){
+      this.trayCode = getSelectedItemCode('tray-dropdownlist', this.trayData)
+
+      // get trays of the selected rack
+      getItemDataList(tray_resource, {q: this.trayCode}).then(data => {
+        this.boxData = []
+        let boxList = extractBoxData(data);
+
+        // update local variables with data from API
+        this.boxFields = boxList['fields'];
+        for (let i = 0; i < boxList.items.length; i++) {
+          this.boxData.push({
+            'Code': boxList.items[i].Code,
+            'Name': boxList.items[i].Name,
+          });
+        }
+        this.boxEnabled = true
+      })
+    },
+
     fillFormFieldsDependentOnBox(){},
   },
 }
