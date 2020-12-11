@@ -261,3 +261,13 @@ def get_racks(c):
     }
     racks = BaseModel.db.session.query(Rack).filter_by(chamber_id=c).all()
     return marshal(racks, field)
+
+
+def get_trays(r):
+    field = {
+        'number': fields.String,
+        'rack.number': fields.String,
+        'code': fields.String
+    }
+    trays = BaseModel.db.session.query(Tray).filter_by(rack_id=r).all()
+    return marshal(trays, field)
