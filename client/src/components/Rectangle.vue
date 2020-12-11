@@ -6,7 +6,7 @@
             <tr :key="i" v-for="(x,i) in 81">
               <td>
                 <div v-if="1 || 3 || 5 || 7 || 9">
-                  <div  ref="cells" class="slot-cell" @click="runCellAvailable(x, i)">
+                  <div  ref="cells" class="slot-cell">
                   </div>
                 </div>
                 <div v-else>
@@ -21,14 +21,22 @@
 </template>
 
 <script>
+import EventBus from "@/components/EventBus";
+
 export default {
 name: "Rectangle",
   data(){
     return{
-      x: 0 , y: 0, cols: 0,
-      width: 100, height: 100
+      slots:null, cols: 0,
+
     }
-  }
+  },
+
+  mounted(){
+    EventBus.$on('slots-fetched', data => {
+      this.slots = data
+    })
+  },
 }
 </script>
 
