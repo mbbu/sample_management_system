@@ -8,7 +8,7 @@ class Chamber(BaseModel.db.Model, SearchableMixin):
 
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
-    freezer_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('freezer.id', ondelete='SET NULL'), nullable=True)
+    freezer_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('freezer.id', ondelete='CASCADE'), nullable=True)
     type = AppDb.Column(AppDb.String(50), nullable=False)
     code = AppDb.Column(AppDb.String(65), nullable=False)
 
