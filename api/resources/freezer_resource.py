@@ -76,18 +76,20 @@ class FreezerResource(BaseResource):
                 BaseModel.db.session.flush()  # flush session to make it available for reference even b4 commit
 
                 # create other resources
-                number = 13
                 for _ in range(chambers):
-                    chamber = Chamber(freezer=freezer.id, _type="Default", code=fake.ean(length=8))
+                    number = _ + 1
+                    chamber = Chamber(freezer=freezer.id, _type=number, code=fake.ean(length=8))
                     BaseModel.db.session.add(chamber)
                     BaseModel.db.session.flush()
                     for _ in range(racks):
-                        rack = Rack(chamber=chamber.id, num=number, code=fake.ean(length=8))
+                        num = _ + 1
+                        rack = Rack(chamber=chamber.id, num=num, code=fake.ean(length=8))
                         BaseModel.db.session.add(rack)
                         BaseModel.db.session.flush()
                         for _ in range(trays):
-                            tray = Tray(rack=rack.id, num=number, code=fake.ean(length=8))
-                            tray.number = number
+                            nums = _ + 1
+                            tray = Tray(rack=rack.id, num=nums, code=fake.ean(length=8))
+                            tray.number = nums
                             BaseModel.db.session.add(tray)
                             BaseModel.db.session.flush()
 
