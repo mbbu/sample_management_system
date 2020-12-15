@@ -121,6 +121,8 @@ export default {
     },
     
     getChamberRacks(){
+      // reset some fields
+      this.rackData= []; this.trayData= []; this.boxData= [];
       this.chamberCode = getSelectedItemCode('chamber-dropdownlist', this.chamberData)
 
       // get racks of the selected chamber
