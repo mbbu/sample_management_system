@@ -25,7 +25,7 @@ class Tray(BaseModel.db.Model, SearchableMixin):
 
     def __init__(self, rack, num, code):
         self.rack_id = rack
-        self.num = num
+        self.number = num
         self.code = code
 
     def __repr__(self):
