@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div id="container">
-      <b-modal id="modal-freezer-view" title="Freezer View">
+      <b-modal id="modal-freezer-view" title="Freezer View" cancel-variant="danger">
         <div class="row">
           <!--CHAMBER-->
           <div class="col form-group">
