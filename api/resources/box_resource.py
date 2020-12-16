@@ -89,7 +89,7 @@ class BoxResource(BaseResource):
 
         if not Box.box_exists(code):
             try:
-                box = Box(tray_id=tray, label=label, code=code)
+                box = Box(tray, label, code)
 
                 BaseModel.db.session.add(box)
                 # move changes from Python to the database’s transaction buffer in order to access the id
