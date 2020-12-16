@@ -89,7 +89,6 @@ class FreezerResource(BaseResource):
                         for _ in range(trays):
                             nums = _ + 1
                             tray = Tray(rack=rack.id, num=nums, code=fake.ean(length=8))
-                            tray.number = nums
                             BaseModel.db.session.add(tray)
                             BaseModel.db.session.flush()
 
