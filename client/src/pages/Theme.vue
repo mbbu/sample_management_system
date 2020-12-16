@@ -25,7 +25,7 @@
                         <b-icon
                             :title="`Update ${ theme.name }`"
                             @mouseover="fillFormForUpdate(theme.name, theme.code)"
-                            class="border border-info rounded" font-scale="2.0"
+                            class="border border-info rounded" :font-scale="`${font_scale}`"
                             icon="pencil" v-b-modal.modal-theme-edit
                             v-b-tooltip.hover
                             variant="info"
@@ -33,7 +33,7 @@
                         &nbsp;
                         <b-icon
                                     :title="`Delete ${theme.name}!`" @click="deleteTheme(theme.code)"
-                                    class="border rounded bg-danger p-1" font-scale="1.85"
+                                    class="border rounded bg-danger p-1" :font-scale="`${font_scale}`"
                                     icon="trash" v-b-tooltip.hover
                                     variant="light"
                             ></b-icon>
@@ -44,47 +44,31 @@
             </div>
 
             <div v-if="!isEditing">
-                <b-modal
-                        @hidden="clearForm"
-                        @ok="onSubmit"
-                        @submit="showModal = false"
-                        cancel-variant="danger"
-                        id="modal-theme"
-                        ok-title="Save"
-                        title="Add Theme"
+                <b-modal id="modal-theme" :title="`Add ${page_title}`"
+                        @hidden="clearForm"  @ok="onSubmit" @submit="showModal = false"
+                        cancel-variant="danger" ok-title="Save"
                 >
                     <form @submit.prevent="createTheme">
 
                         <!-- NAME -->
                         <b-form-group :class="{ 'form-group--error': $v.theme.name.$error }"
                                       id="form-name-group" label="Name:" label-for="form-name-input">
-                            <b-form-input
-                                    id="form-name-input"
-                                    placeholder="Enter Name"
-                                    required
-                                    type="text"
-                                    v-model.trim="$v.theme.name.$model"
-                            ></b-form-input>
+                            <b-form-input id="form-name-input"
+                                    placeholder="Enter Name" required type="text"
+                                    v-model.trim="$v.theme.name.$model"></b-form-input>
                             <div v-if="$v.theme.name.$dirty">
-                                <div class="error" v-if="!$v.theme.name.required">Field is
-                                    required
-                                </div>
+                                <div class="error" v-if="!$v.theme.name.required">Field is required</div>
                             </div>
                         </b-form-group>
 
                         <!-- CODE -->
                         <b-form-group :class="{ 'form-group--error': $v.theme.code.$error }"
                                       id="form-code-group" label="Code:" label-for="form-code-input">
-                            <b-form-input
-                                    id="form-code-input"
-                                    placeholder="Enter Code"
-                                    required
-                                    type="text"
+                            <b-form-input id="form-code-input"
+                                    placeholder="Enter Code" required type="text"
                                     v-model.trim="$v.theme.code.$model"></b-form-input>
                             <div v-if="$v.theme.code.$dirty">
-                                <div class="error" v-if="!$v.theme.code.required">Field is
-                                    required
-                                </div>
+                                <div class="error" v-if="!$v.theme.code.required">Field is required</div>
                             </div>
                         </b-form-group>
                     </form>
@@ -92,47 +76,31 @@
             </div>
 
             <div v-else-if="isEditing">
-                <b-modal
-                        @hidden="clearForm"
-                        @ok="updateTheme"
-                        @submit="showModal = false"
-                        cancel-variant="danger"
-                        id="modal-theme-edit"
-                        ok-title="Update"
-                        title="Edit Theme"
+                <b-modal id="modal-theme-edit" :title="`Edit ${page_title}`"
+                        @hidden="clearForm" @ok="updateTheme" @submit="showModal = false"
+                        cancel-variant="danger" ok-title="Update"
                 >
                     <form @submit.prevent="updateTheme">
 
                         <!-- NAME -->
                         <b-form-group :class="{ 'form-group--error': $v.theme.name.$error }"
                                       id="form-name-group-edit" label="Name:" label-for="form-name-input">
-                            <b-form-input
-                                    id="form-name-input"
-                                    placeholder="Enter Name"
-                                    required
-                                    type="text"
-                                    v-model.trim="$v.theme.name.$model"
-                            ></b-form-input>
+                            <b-form-input id="form-name-input"
+                                    placeholder="Enter Name" required type="text"
+                                    v-model.trim="$v.theme.name.$model"></b-form-input>
                             <div v-if="$v.theme.name.$dirty">
-                                <div class="error" v-if="!$v.theme.name.required">Field is
-                                    required
-                                </div>
+                                <div class="error" v-if="!$v.theme.name.required">Field is require</div>
                             </div>
                         </b-form-group>
 
                         <!-- CODE -->
                         <b-form-group :class="{ 'form-group--error': $v.theme.code.$error }"
                                       id="form-code-group-edit" label="Code:" label-for="form-code-input">
-                            <b-form-input
-                                    id="form-code-input"
-                                    placeholder="Enter Code"
-                                    required
-                                    type="text"
+                            <b-form-input id="form-code-input"
+                                    placeholder="Enter Code" required type="text"
                                     v-model.trim="$v.theme.code.$model"></b-form-input>
                             <div v-if="$v.theme.code.$dirty">
-                                <div class="error" v-if="!$v.theme.code.required">Field is
-                                    required
-                                </div>
+                                <div class="error" v-if="!$v.theme.code.required">Field is required</div>
                             </div>
                         </b-form-group>
                     </form>
@@ -145,15 +113,8 @@
           </div>
 
           <div style="margin: auto;">
-            <loading-progress
-              :indeterminate="indeterminate"
-              :hide-background="hideBackground"
-              :progress="progressPath"
-              :size="size"
-              rotate
-              fillDuration="2"
-              rotationDuration="1"
-            />
+            <loading-progress :indeterminate="indeterminate" :hide-background="hideBackground"
+              :progress="progressPath" :size="size" rotate fillDuration="2" rotationDuration="1"/>
           </div>
         </div>
     </div>
@@ -163,238 +124,156 @@
 import axios from 'axios';
 import {theme_resource} from '@/utils/api_paths'
 import TopNav from "../components/TopNav";
-import {isAdmin, respondTo401, secureStoreGetAuthString, pageStartLoader, showFlashMessage} from '@/utils/util_functions'
+import {isAdmin, secureStoreGetAuthString, handleError, pageStartLoader, showFlashMessage} from '@/utils/util_functions'
+import {font_scale} from '@/utils/constants';
 import EventBus from '../components/EventBus';
 import {required} from "vuelidate/lib/validators";
 
 export default {
   name: 'Theme',
+  components: {TopNav},
+
   data() {
     return {
       page_title: "Themes",
-      response: [],
-      search: '',
-      themeList: [],
+      response: [], themeList: [], search: '',
+      theme: { name: '', code: '' },
 
-      theme: {
-        name: '',
-        code: ''
-      },
+      font_scale,
 
       // variable to check user status and role
       isAuth: null,
 
-      // loader-time
-      time: 2000,
+      time: 2000, // loader-time
 
-           // progressPath
-      indeterminate: true,
-      hideBackground: true,
-      progressPath: 5,
-      size: 180,
+      // progressPath
+      indeterminate: true, hideBackground: true, progressPath: 5, size: 180,
 
       // values for data modification
-      old_code: null,
-      showModal: true,
-      isEditing: false,
+      old_code: null, showModal: true, isEditing: false,
     };
-        },
+  },
 
-        validations: {
-            theme: {
-                name: {required},
-                code: {required},
-            }
-        },
+  validations: { theme: { name: {required}, code: {required} } },
 
-        mounted() {
-            EventBus.$on('searchQuery', (payload) => {
-                this.search = payload
-                this.searchData()
-            })
-        },
+  mounted() {
+    EventBus.$on('searchQuery', (payload) => {
+        this.search = payload; this.searchData()
+    })
+  },
 
-        computed: {
-            filteredList() {
-                return this.themeList.filter(theme => {
-                    return theme.name.toLowerCase().includes(this.search.toLowerCase())
-                })
-            }
-        },
+  computed: {
+    filteredList() {
+        return this.themeList.filter(theme => {
+            return theme.name.toLowerCase().includes(this.search.toLowerCase())
+        })
+    }
+  },
 
-        methods: {
-          // util functions
-            onSubmit(evt) {
-                this.$v.$touch();
-                if (this.$v.$invalid) {
-                    evt.preventDefault()
-                    return;
-                }
-                this.createTheme();
-            },
+  created() { this.getTheme(); },
 
-            clearForm() {
-                this.theme.name = null;
-                this.theme.code = null;
-                this.isEditing = false;
-                this.$v.$reset();
-            },
+  methods: {
+    // util functions
+    onSubmit(evt) {
+      this.$v.$touch();
+      if (this.$v.$invalid) { evt.preventDefault(); return; }
+      this.createTheme();
+    },
 
-            fillFormForUpdate(name, code) {
-                this.theme.name = name;
-                this.theme.code = code;
-                this.old_code = code;
-                this.isEditing = true;
-                this.showModal = true;
-            },
+    clearForm() {
+          this.theme.name = null; this.theme.code = null;
+          this.isEditing = false; this.$v.$reset();
+    },
 
-          // stop&hide progressPath
-haltProgressPath(cont=false, path=0, size=0){
-  this.indeterminate = cont
-this.progressPath = path
-this.size = size
-},
+    fillFormForUpdate(name, code) {
+          this.theme.name = name; this.theme.code = code; this.old_code = code;
+          this.isEditing = true; this.showModal = true;
+    },
 
-          // api interaction functions
-            getTheme() {
-              this.isAuth = isAdmin()
+    // stop&hide progressPath
+    haltProgressPath(cont=false, path=0, size=0){
+      this.indeterminate = cont; this.progressPath = path; this.size = size;
+    },
 
-              axios.get(theme_resource)
-                  .then((res) => {
-                    setTimeout(()=> {
-                    this.haltProgressPath()
-                      this.themeList = this.response = res.data['message'];
-                    }, this.time)
-                  })
-                  .catch((error) => {
-                    // eslint-disable-next-line
-                    this.$log.error(error);
-                  });
-            },
+    // api interaction functions
+    getTheme() {
+      this.isAuth = isAdmin()
 
-            createTheme: function () {
-                let self = this;
-                let loader = pageStartLoader(this)
+      axios.get(theme_resource)
+          .then((res) => {
+            setTimeout(()=> {
+              this.haltProgressPath(); this.themeList = this.response = res.data['message'];
+            }, this.time)
+          }).catch((error) => {
+            // eslint-disable-next-line
+            this.$log.error(error);
+          });
+    },
 
-                axios.post(theme_resource, {
-                    name: this.theme.name,
-                    code: this.theme.code,
-                }, {
-                    headers: {
-                      Authorization: secureStoreGetAuthString()
-                    }
-                })
-                    .then((response) => {
-                      setTimeout(()=> {
-                        loader.hide()
-                        this.getTheme();
-                        this.clearForm();
-                        showFlashMessage(self, 'success', 'Success', response.data['message'])
-                      },this.time)
-                    })
-                    .catch((error) => {
-                        this.$log.error(error);
-                        loader.hide();
-                        if (error.response) {
-                            if (error.response.status === 409) {
-                                showFlashMessage(self, 'error', 'Error', error.response.data['message'])
-                            } else if (error.response.status === 401) {
-                                respondTo401(self);
-                            } else if (error.response.status === 403) {
-                                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
-                            } else {
-                                showFlashMessage(self, 'error', 'Error', error.response.data['message'])
-                            }
-                        }
-                    });
-                this.clearForm();
-            },
+    createTheme: function () {
+      let self = this; let loader = pageStartLoader(this)
 
-            updateTheme: function (evt) {
-                this.$v.$touch();
-                if (this.$v.$invalid) {
-                    evt.preventDefault()
-                } else {
-                    let self = this;
-                    let loader = pageStartLoader(this)
-                    axios.put(theme_resource, {
-                        name: this.theme.name,
-                        code: this.theme.code,
-                    }, {
-                        headers:
-                            {
-                                code: this.old_code,
-                              Authorization: secureStoreGetAuthString()
-                            }
-                    })
-                        .then((response) => {
-                          setTimeout( () => {
-                            loader.hide()
-                            this.getTheme();
-                            showFlashMessage(self, 'success', 'Success', response.data['message'])
-                          }, this.time)
-                        })
-                        .catch((error) => {
-                            this.$log.error(error);
-                            loader.hide()
-                            if (error.response) {
-                                if (error.response.status === 304) {
-                                    showFlashMessage(self, 'info', 'Info', 'Record not modified!')
-                                } else if (error.response.status === 401) {
-                                    respondTo401(self);
-                                } else if (error.response.status === 403) {
-                                    showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
-                                } else {
-                                    showFlashMessage(self, 'error', 'Error', error.response.data['message'])
-                                }
-                            }
-                        });
-                    this.clearForm();
-                }
-            },
+      axios.post(theme_resource, {
+          name: this.theme.name,
+          code: this.theme.code,
+      }, {
+          headers: {
+            Authorization: secureStoreGetAuthString()
+          }
+      }).then((response) => {
+            setTimeout(()=> {
+              loader.hide(); this.getTheme(); this.clearForm();
+              showFlashMessage(self, 'success', 'Success', response.data['message'])
+            },this.time)
+          }).catch((error) => { handleError(this, error, loader) });
+      this.clearForm();
+    },
 
-            deleteTheme: function (code) {
-                let self = this;
-                let loader = pageStartLoader(this)
+    updateTheme: function (evt) {
+      this.$v.$touch();
+      if (this.$v.$invalid) { evt.preventDefault()} else {
+          let self = this; let loader = pageStartLoader(this);
+          axios.put(theme_resource, {
+              name: this.theme.name,
+              code: this.theme.code,
+          }, {
+              headers:
+                  {
+                    code: this.old_code,
+                    Authorization: secureStoreGetAuthString()
+                  }
+          }).then((response) => {
+                setTimeout( () => {
+                  loader.hide(); this.getTheme();
+                  showFlashMessage(self, 'success', 'Success', response.data['message'])
+                }, this.time)
+              }).catch((error) => { handleError(this, error, loader) });
+          this.clearForm();
+      }
+    },
 
-                axios.delete(theme_resource, {
-                    headers: {
-                        code: code,
-                      Authorization: secureStoreGetAuthString()
-                    }
-                })
-                    .then((response) => {
-                      setTimeout(() => {
-                        loader.hide()
-                        this.getTheme();
-                        showFlashMessage(self, 'success', 'Success', response.data['message'])
-                      }, this.time)
-                    })
-                    .catch((error) => {
-                        this.$log.error(error);
-                        loader.hide()
-                        if (error.response) {
-                            if (error.response.status === 401) {
-                                respondTo401(self);
-                            } else if (error.response.status === 403) {
-                                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
-                            } else {
-                                showFlashMessage(self, 'error', 'Error', error.response.data['message'])
-                            }
-                        }
-                    });
-                this.clearForm();
-            },
+    deleteTheme: function (code) {
+      let self = this; let loader = pageStartLoader(this);
 
-            searchData() {
-                return this.themeList.filter(theme => {
-                    return theme.name.toLowerCase().includes(this.search.toLowerCase())
-                })
-            }
-        },
-        created() {
-            this.getTheme();
-        },
-        components: {TopNav}
-    };
+      axios.delete(theme_resource, {
+          headers: {
+            code: code,
+            Authorization: secureStoreGetAuthString()
+          }
+      }).then((response) => {
+            setTimeout(() => {
+              loader.hide(); this.getTheme();
+              showFlashMessage(self, 'success', 'Success', response.data['message'])
+            }, this.time)
+          }).catch((error) => { handleError(this, error, loader) });
+      this.clearForm();
+    },
+
+    searchData() {
+      return this.themeList.filter(theme => {
+          return theme.name.toLowerCase().includes(this.search.toLowerCase())
+      })
+    }
+  },
+};
 </script>

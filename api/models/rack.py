@@ -8,7 +8,7 @@ class Rack(BaseModel.db.Model, SearchableMixin):
 
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
-    chamber_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('chamber.id', ondelete='SET NULL'), nullable=True)
+    chamber_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('chamber.id', ondelete='CASCADE'), nullable=True)
     number = AppDb.Column(AppDb.Integer, nullable=False)
     code = AppDb.Column(AppDb.String(65), nullable=False, unique=True, index=True)
 
@@ -22,6 +22,11 @@ class Rack(BaseModel.db.Model, SearchableMixin):
         ).first():
             return True
         return False
+
+    def __init__(self, chamber, num, code):
+        self.chamber_id = chamber
+        self.number = num
+        self.code = code
 
     def __repr__(self):
         return '<< Rack: (number={0} || chamber={1} || code={2}) >>'.format(self.number, self.chamber_id, self.code)

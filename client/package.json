@@ -37,6 +37,7 @@
     "vue-material-checkbox": "^2.2.0",
     "vue-progress-path": "0.0.2",
     "vue-router": "^3.4.5",
+    "vue-tiny-tabs": "^1.0.5",
     "vue2-circle-progress": "^1.2.3",
     "vue2-google-maps": "^0.10.7",
     "vuejs-logger": "1.5.4",

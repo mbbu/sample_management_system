@@ -12,7 +12,7 @@ from api.utils import format_and_lower_str, log_update, log_delete, log_duplicat
 
 class LaboratoryResource(BaseResource):
     fields = {
-        'name': fields.String,
+        'building': fields.String,
         'room': fields.String,
         'code': fields.String
     }
@@ -47,18 +47,10 @@ class LaboratoryResource(BaseResource):
     @is_theme_admin
     def post(self):
         args = LaboratoryResource.laboratory_parser()
-
-        name = args['name']
-        room = args['room']
-        code = args['code']
-
-        if not Laboratory.code_exists(code):
+        if not Laboratory.code_exists(args['code']):
             try:
-                laboratory = Laboratory(
-                    name=name,
-                    room=room,
-                    code=code
-                )
+                laboratory = Laboratory()
+                laboratory = LaboratoryResource.save_data(laboratory, args)
 
                 BaseModel.db.session.add(laboratory)
                 BaseModel.db.session.commit()
@@ -69,7 +61,7 @@ class LaboratoryResource(BaseResource):
                 current_app.logger.error(e)
                 BaseModel.db.session.rollback()
                 return BaseResource.send_json_message("Error while adding Laboratory", 500)
-        log_duplicate(Laboratory.query.filter(Laboratory.code == code).first())
+        log_duplicate(Laboratory.query.filter(Laboratory.code == args['code']).first())
         return BaseResource.send_json_message("Laboratory already exists", 409)
 
     @jwt_required
@@ -84,17 +76,11 @@ class LaboratoryResource(BaseResource):
 
         else:
             args = LaboratoryResource.laboratory_parser()
-
-            name = args['name']
-            room = args['room']
-            code = args['code']
-
-            if name != laboratory.name or room != laboratory.room or code != laboratory.code:
+            if args['building'] != laboratory.building or args['room'] != laboratory.room \
+                    or args['code'] != laboratory.code:
                 old_info = str(laboratory)
                 try:
-                    laboratory.name = name
-                    laboratory.room = room
-                    laboratory.code = code
+                    laboratory = LaboratoryResource.save_data(laboratory, args)
                     BaseModel.db.session.commit()
                     log_update(old_info, laboratory)
                     return BaseResource.send_json_message("Lab updated successfully", 202)
@@ -124,12 +110,18 @@ class LaboratoryResource(BaseResource):
     @staticmethod
     def laboratory_parser():
         parser = reqparse.RequestParser()
-        parser.add_argument('name', required=True)
+        parser.add_argument('building', required=True)
         parser.add_argument('room', required=True)
         parser.add_argument('code', required=True, type=standard_non_empty_string)
 
         args = parser.parse_args()
         return args
+
+    @staticmethod
+    def save_data(lab, args):
+        lab.building, lab.room, lab.code = args['building'], args['room'], \
+                                                               format_and_lower_str(args['code'])
+        return lab
 
     @staticmethod
     def get_laboratory(code):

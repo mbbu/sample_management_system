@@ -13,15 +13,15 @@ class Sample(BaseModel.db.Model, SearchableMixin):
 
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
-    theme_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('theme.id', ondelete='SET NULL'), nullable=True)
-    user_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
-    slot_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('slot.id', ondelete='SET NULL'), nullable=True)
+    theme_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('theme.id', ondelete='SET NULL'), nullable=True, index=True)
+    user_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('users.id', ondelete='SET NULL'), nullable=True, index=True)
+    slot_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('slot.id', ondelete='SET NULL'), nullable=True, index=True)
     animal_species = AppDb.Column(AppDb.String(100), nullable=True, index=True)
     sample_type = AppDb.Column(AppDb.String(100), nullable=True, index=True)
     sample_description = AppDb.Column(AppDb.Text, nullable=True)
     location_collected = AppDb.Column(AppDb.JSON, nullable=True)
-    project = AppDb.Column(AppDb.String(150), nullable=True, index=True)
-    project_owner = AppDb.Column(AppDb.String(100), nullable=True)
+    project_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('project.id', ondelete='SET NULL'), nullable=True,
+                              index=True)
     retention_date = AppDb.Column(AppDb.DateTime, nullable=True)
     barcode = AppDb.Column(AppDb.String(100), nullable=True)
     analysis = AppDb.Column(AppDb.String(100), nullable=True)
@@ -63,4 +63,4 @@ class Sample(BaseModel.db.Model, SearchableMixin):
                     self.project, self.barcode, self.animal_species,
                     self.slot_id, self.retention_date, self.amount, self.quantity_type, self.code,
                     self.location_collected,
-                    self.project_owner, self.analysis, self.temperature)
+                    self.project_id, self.analysis, self.temperature)

@@ -9,7 +9,8 @@ from api.resources.decorators.user_role_decorators import is_theme_admin
 from api.resources.slot_resource import create_slots
 from api.resources.tray_resource import TrayResource
 from api.utils import format_and_lower_str, log_create, log_duplicate, log_update, log_delete, \
-    has_required_request_params, non_empty_string, non_empty_int, standard_non_empty_string, log_304, get_query_params
+    has_required_request_params, non_empty_string, non_empty_int, standard_non_empty_string, log_304, get_query_params, \
+    get_slots
 
 
 class BoxResource(BaseResource):
@@ -30,7 +31,12 @@ class BoxResource(BaseResource):
             for query_string in query_strings:
                 query, total = Box.search(query_string, 1, 15)
 
-                if total == 0:
+                # query box to check for slots
+                box = BoxResource.get_box(query_string)
+                if box is not None:
+                    data = get_slots(box.id)
+                    return BaseResource.send_json_message(data, 200)
+                elif total == 0:
                     # find all box in the selected freezer.
                     data = []
 

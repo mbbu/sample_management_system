@@ -8,7 +8,7 @@ class Chamber(BaseModel.db.Model, SearchableMixin):
 
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
-    freezer_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('freezer.id', ondelete='SET NULL'), nullable=True)
+    freezer_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('freezer.id', ondelete='CASCADE'), nullable=True)
     type = AppDb.Column(AppDb.String(50), nullable=False)
     code = AppDb.Column(AppDb.String(65), nullable=False)
 
@@ -22,6 +22,11 @@ class Chamber(BaseModel.db.Model, SearchableMixin):
         ).first():
             return True
         return False
+
+    def __init__(self, freezer, _type, code):
+        self.freezer_id = freezer
+        self.type = _type
+        self.code = code
 
     def __repr__(self):
         return '<< Chamber:  (type={0} || freezer={1} || code={2}) >>'.format(self.type, self.freezer_id, self.code)

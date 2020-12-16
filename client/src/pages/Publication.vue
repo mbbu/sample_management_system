@@ -32,7 +32,7 @@
                                 <b-icon
                                         :title="`Contact author(${ publication['user.email'] })`"
                                         class="border border-info rounded"
-                                        font-scale="1.5" icon="envelope"
+                                        :font-scale="`${font_scale}`" icon="envelope"
                                         v-b-tooltip.hover variant="info"
                                 ></b-icon>
                             </a>
@@ -43,7 +43,7 @@
                             <b-icon v-if="isPublicationOwner(publication['user.email'])"
                                     :title="`Update ${ publication.publication_title }`"
                                     @click="fillFormForUpdate(publication)"
-                                    class="border border-info rounded" font-scale="2.0"
+                                    class="border border-info rounded" :font-scale="`${font_scale}`"
                                     icon="pencil"
                                     v-b-tooltip.hover
                                     variant="info"
@@ -51,7 +51,7 @@
                           &nbsp;
                           <b-icon
                               @click="downloadPublication(publication.publication_title)"
-                              class="border border-info rounded" font-scale="2.0"
+                              class="border border-info rounded" :font-scale="`${font_scale}`"
                               icon="download" title="Download"
                               v-b-tooltip.hover variant="info"
                           ></b-icon>
@@ -59,7 +59,7 @@
                           <b-icon :title="`Delete ${ publication.publication_title }!`"
                                   @click="deletePublication(publication.publication_title)"
                                   class="border rounded bg-danger p-1"
-                                  font-scale="1.85" icon="trash"
+                                  :font-scale="`${font_scale}`" icon="trash"
                                   v-b-tooltip.hover v-if="isPublicationOwner(publication['user.email'])"
                                   variant="light"
                           ></b-icon>
@@ -178,13 +178,15 @@ import {publication_resource} from "@/utils/api_paths";
 import {
   getLoggedInUser,
   getSelectedItemSetTextFieldValue,
+  handleError,
   isPublicationOwner,
+  pageStartLoader,
   paginate,
-  respondTo401,
   secureStoreGetAuthString,
   setSampleDataList,
   showFlashMessage
 } from "@/utils/util_functions";
+import {font_scale} from '@/utils/constants';
 import EventBus from '@/components/EventBus';
 import {required} from "vuelidate/lib/validators";
 import PublicationModal from "@/components/PublicationModal";
@@ -203,6 +205,8 @@ export default {
         sample_results: null,
         co_authors: null
       },
+      
+      font_scale,
 
       isRedirected: false,
       item: null,
@@ -330,8 +334,7 @@ export default {
     },
 
     createPublication() {
-      let self = this;
-
+      let loader = pageStartLoader(this)
       axios.post(publication_resource, {
         publication_title: this.publication.title,
         sample: this.publication.sample,
@@ -342,55 +345,27 @@ export default {
         headers: {
           Authorization: secureStoreGetAuthString()
         }
-      })
-          .then((response) => {
+      }).then((response) => {
             this.getPublication();
-            showFlashMessage(self, 'success', response.data['message'], '');
-            this.clearForm();
-          })
-          .catch((error) => {
-            this.clearForm();
-            this.$log.error(error);
-            if (error.response) {
-              if (error.response.status === 409) {
-                showFlashMessage(self, 'error', error.response.data['message'], '');
-              } else if (error.response.status === 400) {
-                showFlashMessage(self, 'error', error.response.data['message'], 'Kindly refill the form');
-              } else if (error.response.status === 401) {
-                respondTo401(self);
-              } else {
-                showFlashMessage(self, 'error', error.response.data['message'], '');
-              }
-            }
-          });
+            loader.hide();
+            showFlashMessage(this, 'success', response.data['message'], '');
+          }).catch((error) => { handleError(this, error, loader)});
       this.clearForm();
     },
 
-    deletePublication: function (title, self = this) {
+    deletePublication: function (title) {
+      let loader = pageStartLoader(this)
       axios.delete(publication_resource, {
         headers:
             {
               title: title,
               Authorization: secureStoreGetAuthString()
             }
-      })
-          .then((response) => {
+      }).then((response) => {
             this.getPublication();
-            showFlashMessage(self, 'success', response.data['message'], '');
-            this.clearForm();
-          })
-          .catch((error) => {
-            this.$log.error(error);
-            if (error.response) {
-              if (error.response.status === 401) {
-                respondTo401(self);
-              } else if (error.response.status === 403) {
-                showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
-              } else {
-                showFlashMessage(self, 'error', error.response.data['message'], '');
-              }
-            }
-          });
+            loader.hide();
+            showFlashMessage(this, 'success', response.data['message'], '');
+      }).catch((error) => { handleError(this, error, loader) });
       this.getPublication();
     },
 

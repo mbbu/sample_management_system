@@ -8,9 +8,9 @@ class Tray(BaseModel.db.Model, SearchableMixin):
 
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
-    rack_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('rack.id', ondelete='SET NULL'), nullable=True)
-    number = AppDb.Column(AppDb.Integer, unique=True, nullable=False)
-    code = AppDb.Column(AppDb.String, nullable=False)
+    rack_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('rack.id', ondelete='CASCADE'), nullable=True)
+    number = AppDb.Column(AppDb.Integer, nullable=False)
+    code = AppDb.Column(AppDb.String, unique=True, nullable=False)
 
     # relationship(s)
     rack = AppDb.relationship('Rack', backref='tray', lazy=True)
@@ -22,6 +22,11 @@ class Tray(BaseModel.db.Model, SearchableMixin):
         ).first():
             return True
         return False
+
+    def __init__(self, rack, num, code):
+        self.rack_id = rack
+        self.num = num
+        self.code = code
 
     def __repr__(self):
         return '<< Tray: (number={0} || rack={1} || code={2}) >>'.format(self.number, self.rack_id, self.code)

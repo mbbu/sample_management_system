@@ -8,7 +8,7 @@ from api.resources.base_resource import BaseResource
 from api.resources.decorators.user_role_decorators import is_theme_admin
 from api.resources.freezer_resource import FreezerResource
 from api.utils import format_and_lower_str, non_empty_string, log_create, log_duplicate, log_update, log_delete, \
-    has_required_request_params, non_empty_int, standard_non_empty_string, log_304, get_query_params
+    has_required_request_params, non_empty_int, standard_non_empty_string, log_304, get_query_params, fake, get_racks
 
 
 class ChamberResource(BaseResource):
@@ -24,7 +24,15 @@ class ChamberResource(BaseResource):
         if query_strings is not None:
             for query_string in query_strings:
                 query, total = Chamber.search(query_string, 1, 15)
-                chambers = query.all()
+
+                # query freezer to check for chambers
+                chamber = ChamberResource.get_chamber(query_string).id
+
+                if chamber is not None:
+                    data = get_racks(chamber)
+                    return BaseResource.send_json_message(data, 200)
+                else:
+                    chambers = query.all()
 
                 data = marshal(chambers, self.fields)
                 return BaseResource.send_json_message(data, 200)
@@ -50,17 +58,16 @@ class ChamberResource(BaseResource):
     def post(self):
         args = ChamberResource.chamber_parser()
         if type(args['freezer']) is str:
-            freezer_db = FreezerResource.get_freezer(args['freezer'])
-            freezer = freezer_db.id
+            freezer = FreezerResource.get_freezer(args['freezer']).id
         else:
             freezer = args['freezer']
 
         _type = args['type']
-        code = args['code']
+        code = fake.ean(length=8)
 
         if not Chamber.chamber_exists(code):
             try:
-                chamber = Chamber(freezer_id=freezer, type=_type, code=code)
+                chamber = Chamber(freezer=freezer, _type=_type, code=code)
                 BaseModel.db.session.add(chamber)
                 BaseModel.db.session.commit()
                 log_create(chamber)

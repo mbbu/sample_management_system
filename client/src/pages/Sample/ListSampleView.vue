@@ -21,7 +21,7 @@
                       <th class="table-header-style" scope="col"> Id</th>
                       <th class="table-header-style" scope="col"> Theme</th>
                       <th class="table-header-style" scope="col"> Project</th>
-                      <th class="table-header-style" scope="col"> Owner (P.I)</th>
+                      <th class="table-header-style" scope="col"> (P.I)</th>
                       <th class="table-header-style" scope="col"> Location Collected</th>
                       <th class="table-header-style" scope="col"> Animal Species</th>
                       <th class="table-header-style" scope="col"> BarCode</th>
@@ -33,8 +33,8 @@
                     <tr :key="sample.id" v-for="(sample, index) in matchFiltersAndSearch.arr">
                         <td> {{ index + 1 }}</td>
                         <td> {{ sample['theme.name'] }}</td>
-                        <td> {{ sample.project }}</td>
-                        <td> {{ sample.project_owner }}</td>
+                        <td> {{ sample['project.name'] }}</td>
+                        <td> {{ sample['project.lead.first_name'] }} {{ sample['project.lead.last_name'] }}</td>
                         <td> {{ sample.location_collected }}</td>
                         <td> {{ sample.animal_species }}</td>
                         <td> {{ sample.barcode }}</td>
@@ -168,16 +168,6 @@ export default {
               .filter((value, index, self) => self.indexOf(value) === index),
         },
         {
-          'By Type': this.response
-              .map(({sample_type}) => sample_type)
-              .filter((value, index, self) => self.indexOf(value) === index),
-        },
-        {
-          'By Status': this.response
-              .map(({status}) => status)
-              .filter((value, index, self) => self.indexOf(value) === index),
-        },
-        {
           'By Retention': this.response
               .map(({retention_date}) => retention_date)
               .filter((value, index, self) => self.indexOf(value) === index),
@@ -196,9 +186,7 @@ export default {
       let filteredData = this.filterData(this.sampleList)
 
       let filterByPI = filteredData.pi
-      let filterByType = filteredData.type
       let filterByTheme = filteredData.theme
-      let filterByStatus = filteredData.status
       let filterByProject = filteredData.project
       let filterBySpecies = filteredData.species
       let filterByRetention = filteredData.retention
@@ -211,7 +199,6 @@ export default {
 
         let lowest = 0;
         for (let i = 1; i < filteredData.length; i++) {
-          console.log("Item  " + i + " ", filteredData[i])
           if ((filteredData[i] < filteredData[lowest]) && filteredData[i].length > 0) lowest = i;
         }
         return paginate(filteredData[lowest]);
@@ -220,18 +207,10 @@ export default {
         this.sampleList = filterByPI // eslint-disable-line
         this.filterData(filterByPI)
         return paginate(filterByPI)
-      } else if (filterByType !== null && filterByType.length > 0) {
-        this.sampleList = filterByType // eslint-disable-line
-        this.filterData(filterByType)
-        return paginate(filterByType)
       } else if (filterByTheme !== null && filterByTheme.length > 0) {
         this.sampleList = filterByTheme // eslint-disable-line
         this.filterData(filterByTheme)
         return paginate(filterByTheme)
-      } else if (filterByStatus !== null && filterByStatus.length > 0) {
-        this.sampleList = filterByStatus // eslint-disable-line
-        this.filterData(filterByStatus)
-        return paginate(filterByStatus)
       } else if (filterByProject !== null && filterByProject.length > 0) {
         this.sampleList = filterByProject // eslint-disable-line
         this.filterData(filterByProject)
@@ -262,12 +241,12 @@ export default {
       EventBus.$emit('page-info', {'pgInfo': info, 'pgData': this.sampleList})
     },
 
-              // stop&hide progressPath
-haltProgressPath(cont=false, path=0, size=0){
-  this.indeterminate = cont
-this.progressPath = path
-this.size = size
-},
+    // stop&hide progressPath
+    haltProgressPath(cont=false, path=0, size=0){
+      this.indeterminate = cont
+      this.progressPath = path
+      this.size = size
+    },
 
     // methods to interact with api
     getSamples() {
@@ -277,7 +256,6 @@ this.size = size
           .then((res) => {
             setTimeout(() => {
               this.haltProgressPath()
-              this.$log.info("Response: " + res.status + " ", res.data.message);
               this.sampleList = this.response = res.data.message;
               for (const [key, value] of this.response.entries()) {
                 console.log(key, value);
@@ -294,19 +272,15 @@ this.size = size
     },
 
     viewSample(code) {
-      let self = this;
       // 1st call the setter function to set the code
       setSampleCode(code)
       // redirect to sample view page
-      redirectAfterCountDown(self, '/view-sample', 1)
+      redirectAfterCountDown(this, '/view-sample', 1)
     },
     //end of methods for api interaction
 
     /* Methods associated with searching and filtering of data in the page */
     filterData(data) {
-      // box.label: (...)
-      // retention_date: (...)
-      console.log("FilterData called")
       let filterByTheme = this.filters.length
           ? data.filter(sample =>
               this.filters.some(filter => sample['theme.name'] ? sample['theme.name'].toString().match(filter) : null))
@@ -338,16 +312,6 @@ this.size = size
               this.filters.some(filter => sample.animal_species ? sample.animal_species.toString().match(filter) : null))
           : null
 
-      let filterByType = this.filters.length
-          ? data.filter(sample =>
-              this.filters.some(filter => sample.sample_type ? sample.sample_type.toString().match(filter) : null))
-          : null
-
-      let filterByStatus = this.filters.length
-          ? data.filter(sample =>
-              this.filters.some(filter => sample.status ? sample.status.toString().match(filter) : null))
-          : null
-
       let filterByRetention = this.filters.length
           ? data.filter(sample =>
               this.filters.some(filter => sample.retention ? sample.retention.toString().match(filter) : null))
@@ -356,9 +320,7 @@ this.size = size
 
       return {
         'pi': filterByPI,
-        'type': filterByType,
         'theme': filterByTheme,
-        'status': filterByStatus,
         'project': filterByProject,
         'species': filterBySpecies,
         'retention': filterByRetention,
@@ -407,31 +369,22 @@ this.size = size
               : null
 
           if (byTheme) {
-            console.log("byTheme", byTheme)
             return byTheme
           } else if (byProject) {
-            console.log("byProject", byProject)
             return byProject
           } else if (byPI) {
-            console.log("byPI", byPI)
             return byPI
           } else if (byLocCollected) {
-            console.log("byLocCollected", byLocCollected)
             return byLocCollected
           } else if (byLocInLab) {
-            console.log("byLocInLab", byLocInLab)
             return byLocInLab
           } else if (bySpecies) {
-            console.log("bySpecies", bySpecies)
             return bySpecies
           } else if (byType) {
-            console.log("byType", byType)
             return byType
           } else if (byStatus) {
-            console.log("byStatus", byStatus)
             return byStatus
           } else if (byRetention) {
-            console.log("byRetention", byRetention)
             return byRetention
           }
         }

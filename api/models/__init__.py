@@ -14,3 +14,5 @@ from api.models.tray import Tray
 from api.models.user import User
 from api.models.sample_request import SampleRequest
 from api.models.slot import Slot
+from api.models.housedata import AnimalHealthHouseData
+from api.models.study_block import StudyBlock

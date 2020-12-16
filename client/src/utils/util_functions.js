@@ -162,6 +162,22 @@ export function extractBoxData(data) {
     return resultObject;
 }
 
+export function extractLabData(data) {
+    let labList = [];
+    let fields = {text: '', value: ''};
+    let resultObject = {items: labList, fields: fields};
+
+    for (let item = 0; item < data.length; item++) {
+        labList.push({
+            'Code': data[item].code,
+            'Name': data[item].building,
+        });
+        fields.text = 'Name';
+        fields.value = 'Code';
+    }
+    return resultObject;
+}
+
 export function extractFreezerData(data) {
     let itemList = [];
     let fields = {text: '', value: ''};
@@ -652,3 +668,33 @@ EventBus.$on('page-info', (payload) => {
     page_info = payload.pgInfo
     paginate(payload.pgData)
 })
+
+
+// generic function to handle errors on web-server response
+export function handleError(self, error, loader){
+    self.$log.error(error);
+    loader.hide();
+
+    if (error.response){
+        if (error.response.status === 304) {
+            showFlashMessage(self, 'info', 'Record not modified!', '');
+        } else if (error.response.status === 400) {
+            showFlashMessage(self, 'error', error.response.data['message'], 'Kindly refill the form');
+        } else if (error.response.status === 401) {
+            respondTo401(self);
+        } else if (error.response.status === 403) {
+            showFlashMessage(self, 'error', 'Unauthorized', error.response.data['message'])
+        } else if (error.response.status === 404) {
+            showFlashMessage(self, 'error', 'Not found', "");
+        } else if (error.response.status === 408) {
+            redirectAfterCountDown(self, '/forgot')
+            return error.response.data.message
+        } else if (error.response.status === 409) {
+            showFlashMessage(self, 'error', error.response.data['message'], '');
+        } else if (error.response.status === 500) {
+            showFlashMessage(self, 'error', "Fatal Error", 'Admin has been contacted.');
+        } else {
+            showFlashMessage(self, 'error', error.response.data['message'], '');
+        }
+    }
+}

@@ -10,7 +10,7 @@ class Slot(BaseModel.db.Model, SearchableMixin):
 
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
-    box_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('box.id'), nullable=False)
+    box_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('box.id', ondelete='CASCADE'), nullable=False)
     code = AppDb.Column(AppDb.String(65), nullable=False, unique=True, index=True)
     position = AppDb.Column(AppDb.JSON, nullable=True)
     available = AppDb.Column(AppDb.Boolean, nullable=False, default=True)
@@ -21,6 +21,11 @@ class Slot(BaseModel.db.Model, SearchableMixin):
     __mapper_args__ = {
         "order_by": id
     }
+
+    def __init__(self, box, code, pos):
+        self.box_id = box
+        self.code = code
+        self.pos = pos
 
     def __repr__(self):
         return '<< Slot: (box={0} || pos={1} || available={2}) >>'.format(self.box, self.position, self.available)
