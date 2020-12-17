@@ -291,3 +291,9 @@ def get_slots(s):
 
     slots = BaseModel.db.session.query(Slot).filter_by(box_id=s).all()
     return marshal(slots, field)
+
+
+def chunks(lst, n):
+    """Yield successive n-sized chunks from lst."""
+    for i in range(0, len(lst), n):
+        yield lst[i:i + n]
