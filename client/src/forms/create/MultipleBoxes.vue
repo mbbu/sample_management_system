@@ -82,7 +82,7 @@ export default {
     },
 
     clearForm(){
-      this.box.number = 0; this.box.rows = 0; this.box.cols = 0;
+      this.box.number = 0; this.box.rows = 0; this.box.cols = 0; this.$v.$reset();
     },
 
     createBoxes: function () {
