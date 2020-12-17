@@ -8,8 +8,8 @@
         <!--NUMBER-->
         <b-form-group id="form-number-group" :class="{ 'form-group--error': $v.box.number.$error }"
                       label="Number of Boxes:" label-for="form-number-input">
-          <b-form-input id="form-number-input" v-model.trim="$v.box.number.$model"
-                        placeholder="Enter number of boxes to create" required type="text"></b-form-input>
+          <b-form-input id="form-number-input" v-model.trim="$v.box.number.$model" min=1
+                        placeholder="Enter number of boxes to create" required type="number"></b-form-input>
           <div v-if="$v.box.number.$dirty">
             <div v-if="!$v.box.number.required" class="error">Field is required</div>
             <div v-if="!$v.box.number.minValue" class="error">Number cannot be less than 1</div>
