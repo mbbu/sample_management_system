@@ -1,14 +1,14 @@
 <template>
 <div>
-  <table id="slots" class="grid" style="--cols:0;">
+  <table id="slots" class="grid-view" style="--cols:0;">
     <tr :key="i" v-for="(x,i) in this.slots">
       <td>
         <div v-if="x.available === true">
-          <div ref="cells" class="slot-cell cell-available">
+          <div ref="cells" class="cell-available-view">
           </div>
         </div>
         <div v-else>
-          <div class="slot-cell cell-occupied"></div>
+          <div class="cell-occupied-view">{{x.code}}</div>
         </div>
       </td>
     </tr>
@@ -73,10 +73,3 @@ name: "Rectangle",
   },
 }
 </script>
-
-<style scoped>
-.slot-cell {
-  /*width: 50px;*/
-  /*height: 50px;*/
-}
-</style>
