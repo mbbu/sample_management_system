@@ -27,10 +27,10 @@ class FreezerResource(BaseResource):
                 query, total = Freezer.search(query_string, 1, 15)
 
                 # query freezer to check for chambers
-                freezer = FreezerResource.get_freezer(query_string).id
+                freezer = FreezerResource.get_freezer(query_string)
 
                 if freezer is not None:
-                    data = get_chambers(freezer)
+                    data = get_chambers(freezer.id)
                     return BaseResource.send_json_message(data, 200)
                 else:
                     freezers = query.all()
