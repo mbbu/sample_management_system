@@ -243,6 +243,17 @@ def get_query_params():
     return query.get('q')
 
 
+def get_freezers(x):
+    field = {
+        'number': fields.String,
+        'lab.building': fields.String,
+        'lab.room': fields.String,
+        'code': fields.String
+    }
+    freezers = BaseModel.db.session.query(Freezer).filter_by(laboratory_id=x).all()
+    return marshal(freezers, field)
+
+
 def get_chambers(f):
     field = {
         'type': fields.String,
