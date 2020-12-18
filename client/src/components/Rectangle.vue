@@ -37,7 +37,16 @@ name: "Rectangle",
   },
 
   methods: {
+    resetBeforeChange(){
+          this.rows = null;
+          this.cols = null;
+          document.getElementById('slots').style.setProperty("--cols", "0");
+          this.availableSlots = []
+    },
+
     drawSlots(){
+      this.resetBeforeChange();
+
       // draw the slots of the selected box.
       // det the dimension of slots i.e rows and cols
       let last_slot = this.slots[this.slots.length - 1]
@@ -67,7 +76,7 @@ name: "Rectangle",
 
 <style scoped>
 .slot-cell {
-  width: 50px;
-  height: 50px;
+  /*width: 50px;*/
+  /*height: 50px;*/
 }
 </style>
