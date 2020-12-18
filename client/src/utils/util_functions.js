@@ -186,7 +186,8 @@ export function extractFreezerData(data) {
     for (let item = 0; item < data.length; item++) {
         itemList.push({
             'Code': data[item].code,
-            'Name': "Freezer number(" + data[item].number + ") in room " + data[item].room
+            'Name': "Freezer number(" + data[item].number + ") in " + data[item]['lab.building'] + " room "
+                + data[item]['lab.room']
         });
         fields.text = 'Name';
         fields.value = 'Code';
