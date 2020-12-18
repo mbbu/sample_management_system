@@ -8,7 +8,7 @@
           </div>
         </div>
         <div v-else>
-          <div class="cell-occupied-view">{{x.code}}</div>
+          <div contenteditable="true" class="cell-occupied-view">{{x.code}}</div>
         </div>
       </td>
     </tr>
