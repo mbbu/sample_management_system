@@ -4,11 +4,12 @@
     <tr :key="i" v-for="(x,i) in this.slots">
       <td>
         <div v-if="x.available === true">
-          <div ref="cells" class="cell-available-view">
-          </div>
+          <div ref="cells" class="cell-available-view"></div>
         </div>
         <div v-else>
-          <div contenteditable="true" class="cell-occupied-view">{{x.code}}</div>
+          <div ref="cells" contenteditable="true" class="cell-occupied-view" @focusout="getNewSlotData(i)">
+            {{x.code}}
+          </div>
         </div>
       </td>
     </tr>
@@ -24,7 +25,7 @@ name: "Rectangle",
   data(){
     return{
       slots:[], cols: null, rows: null,
-      availableSlots: []
+      availableSlots: [], updatedSlots: [],
 
     }
   },
@@ -40,8 +41,8 @@ name: "Rectangle",
     resetBeforeChange(){
           this.rows = null;
           this.cols = null;
+          this.availableSlots = []; this.updatedSlots = [];
           document.getElementById('slots').style.setProperty("--cols", "0");
-          this.availableSlots = []
     },
 
     drawSlots(){
@@ -69,7 +70,14 @@ name: "Rectangle",
           this.$refs.cells[i].style.backgroundColor = 'darkred'
         }
       }
-    }
+    },
+
+    getNewSlotData(index){
+      // use the trim method to remove leading and trailing white spaces
+      if (this.slots[index].code.trim() !== this.$refs.cells[index].textContent.trim()){
+        this.updatedSlots.push({'old': this.slots[index].code.trim(), 'new':this.$refs.cells[index].textContent.trim()})
+      }
+    },
   },
 }
 </script>
