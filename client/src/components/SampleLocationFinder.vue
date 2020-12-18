@@ -115,10 +115,10 @@
 </template>
 <script>
 import {
-  extractApiData, extractBoxData, extractFreezerData,
+  extractLabData, extractBoxData, extractFreezerData,
   getItemDataList, getSelectedBoxSetTextFieldValue, getSelectedItemCode
 } from "@/utils/util_functions";
-import {box_resource, freezer_resource, lab_resource} from "@/utils/api_paths";
+import {box_resource, lab_resource} from "@/utils/api_paths";
 import EventBus from "@/components/EventBus";
 
 export default {
@@ -167,7 +167,7 @@ export default {
       // GET LAB LIST
       getLabList() {
         getItemDataList(lab_resource).then(data => {
-          let labList = extractApiData(data);
+          let labList = extractLabData(data);
 
           // update local variables with data from API
           this.labFields = labList['fields'];
@@ -177,12 +177,15 @@ export default {
               'Name': labList.items[i].Name,
             });
           }
+          this.$log.info('labData', this.labData)
+
         })
       },
 
       getFreezersOfSelectedLab() {
           // set the lab selected
           this.loc.lab = getSelectedItemCode("lab-dropdownlist", this.labData)
+          this.$log.info('Getting freezers of the selected lab: ', this.loc.lab)
 
           // enable freezer fields
           this.freezerEnabled = true
@@ -194,7 +197,7 @@ export default {
           this.loc.box = ''
           this.boxEnabled = false
 
-          getItemDataList(freezer_resource, {
+          getItemDataList(lab_resource, {
               'q': this.loc.lab
           }).then(data => {
             let freezerList = extractFreezerData(data);

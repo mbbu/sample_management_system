@@ -250,7 +250,7 @@ import EventBus from '@/components/EventBus';
 import FilterCard from "@/components/FilterCard";
 import VueTinyTabs from 'vue-tiny-tabs';
 import {minValue, required} from "vuelidate/lib/validators";
-import FreezerView from "@/forms/FreezerView";
+import FreezerView from "@/forms/view/FreezerView";
 
 export default {
   name: 'Freezer',

@@ -15,6 +15,11 @@ class Box(BaseModel.db.Model, SearchableMixin):
     # relationship(s)
     tray = AppDb.relationship('Tray', backref='box', lazy=True)
 
+    def __init__(self, tray, label, code):
+        self.tray_id = tray
+        self.label = label
+        self.code = code
+
     def __repr__(self):
         return '<< Box: (label={0} || tray={1} || code={2}) >>'.format(self.label, self.tray_id, self.code)
 

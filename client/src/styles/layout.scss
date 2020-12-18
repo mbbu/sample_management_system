@@ -104,6 +104,30 @@ ul li {
   cursor: not-allowed !important;;
 }
 
+
+// sample-viewer in freezer
+.grid-view {
+  display: grid;
+  grid-gap: 1px;
+  grid-template-columns: repeat(var(--cols), 70px );
+}
+
+.cell-available-view {
+  width: 70px;
+  height: 70px;
+  background: green;
+  display: table-cell;
+  word-wrap: break-word;
+}
+
+.cell-occupied-view {
+  width: 70px;
+  height: 70px;
+  background: grey;
+  display: table-cell;
+  word-wrap: break-word;
+}
+
 // legends for slots
 /* basic positioning */
 .legend { list-style: none; border: double; margin-left: -5px; }

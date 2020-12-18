@@ -2,6 +2,7 @@ from flask import current_app, request
 from flask_jwt_extended import jwt_required
 from flask_restful import fields, marshal, reqparse
 
+from api.models import Tray
 from api.models.box import Box
 from api.models.database import BaseModel
 from api.resources.base_resource import BaseResource
@@ -10,7 +11,7 @@ from api.resources.slot_resource import create_slots
 from api.resources.tray_resource import TrayResource
 from api.utils import format_and_lower_str, log_create, log_duplicate, log_update, log_delete, \
     has_required_request_params, non_empty_string, non_empty_int, standard_non_empty_string, log_304, get_query_params, \
-    get_slots
+    get_slots, fake, chunks
 
 
 class BoxResource(BaseResource):
@@ -81,32 +82,62 @@ class BoxResource(BaseResource):
     @is_theme_admin
     def post(self):
         args = BoxResource.box_args()
-        tray = TrayResource.get_tray(args['tray']).id
-        label = args['label']
-        code = args['code']
-        row = args['rows']
-        col = args['cols']
+        number = int(args['number'])
+        row = int(args['rows'])
+        col = int(args['cols'])
 
-        if not Box.box_exists(code):
-            try:
-                box = Box(tray_id=tray, label=label, code=code)
+        try:
+            # get available trays.
+            all_trays = Tray.query.order_by(Tray.id.desc()).all()
+            occupied_trays = Tray.query\
+                .filter(Tray.box.any(Box.tray_id.isnot(None)))\
+                .order_by(Tray.id.desc()).all()
+            available_trays = list(set(all_trays) - set(occupied_trays))
 
-                BaseModel.db.session.add(box)
-                # move changes from Python to the database’s transaction buffer in order to access the id
-                BaseModel.db.session.flush()
+            boxes = []  # this list will store all box instances that will be created.
+            box_num = 0  # todo: change by getting the latest label of box in freezer.
 
-                log_create(box)
+            # recursively create boxes and update it's attributes i.e. label and code
+            for _ in range(number):
+                box = Box(tray=None, label=None, code=None)
+                box.code = fake.ean(length=8)
+                if Box.box_exists(box.code):
+                    box.code = fake.ean(length=8)
+                pass
+                box.label = box_num
+                boxes.append(box)
+                box_num += 1
 
-                # create Slots for the new box
-                create_slots(box.id, row, col)
-                return BaseResource.send_json_message("Box successfully created", 201)
-            except Exception as e:
-                current_app.logger.error(e)
-                BaseModel.db.session.rollback()
-                return BaseResource.send_json_message("Error while adding box", 500)
-        else:
-            log_duplicate(Box.query.filter(Box.code == code).first())
-            return BaseResource.send_json_message("Box already exists", 409)
+            tray_num = 0
+            boxes_chunks = list(chunks(boxes, 4))  # create chunks that group boxes in a way that they can
+
+            # In the box chunks extract the grouped boxes
+            for box_list in boxes_chunks:
+                tray = available_trays[tray_num]
+
+                # Further extract box item from the box list
+                for box in box_list:
+                    box.tray_id = tray.id  # update all box items in this list to be in the same tray.
+
+                    # add box to session and move changes from Python to the database’s
+                    # transaction buffer in order to access the id
+                    BaseModel.db.session.add(box)
+                    BaseModel.db.session.flush()
+
+                    # create slots for the new box
+                    create_slots(box.id, row, col)
+
+                    # log the creation of box
+                    log_create(box)
+
+                tray_num += 1  # Increment tray
+            # commit session
+            BaseModel.db.session.commit()
+            return BaseResource.send_json_message("Boxes successfully created", 201)
+        except Exception as e:
+            current_app.logger.error(e)
+            BaseModel.db.session.rollback()
+            return BaseResource.send_json_message("Error while adding box", 500)
 
     @jwt_required
     @is_theme_admin
@@ -158,9 +189,10 @@ class BoxResource(BaseResource):
     @staticmethod
     def box_args():
         parser = reqparse.RequestParser()
-        parser.add_argument('tray', required=True, type=non_empty_int)
-        parser.add_argument('label', required=True, type=non_empty_string)
-        parser.add_argument('code', required=True, type=standard_non_empty_string)
+        # parser.add_argument('tray', required=True, type=non_empty_int)
+        # parser.add_argument('label', required=True, type=non_empty_string)
+        # parser.add_argument('code', required=True, type=standard_non_empty_string)
+        parser.add_argument('number', required=True, type=non_empty_int)
         parser.add_argument('rows', required=False, type=non_empty_int)
         parser.add_argument('cols', required=False, type=non_empty_int)
 

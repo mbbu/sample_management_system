@@ -7,7 +7,7 @@ from api.models.laboratory import Laboratory
 from api.resources.base_resource import BaseResource
 from api.resources.decorators.user_role_decorators import is_theme_admin
 from api.utils import format_and_lower_str, log_update, log_delete, log_duplicate, log_create, \
-    has_required_request_params, standard_non_empty_string, log_304, get_query_params
+    has_required_request_params, standard_non_empty_string, log_304, get_query_params, get_freezers
 
 
 class LaboratoryResource(BaseResource):
@@ -22,7 +22,15 @@ class LaboratoryResource(BaseResource):
         if query_strings is not None:
             for query_string in query_strings:
                 query, total = Laboratory.search(query_string, 1, 15)
-                labs = query.all()
+
+                # query lab to check for freezers
+                lab = LaboratoryResource.get_laboratory(query_string)
+
+                if lab is not None:
+                    data = get_freezers(lab.id)
+                    return BaseResource.send_json_message(data, 200)
+                else:
+                    labs = query.all()
 
                 data = marshal(labs, self.fields)
                 return BaseResource.send_json_message(data, 200)

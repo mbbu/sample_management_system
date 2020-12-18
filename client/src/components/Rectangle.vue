@@ -1,14 +1,15 @@
 <template>
 <div>
-  <table id="slots" class="grid" style="--cols:0;">
+  <table id="slots" class="grid-view" style="--cols:0;">
     <tr :key="i" v-for="(x,i) in this.slots">
       <td>
         <div v-if="x.available === true">
-          <div ref="cells" class="slot-cell cell-available">
-          </div>
+          <div ref="cells" class="cell-available-view"></div>
         </div>
         <div v-else>
-          <div class="slot-cell cell-occupied"></div>
+          <div ref="cells" contenteditable="true" class="cell-occupied-view" @focusout="getNewSlotData(i)">
+            {{x.code}}
+          </div>
         </div>
       </td>
     </tr>
@@ -24,7 +25,7 @@ name: "Rectangle",
   data(){
     return{
       slots:[], cols: null, rows: null,
-      availableSlots: []
+      availableSlots: [], updatedSlots: [],
 
     }
   },
@@ -37,7 +38,16 @@ name: "Rectangle",
   },
 
   methods: {
+    resetBeforeChange(){
+          this.rows = null;
+          this.cols = null;
+          this.availableSlots = []; this.updatedSlots = [];
+          document.getElementById('slots').style.setProperty("--cols", "0");
+    },
+
     drawSlots(){
+      this.resetBeforeChange();
+
       // draw the slots of the selected box.
       // det the dimension of slots i.e rows and cols
       let last_slot = this.slots[this.slots.length - 1]
@@ -60,14 +70,14 @@ name: "Rectangle",
           this.$refs.cells[i].style.backgroundColor = 'darkred'
         }
       }
-    }
+    },
+
+    getNewSlotData(index){
+      // use the trim method to remove leading and trailing white spaces
+      if (this.slots[index].code.trim() !== this.$refs.cells[index].textContent.trim()){
+        this.updatedSlots.push({'old': this.slots[index].code.trim(), 'new':this.$refs.cells[index].textContent.trim()})
+      }
+    },
   },
 }
 </script>
-
-<style scoped>
-.slot-cell {
-  width: 50px;
-  height: 50px;
-}
-</style>

@@ -25,10 +25,10 @@ class RackResource(BaseResource):
                 query, total = Rack.search(query_string, 1, 15)
 
                 # query freezer to check for chambers
-                rack = RackResource.get_rack(query_string).id
+                rack = RackResource.get_rack(query_string)
 
                 if rack is not None:
-                    data = get_trays(rack)
+                    data = get_trays(rack.id)
                     return BaseResource.send_json_message(data, 200)
                 else:
                     racks = query.all()

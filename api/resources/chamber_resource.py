@@ -26,10 +26,10 @@ class ChamberResource(BaseResource):
                 query, total = Chamber.search(query_string, 1, 15)
 
                 # query freezer to check for chambers
-                chamber = ChamberResource.get_chamber(query_string).id
+                chamber = ChamberResource.get_chamber(query_string)
 
                 if chamber is not None:
-                    data = get_racks(chamber)
+                    data = get_racks(chamber.id)
                     return BaseResource.send_json_message(data, 200)
                 else:
                     chambers = query.all()

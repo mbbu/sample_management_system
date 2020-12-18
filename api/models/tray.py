@@ -15,6 +15,10 @@ class Tray(BaseModel.db.Model, SearchableMixin):
     # relationship(s)
     rack = AppDb.relationship('Rack', backref='tray', lazy=True)
 
+    __mapper_args__ = {
+        "order_by": id
+    }
+
     @staticmethod
     def tray_exists(code):
         if Tray.query.filter(
@@ -25,7 +29,7 @@ class Tray(BaseModel.db.Model, SearchableMixin):
 
     def __init__(self, rack, num, code):
         self.rack_id = rack
-        self.num = num
+        self.number = num
         self.code = code
 
     def __repr__(self):

@@ -25,10 +25,10 @@ class Slot(BaseModel.db.Model, SearchableMixin):
     def __init__(self, box, code, pos):
         self.box_id = box
         self.code = code
-        self.pos = pos
+        self.position = pos
 
     def __repr__(self):
-        return '<< Slot: (box={0} || pos={1} || available={2}) >>'.format(self.box, self.position, self.available)
+        return '<< Slot: (box={0} || pos={1} || available={2}) >>'.format(self.box_id, self.position, self.available)
 
     @staticmethod
     def slot_exists(code):

@@ -25,10 +25,10 @@ class TrayResource(BaseResource):
                 query, total = Tray.search(query_string, 1, 15)
 
                 # query tray to check for boxes
-                box = TrayResource.get_tray(query_string).id
+                box = TrayResource.get_tray(query_string)
 
                 if box is not None:
-                    data = get_boxes(box)
+                    data = get_boxes(box.id)
                     return BaseResource.send_json_message(data, 200)
                 else:
                     trays = query.all()
