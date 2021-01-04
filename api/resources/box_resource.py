@@ -22,7 +22,7 @@ class BoxResource(BaseResource):
         'tray.rack.number': fields.String,
         'tray.rack.chamber.type': fields.String,
         'tray.rack.chamber.freezer.number': fields.String,
-        'tray.rack.chamber.freezer.lab.name': fields.String,
+        'tray.rack.chamber.freezer.lab.building': fields.String,
         'tray.rack.chamber.freezer.lab.room': fields.String
     }
 
