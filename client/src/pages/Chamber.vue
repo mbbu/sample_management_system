@@ -32,7 +32,7 @@
             <td> {{ index + 1 }}</td>
             <td> {{ chamber.type }}</td>
             <td> {{ chamber.code }}</td>
-            <td> {{ chamber['freezer.room'] }}</td>
+            <td> {{ chamber['freezer.lab.room'] }}</td>
             <td> {{ chamber['freezer.number'] }}</td>
 
             <td v-if="isAuth">
