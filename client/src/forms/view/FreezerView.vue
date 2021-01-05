@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div id="container">
-      <b-modal id="modal-freezer-view" title="Freezer View" cancel-variant="danger">
+      <b-modal id="modal-freezer-view" title="Freezer View" cancel-variant="danger" @ok="save">
         <div class="row">
           <!--CHAMBER-->
           <div class="col form-group">
@@ -190,6 +190,8 @@ export default {
         EventBus.$emit('slots-fetched', data)
       })
     },
+
+    save(){EventBus.$emit('update-slots')},
   },
 }
 </script>
