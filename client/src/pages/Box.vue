@@ -35,7 +35,7 @@
                       <td> {{box['tray.rack.number']}}</td>
                       <td> {{box['tray.rack.chamber.type']}}</td>
                       <td> {{box['tray.rack.chamber.freezer.number']}}</td>
-                      <td> {{box['tray.rack.chamber.freezer.lab.name']}}</td>
+                      <td> {{box['tray.rack.chamber.freezer.lab.building']}}</td>
                       <td> {{box['tray.rack.chamber.freezer.lab.room']}}</td>
 
                     <td v-if="isAuth">

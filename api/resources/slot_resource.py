@@ -1,8 +1,9 @@
+import demjson  # used to decode javascript objects to py dicts
 from flask import current_app
-from flask_restful import marshal, fields
+from flask_restful import marshal, fields, reqparse
 
 from api import BaseResource
-from api.models import Slot
+from api.models import Slot, Sample
 from api.models.database import BaseModel
 from api.utils import log_create, log_duplicate, get_query_params, fake
 
@@ -35,6 +36,13 @@ class SlotResource(BaseResource):
                 return BaseResource.send_json_message("Slots not found", 404)
             data = marshal(slots, self.fields)
             return BaseResource.send_json_message(data, 200)
+
+    def put(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('slots', required=True)
+        args = parser.parse_args()
+        slots = demjson.decode(args['slots'])
+        return update_sample_in_slot(slots)
 
     @staticmethod
     def get_slot(code):
@@ -69,6 +77,19 @@ def create_slots(box, row, col):
 
     BaseModel.db.session.commit()  # commit once
     return BaseResource.send_json_message("Slots successfully created", 201)
+
+
+def update_sample_in_slot(slots):
+    """
+        function takes a sample code for a given slot or list of samples for slots in a box
+        and updates the sample code for the specified slot.
+    """
+    for slot in slots['updated']:
+        updated_sample = BaseModel.db.session.query(Sample).filter_by(code=slot['old']).first()
+        updated_sample.code = slot['new']  # set the new code of the sample
+
+    BaseModel.db.session.commit()  # commit session once done
+    return BaseResource.send_json_message("Samples in slots successfully updated", 201)
 
 
 # function to create a matrix for the box to visualize the positions

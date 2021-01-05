@@ -14,7 +14,7 @@ from api.utils import format_and_lower_str, non_empty_string, log_create, log_du
 class ChamberResource(BaseResource):
     fields = {
         'type': fields.String,
-        'freezer.room': fields.String,
+        'freezer.lab.room': fields.String,
         'freezer.number': fields.String,
         'code': fields.String
     }

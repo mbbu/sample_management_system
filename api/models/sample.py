@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from sqlalchemy.orm import backref
+
 from api.constants import SAMPLE_FROM_FIELD
 from api.models.database import BaseModel
 from api.search.searchable_mixin import SearchableMixin
@@ -40,7 +42,7 @@ class Sample(BaseModel.db.Model, SearchableMixin):
     status = AppDb.Column(AppDb.String, nullable=False, default=SAMPLE_FROM_FIELD)
 
     # relationship(s)
-    slot = AppDb.relationship('Slot', backref='sample', lazy=True)
+    slot = AppDb.relationship('Slot', backref=backref('sample', uselist=False), lazy=True)
     user = AppDb.relationship('User', backref='sample', lazy=True)
     requests = AppDb.relationship('SampleRequest', backref='requested_sample', lazy=True)
     publication = AppDb.relationship('Publication', backref='sample', lazy=True)

@@ -9,6 +9,7 @@ export var request_password_reset_resource = `http://${API_BASE_URL}/forgot`;
 export var bio_hazard_level_resource = `http://${API_BASE_URL}/bio-hazard-level`;
 export var request_confirm_resource = `http://${API_BASE_URL}/requestConfirmation`;
 export var box_resource = `http://${API_BASE_URL}/box`;
+export var slot_resource = `http://${API_BASE_URL}/slot`;
 export var rack_resource = `http://${API_BASE_URL}/rack`;
 export var tray_resource = `http://${API_BASE_URL}/tray`;
 export var role_resource = `http://${API_BASE_URL}/role`;

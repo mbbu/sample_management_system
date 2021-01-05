@@ -473,7 +473,8 @@ export default {
 
     updateFreezer: function (evt) {
       this.$v.$touch();
-      if (this.$v.$invalid) {
+      // check if the required fields are invalid.
+      if (this.$v.freezer.code.$invalid || this.$v.freezer.number.$invalid || this.$v.freezer.laboratory.$invalid) {
         evt.preventDefault()
       } else {
         this.freezer.laboratory = getSelectedItem(this.labDataList, this.laboratory);
