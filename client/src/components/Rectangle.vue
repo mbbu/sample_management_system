@@ -19,6 +19,9 @@
 
 <script>
 import EventBus from "@/components/EventBus";
+import axios from "axios";
+import {slot_resource} from "@/utils/api_paths";
+import {handleError, pageStartLoader, secureStoreGetAuthString, showFlashMessage} from "@/utils/util_functions";
 
 export default {
 name: "Rectangle",
@@ -26,7 +29,7 @@ name: "Rectangle",
     return{
       slots:[], cols: null, rows: null,
       availableSlots: [], updatedSlots: [],
-
+      time: 2000, // loader-time
     }
   },
 
@@ -35,6 +38,8 @@ name: "Rectangle",
       this.slots = data
       this.drawSlots()
     })
+
+    EventBus.$on('update-slots', this.updateSlotData)
   },
 
   methods: {
@@ -75,8 +80,27 @@ name: "Rectangle",
     getNewSlotData(index){
       // use the trim method to remove leading and trailing white spaces
       if (this.slots[index].code.trim() !== this.$refs.cells[index].textContent.trim()){
-        this.updatedSlots.push({'old': this.slots[index].code.trim(), 'new':this.$refs.cells[index].textContent.trim()})
+        this.updatedSlots.push({'old': this.slots[index]['sample.code'].trim(), 'new':this.$refs.cells[index].textContent.trim()})
       }
+    },
+
+    updateSlotData(){
+      let loader = pageStartLoader(this);
+      this.$log.info('updated slots are: ', this.updatedSlots, ' of type ', typeof this.updatedSlots[0])
+
+      axios.put(slot_resource, {
+              slots: {'updated' :this.updatedSlots}
+          }, {
+              headers:
+                  {
+                    Authorization: secureStoreGetAuthString()
+                  }
+          }).then((response) => {
+                setTimeout(()=> {
+                  loader.hide();
+                  showFlashMessage(this, 'success', response.data['message'], '');
+                },this.time)
+          }).catch((error) => { handleError(this, error, loader) });
     },
   },
 }
