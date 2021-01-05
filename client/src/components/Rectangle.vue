@@ -8,7 +8,7 @@
         </div>
         <div v-else>
           <div ref="cells" contenteditable="true" class="cell-occupied-view" @focusout="getNewSlotData(i)">
-            {{x.code}}
+            {{x['sample.code']}}
           </div>
         </div>
       </td>
