@@ -13,7 +13,7 @@
     "@google/markerclusterer": "^2.0.9",
     "@syncfusion/ej2-vue-dropdowns": "^18.3.35",
     "@syncfusion/ej2-vue-maps": "^18.3.35",
-    "axios": "^0.18.1",
+    "axios": "^0.21.1",
     "bootstrap": "^4.5.2",
     "bootstrap-vue": "^2.17.3",
     "bulma": "^0.8.2",
