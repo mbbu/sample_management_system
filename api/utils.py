@@ -298,6 +298,7 @@ def get_slots(s):
         'position': fields.Raw,
         'code': fields.String,
         'available': fields.Boolean,
+        'sample.code': fields.String,
     }
 
     slots = BaseModel.db.session.query(Slot).filter_by(box_id=s).all()
