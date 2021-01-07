@@ -54,7 +54,7 @@
             <tr :key="i" v-for="(x,i) in this.loc.slots">
               <td>
                 <div v-if="x.available === true">
-                  <div  ref="cells" class="cell-available" @click="runCellAvailable(x, i)">
+                  <div  ref="cells" class="cell-available" @mouseover="runCellAvailable(x, i)">
                   </div>
                 </div>
                 <div v-else>

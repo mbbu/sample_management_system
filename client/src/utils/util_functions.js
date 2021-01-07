@@ -692,6 +692,8 @@ export function handleError(self, error, loader){
             return error.response.data.message
         } else if (error.response.status === 409) {
             showFlashMessage(self, 'error', error.response.data['message'], '');
+        } else if (error.response.status === 422) {
+            showFlashMessage(self, 'error', error.response.data['message'], 'Unable to process request');
         } else if (error.response.status === 500) {
             showFlashMessage(self, 'error', "Fatal Error", 'Admin has been contacted.');
         } else {
