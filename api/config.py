@@ -50,6 +50,13 @@ class BaseConfig(object):
     # REDCap API Token
     REDCap_API_TOKEN = os.environ.get('REDCap_API_TOKEN')
 
+    # CORS
+    cors_config = {
+       "origins": ["http://localhost:8080", "http://10.0.0.155:8080"],
+       "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+       "allow_headers": ["Authorization", "Content-Type", "code", "title"]
+    }
+
 
 class TestConfig(BaseConfig):
     configs = {"TESTING": True,
