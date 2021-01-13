@@ -188,8 +188,7 @@ def create_app(test_config=None):
     register_resources(app)
 
     # Cross-Origin Resource Sharing
-    # todo: proper CORS config, to ensure requests to the api are only sent by verified clients
-    CORS(app, resources={r"/*": {"origins": "*"}})
+    CORS(app, resources={r"/*": BaseConfig.cors_config})
 
     # Extensions SetUp
     ext = extensions_set_up(app)
