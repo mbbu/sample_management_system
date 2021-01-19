@@ -51,8 +51,9 @@ class SampleRequestResource(BaseResource):
             BaseModel.db.session.commit()
             log_create(sample_request)
 
-            storage = str(sample.box.tray.rack.chamber.freezer.lab.name) + ' Lab, freezer number ' + \
-                      str(sample.box.tray.rack.chamber.freezer.number) + ' in a box labeled ' + str(sample.box.label)
+            storage = str(sample.slot.box.tray.rack.chamber.freezer.lab.building) + ' Lab, freezer number ' + \
+                      str(sample.slot.box.tray.rack.chamber.freezer.number) + \
+                      ' in a box labeled ' + str(sample.slot.box.label) + ' and position ' + str(sample.slot.position)
 
             send_sample_request_email(email=sample.user.email, handler=sample.user.first_name,
                                       requester_name=user.first_name + ' ' + user.last_name, requester_email=user.email,
