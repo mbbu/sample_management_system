@@ -53,7 +53,7 @@ class SampleResource(BaseResource):
         'slot.box.tray.rack.number': fields.String,
         'slot.box.tray.rack.chamber.type': fields.String,
         'slot.box.tray.rack.chamber.freezer.number': fields.String,
-        'slot.box.tray.rack.chamber.freezer.lab.name': fields.String,
+        'slot.box.tray.rack.chamber.freezer.lab.building': fields.String,
         'slot.box.tray.rack.chamber.freezer.lab.room': fields.String
 
     }

@@ -29,8 +29,6 @@ export function redirectAfterCountDown(self, route, countDown = 5) {
         return countDown
     } else if (countDown === 0) {
 
-        self.$log.info("**** Timer out ... ****");
-        self.$log.info("ROUTE PASSED" + route)
         self.$router.push({path: route}).then(r => console.log(r));
     }
     return countDown;

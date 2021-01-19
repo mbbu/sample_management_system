@@ -357,7 +357,7 @@ export default {
       this.sample.securityLevel = res['bioHazardLevel.name'];
       this.sample.code = res['code'];
       this.sample.date = this.dateNow();
-      this.sample.lab = res['slot.box.tray.rack.chamber.freezer.lab.name'];
+      this.sample.lab = res['slot.box.tray.rack.chamber.freezer.lab.building'];
       this.sample.room = res['slot.box.tray.rack.chamber.freezer.lab.room'];
       this.sample.freezer = res['slot.box.tray.rack.chamber.freezer.number'];
       this.sample.chamber = res['slot.box.tray.rack.chamber.type'];
@@ -388,7 +388,7 @@ export default {
             setTimeout(() => {
               loader.hide()
               this.response = res.data.message;
-              this.setSampleData(this.response)
+              this.setSampleData(this.response);
             }, 2500)
           }).catch((error) => {
         handleError(this, error, loader)
