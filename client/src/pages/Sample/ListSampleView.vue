@@ -257,11 +257,10 @@ export default {
             setTimeout(() => {
               this.haltProgressPath()
               this.sampleList = this.response = res.data.message;
+              // eslint-disable-next-line no-unused-vars
               for (const [key, value] of this.response.entries()) {
-                console.log(key, value);
-                for (let item in key) {
-                  console.log(item + typeof item)
-                }
+                // eslint-disable-next-line no-unused-vars,no-empty
+                for (let item in key) {}
             }
             }, 2000)
           })
