@@ -21,7 +21,8 @@ class SampleRequestResource(BaseResource):
         'requested_sample.project': fields.String,
         'requested_sample.animal_species': fields.String,
         'requested_sample.sample_type': fields.String,
-        'requested_sample.location_collected': fields.String,
+        'requested_sample.study_block.name': fields.String,
+        'requested_sample.study_block.area': fields.String,
         'requested_sample.user.first_name': fields.String,
         'requested_sample.user.last_name': fields.String,
         'requested_sample.user.email': fields.String,
@@ -55,10 +56,12 @@ class SampleRequestResource(BaseResource):
                       str(sample.slot.box.tray.rack.chamber.freezer.number) + \
                       ' in a box labeled ' + str(sample.slot.box.label) + ' and position ' + str(sample.slot.position)
 
+            location = sample.study_block.name + ", " + sample.study_block.area
+
             send_sample_request_email(email=sample.user.email, handler=sample.user.first_name,
                                       requester_name=user.first_name + ' ' + user.last_name, requester_email=user.email,
                                       species=sample.animal_species, qt=sample.quantity.id,
-                                      sample_type=sample.sample_type, location=sample.location_collected,
+                                      sample_type=sample.sample_type, location=location,
                                       available=sample.amount, storage=storage, amount=amount, date=date,
                                       sample_request=sample_request.id)
 
