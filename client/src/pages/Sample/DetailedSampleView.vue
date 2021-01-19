@@ -389,7 +389,6 @@ export default {
               loader.hide()
               this.response = res.data.message;
               this.setSampleData(this.response);
-              this.$log.info(this.response)
             }, 2500)
           }).catch((error) => {
         handleError(this, error, loader)
