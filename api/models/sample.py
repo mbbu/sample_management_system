@@ -11,7 +11,7 @@ class Sample(BaseModel.db.Model, SearchableMixin):
     __tablename__ = index_name = 'sample'
     __searchable__ = ['animal_species', 'sample_type', 'status',
                       'retention_date', 'barcode', 'analysis', 'code',
-                      'temperature', 'bio_hazard_level', 'created_at']
+                      'temperature', 'bio_hazard_level', 'created_at', 'location_collected']
 
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
@@ -21,7 +21,8 @@ class Sample(BaseModel.db.Model, SearchableMixin):
     animal_species = AppDb.Column(AppDb.String(100), nullable=True, index=True)
     sample_type = AppDb.Column(AppDb.String(100), nullable=True, index=True)
     sample_description = AppDb.Column(AppDb.Text, nullable=True)
-    location_collected = AppDb.Column(AppDb.JSON, nullable=True)
+    location_collected = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('study_block.id', ondelete='SET NULL'),
+                                      nullable=True, index=True)
     project_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('project.id', ondelete='SET NULL'), nullable=True,
                               index=True)
     retention_date = AppDb.Column(AppDb.DateTime, nullable=True)
