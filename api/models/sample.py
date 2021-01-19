@@ -11,7 +11,7 @@ class Sample(BaseModel.db.Model, SearchableMixin):
     __tablename__ = index_name = 'sample'
     __searchable__ = ['animal_species', 'sample_type', 'status',
                       'retention_date', 'barcode', 'analysis', 'code',
-                      'temperature', 'bio_hazard_level', 'created_at', 'location_collected']
+                      'temperature', 'bio_hazard_level', 'created_at']
 
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
