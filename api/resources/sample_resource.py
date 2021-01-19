@@ -15,6 +15,7 @@ from api.resources.decorators.user_role_decorators import is_sample_owner
 from api.resources.project_resource import ProjectResource
 from api.resources.quantity_type_resource import QuantityTypeResource
 from api.resources.slot_resource import SlotResource
+from api.resources.study_block_resource import StudyBlockResource
 from api.resources.theme_resource import ThemeResource
 from api.utils import format_and_lower_str, log_create, log_update, log_duplicate, \
     has_required_request_params, non_empty_int, log_304, set_date_from_int, get_any_user_by_email, get_query_params, \
@@ -201,7 +202,7 @@ class SampleResource(BaseResource):
         parser.add_argument('theme', required=True)
         parser.add_argument('slots', required=False)
         parser.add_argument('amount', required=True)
-        parser.add_argument('project', required=False)
+        parser.add_argument('project', required=True)
         parser.add_argument('analysis', required=True)
         parser.add_argument('temperature', required=True)
         parser.add_argument('sample_type', required=False)
@@ -211,7 +212,7 @@ class SampleResource(BaseResource):
         parser.add_argument('retention_period', required=True)
         parser.add_argument('bio_hazard_level', required=True)
         parser.add_argument('sample_description', required=False)
-        parser.add_argument('location_collected', required=False)
+        parser.add_argument('location_collected', required=True)
         parser.add_argument('user', required=False, type=non_empty_int)  # user is the sample owner
 
         args = parser.parse_args()
@@ -249,10 +250,11 @@ class SampleResource(BaseResource):
         qt = QuantityTypeResource.get_quantity_type(args['quantity_type']).id
         bhl = BioHazardLevelResource.get_bio_hazard_level(args['bio_hazard_level']).id
         project = ProjectResource.get_project(args['project']).id
+        location = StudyBlockResource.get_study_block(args['location']).id
 
         sample.theme_id, sample.user_id, sample.slot_id = theme, user, slot.id
         sample.animal_species, sample.sample_type = args['species'], args['type']
-        sample.sample_description, sample.location_collected = args['desc'], args['location']
+        sample.sample_description, sample.location_collected = args['desc'], location
         sample.barcode, sample.project_id = barcode, project
         sample.temperature, sample.amount, sample.quantity_type = args['temperature'], args['amount'], qt
         sample.retention_date, sample.analysis = args['retention_date'], args['analysis']
