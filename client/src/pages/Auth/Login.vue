@@ -164,7 +164,7 @@ export default {
                                   redirectAfterCountDown(this, '/home') + " seconds");
                               // set jwt token required across requests
                               secureStoreSetUserInfo(response.data.message.token, response.data.message.email, response.data.message.first_name,
-                                  response.data.message.last_name, response.data.message['role.name']);
+                                  response.data.message.last_name, response.data.message['role.code']);
                             } else if (response.status === 203) {
                               showFlashMessage(this, 'error', response.data.message, 'You can request for reactivation email')
                               redirectAfterCountDown(this, '/requestConfirmation')
