@@ -12,7 +12,7 @@ class AuthResource(BaseResource):
         'email': fields.String,
         'first_name': fields.String,
         'last_name': fields.String,
-        'role.name': fields.String,
+        'role.code': fields.String,
     }
 
     def post(self):
