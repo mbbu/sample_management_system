@@ -229,12 +229,12 @@ class UserResource(BaseResource):
             for sample in user_samples:
                 sample_details = {}
                 theme = sample.theme.name
-                project = sample.project_id
+                project = sample.project.name
                 species = sample.animal_species
                 _type = sample.sample_type
                 barcode = sample.barcode
                 code = sample.code
-                location = sample.location_collected
+                location = sample.study_block.name + ", " + sample.study_block.area
 
                 sample_details.update(
                     {'theme': theme, 'project': project, 'species': species, 'type': _type,
@@ -251,7 +251,7 @@ class UserResource(BaseResource):
                 publications = {}
                 title = publication.publication_title
                 co_authors = publication.co_authors
-                project = publication.sample.project
+                project = publication.sample.project.name
                 theme = publication.sample.theme.name
                 sample = publication.sample.code
                 sample_results = publication.sample_results
@@ -269,8 +269,8 @@ class UserResource(BaseResource):
             user_sample_request_details = []
             for sample_request in user_sample_requests:
                 sample_requests = {}
-                sample_owner = sample_request.requested_sample.project_owner
-                sample_project = sample_request.requested_sample.project
+                sample_owner = sample_request.requested_sample.user.first_name
+                sample_project = sample_request.requested_sample.project.name
                 sample_type = sample_request.requested_sample.sample_type
                 sample_species = sample_request.requested_sample.animal_species
                 amount = sample_request.amount
@@ -284,7 +284,7 @@ class UserResource(BaseResource):
 
                 sample_requests.update({'type': sample_type, 'species': sample_species, 'amount': amount,
                                         'request_date': request_date, 'response_date': response_date, 'code': code,
-                                        'status': status, 'owner': sample_owner, 'project': sample_project,
+                                        'status': status,  'project': sample_project, 'owner': sample_owner,
                                         'notes': notes, 'approved': approved})
                 user_sample_request_details.append(sample_requests)
 
@@ -299,7 +299,7 @@ class UserResource(BaseResource):
                 requested_samples = {}
                 requester = sample_request.requested_sample.user.first_name + \
                             " " + sample_request.requested_sample.user.last_name
-                sample_project = sample_request.requested_sample.project
+                sample_project = sample_request.requested_sample.project.name
                 sample_type = sample_request.requested_sample.sample_type
                 sample_species = sample_request.requested_sample.animal_species
                 amount = sample_request.amount

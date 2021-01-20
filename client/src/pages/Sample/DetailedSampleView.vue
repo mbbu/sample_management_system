@@ -347,7 +347,7 @@ export default {
       this.sample.sampleType = res['sample_type'];
       this.sample.species = res['animal_species'];
       this.sample.description = res['sample_description'];
-      this.sample.locationCollected = res['location_collected'];
+      this.sample.locationCollected = res['study_block.name'] + ", " + res['study_block.area'];
       this.sample.retention = res['retention_date'];
       this.sample.barcode = res['barcode'];
       this.sample.analysis = res['analysis'];

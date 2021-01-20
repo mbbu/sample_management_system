@@ -38,7 +38,6 @@
                   @change="setProject"
               ></ejs-dropdownlist>
             </b-form-group>
-
           </div>
 
           <!--PROJECT HEAD-->
@@ -78,11 +77,26 @@
 
         <!-- TAB 2 -->
         <tab-content :before-change="handleSubmit" title="Sample Location in Institution">
-          <div v-if="isUpdate" class="form-group">
-            <label for="locationCollected">Location Collected</label>
-            <input id="locationCollected" v-model="sample.locationCollected" class="form-control" required
-                   type="text"/>
+          <!-- LOCATION -->
+          <div class="form-group">
+            <b-form-group id="form-locationCollected" label="Select Location:" label-for="form-loc-input">
+              <ejs-dropdownlist
+                  id="locationCollected-dropdownlist"
+                  :dataSource='locDataList'
+                  :fields="fields"
+                  :v-model="sample.locationCollected"
+                  :value="selectDropDownItemForUpdate('locationCollected-dropdownlist', sample.locationCollected, locDataList)"
+                  placeholder='Select location sample(s) was collected from'
+                  @change="setLocation"
+              ></ejs-dropdownlist>
+            </b-form-group>
           </div>
+
+<!--          <div v-if="isUpdate" class="form-group">-->
+<!--            <label for="locationCollected">Location Collected</label>-->
+<!--            <input id="locationCollected" v-model="sample.locationCollected" class="form-control" required-->
+<!--                   type="text"/>-->
+<!--          </div>-->
 
           <!-- CASCADING DROPDOWNS TO DETERMINE A PLACE FOR THE SAMPLE -->
           <div>
@@ -226,7 +240,7 @@ import {
 } from "@/utils/util_functions";
 import {
   bio_hazard_level_resource, project_resource,
-  quantity_type_resource, sample_resource, theme_resource
+  quantity_type_resource, sample_resource, study_block_resource, theme_resource
 } from "@/utils/api_paths";
 import TopNav from "@/components/TopNav";
 import ErrorsDisplay from "@/components/ErrorsDisplay";
@@ -258,6 +272,7 @@ export default {
 
       // lists
       errors: [], QTDataList: [], projectList: [], themeDataList: [], projectDataList: [], secLevelDataList: [],
+      locDataList: [],
       fields: {text: '', value: ''},
       page_title: "Add Sample",
     };
@@ -309,6 +324,20 @@ export default {
           this.projectDataList.push({
             'Code': projectList.items[i].Code,
             'Name': projectList.items[i].Name,
+          });
+        }
+      })
+
+      // GET StudyBlock LIST
+      getItemDataList(study_block_resource).then(data => {
+        let locationList = extractApiData(data);
+
+        // update local variables with data from API
+        this.fields = locationList['fields'];
+        for (let i = 0; i < locationList.items.length; i++) {
+          this.locDataList.push({
+            'Code': locationList.items[i].Code,
+            'Name': locationList.items[i].Name,
           });
         }
       })
@@ -474,6 +503,10 @@ export default {
         //  convert years to days
         this.sample.convertedRetentionPeriod = this.sample.retention * 365
       }
+    },
+
+    setLocation() {
+      this.sample.locationCollected = getSelectedItemCode("locationCollected-dropdownlist", this.locDataList)
     },
 
     formSubmit() {

@@ -15,15 +15,19 @@ class Sample(BaseModel.db.Model, SearchableMixin):
 
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
-    theme_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('theme.id', ondelete='SET NULL'), nullable=True, index=True)
-    user_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('users.id', ondelete='SET NULL'), nullable=True, index=True)
-    slot_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('slot.id', ondelete='SET NULL'), nullable=True, index=True)
+    theme_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('theme.id', ondelete='SET NULL'),
+                            nullable=False, index=True)
+    user_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('users.id', ondelete='SET NULL'),
+                           nullable=False, index=True)
+    slot_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('slot.id', ondelete='SET NULL'),
+                           nullable=False, index=True)
     animal_species = AppDb.Column(AppDb.String(100), nullable=True, index=True)
     sample_type = AppDb.Column(AppDb.String(100), nullable=True, index=True)
     sample_description = AppDb.Column(AppDb.Text, nullable=True)
-    location_collected = AppDb.Column(AppDb.JSON, nullable=True)
-    project_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('project.id', ondelete='SET NULL'), nullable=True,
-                              index=True)
+    location_collected = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('study_block.id', ondelete='SET NULL'),
+                                      nullable=False, index=True)
+    project_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('project.id', ondelete='SET NULL'),
+                              nullable=False, index=True)
     retention_date = AppDb.Column(AppDb.DateTime, nullable=True)
     barcode = AppDb.Column(AppDb.String(100), nullable=True)
     analysis = AppDb.Column(AppDb.String(100), nullable=True)
@@ -35,9 +39,9 @@ class Sample(BaseModel.db.Model, SearchableMixin):
 
     # Default = Celsius
     amount = AppDb.Column(AppDb.Integer, nullable=True, default=0)
-    quantity_type = AppDb.Column(AppDb.String, AppDb.ForeignKey('quantity_type.id', ondelete='SET NULL'), nullable=True)
+    quantity_type = AppDb.Column(AppDb.String, AppDb.ForeignKey('quantity_type.id', ondelete='SET NULL'), nullable=False)
     bio_hazard_level = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('bio_hazard_level.id', ondelete='SET NULL'),
-                                    nullable=True)
+                                    nullable=False)
     code = AppDb.Column(AppDb.String, nullable=False, unique=True)
     status = AppDb.Column(AppDb.String, nullable=False, default=SAMPLE_FROM_FIELD)
 

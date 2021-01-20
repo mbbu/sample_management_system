@@ -14,6 +14,7 @@ class StudyBlock(BaseModel.db.Model, SearchableMixin):
 
     # relationship
     house_hold_data = AppDb.relationship('AnimalHealthHouseData', backref='study_block', lazy=True)
+    samples = AppDb.relationship('Sample', backref='study_block', lazy=True)
 
     @staticmethod
     def study_block_exists(code):

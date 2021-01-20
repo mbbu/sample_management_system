@@ -35,7 +35,7 @@
                         <td> {{ sample['theme.name'] }}</td>
                         <td> {{ sample['project.name'] }}</td>
                         <td> {{ sample['project.lead.first_name'] }} {{ sample['project.lead.last_name'] }}</td>
-                        <td> {{ sample.location_collected }}</td>
+                        <td> {{ sample['study_block.name'] }}, {{ sample['study_block.area'] }}</td>
                         <td> {{ sample.animal_species }}</td>
                         <td> {{ sample.barcode }}</td>
 
