@@ -9,8 +9,8 @@ import EventBus from "../components/EventBus";
 self.flashMessage = undefined;
 
 
-export const ADMIN = "System Admin"
-export const RESEARCHER = "Lab Technician" //todo: review role
+export const ADMIN = "-1"
+export const RESEARCHER = "1" //todo: review role
 
 export function showFlashMessage(self, status, title, message) {
     self.flashMessage.show({
