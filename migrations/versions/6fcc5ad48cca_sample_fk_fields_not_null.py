@@ -24,9 +24,6 @@ def upgrade():
     op.alter_column('sample', 'bio_hazard_level',
                     existing_type=sa.INTEGER(),
                     nullable=False)
-    op.alter_column('sample', 'location_collected',
-                    existing_type=sa.INTEGER(),
-                    nullable=False)
     op.alter_column('sample', 'project_id',
                     existing_type=sa.INTEGER(),
                     nullable=False)
@@ -60,9 +57,6 @@ def downgrade():
                     existing_type=sa.VARCHAR(),
                     nullable=True)
     op.alter_column('sample', 'project_id',
-                    existing_type=sa.INTEGER(),
-                    nullable=True)
-    op.alter_column('sample', 'location_collected',
                     existing_type=sa.INTEGER(),
                     nullable=True)
     op.alter_column('sample', 'bio_hazard_level',
