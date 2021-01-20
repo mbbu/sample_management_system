@@ -76,7 +76,7 @@ export default {
 
                 // set jwt token required across requests
                 secureStoreSetUserInfo(response.data.message.token, response.data.message.email, response.data.message.first_name,
-                    response.data.message.last_name, response.data.message['role.name']);
+                    response.data.message.last_name, response.data.message['role.code']);
               }
             }, 3000)
           })
