@@ -25,9 +25,9 @@ DATABASE_URI_ENV_NAME = APP_NAME + "_DATABASE_URI"
 
 # External URLs and APIs
 REDCAP_URI = 'https://redcap.icipe.org/redcap/api/'
-EMAIL_CONFIRM_URI = 'http://10.0.0.155:8080/confirm/{0}'
-PASSWORD_RESET_URI = 'http://10.0.0.155:8080/reset/{0}'
-SAMPLE_REQUEST_RESPONSE = 'http://10.0.0.155:8080/request-response/{0}'
+EMAIL_CONFIRM_URI = 'http://lims.icipe.org:8080/confirm/{0}'
+PASSWORD_RESET_URI = 'http://lims.icipe.org:8080/reset/{0}'
+SAMPLE_REQUEST_RESPONSE = 'http://lims.icipe.org:8080/request-response/{0}'
 SAMPLE_COLLECTION_FORM = 'https://redcap.icipe.org/redcap/surveys/?s=EAC9JMJWWT'
 SAMPLE_MANAGEMENT_FORM = 'https://redcap.icipe.org/redcap/surveys/?s=3LWMHELP7P'
 
@@ -39,7 +39,7 @@ EMAIL_TOKEN_EXPIRATION = 3600  # equivalent to 1 hour
 EXPIRATION_AS_HR = EMAIL_TOKEN_EXPIRATION / (60 * 60)
 
 # Email sender
-EMAIL_SENDER = ''  # todo: set email that will send out other mails
+EMAIL_SENDER = 'icipe.samplemanagementsystem@gmail.com'
 
 # role constants
 SYSADMIN = "-1"
