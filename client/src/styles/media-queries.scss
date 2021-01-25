@@ -19,7 +19,7 @@
   }
 
   .main-content__title {
-    margin: 15px 0 15px 0px;
+    margin: 15px 0 15px 0;
   }
 
   #wrapper {
@@ -40,4 +40,39 @@
     left: 290px;
     z-index: 9999;
   }
+}
+
+/* Extra large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+  .main-content {
+    margin: 0 0 0 70px;
   }
+
+  .main-content__top {
+    width: 80%;
+    margin-left: 0;
+  }
+
+  .main-content__title {
+    margin: 15px 0 15px 0;
+  }
+
+  #wrapper {
+    padding-left: 277px;
+  }
+
+  #wrapper.toggled .content-overlay {
+    display: block;
+  }
+
+  .menu-container {
+    width: 0;
+    left: -277px;
+  }
+
+  #wrapper.toggled .menu-container {
+    width: 290px;
+    left: 290px;
+    z-index: 9999;
+  }
+}

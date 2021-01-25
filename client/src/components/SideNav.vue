@@ -77,7 +77,7 @@
 </template>
 
 <script>
-    import FooterScript from "./../components/Footer";
+    import FooterScript from "@/components/Footer";
     export default {
         name: 'side-menu',
         components: {FooterScript}

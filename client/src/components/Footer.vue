@@ -8,7 +8,7 @@
 </template>
 
 <script>
-    import {getThisYear} from "../utils/util_functions";
+    import {getThisYear} from "@/utils/util_functions";
 
     export default {
         name: "FooterScript",
@@ -20,7 +20,3 @@
         methods: {getThisYear},
     }
 </script>
-
-<style scoped>
-
-</style>

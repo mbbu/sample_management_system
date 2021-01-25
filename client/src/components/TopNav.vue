@@ -118,7 +118,7 @@ export default {
   },
   methods: {
     getCompanyLogo() {
-      return require('../assets/logo.png')
+      return require('@/assets/logo.png')
             },
             getUser() {
                 this.isAuth = isUserLoggedIn()

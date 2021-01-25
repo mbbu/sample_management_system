@@ -133,7 +133,7 @@ def register_resources(app):
 def config_app(app_instance):
     config_type = get_config_type()
     file_logging(app_instance)
-    # mail_admin(app_instance) todo: uncomment when app is in production
+    mail_admin(app_instance)
 
     # possible configurations as a dictionary
     configs = {
