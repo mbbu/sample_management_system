@@ -52,7 +52,7 @@ class BaseConfig(object):
 
     # CORS
     cors_config = {
-       "origins": ["http://localhost:80", "http://127.0.0.1:80",
+       "origins": ["http://localhost", "http://localhost:80",
                    "http://localhost:8080", "http://lims.icipe.org:8080",
                    "http://lims.icipe.org", "http://lims.icipe.org:80"],
        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
