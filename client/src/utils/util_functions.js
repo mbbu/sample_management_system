@@ -29,7 +29,8 @@ export function redirectAfterCountDown(self, route, countDown = 5) {
         return countDown
     } else if (countDown === 0) {
 
-        self.$router.push({path: route}).then(r => console.log(r));
+        // eslint-disable-next-line no-unused-vars
+        self.$router.push({path: route}).then(r => { return r});
     }
     return countDown;
 }
