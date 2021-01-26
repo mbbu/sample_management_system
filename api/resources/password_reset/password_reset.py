@@ -8,7 +8,7 @@ from flask_restful import reqparse
 
 from api import BaseResource
 from api.models.database import BaseModel
-from api.constants import EXPIRATION_AS_HR, PASSWORD_RESET_URI
+from api.constants import EXPIRATION_AS_HR, PASSWORD_RESET_URI, ADMIN_EMAIL
 from api.models import User
 from api.resources.email_confirmation.send_email import send_email
 from api.utils import confirm_token, get_user_by_email, \
@@ -18,7 +18,7 @@ from api.utils import confirm_token, get_user_by_email, \
 def send_pwd_reset_email(email):
     email_token = generate_confirmation_token(email)
     pwd_url = PASSWORD_RESET_URI.format(email_token)
-    html = render_template("password_reset.html", pwd_url=pwd_url, valid_time=EXPIRATION_AS_HR)
+    html = render_template("password_reset.html", pwd_url=pwd_url, admin_email=ADMIN_EMAIL, valid_time=EXPIRATION_AS_HR)
     send_email(email, 'Reset Your Password', template=html)
 
 

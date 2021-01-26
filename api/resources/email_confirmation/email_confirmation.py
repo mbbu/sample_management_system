@@ -8,7 +8,7 @@ from flask_restful import marshal, fields, reqparse
 
 from api import BaseResource
 from api.models.database import BaseModel
-from api.constants import EXPIRATION_AS_HR, EMAIL_CONFIRM_URI
+from api.constants import EXPIRATION_AS_HR, EMAIL_CONFIRM_URI, ADMIN_EMAIL
 from api.resources.email_confirmation.send_email import send_email
 from api.utils import log_in_user_jwt, get_unconfirmed_user, generate_confirmation_token, confirm_token
 
@@ -16,7 +16,8 @@ from api.utils import log_in_user_jwt, get_unconfirmed_user, generate_confirmati
 def send_confirmation_email(email):
     email_token = generate_confirmation_token(email)
     confirm_url = EMAIL_CONFIRM_URI.format(email_token)
-    html = render_template("email_confirmation.html", confirm_url=confirm_url, valid_time=EXPIRATION_AS_HR)
+    html = render_template("email_confirmation.html", confirm_url=confirm_url, admin_email=ADMIN_EMAIL,
+                           valid_time=EXPIRATION_AS_HR)
     send_email(email, 'Confirm Your Email Address', template=html)
 
 
