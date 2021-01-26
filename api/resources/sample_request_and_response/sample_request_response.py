@@ -6,7 +6,7 @@ from flask_restful import reqparse
 
 from api import BaseResource
 from api.models.database import BaseModel
-from api.constants import APPROVED_STATUS, DECLINED_STATUS
+from api.constants import APPROVED_STATUS, DECLINED_STATUS, ADMIN_EMAIL, LIMS_URL
 from api.resources.email_confirmation.send_email import send_email
 from api.resources.sample_request_and_response.sample_request_resource import SampleRequestResource
 from api.utils import confirm_token
@@ -95,9 +95,9 @@ def send_response_on_request_status(email, requester_name, status, notes, approv
         title = "Request Declined"
 
     # todo: lims url
-    lims_url = 'http://10.0.0.155/lims'
     html = render_template('sample_request_response.html', requester_name=requester_name, status=status, notes=notes,
-                           lims_url=lims_url, approved_amount=approved_amount, storage=storage, species=species, qt=qt,
-                           type=_type, location=location, approved=APPROVED_STATUS, declined=DECLINED_STATUS)
+                           lims_url=LIMS_URL, approved_amount=approved_amount, storage=storage, species=species, qt=qt,
+                           admin_email=ADMIN_EMAIL, type=_type, location=location, approved=APPROVED_STATUS,
+                           declined=DECLINED_STATUS)
 
     send_email(email, title, template=html)

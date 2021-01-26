@@ -4,7 +4,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from api import BaseResource, BaseConfig
 from api.models.database import BaseModel
-from api.constants import REDCAP_URI, SAMPLE_FROM_FIELD
+from api.constants import REDCAP_URI, SAMPLE_FROM_FIELD, ADMIN_EMAIL
 from api.models import Sample
 from api.resources.email_confirmation.send_email import send_email
 from api.utils import log_export_from_redcap, log_duplicate, get_user_by_email
@@ -84,5 +84,5 @@ def export_all_records():
 
 
 def send_email_on_redcap_issue(email, error, user, user_email):
-    html = render_template("redcap_error.html", user_email=user_email, user=user, error=error)
+    html = render_template("redcap_error.html", user_email=user_email, user=user, error=error, admin_email=ADMIN_EMAIL)
     send_email(email, 'REDCap Error', template=html)

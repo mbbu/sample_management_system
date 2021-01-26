@@ -2,7 +2,7 @@ from flask import current_app, request, render_template
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restful import reqparse, marshal, fields
 
-from api.constants import PENDING_STATUS, SAMPLE_REQUEST_RESPONSE, TOKEN_EXPIRATION_AS_DAYS
+from api.constants import PENDING_STATUS, SAMPLE_REQUEST_RESPONSE, TOKEN_EXPIRATION_AS_DAYS, ADMIN_EMAIL
 from api.models import SampleRequest
 from api.models.database import BaseModel
 from api.resources.base_resource import BaseResource
@@ -195,7 +195,7 @@ def send_sample_request_email(email, handler, requester_name, requester_email, s
                            requester_name=requester_name, requester_email=requester_email, qt=qt,
                            species=species, type=sample_type, location=location, handler=handler,
                            available_amount=available, storage=storage, amount=amount, date=date,
-                           sample_request_response_url=sample_request_response_url,
+                           sample_request_response_url=sample_request_response_url,  admin_email=ADMIN_EMAIL,
                            expiration_days=TOKEN_EXPIRATION_AS_DAYS, expiration_date=expiration_date)
     send_email(email, 'Sample Request', template=html)
 
@@ -208,7 +208,7 @@ def send_sample_request_update_email(email, handler, requester_name, requester_e
     html = render_template("sample_request_update.html",
                            requester_name=requester_name, requester_email=requester_email, qt=qt,
                            handler=handler, former_amount=former_amount, available_amount=available, amount=amount,
-                           sample_request_response_url=sample_request_response_url,
+                           sample_request_response_url=sample_request_response_url,  admin_email=ADMIN_EMAIL,
                            expiration_days=TOKEN_EXPIRATION_AS_DAYS, expiration_date=expiration_date)
     send_email(email, 'Sample Request Update', template=html)
 
@@ -222,6 +222,6 @@ def send_reminder_to_handler(email, handler, requester_name, requester_email, sp
                            requester_name=requester_name, requester_email=requester_email, qt=qt,
                            species=species, type=sample_type, location=location, handler=handler,
                            available_amount=available, storage=storage, amount=amount,
-                           sample_request_response_url=sample_request_response_url,
+                           sample_request_response_url=sample_request_response_url, admin_email=ADMIN_EMAIL,
                            expiration_days=TOKEN_EXPIRATION_AS_DAYS, expiration_date=expiration_date)
     send_email(email, 'Sample Request Reminder', template=html)
