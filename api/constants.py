@@ -24,6 +24,7 @@ revoked_store = redis.StrictRedis(host='localhost', port=6379, db=0,
 DATABASE_URI_ENV_NAME = APP_NAME + "_DATABASE_URI"
 
 # External URLs and APIs
+LIMS_URL = 'http://lims.icipe.org'
 REDCAP_URI = 'https://redcap.icipe.org/redcap/api/'
 EMAIL_CONFIRM_URI = 'http://lims.icipe.org/confirm/{0}'
 PASSWORD_RESET_URI = 'http://lims.icipe.org/reset/{0}'
@@ -39,7 +40,7 @@ EMAIL_TOKEN_EXPIRATION = 3600  # equivalent to 1 hour
 EXPIRATION_AS_HR = EMAIL_TOKEN_EXPIRATION / (60 * 60)
 
 # Email sender
-EMAIL_SENDER = 'icipe.samplemanagementsystem@gmail.com'
+ADMIN_EMAIL = 'icipe.samplemanagementsystem@gmail.com'
 
 # role constants
 SYSADMIN = "-1"
