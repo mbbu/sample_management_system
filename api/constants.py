@@ -45,6 +45,8 @@ ADMIN_EMAIL = 'icipe.samplemanagementsystem@gmail.com'
 # role constants
 SYSADMIN = "-1"
 THEMEADMIN = "1"
+RESEARCHER = "2"
+LAB_ADMIN = "3"
 
 FORBIDDEN_FUNCTION_ACCESS_RESPONSE_CODE = 403
 FORBIDDEN_FUNCTION_ACCESS_RESPONSE = "You cannot access this function, you are not an admin!"

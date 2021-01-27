@@ -9,8 +9,10 @@ import EventBus from "../components/EventBus";
 self.flashMessage = undefined;
 
 
-export const ADMIN = "-1"
-export const RESEARCHER = "1" //todo: review role
+export const SYS_ADMIN = "-1"
+export const THEME_ADMIN = "1"
+export const RESEARCHER = "2"
+export const LAB_ADMIN = "3"
 
 export function showFlashMessage(self, status, title, message) {
     self.flashMessage.show({
@@ -425,6 +427,7 @@ export function getStoredUserDetails() {
     user.last_name = store.state.user.lastName
     user.role = store.state.user.role
 
+    console.log("User details", user)
     return user
 }
 
@@ -480,19 +483,23 @@ export function logOutUser(self) {
 // SYSTEM ADMIN FUNCTIONS
 export function isAdmin() {
     let userStatus = getLoggedInUser()
-    return !!(userStatus && userStatus.role === ADMIN);
+    return !!(userStatus && userStatus.role === SYS_ADMIN);
 }
 
 // THEME ADMIN FUNCTIONS
 export function isThemeAdmin() {
     let userStatus = getLoggedInUser()
-    return !!(userStatus && (userStatus.role === ADMIN || userStatus.role === RESEARCHER));
+    return !!(userStatus && (userStatus.role === SYS_ADMIN || userStatus.role === THEME_ADMIN));
 }
 
-//todo: review
 export function isResearcher() {
     let userStatus = getLoggedInUser()
-    return !!(userStatus && (userStatus.role === ADMIN || userStatus.role === 'Researcher'));
+    return !!(userStatus && (userStatus.role === SYS_ADMIN || userStatus.role === RESEARCHER));
+}
+
+export function isLabAdmin() {
+    let userStatus = getLoggedInUser()
+    return !!(userStatus && (userStatus.role === SYS_ADMIN || userStatus.role === LAB_ADMIN));
 }
 
 // PUBLICATION OWNER FUNCTIONS

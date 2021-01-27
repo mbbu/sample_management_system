@@ -7,7 +7,7 @@ from flask_jwt_extended import get_jwt_identity
 
 from api import BaseResource
 from api.constants import SYSADMIN, FORBIDDEN_FUNCTION_ACCESS_RESPONSE, FORBIDDEN_FUNCTION_ACCESS_RESPONSE_CODE, \
-    THEMEADMIN
+    THEMEADMIN, RESEARCHER, LAB_ADMIN
 from api.models import User, Sample, Role, Publication
 from api.utils import get_user_by_email
 
@@ -42,8 +42,10 @@ def is_theme_admin(theme_admin_restricted_func):
         user = get_user_by_email(get_jwt_identity())
 
         theme_admin = User.query.filter(User.id == user.id, user.role.code == THEMEADMIN).first()
+        researcher = User.query.filter(User.id == user.id, user.role.code == RESEARCHER).first()
+        lab_admin = User.query.filter(User.id == user.id, user.role.code == LAB_ADMIN).first()
         sys_admin = User.query.filter(User.id == user.id, user.role.code == SYSADMIN).first()
-        if not theme_admin and not sys_admin:
+        if not theme_admin and not researcher and not lab_admin and not sys_admin:
             return BaseResource.send_json_message(FORBIDDEN_FUNCTION_ACCESS_RESPONSE,
                                                   FORBIDDEN_FUNCTION_ACCESS_RESPONSE_CODE)
         return theme_admin_restricted_func(*args, **kwargs)
