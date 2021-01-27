@@ -53,6 +53,27 @@ def is_theme_admin(theme_admin_restricted_func):
     return wrapper
 
 
+def is_researcher(researcher_restricted_func):
+    """
+    Decorator func to check if the user is the admin before executing a function
+    :param researcher_restricted_func:
+    :return:
+    """
+
+    def wrapper(*args, **kwargs):
+        user = get_user_by_email(get_jwt_identity())
+
+        theme_admin = User.query.filter(User.id == user.id, user.role.code == THEMEADMIN).first()
+        researcher = User.query.filter(User.id == user.id, user.role.code == RESEARCHER).first()
+        sys_admin = User.query.filter(User.id == user.id, user.role.code == SYSADMIN).first()
+        if not theme_admin and not researcher and not sys_admin:
+            return BaseResource.send_json_message(FORBIDDEN_FUNCTION_ACCESS_RESPONSE,
+                                                  FORBIDDEN_FUNCTION_ACCESS_RESPONSE_CODE)
+        return researcher_restricted_func(*args, **kwargs)
+
+    return wrapper
+
+
 def is_sample_owner(sample_restricted_func):
     """
     Decorator func to check if the user is the admin before executing a function
