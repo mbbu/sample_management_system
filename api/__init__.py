@@ -127,8 +127,6 @@ def register_resources(app):
     # api.handle_error(500)
     # api.error_router()
 
-    # TODO: register resources here
-
 
 def config_app(app_instance):
     config_type = get_config_type()
@@ -227,4 +225,5 @@ def create_app(test_config=None):
         return BaseResource.send_json_message('An unexpected error occurred!'
                                               'But stay put the administrator has been notified.'
                                               'Sorry for the inconvenience!', 500)
+
     return app

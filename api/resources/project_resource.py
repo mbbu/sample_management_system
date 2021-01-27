@@ -118,8 +118,8 @@ class ProjectResource(BaseResource):
             return BaseResource.send_json_message("Project not found", 404)
 
         BaseModel.db.session.delete(project)
-        BaseModel.db.session.commit()
         log_delete(project)
+        BaseModel.db.session.commit()
         return BaseResource.send_json_message("Project deleted", 200)
 
     @staticmethod
