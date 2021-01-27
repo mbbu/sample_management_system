@@ -8,11 +8,11 @@ class Project(BaseModel.db.Model, SearchableMixin):
 
     AppDb = BaseModel.db
     id = AppDb.Column(AppDb.Integer, primary_key=True)
-    code = AppDb.Column(AppDb.String(20), nullable=False, unique=True, index=True)
+    code = AppDb.Column(AppDb.String(60), nullable=False, unique=True, index=True)
     theme_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('theme.id', ondelete='SET NULL'), nullable=False)
     name = AppDb.Column(AppDb.String(255), nullable=False, index=True)
     head = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('users.id', ondelete='SET NULL'), nullable=False)
-    description = AppDb.Column(AppDb.String(255), nullable=True)
+    description = AppDb.Column(AppDb.Text, nullable=True)
 
     # relationship(s) defined here
     samples = AppDb.relationship('Sample', backref='project', lazy=True)
