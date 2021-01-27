@@ -27,7 +27,7 @@ class Sample(BaseModel.db.Model, SearchableMixin):
     location_collected = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('study_block.id', ondelete='SET NULL'),
                                       nullable=True, index=True)
     project_id = AppDb.Column(AppDb.Integer, AppDb.ForeignKey('project.id', ondelete='CASCADE'),
-                              nullable=False, index=True)
+                              nullable=True, index=True)
     retention_date = AppDb.Column(AppDb.DateTime, nullable=True)
     barcode = AppDb.Column(AppDb.String(100), nullable=True)
     analysis = AppDb.Column(AppDb.String(100), nullable=True)
