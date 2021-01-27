@@ -23,7 +23,7 @@ def send_confirmation_email(email):
 
 class EmailConfirmationResource(BaseResource):
     fields = {
-        'role.name': fields.String,
+        'role.code': fields.String,
         'email': fields.String,
         'first_name': fields.String,
         'last_name': fields.String
