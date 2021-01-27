@@ -12,6 +12,8 @@ import axios from 'axios';
 import VueAxios from 'vue-axios';
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome'
 import Loading from 'vue-loading-overlay';
+import titleMixin from '@/mixins/titleMixin'
+
 
 
 // logging options
@@ -44,6 +46,7 @@ Vue.use(VueLogger, options);
 Vue.use(FlashMessage, flash_config);
 Vue.use(Loading);
 Vue.use(Page, pagination_config)
+Vue.mixin(titleMixin)
 import VueProgress from 'vue-progress-path'
 Vue.use(VueProgress, {
   defaultShape: 'circle',
