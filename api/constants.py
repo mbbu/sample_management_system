@@ -40,7 +40,7 @@ EMAIL_TOKEN_EXPIRATION = 3600  # equivalent to 1 hour
 EXPIRATION_AS_HR = EMAIL_TOKEN_EXPIRATION / (60 * 60)
 
 # Email sender
-ADMIN_EMAIL = 'icipe.samplemanagementsystem@gmail.com'
+ADMIN_EMAIL = os.environ.get('MAIL_USERNAME')
 
 # role constants
 SYSADMIN = "-1"
